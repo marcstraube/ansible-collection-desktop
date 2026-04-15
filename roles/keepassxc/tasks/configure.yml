@@ -1,0 +1,153 @@
+---
+#
+# KeePassXC Configure Tasks
+#
+
+- name: Configure | Create config directories
+  ansible.builtin.file:
+    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}'
+    state: directory
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0700'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+# General
+- name: Configure | General settings
+  community.general.ini_file:
+    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    section: 'General'
+    option: 'ConfigVersion'
+    value: '{{ keepassxc_config.General.ConfigVersion | default(2) }}'
+    no_extra_spaces: true
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0600'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+# Browser
+- name: Configure | Browser integration
+  community.general.ini_file:
+    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    section: 'Browser'
+    option: 'Enabled'
+    value: '{{ item.browser_integration | default(keepassxc_browser_integration_enabled) | string | lower }}'
+    no_extra_spaces: true
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0600'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+# FdoSecrets
+- name: Configure | Secret Service (FdoSecrets)
+  community.general.ini_file:
+    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    section: 'FdoSecrets'
+    option: 'Enabled'
+    value: '{{ item.secret_service | default(keepassxc_secret_service_enabled) | string | lower }}'
+    no_extra_spaces: true
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0600'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+# GUI
+- name: Configure | GUI settings
+  community.general.ini_file:
+    path: '/home/{{ item.0.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    section: 'GUI'
+    option: '{{ item.1.option }}'
+    value: '{{ item.0.config[item.1.option] | default(item.1.value) | string | lower }}'
+    no_extra_spaces: true
+    owner: '{{ item.0.name }}'
+    group: '{{ item.0.group | default(item.0.name) }}'
+    mode: '0600'
+  loop: >-
+    {{ keepassxc_users | product([
+         {'option': 'DarkTrayIcon', 'value': keepassxc_config.GUI.DarkTrayIcon | default(false)},
+         {'option': 'HidePasswords', 'value': keepassxc_config.GUI.HidePasswords | default(true)},
+         {'option': 'HideUsernames', 'value': keepassxc_config.GUI.HideUsernames | default(false)},
+         {'option': 'MinimizeToTray', 'value': keepassxc_config.GUI.MinimizeToTray | default(true)},
+         {'option': 'ShowTrayIcon', 'value': keepassxc_config.GUI.ShowTrayIcon | default(true)}
+       ]) | list }}
+  loop_control:
+    label: '{{ item.0.name }}: GUI.{{ item.1.option }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.0.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+# SSHAgent
+- name: Configure | SSH Agent
+  community.general.ini_file:
+    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    section: 'SSHAgent'
+    option: 'Enabled'
+    value: '{{ item.ssh_agent | default(keepassxc_ssh_agent_enabled) | string | lower }}'
+    no_extra_spaces: true
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0600'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+# Security
+- name: Configure | Security settings
+  community.general.ini_file:
+    path: '/home/{{ item.0.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    section: 'Security'
+    option: '{{ item.1.option }}'
+    value: '{{ item.0.config[item.1.option] | default(item.1.value) | string | lower }}'
+    no_extra_spaces: true
+    owner: '{{ item.0.name }}'
+    group: '{{ item.0.group | default(item.0.name) }}'
+    mode: '0600'
+  loop: >-
+    {{ keepassxc_users | product([
+         {'option': 'ClearClipboard',
+          'value': keepassxc_config.Security.ClearClipboard | default(true)},
+         {'option': 'ClearClipboardTimeout',
+          'value': keepassxc_config.Security.ClearClipboardTimeout | default(10)},
+         {'option': 'HideNotes',
+          'value': keepassxc_config.Security.HideNotes | default(true)},
+         {'option': 'IconDownloadFallback',
+          'value': keepassxc_config.Security.IconDownloadFallback | default(false)},
+         {'option': 'LockDatabaseIdle',
+          'value': keepassxc_config.Security.LockDatabaseIdle | default(true)},
+         {'option': 'LockDatabaseIdleSeconds',
+          'value': keepassxc_config.Security.LockDatabaseIdleSeconds | default(300)},
+         {'option': 'LockDatabaseMinimize',
+          'value': keepassxc_config.Security.LockDatabaseMinimize | default(false)},
+         {'option': 'LockDatabaseScreenLock',
+          'value': keepassxc_config.Security.LockDatabaseScreenLock | default(true)},
+         {'option': 'RelockAutoType',
+          'value': keepassxc_config.Security.RelockAutoType | default(false)}
+       ]) | list }}
+  loop_control:
+    label: '{{ item.0.name }}: Security.{{ item.1.option }}'
+  when:
+    - keepassxc_users | length > 0
+    - (item.0.mode | default(keepassxc_user_config_mode)) != 'disabled'

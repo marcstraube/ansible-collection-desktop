@@ -1,0 +1,106 @@
+---
+#
+# ComfyUI - Stable Diffusion Node-Based UI
+#
+# Global install to ai_comfyui_install_dir with dedicated service user
+
+- name: ComfyUI | Install ComfyUI system dependencies
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_comfyui_venv_packages }}'
+    state: present
+
+- name: ComfyUI | Create ComfyUI service user
+  become: true
+  ansible.builtin.user:
+    name: '{{ ai_comfyui_user }}'
+    group: '{{ ai_comfyui_group }}'
+    system: true
+    home: '{{ ai_comfyui_install_dir }}'
+    create_home: false
+    shell: /usr/sbin/nologin
+
+- name: ComfyUI | Create ComfyUI install directory
+  become: true
+  ansible.builtin.file:
+    path: '{{ ai_comfyui_install_dir }}'
+    state: directory
+    owner: '{{ ai_comfyui_user }}'
+    group: '{{ ai_comfyui_group }}'
+    mode: '0755'
+
+- name: ComfyUI | Clone ComfyUI repository
+  become: true
+  become_user: '{{ ai_comfyui_user }}'
+  ansible.builtin.git:
+    repo: '{{ __ai_comfyui_repo_url }}'
+    dest: '{{ ai_comfyui_install_dir }}'
+    version: '{{ ai_comfyui_version }}'
+    update: true
+
+- name: ComfyUI | Create ComfyUI Python virtual environment
+  become: true
+  become_user: '{{ ai_comfyui_user }}'
+  ansible.builtin.command:
+    cmd: '{{ __ai_comfyui_python }} -m venv venv'
+    chdir: '{{ ai_comfyui_install_dir }}'
+    creates: '{{ ai_comfyui_install_dir }}/venv/bin/activate'
+
+- name: ComfyUI | Install PyTorch (NVIDIA CUDA)
+  become: true
+  become_user: '{{ ai_comfyui_user }}'
+  ansible.builtin.pip:
+    name:
+      - torch
+      - torchvision
+      - torchaudio
+    extra_args: '--index-url https://download.pytorch.org/whl/cu126'
+    virtualenv: '{{ ai_comfyui_install_dir }}/venv'
+  when: ai_comfyui_gpu == 'nvidia'
+
+- name: ComfyUI | Install PyTorch (AMD ROCm)
+  become: true
+  become_user: '{{ ai_comfyui_user }}'
+  ansible.builtin.pip:
+    name:
+      - torch
+      - torchvision
+      - torchaudio
+    extra_args: '--index-url https://download.pytorch.org/whl/rocm6.2.4'
+    virtualenv: '{{ ai_comfyui_install_dir }}/venv'
+  when: ai_comfyui_gpu == 'amd'
+
+- name: ComfyUI | Install ComfyUI requirements
+  become: true
+  become_user: '{{ ai_comfyui_user }}'
+  ansible.builtin.pip:
+    requirements: '{{ ai_comfyui_install_dir }}/requirements.txt'
+    virtualenv: '{{ ai_comfyui_install_dir }}/venv'
+
+- name: ComfyUI | Clone ComfyUI-Manager
+  become: true
+  become_user: '{{ ai_comfyui_user }}'
+  ansible.builtin.git:
+    repo: '{{ __ai_comfyui_manager_repo_url }}'
+    dest: '{{ ai_comfyui_install_dir }}/custom_nodes/ComfyUI-Manager'
+    version: 'main'
+    update: true
+  when: ai_comfyui_manager_enabled | bool
+
+- name: ComfyUI | Deploy ComfyUI systemd service
+  become: true
+  ansible.builtin.template:
+    src: comfyui.service.j2
+    dest: /etc/systemd/system/comfyui.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart ComfyUI
+
+- name: ComfyUI | Manage ComfyUI service
+  become: true
+  ansible.builtin.systemd_service:
+    name: comfyui.service
+    enabled: "{{ ai_comfyui_service_enabled | bool }}"
+    state: "{{ ai_comfyui_service_enabled | bool | ternary('started', 'stopped') }}"
+    daemon_reload: true

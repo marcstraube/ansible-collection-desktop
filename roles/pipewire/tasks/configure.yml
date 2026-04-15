@@ -1,0 +1,21 @@
+---
+#
+# PipeWire Configuration Tasks
+#
+
+- name: Configure | Ensure config directory exists
+  ansible.builtin.file:
+    path: '{{ __pipewire_config_dir }}/pipewire.conf.d'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure | Deploy custom PipeWire config
+  ansible.builtin.template:
+    src: 'pipewire.conf.j2'
+    dest: '{{ __pipewire_config_dir }}/pipewire.conf.d/99-custom.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart PipeWire

@@ -1,0 +1,289 @@
+---
+# =============================================================================
+# Desktop Workstation Full Playbook
+# =============================================================================
+# Complete desktop workstation setup with ALL optional tools:
+# - Base system (from desktop_workstation.yml)
+# - CAD applications (OpenSCAD, FreeCAD)
+# - Professional imaging (VueScan, advanced scanners)
+# - Tabletop RPG tools (Wonderdraft, Dungeondraft)
+# - Advanced file managers (vifm, Midnight Commander)
+# - Graphics applications (GIMP, Krita, Inkscape)
+# - Multimedia production (VLC, Audacity, FFMultiConverter)
+# - Download managers (Transmission)
+# - Gaming (Wine, Lutris, RetroArch)
+# - Security apps (VeraCrypt, hardware wallets)
+# - Communication (Slack, Telegram, Threema)
+# - Remote access (Remmina, RustDesk)
+# - System utilities (GParted, Filelight, Solaar)
+#
+# Usage:
+#   ansible-playbook marcstraube.desktop.workstation_full
+# =============================================================================
+
+- name: Import base workstation setup
+  ansible.builtin.import_playbook: desktop_workstation.yml
+
+- name: Deploy Full Workstation Features
+  hosts: workstations
+  become: true
+  gather_facts: true
+
+  vars:
+    # =========================================================================
+    # EXTENDED APPLICATIONS (ALL ENABLED FOR FULL SETUP)
+    # =========================================================================
+
+    # CAD & 3D modeling
+    cad_enabled: true
+    cad_openscad: true
+    cad_freecad: false     # Optional: Heavy, enable if needed
+    cad_blender: false     # Optional: Very heavy, enable if needed
+
+    # Professional imaging & scanning
+    imaging_enabled: true
+    imaging_vuescan: true
+    imaging_sane: true
+    imaging_xsane: true
+
+    # Tabletop RPG tools
+    tabletop_enabled: true
+    tabletop_wonderdraft: true
+    tabletop_dungeondraft: true
+
+    # Advanced file managers
+    filemanagers_enabled: true
+    filemanagers_vifm: true
+    filemanagers_mc: true
+    filemanagers_ranger: false    # Optional: Python-based
+
+    # Graphics applications
+    graphics_apps_enabled: true
+    graphics_apps_gimp: true
+    graphics_apps_krita: true
+    graphics_apps_inkscape: true
+    graphics_apps_xnconvert: true
+
+    # Multimedia production
+    multimedia_enabled: true
+    multimedia_vlc: true
+    multimedia_audacity: true
+    multimedia_ffmulticonverter: true
+    multimedia_peek: true
+    multimedia_kdenlive: false    # Optional: Video editing, heavy
+
+    # Download managers
+    downloads_enabled: true
+    downloads_transmission: true
+    downloads_qbittorrent: false  # Alternative to Transmission
+
+    # Gaming
+    gaming_enabled: true
+    gaming_wine: true
+    gaming_lutris: true
+    gaming_retroarch: true
+    gaming_playback: true
+    gaming_steam: false           # Optional: Proprietary, large
+
+    # Security applications
+    security_apps_enabled: true
+    security_apps_veracrypt: true
+    security_apps_cypherock: true
+    security_apps_ledger: false   # Optional: If using Ledger hardware wallet
+
+    # Communication
+    communication_enabled: true
+    communication_slack: true
+    communication_telegram: true
+    communication_threema: true
+    communication_sieve: true
+    communication_signal: false   # Optional
+    communication_discord: false  # Optional
+
+    # Remote access
+    remote_access_enabled: true
+    remote_access_remmina: true
+    remote_access_rustdesk: true
+    remote_access_asbru: true
+    remote_access_tigervnc: false # Optional
+
+    # System utilities
+    system_apps_enabled: true
+    system_apps_gparted: true
+    system_apps_filelight: true
+    system_apps_solaar: true
+    system_apps_baobab: false     # Duplicate of Filelight (GNOME)
+
+  tasks:
+    # =========================================================================
+    # CAD APPLICATIONS
+    # =========================================================================
+
+    - name: CAD | Include cad role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.cad
+      when: cad_enabled | bool
+      tags:
+        - cad
+        - applications
+
+    # =========================================================================
+    # IMAGING & SCANNING
+    # =========================================================================
+
+    - name: Imaging | Include imaging role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.imaging
+      when: imaging_enabled | bool
+      tags:
+        - imaging
+        - applications
+
+    # =========================================================================
+    # TABLETOP RPG TOOLS
+    # =========================================================================
+
+    - name: Tabletop | Include tabletop role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.tabletop
+      when: tabletop_enabled | bool
+      tags:
+        - tabletop
+        - applications
+
+    # =========================================================================
+    # FILE MANAGERS
+    # =========================================================================
+
+    - name: File Managers | Include filemanagers role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.filemanagers
+      when: filemanagers_enabled | bool
+      tags:
+        - filemanagers
+        - applications
+
+    # =========================================================================
+    # GRAPHICS APPLICATIONS
+    # =========================================================================
+
+    - name: Graphics | Include graphics_apps role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.graphics_apps
+      when: graphics_apps_enabled | bool
+      tags:
+        - graphics
+        - applications
+
+    # =========================================================================
+    # MULTIMEDIA
+    # =========================================================================
+
+    - name: Multimedia | Include multimedia role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.multimedia
+      when: multimedia_enabled | bool
+      tags:
+        - multimedia
+        - applications
+
+    # =========================================================================
+    # DOWNLOADS
+    # =========================================================================
+
+    - name: Downloads | Include downloads role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.downloads
+      when: downloads_enabled | bool
+      tags:
+        - downloads
+        - applications
+
+    # =========================================================================
+    # GAMING
+    # =========================================================================
+
+    - name: Gaming | Include gaming role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.gaming
+      when: gaming_enabled | bool
+      tags:
+        - gaming
+        - applications
+
+    # =========================================================================
+    # SECURITY APPLICATIONS
+    # =========================================================================
+
+    - name: Security Apps | Include security_apps role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.security_apps
+      when: security_apps_enabled | bool
+      tags:
+        - security
+        - applications
+
+    # =========================================================================
+    # COMMUNICATION
+    # =========================================================================
+
+    - name: Communication | Include communication role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.communication
+      when: communication_enabled | bool
+      tags:
+        - communication
+        - applications
+
+    # =========================================================================
+    # REMOTE ACCESS
+    # =========================================================================
+
+    - name: Remote Access | Include remote_access role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.remote_access
+      when: remote_access_enabled | bool
+      tags:
+        - remote
+        - applications
+
+    # =========================================================================
+    # SYSTEM UTILITIES
+    # =========================================================================
+
+    - name: System Apps | Include system_apps role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.system_apps
+      when: system_apps_enabled | bool
+      tags:
+        - system
+        - applications
+
+  post_tasks:
+    - name: Summary | Display installation summary
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "Full Desktop Workstation Deployment Complete!"
+          - "============================================================"
+          - ""
+          - "Extended Applications Installed:"
+          - "  - CAD: {{ 'ENABLED' if cad_enabled else 'DISABLED' }}"
+          - "  - Imaging: {{ 'ENABLED' if imaging_enabled else 'DISABLED' }}"
+          - "  - Tabletop: {{ 'ENABLED' if tabletop_enabled else 'DISABLED' }}"
+          - "  - File Managers: {{ 'ENABLED' if filemanagers_enabled else 'DISABLED' }}"
+          - "  - Graphics Apps: {{ 'ENABLED' if graphics_apps_enabled else 'DISABLED' }}"
+          - "  - Multimedia: {{ 'ENABLED' if multimedia_enabled else 'DISABLED' }}"
+          - "  - Downloads: {{ 'ENABLED' if downloads_enabled else 'DISABLED' }}"
+          - "  - Gaming: {{ 'ENABLED' if gaming_enabled else 'DISABLED' }}"
+          - "  - Security Apps: {{ 'ENABLED' if security_apps_enabled else 'DISABLED' }}"
+          - "  - Communication: {{ 'ENABLED' if communication_enabled else 'DISABLED' }}"
+          - "  - Remote Access: {{ 'ENABLED' if remote_access_enabled else 'DISABLED' }}"
+          - "  - System Utilities: {{ 'ENABLED' if system_apps_enabled else 'DISABLED' }}"
+          - ""
+          - "Next Steps:"
+          - "  1. Configure application-specific settings"
+          - "  2. Import/sync application data"
+          - "  3. Run security playbook: ansible-playbook marcstraube.desktop.security"
+          - "  4. Reboot to ensure all services are running"
+          - "============================================================"

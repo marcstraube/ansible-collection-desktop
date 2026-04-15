@@ -1,0 +1,52 @@
+---
+#
+# KeePassXC Main Tasks
+#
+
+- name: Main | Derive users from users_list (exclude root and system users)
+  ansible.builtin.set_fact:
+    keepassxc_users: >-
+      {{ users_list | default([])
+         | rejectattr('name', 'equalto', 'root')
+         | selectattr('system', 'undefined') | list
+         + users_list | default([])
+         | rejectattr('name', 'equalto', 'root')
+         | selectattr('system', 'defined')
+         | rejectattr('system', 'equalto', true) | list }}
+  when:
+    - keepassxc_enabled | bool
+    - keepassxc_users | length == 0
+    - users_list is defined
+    - users_list | length > 0
+  tags:
+    - keepassxc
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when: keepassxc_enabled | bool
+  tags:
+    - keepassxc
+
+- name: Main | Import secret service tasks
+  ansible.builtin.import_tasks: secret_service.yml
+  when:
+    - keepassxc_enabled | bool
+    - keepassxc_secret_service_enabled | bool
+  tags:
+    - keepassxc
+
+- name: Main | Import autostart tasks
+  ansible.builtin.import_tasks: autostart.yml
+  when:
+    - keepassxc_enabled | bool
+    - keepassxc_autostart_enabled | bool
+  tags:
+    - keepassxc
+
+- name: Main | Import configure tasks
+  ansible.builtin.import_tasks: configure.yml
+  when:
+    - keepassxc_enabled | bool
+    - keepassxc_deploy_config_enabled | bool or keepassxc_users | length > 0
+  tags:
+    - keepassxc

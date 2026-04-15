@@ -1,0 +1,18 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    tuxedo_enabled: true
+    tuxedo_drivers_enabled: false
+    tuxedo_control_center_enabled: false
+    tuxedo_yt6801_ethernet_enabled: false
+    tuxedo_tccd_enabled: false
+    tuxedo_tccd_sleep_enabled: false
+    tuxedo_warn_conflicts: true
+
+  tasks:
+    - name: Converge | Include tuxedo role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

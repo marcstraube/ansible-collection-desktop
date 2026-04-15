@@ -1,0 +1,18 @@
+---
+#
+# AI Tools Handlers
+#
+
+- name: Restart Ollama
+  become: true
+  ansible.builtin.systemd_service:
+    name: '{{ __ai_ollama_service }}'
+    state: restarted
+  when: ai_ollama_service_enabled | bool
+
+- name: Restart ComfyUI
+  become: true
+  ansible.builtin.systemd_service:
+    name: comfyui.service
+    state: restarted
+  when: ai_comfyui_service_enabled | bool

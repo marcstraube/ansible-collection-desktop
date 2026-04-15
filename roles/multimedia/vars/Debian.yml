@@ -1,0 +1,18 @@
+---
+#
+# Debian Variables
+#
+
+__multimedia_vlc_package: 'vlc'
+__multimedia_mpv_package: 'mpv'
+__multimedia_audacity_package: 'audacity'
+__multimedia_ardour_package: 'ardour'
+__multimedia_kdenlive_package: 'kdenlive'
+__multimedia_openshot_package: 'openshot-qt'
+__multimedia_ffmulticonverter_package: 'ffmulticonverter'
+__multimedia_handbrake_package: 'handbrake'
+__multimedia_peek_package: 'peek'
+__multimedia_obs_package: 'obs-studio'
+__multimedia_simplescreenrecorder_package: 'simplescreenrecorder'
+__multimedia_rhythmbox_package: 'rhythmbox'
+__multimedia_cava_package: 'cava'

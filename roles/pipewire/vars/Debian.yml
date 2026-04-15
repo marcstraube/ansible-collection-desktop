@@ -1,0 +1,51 @@
+---
+#
+# Debian Variables
+#
+
+__pipewire_packages:
+  - pipewire
+
+__pipewire_audio_packages:
+  - pipewire-audio-client-libraries
+
+__pipewire_session_managers:
+  wireplumber: wireplumber
+  pipewire-media-session: pipewire-media-session
+
+__pipewire_pulse_package: pipewire-pulse
+__pipewire_alsa_package: pipewire-alsa
+__pipewire_jack_package: pipewire-jack
+# Not packaged separately on Debian
+__pipewire_zeroconf_package: ''
+
+__pipewire_bluetooth_packages:
+  - libspa-0.2-bluetooth
+
+__pipewire_32bit_packages:
+  - libpipewire-0.3-0:i386
+
+# Use rtkit instead of realtime-privileges
+__pipewire_realtime_package: ''
+__pipewire_realtime_group: audio
+
+__pipewire_volume_control_packages:
+  pavucontrol: pavucontrol
+  none: ''
+
+__pipewire_patchbay_packages:
+  helvum: helvum
+  qpwgraph: qpwgraph
+  none: ''
+
+__pipewire_pulseaudio_packages:
+  - pulseaudio
+  - pulseaudio-module-bluetooth
+
+__pipewire_config_dir: /etc/pipewire
+__pipewire_user_config_dir: .config/pipewire
+
+__pipewire_user_services:
+  - pipewire.service
+  - pipewire-pulse.service
+  - wireplumber.service

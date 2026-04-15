@@ -1,0 +1,40 @@
+---
+#
+# Plymouth Main Tasks
+#
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - plymouth
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when: plymouth_enabled | bool
+  tags:
+    - plymouth
+    - plymouth:install
+
+- name: Main | Import configure tasks
+  ansible.builtin.import_tasks: configure.yml
+  when: plymouth_enabled | bool
+  tags:
+    - plymouth
+    - plymouth:configure
+
+- name: Main | Import kernel tasks
+  ansible.builtin.import_tasks: kernel.yml
+  when:
+    - plymouth_enabled | bool
+    - plymouth_kernel_params_enabled | bool
+  tags:
+    - plymouth
+    - plymouth:kernel

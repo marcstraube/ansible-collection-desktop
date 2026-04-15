@@ -1,0 +1,22 @@
+---
+#
+# Arch Linux Variables
+#
+
+# Official repository packages
+__remote_access_remmina_package: remmina
+__remote_access_tigervnc_package: tigervnc
+__remote_access_freerdp_package: freerdp
+
+# AUR packages (dict keyed by purpose)
+__remote_access_aur_packages:
+  rustdesk:
+    - rustdesk-bin
+  asbru:
+    - asbru-cm
+  realvnc:
+    - realvnc-vnc-viewer
+  anydesk:
+    - anydesk-bin
+  teamviewer:
+    - teamviewer

@@ -1,0 +1,18 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=KeePassXC Password Manager
+Documentation=https://keepassxc.org/docs/
+After=graphical-session.target
+
+[Service]
+Type=simple
+{% if item.delay is defined and item.delay > 0 %}
+ExecStartPre=/usr/bin/sleep {{ item.delay }}
+{% endif %}
+ExecStart=/usr/bin/keepassxc
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,34 @@
+---
+#
+# Package Names
+#
+
+# GParted disk partition editor
+__system_apps_gparted_package: 'gparted'
+
+# Filelight disk usage analyzer
+__system_apps_filelight_package: 'filelight'
+
+# Baobab (GNOME disk usage analyzer)
+__system_apps_baobab_package: 'baobab'
+
+# Solaar Logitech device manager
+__system_apps_solaar_package: 'solaar'
+
+# GNOME System Monitor
+__system_apps_gnome_system_monitor_package: 'gnome-system-monitor'
+
+# KDE Plasma System Monitor
+__system_apps_plasma_system_monitor_package: 'plasma-systemmonitor'
+
+# Timeshift system snapshot manager
+__system_apps_timeshift_package: 'timeshift'
+
+# Deja Dup backup utility
+__system_apps_deja_dup_package: 'deja-dup'
+
+# Seahorse GNOME keyring manager
+__system_apps_seahorse_package: 'seahorse'
+
+# dconf Editor settings browser
+__system_apps_dconf_editor_package: 'dconf-editor'

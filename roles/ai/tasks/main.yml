@@ -1,0 +1,67 @@
+---
+#
+# AI Tools Main Tasks
+#
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - ai
+
+- name: Main | Include CLI tools
+  ansible.builtin.include_tasks:
+    file: cli.yml
+    apply:
+      tags:
+        - ai
+        - ai:cli
+  when: ai_enabled | bool
+  tags:
+    - ai
+    - ai:cli
+
+- name: Main | Include desktop applications
+  ansible.builtin.include_tasks:
+    file: desktop.yml
+    apply:
+      tags:
+        - ai
+        - ai:desktop
+  when: ai_enabled | bool
+  tags:
+    - ai
+    - ai:desktop
+
+- name: Main | Include local AI tools
+  ansible.builtin.include_tasks:
+    file: local.yml
+    apply:
+      tags:
+        - ai
+        - ai:local
+  when: ai_enabled | bool
+  tags:
+    - ai
+    - ai:local
+
+- name: Main | Include ComfyUI tasks
+  ansible.builtin.include_tasks:
+    file: comfyui.yml
+    apply:
+      tags:
+        - ai
+        - ai:comfyui
+  when:
+    - ai_enabled | bool
+    - ai_comfyui_enabled | bool
+  tags:
+    - ai
+    - ai:comfyui

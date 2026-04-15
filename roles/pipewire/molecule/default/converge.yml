@@ -1,0 +1,25 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    pipewire_enabled: true
+    pipewire_service_enabled: false
+    pipewire_audio_enabled: true
+    pipewire_session_manager: 'wireplumber'
+    pipewire_pulseaudio_enabled: true
+    pipewire_alsa_enabled: true
+    pipewire_jack_enabled: false
+    pipewire_bluetooth_enabled: false
+    pipewire_32bit_enabled: false
+    pipewire_realtime_enabled: false
+    pipewire_volume_control: 'none'
+    pipewire_patchbay: 'none'
+    pipewire_custom_config_enabled: false
+    pipewire_remove_pulseaudio_enabled: false
+
+  tasks:
+    - name: Converge | Include pipewire role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

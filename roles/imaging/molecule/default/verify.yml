@@ -1,0 +1,166 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Load OS-Specific Variables
+    #
+
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # SANE
+    #
+
+    - name: Verify | Check SANE installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __imaging_sane_package }}'
+      register: _imaging_sane_arch
+      changed_when: false
+      failed_when: _imaging_sane_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check SANE installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __imaging_sane_package }}'
+      register: _imaging_sane_deb
+      changed_when: false
+      failed_when: _imaging_sane_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check SANE installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __imaging_sane_package }}'
+      register: _imaging_sane_rpm
+      changed_when: false
+      failed_when: _imaging_sane_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # XSane
+    #
+
+    - name: Verify | Check XSane installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __imaging_xsane_package }}'
+      register: _imaging_xsane_arch
+      changed_when: false
+      failed_when: _imaging_xsane_arch.rc != 0
+      when:
+        - imaging_xsane_enabled | default(false) | bool
+        - ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check XSane installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __imaging_xsane_package }}'
+      register: _imaging_xsane_deb
+      changed_when: false
+      failed_when: _imaging_xsane_deb.rc != 0
+      when:
+        - imaging_xsane_enabled | default(false) | bool
+        - ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check XSane installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __imaging_xsane_package }}'
+      register: _imaging_xsane_rpm
+      changed_when: false
+      failed_when: _imaging_xsane_rpm.rc != 0
+      when:
+        - imaging_xsane_enabled | default(false) | bool
+        - ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Simple Scan
+    #
+
+    - name: Verify | Check Simple Scan installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __imaging_simple_scan_package }}'
+      register: _imaging_simple_scan_arch
+      changed_when: false
+      failed_when: _imaging_simple_scan_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check Simple Scan installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __imaging_simple_scan_package }}'
+      register: _imaging_simple_scan_deb
+      changed_when: false
+      failed_when: _imaging_simple_scan_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check Simple Scan installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __imaging_simple_scan_package }}'
+      register: _imaging_simple_scan_rpm
+      changed_when: false
+      failed_when: _imaging_simple_scan_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # ImageMagick
+    #
+
+    - name: Verify | Check ImageMagick installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __imaging_imagemagick_package }}'
+      register: _imaging_imagemagick_arch
+      changed_when: false
+      failed_when: _imaging_imagemagick_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check ImageMagick installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __imaging_imagemagick_package }}'
+      register: _imaging_imagemagick_deb
+      changed_when: false
+      failed_when: _imaging_imagemagick_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check ImageMagick installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __imaging_imagemagick_package }}'
+      register: _imaging_imagemagick_rpm
+      changed_when: false
+      failed_when: _imaging_imagemagick_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # GraphicsMagick
+    #
+
+    - name: Verify | Check GraphicsMagick installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __imaging_graphicsmagick_package }}'
+      register: _imaging_graphicsmagick_arch
+      changed_when: false
+      failed_when: _imaging_graphicsmagick_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check GraphicsMagick installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __imaging_graphicsmagick_package }}'
+      register: _imaging_graphicsmagick_deb
+      changed_when: false
+      failed_when: _imaging_graphicsmagick_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check GraphicsMagick installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __imaging_graphicsmagick_package }}'
+      register: _imaging_graphicsmagick_rpm
+      changed_when: false
+      failed_when: _imaging_graphicsmagick_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'

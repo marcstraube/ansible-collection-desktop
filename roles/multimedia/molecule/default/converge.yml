@@ -1,0 +1,25 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    multimedia_enabled: true
+    multimedia_vlc_enabled: true
+    multimedia_mpv_enabled: false
+    multimedia_audacity_enabled: false
+    multimedia_ardour_enabled: false
+    multimedia_kdenlive_enabled: false
+    multimedia_openshot_enabled: false
+    multimedia_ffmulticonverter_enabled: false
+    multimedia_handbrake_enabled: false
+    multimedia_peek_enabled: false
+    multimedia_obs_enabled: false
+    multimedia_simplescreenrecorder_enabled: false
+    multimedia_rhythmbox_enabled: false
+    multimedia_cava_enabled: false
+
+  tasks:
+    - name: Converge | Include multimedia role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

@@ -1,0 +1,157 @@
+---
+#
+# AI CLI Tools Installation
+#
+
+# Claude Code
+
+- name: CLI | Install Claude Code from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.claude_code }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_claude_code_enabled | bool
+
+- name: CLI | Install Claude Code via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: '@anthropic-ai/claude-code'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_claude_code_enabled | bool
+
+# Gemini CLI
+
+- name: CLI | Install Gemini CLI from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.gemini_cli }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_gemini_cli_enabled | bool
+
+- name: CLI | Install Gemini CLI via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: '@google/gemini-cli'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_gemini_cli_enabled | bool
+
+# OpenAI Codex
+
+- name: CLI | Install OpenAI Codex (Arch)
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_codex_package }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_codex_enabled | bool
+    - __ai_codex_package | length > 0
+
+- name: CLI | Install OpenAI Codex via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: '@openai/codex'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_codex_enabled | bool
+
+# OpenCode
+
+- name: CLI | Install OpenCode from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.opencode }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_opencode_enabled | bool
+
+- name: CLI | Install OpenCode via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: 'opencode-ai'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_opencode_enabled | bool
+
+- name: CLI | Install OpenCode Claude auth from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.opencode_claude_auth }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_opencode_enabled | bool
+    - ai_opencode_claude_auth_enabled | bool
+
+- name: CLI | Install OpenCode Claude auth via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: 'opencode-claude-auth'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_opencode_enabled | bool
+    - ai_opencode_claude_auth_enabled | bool
+
+- name: CLI | Install OpenCode Gemini auth from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.opencode_gemini_auth }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_opencode_enabled | bool
+    - ai_opencode_gemini_auth_enabled | bool
+
+- name: CLI | Install OpenCode Gemini auth via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: 'opencode-gemini-auth'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_opencode_enabled | bool
+    - ai_opencode_gemini_auth_enabled | bool
+
+# Aider
+
+- name: CLI | Install Aider from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.aider }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_aider_enabled | bool
+
+- name: CLI | Install Aider via pipx (non-Arch)
+  become: true
+  community.general.pipx:
+    name: 'aider-chat'
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_aider_enabled | bool

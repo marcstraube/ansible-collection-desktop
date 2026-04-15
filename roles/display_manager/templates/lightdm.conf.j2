@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+[Seat:*]
+greeter-session={{ __display_manager_lightdm_greeter_names[display_manager_lightdm_greeter] }}
+{% if display_manager_autologin_enabled | bool and display_manager_autologin_user %}
+autologin-user={{ display_manager_autologin_user }}
+{% if display_manager_autologin_session %}
+autologin-session={{ display_manager_autologin_session }}
+{% endif %}
+{% endif %}
+{% if display_manager_numlock | bool %}
+greeter-setup-script=/usr/bin/numlockx on
+{% endif %}

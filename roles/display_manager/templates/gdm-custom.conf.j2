@@ -1,0 +1,17 @@
+{{ ansible_managed | comment }}
+[daemon]
+{% if display_manager_autologin_enabled | bool and display_manager_autologin_user %}
+AutomaticLoginEnable=True
+AutomaticLogin={{ display_manager_autologin_user }}
+{% endif %}
+{% if not display_manager_gdm_wayland | bool %}
+WaylandEnable=false
+{% endif %}
+
+[security]
+
+[xdmcp]
+
+[chooser]
+
+[debug]

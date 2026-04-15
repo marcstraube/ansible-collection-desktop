@@ -1,0 +1,37 @@
+---
+#
+# Package Installation
+#
+
+- name: Install | Build package list
+  ansible.builtin.set_fact:
+    __terminal_install_packages: >-
+      {{ terminal_emulators | map('extract', __terminal_packages) | select('string') | list }}
+
+- name: Install | Add Kitty image support
+  ansible.builtin.set_fact:
+    __terminal_install_packages: >-
+      {{ __terminal_install_packages + __terminal_kitty_image_packages }}
+  when:
+    - "'kitty' in terminal_emulators"
+    - terminal_kitty_images_enabled | bool
+
+- name: Install | Filter empty packages
+  ansible.builtin.set_fact:
+    __terminal_install_packages: >-
+      {{ __terminal_install_packages | select('string') | reject('equalto', '') | unique | list }}
+
+- name: Install | Terminal emulator packages
+  ansible.builtin.package:
+    name: '{{ __terminal_install_packages }}'
+    state: present
+  when: __terminal_install_packages | length > 0
+
+- name: Install | Note about unavailable terminals
+  ansible.builtin.debug:
+    msg: >-
+      Terminal '{{ item }}' is not available in OS repositories.
+      Install manually or via Flatpak/AppImage.
+  loop: '{{ terminal_emulators }}'
+  when:
+    - __terminal_packages[item] | default('') | length == 0

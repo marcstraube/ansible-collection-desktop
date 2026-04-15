@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: Marc Straube
+  description: Install graphics and image editing applications
+  license: MIT
+  min_ansible_version: '2.17'
+
+  platforms:
+    - name: ArchLinux
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - trixie
+    - name: EL
+      versions:
+        - all
+
+  galaxy_tags:
+    - graphics
+    - gimp
+    - inkscape
+    - krita
+    - image
+    - editing
+    - desktop
+
+dependencies: []

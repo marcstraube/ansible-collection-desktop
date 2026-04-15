@@ -1,0 +1,41 @@
+---
+- name: Chromium | Ensure Chromium policies directories exist
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - '{{ __browser_chromium_policies_path }}/managed'
+    - '{{ __browser_chromium_policies_path }}/recommended'
+
+- name: Chromium | Deploy Chromium managed policies
+  ansible.builtin.template:
+    src: chromium-policies.json.j2
+    dest: '{{ __browser_chromium_policies_path }}/managed/policies.json'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Chromium | Ensure pacman hooks directory exists (Arch)
+  ansible.builtin.file:
+    path: '/etc/pacman.d/hooks'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_chromium_wayland_gestures_enabled | bool
+
+- name: Chromium | Deploy Chromium Wayland gestures hook (Arch)
+  ansible.builtin.template:
+    src: chromium-wayland-gestures.hook.j2
+    dest: '/etc/pacman.d/hooks/chromium-wayland-gestures.hook'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_chromium_wayland_gestures_enabled | bool

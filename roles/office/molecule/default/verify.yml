@@ -1,0 +1,44 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Load OS-Specific Variables
+    #
+
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # PDF Viewer
+    #
+
+    - name: Verify | Check evince is installed
+      ansible.builtin.package:
+        name: '{{ __office_pdf_viewers["evince"] }}'
+        state: present
+      check_mode: true
+      register: __office_evince_check
+      failed_when: __office_evince_check.changed
+
+    #
+    # Spell Checking
+    #
+
+    - name: Verify | Check hunspell packages are installed
+      ansible.builtin.package:
+        name: '{{ __office_hunspell_packages }}'
+        state: present
+      check_mode: true
+      register: __office_hunspell_check
+      failed_when: __office_hunspell_check.changed

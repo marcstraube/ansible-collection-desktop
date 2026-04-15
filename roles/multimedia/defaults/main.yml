@@ -1,0 +1,74 @@
+---
+#
+# Role Control
+#
+
+# Enable the multimedia role
+multimedia_enabled: true
+
+#
+# Video Players
+#
+
+# Enable VLC media player
+multimedia_vlc_enabled: true
+
+# Enable MPV media player
+multimedia_mpv_enabled: false
+
+#
+# Audio Editors
+#
+
+# Enable Audacity audio editor
+multimedia_audacity_enabled: true
+
+# Enable Ardour digital audio workstation
+multimedia_ardour_enabled: false
+
+#
+# Video Editors
+#
+
+# Enable Kdenlive video editor
+multimedia_kdenlive_enabled: false
+
+# Enable OpenShot video editor
+multimedia_openshot_enabled: false
+
+#
+# Converters
+#
+
+# Enable FFMultiConverter media file converter
+multimedia_ffmulticonverter_enabled: true
+
+# Enable HandBrake video transcoder
+multimedia_handbrake_enabled: false
+
+#
+# Screen Recording
+#
+
+# Enable Peek animated GIF recorder
+multimedia_peek_enabled: true
+
+# Enable OBS Studio streaming and recording
+multimedia_obs_enabled: false
+
+# Enable SimpleScreenRecorder
+multimedia_simplescreenrecorder_enabled: false
+
+#
+# Music Players
+#
+
+# Enable Rhythmbox GNOME music player
+multimedia_rhythmbox_enabled: false
+
+#
+# Audio Visualization
+#
+
+# Enable Cava console audio visualizer
+multimedia_cava_enabled: false

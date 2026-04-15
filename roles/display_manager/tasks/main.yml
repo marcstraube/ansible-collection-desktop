@@ -1,0 +1,38 @@
+---
+#
+# Display Manager Main Tasks
+#
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - display-manager
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when: display_manager_enabled | bool
+  tags:
+    - display-manager
+    - display-manager:install
+
+- name: Main | Import configure tasks
+  ansible.builtin.import_tasks: configure.yml
+  when: display_manager_enabled | bool
+  tags:
+    - display-manager
+    - display-manager:configure
+
+- name: Main | Import service tasks
+  ansible.builtin.import_tasks: service.yml
+  when: display_manager_enabled | bool
+  tags:
+    - display-manager
+    - display-manager:service

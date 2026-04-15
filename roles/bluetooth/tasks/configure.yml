@@ -1,0 +1,17 @@
+---
+- name: Configure | Ensure config directory exists
+  ansible.builtin.file:
+    path: '{{ __bluetooth_config_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure | Deploy main.conf
+  ansible.builtin.template:
+    src: 'main.conf.j2'
+    dest: '{{ __bluetooth_config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Bluetooth

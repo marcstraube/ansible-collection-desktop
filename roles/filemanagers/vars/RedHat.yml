@@ -1,0 +1,16 @@
+---
+#
+# RedHat Packages
+#
+
+__filemanagers_vifm_package: 'vifm'
+__filemanagers_mc_package: 'mc'
+__filemanagers_ranger_package: 'ranger'
+__filemanagers_nnn_package: 'nnn'
+__filemanagers_lf_package: ''
+__filemanagers_thunar_package: 'thunar'
+__filemanagers_dolphin_package: 'dolphin'
+__filemanagers_nautilus_package: 'nautilus'
+__filemanagers_pcmanfm_package: 'pcmanfm'
+__filemanagers_nemo_package: 'nemo'
+__filemanagers_doublecmd_package: ''

@@ -1,0 +1,22 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    remote_access_enabled: true
+    # Official packages only (no AUR) for testing
+    remote_access_remmina_enabled: true
+    remote_access_tigervnc_enabled: true
+    remote_access_freerdp_enabled: true
+    # Skip AUR packages in molecule tests
+    remote_access_rustdesk_enabled: false
+    remote_access_asbru_enabled: false
+    remote_access_realvnc_enabled: false
+    remote_access_anydesk_enabled: false
+    remote_access_teamviewer_enabled: false
+
+  tasks:
+    - name: Converge | Include remote_access role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

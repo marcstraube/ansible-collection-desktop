@@ -1,0 +1,41 @@
+---
+#
+# ArchLinux-specific variables for AI tools
+#
+
+# AUR packages
+__ai_aur_packages:
+  claude_code:
+    - claude-code
+  gemini_cli:
+    - gemini-cli
+  opencode:
+    - opencode-bin
+  opencode_claude_auth:
+    - opencode-claude-auth
+  opencode_gemini_auth:
+    - opencode-gemini-auth
+  aider:
+    - aider
+  claude_desktop:
+    - claude-desktop-bin
+  opencode_desktop:
+    - opencode-desktop-bin
+  lmstudio:
+    - lmstudio-appimage
+
+# CLI Tools
+__ai_codex_package: 'openai-codex'
+
+# Local AI
+__ai_ollama_package: 'ollama'
+
+# Service names
+__ai_ollama_service: 'ollama.service'
+
+# ComfyUI
+__ai_comfyui_python: 'python'
+__ai_comfyui_venv_packages:
+  - 'python'
+  - 'python-virtualenv'
+  - 'git'

@@ -1,0 +1,54 @@
+---
+- name: Install | VeraCrypt packages
+  ansible.builtin.package:
+    name: '{{ __security_apps_packages.veracrypt }}'
+    state: present
+  when:
+    - security_apps_veracrypt_enabled | bool
+    - __security_apps_packages.veracrypt is defined
+
+- name: Install | ClamTk packages
+  ansible.builtin.package:
+    name: '{{ __security_apps_packages.clamtk }}'
+    state: present
+  when:
+    - security_apps_clamtk_enabled | bool
+    - __security_apps_packages.clamtk is defined
+
+- name: Install | Gufw packages
+  ansible.builtin.package:
+    name: '{{ __security_apps_packages.gufw }}'
+    state: present
+  when:
+    - security_apps_gufw_enabled | bool
+    - __security_apps_packages.gufw is defined
+
+- name: Install | Cypherock CySync from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __security_apps_aur_packages.cypherock }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - security_apps_cypherock_enabled | bool
+
+- name: Install | Ledger Live from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __security_apps_aur_packages.ledger }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - security_apps_ledger_enabled | bool
+
+- name: Install | Trezor Suite from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __security_apps_aur_packages.trezor }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - security_apps_trezor_enabled | bool

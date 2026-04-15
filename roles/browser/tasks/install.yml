@@ -1,0 +1,136 @@
+---
+#
+# Firefox
+#
+
+- name: Install | Firefox packages
+  ansible.builtin.package:
+    name: '{{ __browser_firefox_package }}'
+    state: present
+  when: browser_firefox_enabled | bool
+
+- name: Install | Firefox language pack
+  ansible.builtin.package:
+    name: '{{ __browser_firefox_i18n_package }}'
+    state: present
+  when:
+    - browser_firefox_enabled | bool
+    - browser_firefox_i18n | length > 0
+
+#
+# LibreWolf (AUR on Arch, not available elsewhere)
+#
+
+- name: Install | LibreWolf from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __browser_aur_packages.librewolf }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_librewolf_enabled | bool
+
+- name: Install | LibreWolf not available notice
+  ansible.builtin.debug:
+    msg: >-
+      LibreWolf is not available in standard repositories for
+      {{ ansible_facts["os_family"] }}. Please install manually or via Flatpak.
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - browser_librewolf_enabled | bool
+
+#
+# Chromium
+#
+
+- name: Install | Chromium packages
+  ansible.builtin.package:
+    name: '{{ __browser_chromium_package }}'
+    state: present
+  when: browser_chromium_enabled | bool
+
+#
+# Brave (AUR on Arch, not available elsewhere)
+#
+
+- name: Install | Brave from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __browser_aur_packages.brave }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_brave_enabled | bool
+
+- name: Install | Brave not available notice
+  ansible.builtin.debug:
+    msg: >-
+      Brave is not available in standard repositories for
+      {{ ansible_facts["os_family"] }}. Please install manually or via Flatpak.
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - browser_brave_enabled | bool
+
+#
+# Tor Browser
+#
+
+- name: Install | Import Tor Browser GPG key (Arch)
+  become: true
+  become_user: 'aur_builder'
+  ansible.builtin.shell:
+    executable: /bin/bash
+    cmd: |
+      gpg --keyserver hkps://keys.openpgp.org \
+        --recv-keys EF6E286DDA85EA2A4BA7DE684E2C6E8793298290 2>/dev/null || \
+      gpg --keyserver hkps://keyserver.ubuntu.com \
+        --recv-keys EF6E286DDA85EA2A4BA7DE684E2C6E8793298290
+  register: __browser_tor_gpg
+  changed_when: "'imported' in __browser_tor_gpg.stderr"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_tor_enabled | bool
+
+- name: Install | Tor Browser from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __browser_aur_packages.tor }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_tor_enabled | bool
+
+- name: Install | Tor Browser packages
+  ansible.builtin.package:
+    name: '{{ __browser_tor_package }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - browser_tor_enabled | bool
+    - __browser_tor_package | length > 0
+
+#
+# Zen Browser (AUR on Arch only)
+#
+
+- name: Install | Zen Browser from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __browser_aur_packages.zen }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_zen_enabled | bool
+
+- name: Install | Zen Browser not available notice
+  ansible.builtin.debug:
+    msg: >-
+      Zen Browser is not available for {{ ansible_facts["os_family"] }}.
+      Please install via Flatpak or AppImage.
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - browser_zen_enabled | bool

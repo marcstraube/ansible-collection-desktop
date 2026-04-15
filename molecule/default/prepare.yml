@@ -1,0 +1,41 @@
+---
+# Prepare Docker containers for molecule testing
+# Creates aur_builder user (Arch) and installs base dependencies
+
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  tasks:
+    # =========================================================================
+    # ARCH LINUX
+    # =========================================================================
+
+    - name: Update pacman cache and upgrade (Arch)
+      community.general.pacman:
+        update_cache: true
+        upgrade: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Install base-devel and sudo (Arch)
+      community.general.pacman:
+        name:
+          - base-devel
+          - sudo
+        state: present
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Create aur_builder user (Arch)
+      ansible.builtin.user:
+        name: aur_builder
+        group: wheel
+        create_home: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Configure sudoers for aur_builder (Arch)
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/aur_builder
+        line: 'aur_builder ALL=(ALL) NOPASSWD: ALL'
+        create: true
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      when: ansible_facts['os_family'] == 'Archlinux'

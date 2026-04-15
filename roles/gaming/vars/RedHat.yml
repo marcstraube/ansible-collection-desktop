@@ -1,0 +1,12 @@
+---
+#
+# RedHat-Specific Variables
+#
+
+# Package names
+__gaming_lutris_package: 'lutris'
+__gaming_retroarch_package: ''
+__gaming_steam_package: ''
+__gaming_pcsx2_package: ''
+__gaming_dolphin_package: ''
+__gaming_moonlight_package: ''

@@ -1,0 +1,516 @@
+---
+# =============================================================================
+# Security Playbook (Universal - Workstation & Laptop)
+# =============================================================================
+# Comprehensive security hardening for desktops and laptops:
+# - Firewall (firewalld)
+# - AppArmor / MAC
+# - Disk encryption verification
+# - Secure DNS (DNS-over-TLS)
+# - Browser hardening
+# - Screen lock & session security
+# - USB/Bluetooth restrictions
+# - GnuPG & hardware token support
+#
+# Usage:
+#   ansible-playbook marcstraube.desktop.security
+#   ansible-playbook marcstraube.desktop.security -l laptops
+# =============================================================================
+
+- name: Apply Security Hardening
+  hosts: workstations:laptops
+  become: true
+  gather_facts: true
+
+  vars:
+    # =========================================================================
+    # COMPONENT TOGGLES
+    # =========================================================================
+
+    # Core security
+    desktop_firewall_enabled: true
+    desktop_apparmor_enabled: true
+    desktop_sysctl_enabled: true
+
+    # Network security
+    desktop_secure_dns_enabled: true
+    desktop_vpn_killswitch_enabled: false
+
+    # Device security
+    desktop_usb_guard_enabled: false  # Strict USB policy
+    desktop_bluetooth_hardening_enabled: true
+
+    # Application security
+    desktop_browser_hardening_enabled: true
+    desktop_flatpak_permissions_enabled: true
+
+    # Cryptography
+    desktop_gnupg_enabled: true
+    desktop_hardware_tokens_enabled: true
+
+    # Password management
+    desktop_keepassxc_enabled: true
+    desktop_keepassxc_secret_service: true  # Replace GNOME Keyring
+
+    # Session security
+    desktop_screen_lock_enabled: true
+    desktop_idle_timeout_enabled: true
+
+    # =========================================================================
+    # FIREWALL SETTINGS
+    # =========================================================================
+
+    # Default policy: drop all incoming, allow outgoing
+    firewall_default_zone: 'drop'
+
+    # Allowed services (minimal for desktop)
+    firewall_allowed_services: []
+    # Example for development:
+    #   - 'ssh'
+    #   - 'mdns'  # Avahi/Bonjour
+
+    # =========================================================================
+    # APPARMOR SETTINGS
+    # =========================================================================
+
+    apparmor_extra_profiles: true
+    apparmor_audit_denied: true
+    apparmor_notify: true
+
+    # =========================================================================
+    # SYSCTL HARDENING
+    # =========================================================================
+
+    sysctl_profile_security: true
+
+    # Additional desktop-specific settings
+    sysctl_extra_settings:
+      # Restrict kernel pointer leaks
+      kernel.kptr_restrict: 2
+      # Restrict dmesg access
+      kernel.dmesg_restrict: 1
+      # Disable magic SysRq (except for REISUB)
+      kernel.sysrq: 176
+      # Restrict unprivileged BPF
+      kernel.unprivileged_bpf_disabled: 1
+      # Restrict perf events
+      kernel.perf_event_paranoid: 3
+      # Restrict ptrace
+      kernel.yama.ptrace_scope: 2
+
+    # =========================================================================
+    # SECURE DNS SETTINGS
+    # =========================================================================
+
+    # DNS-over-TLS via systemd-resolved or Unbound
+    dns_method: 'systemd-resolved'  # or 'unbound'
+
+    # DoT upstream servers
+    dns_servers:
+      - '1.1.1.1#cloudflare-dns.com'
+      - '1.0.0.1#cloudflare-dns.com'
+      - '9.9.9.9#dns.quad9.net'
+
+    # DNSSEC validation
+    dns_dnssec: true
+
+    # =========================================================================
+    # BLUETOOTH HARDENING (Per security review)
+    # =========================================================================
+
+    # Timeout for discoverable mode (seconds, 0 = infinite - INSECURE)
+    bluetooth_discoverable_timeout: 180
+
+    # Timeout for pairable mode (seconds)
+    bluetooth_pairable_timeout: 180
+
+    # MAC address randomization: off, device, network
+    bluetooth_privacy: 'device'
+
+    # Disable Bluetooth when not in use
+    bluetooth_auto_enable: false
+
+    # =========================================================================
+    # BROWSER HARDENING (Per security review)
+    # =========================================================================
+
+    # Enable arkenfox user.js for Firefox
+    browser_firefox_user_js: true
+
+    # Extension policy: blocked = whitelist only
+    browser_extension_default_mode: 'blocked'
+
+    # Allowed extensions
+    browser_allowed_extensions:
+      - 'uBlock Origin'
+      - 'Bitwarden'
+      - 'Firefox Multi-Account Containers'
+
+    # Disable telemetry
+    browser_telemetry_disabled: true
+
+    # Disable WebRTC IP leak
+    browser_webrtc_disabled: false  # true breaks video calls
+
+    # =========================================================================
+    # USB GUARD SETTINGS
+    # =========================================================================
+
+    # Policy: block, allow, reject
+    usbguard_default_policy: 'block'
+
+    # Allow already connected devices
+    usbguard_allow_initial: true
+
+    # Whitelist patterns (customize per hardware)
+    usbguard_whitelist: []
+    # Example:
+    #   - 'allow id 1d6b:*'  # Linux Foundation hubs
+    #   - 'allow id 046d:*'  # Logitech
+
+    # =========================================================================
+    # SESSION SECURITY
+    # =========================================================================
+
+    # Screen lock timeout (seconds)
+    screen_lock_timeout: 300
+
+    # Idle timeout before lock (seconds)
+    idle_timeout: 600
+
+    # Lock on lid close
+    lock_on_lid_close: true
+
+    # Lock on suspend
+    lock_on_suspend: true
+
+    # =========================================================================
+    # GNUPG & HARDWARE TOKENS
+    # =========================================================================
+
+    # GPG agent timeout (seconds)
+    gpg_agent_default_cache_ttl: 600
+    gpg_agent_max_cache_ttl: 7200
+
+    # SSH support via GPG agent
+    gpg_agent_enable_ssh: true
+
+    # Hardware token types to support
+    hardware_tokens:
+      - 'yubikey'
+      - 'nitrokey'
+      - 'solokey'
+
+  pre_tasks:
+    - name: Pretasks | Check for full disk encryption
+      ansible.builtin.shell: |
+        set -o pipefail
+        lsblk -o NAME,FSTYPE,MOUNTPOINT | grep -E 'luks|crypt' || echo 'NO_ENCRYPTION'
+      register: __disk_encryption_check
+      changed_when: false
+      failed_when: false
+
+    - name: Pretasks | Warn if no disk encryption detected
+      ansible.builtin.debug:
+        msg:
+          - "⚠️  WARNING: No disk encryption detected!"
+          - ""
+          - "Full disk encryption (LUKS) is strongly recommended for desktops."
+          - "Without it, physical access allows complete data theft."
+          - ""
+          - "To enable: reinstall with encrypted root or encrypt /home partition."
+      when: "'NO_ENCRYPTION' in __disk_encryption_check.stdout"
+
+    - name: Pretasks | Display security configuration
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "DESKTOP SECURITY CONFIGURATION"
+          - "============================================================"
+          - "Firewall: {{ desktop_firewall_enabled }}"
+          - "AppArmor: {{ desktop_apparmor_enabled }}"
+          - "Sysctl hardening: {{ desktop_sysctl_enabled }}"
+          - "Secure DNS: {{ desktop_secure_dns_enabled }}"
+          - "USB Guard: {{ desktop_usb_guard_enabled }}"
+          - "Bluetooth hardening: {{ desktop_bluetooth_hardening_enabled }}"
+          - "Browser hardening: {{ desktop_browser_hardening_enabled }}"
+          - "GnuPG: {{ desktop_gnupg_enabled }}"
+          - "Hardware tokens: {{ desktop_hardware_tokens_enabled }}"
+          - "Screen lock: {{ desktop_screen_lock_enabled }}"
+          - "============================================================"
+
+  tasks:
+    # =========================================================================
+    # SYSCTL HARDENING
+    # =========================================================================
+
+    - name: Sysctl | Include sysctl role
+      ansible.builtin.include_role:
+        name: marcstraube.common.sysctl
+      vars:
+        sysctl_enabled: true
+        sysctl_profile_security: '{{ sysctl_profile_security }}'
+        sysctl_extra: '{{ sysctl_extra_settings }}'
+      when: desktop_sysctl_enabled | bool
+
+    # =========================================================================
+    # APPARMOR
+    # =========================================================================
+
+    - name: AppArmor | Include apparmor role
+      ansible.builtin.include_role:
+        name: marcstraube.common.apparmor
+      vars:
+        apparmor_enabled: true
+        apparmor_extra_profiles: '{{ apparmor_extra_profiles }}'
+        apparmor_audit_denied: '{{ apparmor_audit_denied }}'
+        apparmor_notify: '{{ apparmor_notify }}'
+        apparmor_notify_package: true
+      when: desktop_apparmor_enabled | bool
+
+    # =========================================================================
+    # FIREWALL
+    # =========================================================================
+
+    - name: Firewall | Include firewalld role
+      ansible.builtin.include_role:
+        name: marcstraube.common.firewalld
+      vars:
+        firewalld_enabled: true
+        firewalld_default_zone: '{{ firewall_default_zone }}'
+        firewalld_services: '{{ firewall_allowed_services }}'
+      when: desktop_firewall_enabled | bool
+
+    # =========================================================================
+    # SECURE DNS
+    # =========================================================================
+
+    - name: DNS | Configure systemd-resolved for DoT
+      when:
+        - desktop_secure_dns_enabled | bool
+        - dns_method == 'systemd-resolved'
+      block:
+        - name: DNS | Configure resolved.conf
+          ansible.builtin.template:
+            src: 'resolved.conf.j2'
+            dest: '/etc/systemd/resolved.conf.d/dns-over-tls.conf'
+            owner: root
+            group: root
+            mode: '0644'
+          notify: Restart systemd-resolved
+
+        - name: DNS | Ensure resolved.conf.d directory exists
+          ansible.builtin.file:
+            path: '/etc/systemd/resolved.conf.d'
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+
+    - name: DNS | Include unbound role
+      ansible.builtin.include_role:
+        name: marcstraube.common.unbound
+      vars:
+        unbound_enabled: true
+        unbound_tls_upstream: true
+        unbound_qname_minimisation_strict: true
+      when:
+        - desktop_secure_dns_enabled | bool
+        - dns_method == 'unbound'
+
+    # =========================================================================
+    # BLUETOOTH HARDENING
+    # =========================================================================
+
+    - name: Bluetooth | Include bluetooth role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.bluetooth
+      vars:
+        bluetooth_enabled: true
+        bluetooth_discoverable_timeout: '{{ bluetooth_discoverable_timeout }}'
+        bluetooth_pairable_timeout: '{{ bluetooth_pairable_timeout }}'
+        bluetooth_privacy: '{{ bluetooth_privacy }}'
+        bluetooth_auto_enable: '{{ bluetooth_auto_enable }}'
+      when: desktop_bluetooth_hardening_enabled | bool
+
+    # =========================================================================
+    # BROWSER HARDENING
+    # =========================================================================
+
+    - name: Browser | Include browser role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.browser
+      vars:
+        browser_enabled: true
+        browser_firefox_user_js: '{{ browser_firefox_user_js }}'
+        browser_extension_default_mode: '{{ browser_extension_default_mode }}'
+        browser_allowed_extensions: '{{ browser_allowed_extensions }}'
+        browser_telemetry_disabled: '{{ browser_telemetry_disabled }}'
+      when: desktop_browser_hardening_enabled | bool
+
+    # =========================================================================
+    # GNUPG
+    # =========================================================================
+
+    - name: GnuPG | Include gnupg role
+      ansible.builtin.include_role:
+        name: marcstraube.common.gnupg
+      vars:
+        gnupg_enabled: true
+        gnupg_agent_default_cache_ttl: '{{ gpg_agent_default_cache_ttl }}'
+        gnupg_agent_max_cache_ttl: '{{ gpg_agent_max_cache_ttl }}'
+        gnupg_agent_enable_ssh: '{{ gpg_agent_enable_ssh }}'
+      when: desktop_gnupg_enabled | bool
+
+    # =========================================================================
+    # HARDWARE TOKENS
+    # =========================================================================
+
+    - name: Hardware Tokens | Include hardware_tokens role
+      ansible.builtin.include_role:
+        name: marcstraube.common.hardware_tokens
+      vars:
+        hardware_tokens_enabled: true
+        hardware_tokens_types: '{{ hardware_tokens }}'
+      when: desktop_hardware_tokens_enabled | bool
+
+    # =========================================================================
+    # KEEPASSXC (Password Manager)
+    # =========================================================================
+
+    - name: KeePassXC | Include keepassxc role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.keepassxc
+      vars:
+        keepassxc_enabled: true
+        keepassxc_browser_integration: '{{ desktop_browser_hardening_enabled }}'
+        keepassxc_secret_service_enabled: '{{ desktop_keepassxc_secret_service }}'
+      when: desktop_keepassxc_enabled | bool
+
+    # =========================================================================
+    # USB GUARD
+    # =========================================================================
+
+    - name: USB Guard | Install and configure
+      when: desktop_usb_guard_enabled | bool
+      block:
+        - name: USB Guard | Install package
+          ansible.builtin.package:
+            name: usbguard
+            state: present
+
+        - name: USB Guard | Generate initial policy
+          ansible.builtin.command: usbguard generate-policy
+          register: __usbguard_policy
+          changed_when: false
+          when: usbguard_allow_initial | bool
+
+        - name: USB Guard | Write policy
+          ansible.builtin.copy:
+            content: '{{ __usbguard_policy.stdout }}'
+            dest: '/etc/usbguard/rules.conf'
+            owner: root
+            group: root
+            mode: '0600'
+          when:
+            - usbguard_allow_initial | bool
+            - __usbguard_policy.stdout | length > 0
+          notify: Restart usbguard
+
+        - name: USB Guard | Enable and start service
+          ansible.builtin.systemd:
+            name: usbguard
+            enabled: true
+            state: started
+
+    # =========================================================================
+    # SCREEN LOCK / SESSION SECURITY
+    # =========================================================================
+
+    - name: Screen Lock | Configure idle timeout
+      when: desktop_screen_lock_enabled | bool
+      block:
+        - name: Screen Lock | Create logind.conf.d directory
+          ansible.builtin.file:
+            path: '/etc/systemd/logind.conf.d'
+            state: directory
+            owner: root
+            group: root
+            mode: '0755'
+
+        - name: Screen Lock | Configure logind
+          ansible.builtin.copy:
+            dest: '/etc/systemd/logind.conf.d/security.conf'
+            owner: root
+            group: root
+            mode: '0644'
+            content: |
+              # Desktop security hardening
+              [Login]
+              HandleLidSwitch=suspend
+              HandleLidSwitchExternalPower=suspend
+              IdleAction=lock
+              IdleActionSec={{ idle_timeout }}
+          notify: Restart systemd-logind
+
+  handlers:
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted
+
+    - name: Restart systemd-logind
+      ansible.builtin.systemd:
+        name: systemd-logind
+        state: restarted
+
+    - name: Restart usbguard
+      ansible.builtin.systemd:
+        name: usbguard
+        state: restarted
+
+  post_tasks:
+    - name: Summary | Display security status
+      ansible.builtin.debug:
+        msg: >-
+          {{
+            ['============================================================',
+             'DESKTOP SECURITY HARDENING COMPLETE',
+             '============================================================',
+             '',
+             'Applied security measures:',
+             '  - Kernel hardening (sysctl): ' ~ desktop_sysctl_enabled,
+             '  - AppArmor MAC: ' ~ desktop_apparmor_enabled,
+             '  - Firewall (drop policy): ' ~ desktop_firewall_enabled,
+             '  - Secure DNS (DoT): ' ~ desktop_secure_dns_enabled,
+             '  - Bluetooth hardening: ' ~ desktop_bluetooth_hardening_enabled,
+             '  - Browser hardening: ' ~ desktop_browser_hardening_enabled,
+             '  - USB Guard: ' ~ desktop_usb_guard_enabled,
+             '  - GnuPG configured: ' ~ desktop_gnupg_enabled,
+             '  - Hardware token support: ' ~ desktop_hardware_tokens_enabled,
+             '  - Screen lock: ' ~ desktop_screen_lock_enabled,
+             '',
+             'Security settings:',
+             '  - Bluetooth timeout: ' ~ bluetooth_discoverable_timeout ~ 's',
+             '  - Bluetooth privacy: ' ~ bluetooth_privacy,
+             '  - Browser extension policy: ' ~ browser_extension_default_mode,
+             '  - Screen lock timeout: ' ~ screen_lock_timeout ~ 's',
+             '  - Idle timeout: ' ~ idle_timeout ~ 's',
+             '',
+             'RECOMMENDATIONS:']
+            + (('NO_ENCRYPTION' in __disk_encryption_check.stdout) | ternary(
+              ['⚠️  Enable full disk encryption (LUKS)!'],
+              []))
+            + ['1. Use a hardware token (YubiKey, Nitrokey) for 2FA',
+               '2. Enable USB Guard if using sensitive data',
+               '3. Review browser extensions regularly',
+               '4. Keep system updated',
+               '',
+               'NEXT STEPS:',
+               '1. Reboot to apply kernel parameters',
+               '2. Check AppArmor status: aa-status',
+               '3. Check firewall: firewall-cmd --list-all',
+               '4. Test DNS: resolvectl status',
+               '',
+               '============================================================']
+          }}

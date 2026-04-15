@@ -1,0 +1,36 @@
+---
+#
+# Role Control
+#
+
+# Enable the imaging role
+imaging_enabled: true
+
+#
+# Scanning Applications
+#
+
+# Enable VueScan professional scanning software (Arch Linux AUR only)
+imaging_vuescan_enabled: true
+
+# Enable SANE scanner backend
+imaging_sane_enabled: true
+
+# Enable XSane graphical scanning frontend
+imaging_xsane_enabled: false
+
+# Enable Simple Scan (GNOME scanning application)
+imaging_simple_scan_enabled: false
+
+# Enable Skanlite (KDE scanning application)
+imaging_skanlite_enabled: false
+
+#
+# Image Processing
+#
+
+# Enable ImageMagick command-line image manipulation
+imaging_imagemagick_enabled: false
+
+# Enable GraphicsMagick image processing system
+imaging_graphicsmagick_enabled: false

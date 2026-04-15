@@ -1,0 +1,41 @@
+---
+#
+# System Configuration
+#
+
+- name: Configure | Deploy Wine environment configuration
+  ansible.builtin.template:
+    src: wine.sh.j2
+    dest: /etc/profile.d/wine.sh
+    owner: root
+    group: root
+    mode: '0644'
+  when: wine_env_enabled | bool
+
+- name: Configure | Remove Wine environment configuration
+  ansible.builtin.file:
+    path: /etc/profile.d/wine.sh
+    state: absent
+  when: not (wine_env_enabled | bool)
+
+#
+# User Prefix Initialization
+#
+
+- name: Configure | Include user configuration tasks
+  ansible.builtin.include_tasks:
+    file: users.yml
+    apply:
+      tags:
+        - wine
+        - wine:configure
+  loop: '{{ wine_users }}'
+  loop_control:
+    loop_var: __wine_user
+    label: '{{ __wine_user.username }}'
+  when:
+    - wine_users | length > 0
+    - (__wine_user.mode | default(wine_user_config_mode)) != 'disabled'
+  tags:
+    - wine
+    - wine:configure

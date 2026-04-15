@@ -1,0 +1,34 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    browser_enabled: true
+    browser_firefox_enabled: true
+    browser_chromium_enabled: true
+    browser_librewolf_enabled: false
+    browser_brave_enabled: false
+    browser_tor_enabled: false
+    browser_zen_enabled: false
+
+    browser_firefox_policies_enabled: true
+    browser_chromium_policies_enabled: true
+
+    # Skip user configuration in container test
+    browser_users: []
+
+    # Minimal extensions for testing
+    browser_firefox_extensions:
+      'uBlock0@raymondhill.net':
+        url: 'https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi'
+        mode: 'force_installed'
+
+    browser_chromium_extensions:
+      'cjpalhdlnbpafiamejdnhcphjbkeiagm':
+        mode: 'force_installed'
+
+  tasks:
+    - name: Converge | Include browser role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

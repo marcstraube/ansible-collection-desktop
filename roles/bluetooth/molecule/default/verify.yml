@@ -1,0 +1,114 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load shared variables
+      ansible.builtin.include_vars: ../../vars/main.yml
+
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    - name: Verify | Check bluez package installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q bluez
+      register: __bluetooth_pkg_check
+      changed_when: false
+      failed_when: __bluetooth_pkg_check.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check bluez package installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l bluez
+      register: __bluetooth_pkg_check
+      changed_when: false
+      failed_when: __bluetooth_pkg_check.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check bluez package installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q bluez
+      register: __bluetooth_pkg_check
+      changed_when: false
+      failed_when: __bluetooth_pkg_check.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Verify | Check config directory exists
+      ansible.builtin.stat:
+        path: '{{ __bluetooth_config_dir }}'
+      register: __bluetooth_dir_stat
+      failed_when: not __bluetooth_dir_stat.stat.isdir
+
+    - name: Verify | Check main.conf exists with correct permissions
+      ansible.builtin.stat:
+        path: '{{ __bluetooth_config_file }}'
+      register: __bluetooth_config_stat
+      failed_when: >-
+        not __bluetooth_config_stat.stat.exists or
+        __bluetooth_config_stat.stat.mode != '0644' or
+        __bluetooth_config_stat.stat.pw_name != 'root'
+
+    - name: Verify | Check main.conf contains ansible_managed header
+      ansible.builtin.command:
+        cmd: grep -c 'Ansible managed' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_managed_check
+      changed_when: false
+      failed_when: __bluetooth_managed_check.rc != 0
+
+    - name: Verify | Check main.conf contains General section
+      ansible.builtin.command:
+        cmd: grep -c '\[General\]' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_general_check
+      changed_when: false
+      failed_when: __bluetooth_general_check.rc != 0
+
+    - name: Verify | Check main.conf contains Policy section
+      ansible.builtin.command:
+        cmd: grep -c '\[Policy\]' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_policy_check
+      changed_when: false
+      failed_when: __bluetooth_policy_check.rc != 0
+
+    - name: Verify | Check main.conf contains GATT section
+      ansible.builtin.command:
+        cmd: grep -c '\[GATT\]' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_gatt_check
+      changed_when: false
+      failed_when: __bluetooth_gatt_check.rc != 0
+
+    - name: Verify | Check Privacy setting
+      ansible.builtin.command:
+        cmd: grep -c 'Privacy = device' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_privacy_check
+      changed_when: false
+      failed_when: __bluetooth_privacy_check.rc != 0
+
+    - name: Verify | Check SecureConnections setting
+      ansible.builtin.command:
+        cmd: grep -c 'SecureConnections = on' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_sc_check
+      changed_when: false
+      failed_when: __bluetooth_sc_check.rc != 0
+
+    - name: Verify | Check GATT Cache value is valid
+      ansible.builtin.command:
+        cmd: grep -c 'Cache = always' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_cache_check
+      changed_when: false
+      failed_when: __bluetooth_cache_check.rc != 0
+
+    - name: Verify | Check ReconnectAttempts setting
+      ansible.builtin.command:
+        cmd: grep -c 'ReconnectAttempts = 7' '{{ __bluetooth_config_file }}'
+      register: __bluetooth_reconnect_check
+      changed_when: false
+      failed_when: __bluetooth_reconnect_check.rc != 0

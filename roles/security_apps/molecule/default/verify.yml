@@ -1,0 +1,72 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Load OS-Specific Variables
+    #
+
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # VeraCrypt (Arch only)
+    #
+
+    - name: Verify | Check VeraCrypt installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __security_apps_packages.veracrypt | first }}'
+      register: _secapps_veracrypt_arch
+      changed_when: false
+      failed_when: _secapps_veracrypt_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __security_apps_packages.veracrypt is defined
+
+    #
+    # ClamTk (Arch only)
+    #
+
+    - name: Verify | Check ClamTk installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __security_apps_packages.clamtk | first }}'
+      register: _secapps_clamtk_arch
+      changed_when: false
+      failed_when: _secapps_clamtk_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __security_apps_packages.clamtk is defined
+
+    #
+    # Gufw (Arch + Debian)
+    #
+
+    - name: Verify | Check Gufw installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __security_apps_packages.gufw | first }}'
+      register: _secapps_gufw_arch
+      changed_when: false
+      failed_when: _secapps_gufw_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __security_apps_packages.gufw is defined
+
+    - name: Verify | Check Gufw installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __security_apps_packages.gufw | first }}'
+      register: _secapps_gufw_deb
+      changed_when: false
+      failed_when: _secapps_gufw_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __security_apps_packages.gufw is defined

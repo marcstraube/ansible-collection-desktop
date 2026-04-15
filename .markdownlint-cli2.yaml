@@ -1,0 +1,6 @@
+---
+config:
+  extends: .markdownlint.yml
+ignores:
+  - ".ansible/**"
+  - "CHANGELOG.md"

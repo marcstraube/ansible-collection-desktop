@@ -1,0 +1,53 @@
+{{ ansible_managed | comment }}
+#
+# BlueZ main configuration file.
+# See bluetoothd(8) and main.conf(5) for details.
+
+[General]
+{% if bluetooth_device_name | length > 0 %}
+
+# Adapter name
+Name = {{ bluetooth_device_name }}
+{% endif %}
+{% if bluetooth_device_class | length > 0 %}
+
+# Device class
+Class = {{ bluetooth_device_class }}
+{% endif %}
+
+DiscoverableTimeout = {{ bluetooth_discoverable_timeout }}
+PairableTimeout = {{ bluetooth_pairable_timeout }}
+AlwaysPairable = {{ bluetooth_always_pairable | lower }}
+ControllerMode = {{ bluetooth_controller_mode }}
+NameResolving = {{ bluetooth_name_resolving | lower }}
+TemporaryTimeout = {{ bluetooth_temporary_timeout }}
+Privacy = {{ bluetooth_privacy }}
+SecureConnections = {{ bluetooth_secure_connections }}
+JustWorksRepairing = {{ bluetooth_just_works_repairing }}
+FastConnectable = {{ bluetooth_fast_connectable | lower }}
+{% if bluetooth_experimental | bool %}
+
+Experimental = true
+{% endif %}
+{% if bluetooth_kernel_experimental | bool %}
+
+KernelExperimental = true
+{% endif %}
+{% if bluetooth_extra_config | length > 0 %}
+
+{% for key, value in bluetooth_extra_config.items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+{% endif %}
+
+[Policy]
+
+AutoEnable = {{ bluetooth_auto_enable | lower }}
+ReconnectAttempts = {{ bluetooth_reconnect_attempts }}
+ReconnectIntervals = {{ bluetooth_reconnect_intervals }}
+ResumeDelay = {{ bluetooth_resume_delay }}
+
+[GATT]
+
+Cache = {{ bluetooth_gatt_cache }}
+Channels = {{ bluetooth_gatt_channels }}

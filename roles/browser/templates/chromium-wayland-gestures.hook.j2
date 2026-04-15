@@ -1,0 +1,12 @@
+{{ ansible_managed | comment }}
+# Enable Wayland touchpad gesture navigation for Chromium
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = chromium
+
+[Action]
+Description = Patching Chromium desktop entry for Wayland touchpad gestures...
+When = PostTransaction
+Exec = /bin/sh -c "sed -i 's/^Exec=chromium/Exec=chromium --ozone-platform-hint=auto --enable-features=TouchpadOverscrollHistoryNavigation/' /usr/share/applications/chromium.desktop"

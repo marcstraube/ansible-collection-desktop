@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    keepassxc_enabled: true
+    keepassxc_secret_service_enabled: true
+    keepassxc_secret_service_global: true
+    keepassxc_autostart_enabled: false
+
+  tasks:
+    - name: Converge | Include keepassxc role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

@@ -1,0 +1,44 @@
+---
+namespace: marcstraube
+name: desktop
+version: 1.0.0 # x-release-please-version
+readme: README.md
+authors:
+  - Marc Straube <email@marcstraube.de>
+description: >-
+  27 desktop workstation roles for Arch Linux and Debian Trixie.
+  Desktop environments, display managers, browsers, development tools,
+  multimedia, office, and productivity applications.
+license_file: LICENSE
+tags:
+  - linux
+  - archlinux
+  - debian
+  - desktop
+  - workstation
+  - hyprland
+  - wayland
+  - development
+  - multimedia
+  - browser
+  - wine
+  - security
+repository: https://github.com/marcstraube/ansible-collection-desktop
+documentation: https://github.com/marcstraube/ansible-collection-desktop
+homepage: https://github.com/marcstraube/ansible-collection-desktop
+issues: https://github.com/marcstraube/ansible-collection-desktop/issues
+build_ignore:
+  - '*.tar.gz'
+  - '.git'
+  - '.github'
+  - '.ansible'
+  - '.claude'
+  - '.venv'
+  - '*.pyc'
+  - '__pycache__'
+  - 'roles/*/molecule'
+dependencies:
+  marcstraube.common: '>=1.0.0'
+  community.general: '>=8.0.0'
+  ansible.posix: '>=1.5.0'
+  kewlfft.aur: '>=0.10.0'

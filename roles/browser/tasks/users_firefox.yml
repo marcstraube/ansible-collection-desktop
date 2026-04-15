@@ -1,0 +1,54 @@
+---
+- name: Users Firefox | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ browser_user.username }}'
+
+- name: Users Firefox | Set user home fact
+  ansible.builtin.set_fact:
+    __browser_user_home: '{{ getent_passwd[browser_user.username][4] }}'
+
+- name: Users Firefox | Check for existing Firefox profile
+  ansible.builtin.find:
+    paths: '{{ __browser_user_home }}/.mozilla/firefox'
+    patterns: '{{ __browser_firefox_profile_pattern }}'
+    file_type: directory
+  register: __browser_firefox_existing_profiles
+  # Profile directory may not exist yet on first run
+  failed_when: false
+
+- name: Users Firefox | Create Firefox profile if none exists
+  ansible.builtin.command:
+    cmd: 'firefox --headless -CreateProfile "default-release"'
+  become: true
+  become_user: '{{ browser_user.username }}'
+  register: __browser_create_firefox_profile
+  changed_when: __browser_create_firefox_profile.rc == 0
+  when: >-
+    __browser_firefox_existing_profiles.files is not defined or
+    __browser_firefox_existing_profiles.files | length == 0
+
+- name: Users Firefox | Find Firefox profile after creation
+  ansible.builtin.find:
+    paths: '{{ __browser_user_home }}/.mozilla/firefox'
+    patterns: '{{ __browser_firefox_profile_pattern }}'
+    file_type: directory
+  register: __browser_firefox_profiles
+  when: >-
+    __browser_firefox_existing_profiles.files is not defined or
+    __browser_firefox_existing_profiles.files | length == 0
+
+- name: Users Firefox | Set Firefox profile path fact
+  ansible.builtin.set_fact:
+    __browser_firefox_profile_path: >-
+      {{ ((__browser_firefox_profiles | default(__browser_firefox_existing_profiles)).files
+         | sort(attribute='path') | first).path }}
+
+- name: Users Firefox | Deploy Firefox user.js
+  ansible.builtin.template:
+    src: user.js.j2
+    dest: '{{ __browser_firefox_profile_path }}/user.js'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0644'
+  when: browser_firefox_preferences | length > 0

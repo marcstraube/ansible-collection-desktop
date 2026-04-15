@@ -1,0 +1,85 @@
+---
+# Collection-level smoke test for marcstraube.desktop
+# Tests desktop environment setup with default values
+
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  pre_tasks:
+    - name: Update pacman cache (Arch Linux)
+      community.general.pacman:
+        update_cache: true
+      changed_when: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Install prerequisites on Debian (minimal Docker image)
+      ansible.builtin.apt:
+        name:
+          - systemd
+          - systemd-timesyncd
+          - locales
+          - dbus
+        state: present
+        update_cache: true
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Replace curl-minimal with curl on RedHat (Docker image conflict)
+      ansible.builtin.dnf:
+        name:
+          - curl
+        state: present
+        allowerasing: true
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Install glibc-langpack-en on RedHat (minimal Docker image)
+      ansible.builtin.dnf:
+        name:
+          - glibc-langpack-en
+          - glibc-locale-source
+        state: present
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Start D-Bus on RedHat (not auto-started in Docker)
+      ansible.builtin.service:
+        name: dbus-broker
+        state: started
+      when: ansible_facts['os_family'] == 'RedHat'
+
+  roles:
+    # ==========================================================================
+    # BASE DESKTOP COMPONENTS
+    # ==========================================================================
+    - role: marcstraube.common.base
+      vars:
+        desktop_base_enabled: true
+
+    - role: marcstraube.desktop.shell
+      vars:
+        shell_zsh_enabled: true
+        # starship not available in Debian 12 repos (only Debian 13+)
+        shell_starship: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
+
+    - role: marcstraube.desktop.terminal
+      vars:
+        terminal_alacritty_enabled: true
+
+    # ==========================================================================
+    # DEVELOPMENT
+    # ==========================================================================
+    - role: marcstraube.desktop.development
+      vars:
+        development_enabled: true
+
+    # ==========================================================================
+    # BROWSER (minimal config)
+    # ==========================================================================
+    - role: marcstraube.desktop.browser
+      vars:
+        browser_firefox_enabled: true
+        browser_extensions: []
+
+  post_tasks:
+    - name: Verify desktop smoke test
+      ansible.builtin.debug:
+        msg: "Desktop collection smoke test completed"

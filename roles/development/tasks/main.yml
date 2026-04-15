@@ -1,0 +1,85 @@
+---
+#
+# Development Main Tasks
+#
+
+- name: Main | Derive development users from users_list (exclude system users)
+  ansible.builtin.set_fact:
+    development_users: >-
+      {{ (users_list | default([])
+          | selectattr('git', 'defined')
+          | selectattr('system', 'undefined') | list
+          + users_list | default([])
+          | selectattr('git', 'defined')
+          | selectattr('system', 'defined')
+          | rejectattr('system', 'equalto', true) | list)
+         | community.general.json_query(
+             '[].{username: name, git_name: comment, git_email: git.email, '
+             + 'git_signing_key: git.signing_key}'
+           ) }}
+  when:
+    - development_enabled | bool
+    - development_users | length == 0
+    - users_list is defined
+    - users_list | length > 0
+  tags:
+    - development
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - development
+
+- name: Main | Import version control tasks
+  ansible.builtin.import_tasks: git.yml
+  when:
+    - development_enabled | bool
+    - development_git_enabled | bool
+  tags:
+    - development
+    - development:git
+
+- name: Main | Import programming languages tasks
+  ansible.builtin.import_tasks: languages.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:languages
+
+- name: Main | Import build tools tasks
+  ansible.builtin.import_tasks: build.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:build
+
+- name: Main | Import IDEs tasks
+  ansible.builtin.import_tasks: ides.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:ides
+
+- name: Main | Import misc tools tasks
+  ansible.builtin.import_tasks: tools.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:tools
+
+- name: Main | Import user configuration tasks
+  ansible.builtin.import_tasks: users.yml
+  when:
+    - development_enabled | bool
+    - development_users | length > 0
+  tags:
+    - development
+    - development:users

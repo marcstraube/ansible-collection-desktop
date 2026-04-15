@@ -1,0 +1,22 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    development_enabled: true
+    development_git_enabled: true
+    development_python_enabled: true
+    development_nodejs_enabled: false
+    development_rust_enabled: false
+    development_go_enabled: false
+    development_java_enabled: false
+    development_vscodium_enabled: false
+    development_vscode_enabled: false
+    development_zed_enabled: false
+    development_users: []
+
+  tasks:
+    - name: Converge | Include development role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

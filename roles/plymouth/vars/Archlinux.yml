@@ -1,0 +1,13 @@
+---
+#
+# Arch Linux Variables
+#
+
+__plymouth_packages:
+  - 'plymouth'
+
+__plymouth_mkinitcpio_conf: '/etc/mkinitcpio.conf'
+__plymouth_initramfs_command: 'mkinitcpio -P'
+
+__plymouth_grub_default_file: '/etc/default/grub'
+__plymouth_grub_mkconfig_command: 'grub-mkconfig -o /boot/grub/grub.cfg'

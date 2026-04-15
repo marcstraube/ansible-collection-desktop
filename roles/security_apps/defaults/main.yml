@@ -1,0 +1,37 @@
+---
+#
+# Role Control
+#
+
+# Enable the security_apps role
+security_apps_enabled: true
+
+#
+# Encryption
+#
+
+# Install VeraCrypt disk encryption (Arch only)
+security_apps_veracrypt_enabled: true
+
+#
+# Hardware Wallets
+#
+
+# Install Cypherock CySync hardware wallet management (AUR)
+security_apps_cypherock_enabled: true
+
+# Install Ledger Live hardware wallet (AUR)
+security_apps_ledger_enabled: false
+
+# Install Trezor Suite hardware wallet (AUR)
+security_apps_trezor_enabled: false
+
+#
+# Security Tools
+#
+
+# Install ClamTk ClamAV GUI (Arch only)
+security_apps_clamtk_enabled: false
+
+# Install Gufw firewall GUI (Arch + Debian)
+security_apps_gufw_enabled: false

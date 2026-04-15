@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    downloads_enabled: true
+    downloads_transmission_enabled: true
+    downloads_qbittorrent_enabled: true
+    downloads_deluge_enabled: true
+    downloads_ytdlp_enabled: true
+    downloads_aria2_enabled: true
+    downloads_uget_enabled: true
+    downloads_jdownloader_enabled: false
+
+  tasks:
+    - name: Converge | Include downloads role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

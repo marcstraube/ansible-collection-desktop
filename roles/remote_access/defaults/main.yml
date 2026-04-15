@@ -1,0 +1,47 @@
+---
+#
+# Role Control
+#
+
+# Enable the remote_access role
+remote_access_enabled: true
+
+#
+# Remote Desktop
+#
+
+# Enable Remmina remote desktop client (RDP, VNC, SSH)
+remote_access_remmina_enabled: true
+
+# Enable RustDesk open source remote desktop (Arch AUR only)
+remote_access_rustdesk_enabled: true
+
+# Enable Asbru Connection Manager (Arch AUR only)
+remote_access_asbru_enabled: true
+
+#
+# VNC Clients
+#
+
+# Enable TigerVNC viewer
+remote_access_tigervnc_enabled: false
+
+# Enable RealVNC viewer (Arch AUR only)
+remote_access_realvnc_enabled: false
+
+#
+# RDP Clients
+#
+
+# Enable FreeRDP (command-line, often used by Remmina)
+remote_access_freerdp_enabled: false
+
+#
+# Other
+#
+
+# Enable AnyDesk (Arch AUR only)
+remote_access_anydesk_enabled: false
+
+# Enable TeamViewer (Arch AUR only)
+remote_access_teamviewer_enabled: false

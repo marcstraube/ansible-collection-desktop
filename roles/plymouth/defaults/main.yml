@@ -1,0 +1,35 @@
+---
+#
+# Role Control
+#
+
+# Enable the plymouth role
+plymouth_enabled: true
+
+#
+# Theme
+#
+
+# Built-in themes: spinner, bgrt, fade-in, glow, script, solar, spinfinity, tribar
+plymouth_theme: 'bgrt'
+
+#
+# Packages
+#
+
+# Additional packages (e.g. AUR themes: plymouth-theme-arch-logo)
+plymouth_extra_packages: []
+
+#
+# Kernel Parameters
+#
+
+# Manage 'quiet splash' in GRUB_CMDLINE_LINUX_DEFAULT
+plymouth_kernel_params_enabled: true
+
+#
+# Initramfs (Arch Linux)
+#
+
+# Insert plymouth hook after this hook ('auto' = after udev or systemd)
+plymouth_hook_position: 'auto'

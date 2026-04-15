@@ -1,0 +1,155 @@
+---
+#
+# Arch Linux Variables
+#
+
+#
+# Hyprland
+#
+
+__desktop_environment_hyprland_packages:
+  - 'hyprland'
+  - 'hyprland-qt-support'
+
+# Extras (official repo)
+__desktop_environment_hyprland_hypridle_package: 'hypridle'
+__desktop_environment_hyprland_hyprlock_package: 'hyprlock'
+__desktop_environment_hyprland_hyprpaper_package: 'hyprpaper'
+__desktop_environment_hyprland_hyprpicker_package: 'hyprpicker'
+__desktop_environment_hyprland_hyprcursor_package: 'hyprcursor'
+__desktop_environment_hyprland_hyprshot_package: 'hyprshot'
+__desktop_environment_hyprland_hyprsunset_package: 'hyprsunset'
+__desktop_environment_hyprland_hyprlauncher_package: 'hyprlauncher'
+__desktop_environment_hyprland_hyprpwcenter_package: 'hyprpwcenter'
+
+__desktop_environment_hyprland_portal_package: 'xdg-desktop-portal-hyprland'
+__desktop_environment_hyprland_polkit_package: 'hyprpolkitagent'
+__desktop_environment_hyprland_uwsm_package: 'uwsm'
+
+# AUR packages
+# hyprsysteminfo: AUR package broken (out-of-date since 2025-09, soname mismatch)
+# -git variant conflicts with stable hyprutils/hyprlang — revisit when fixed
+__desktop_environment_aur_packages:
+  hyprqt6engine:
+    - 'hyprqt6engine'
+  hyprshutdown:
+    - 'hyprshutdown'
+  hyprshade:
+    - 'hyprshade'
+
+#
+# Sway
+#
+
+__desktop_environment_sway_packages:
+  - 'sway'
+
+__desktop_environment_sway_extras_packages:
+  - 'swaylock'
+  - 'swayidle'
+  - 'swaybg'
+
+__desktop_environment_sway_portal_package: 'xdg-desktop-portal-wlr'
+
+#
+# i3
+#
+
+__desktop_environment_i3_packages:
+  - 'i3-wm'
+
+__desktop_environment_i3_status_packages:
+  i3status: 'i3status'
+  i3blocks: 'i3blocks'
+  polybar: 'polybar'
+
+__desktop_environment_i3_dmenu_package: 'dmenu'
+__desktop_environment_i3_picom_package: 'picom'
+
+#
+# KDE
+#
+
+__desktop_environment_kde_minimal_packages:
+  - 'plasma-desktop'
+
+__desktop_environment_kde_full_packages:
+  - 'plasma-meta'
+
+__desktop_environment_kde_app_packages:
+  dolphin: 'dolphin'
+  konsole: 'konsole'
+  kate: 'kate'
+  okular: 'okular'
+  gwenview: 'gwenview'
+  ark: 'ark'
+  spectacle: 'spectacle'
+  kcalc: 'kcalc'
+
+#
+# GNOME
+#
+
+__desktop_environment_gnome_minimal_packages:
+  - 'gnome-shell'
+
+__desktop_environment_gnome_full_packages:
+  - 'gnome'
+
+__desktop_environment_gnome_extras_package: 'gnome-extra'
+__desktop_environment_gnome_tweaks_package: 'gnome-tweaks'
+
+#
+# XFCE
+#
+
+__desktop_environment_xfce_packages:
+  - 'xfce4'
+
+__desktop_environment_xfce_goodies_package: 'xfce4-goodies'
+__desktop_environment_xfce_whiskermenu_package: 'xfce4-whiskermenu-plugin'
+
+#
+# LXDE
+#
+
+__desktop_environment_lxde_minimal_packages:
+  - 'lxde-common'
+  - 'lxsession'
+  - 'openbox'
+  - 'lxpanel'
+  - 'pcmanfm'
+
+__desktop_environment_lxde_full_packages:
+  - 'lxde'
+
+#
+# LXQt
+#
+
+__desktop_environment_lxqt_packages:
+  - 'lxqt'
+
+__desktop_environment_lxqt_icon_packages:
+  breeze-icons: 'breeze-icons'
+  oxygen-icons: 'oxygen-icons'
+
+#
+# Themes
+#
+
+__desktop_environment_cursor_theme_packages:
+  adwaita: 'adwaita-icon-theme'
+  breeze: 'breeze'
+  capitaine: 'capitaine-cursors'
+
+__desktop_environment_cursor_theme_aur_packages:
+  bibata: 'bibata-cursor-theme-bin'
+
+__desktop_environment_icon_theme_packages:
+  adwaita: 'adwaita-icon-theme'
+  breeze: 'breeze-icons'
+  papirus: 'papirus-icon-theme'
+  hicolor: 'hicolor-icon-theme'
+
+__desktop_environment_icon_theme_aur_packages: {}

@@ -1,0 +1,87 @@
+---
+#
+# Package Installation
+#
+
+- name: Install | Lutris
+  ansible.builtin.package:
+    name: '{{ __gaming_lutris_package }}'
+    state: present
+  when:
+    - gaming_lutris_enabled | bool
+    - __gaming_lutris_package | default('') | length > 0
+
+- name: Install | Steam
+  ansible.builtin.package:
+    name: '{{ __gaming_steam_package }}'
+    state: present
+  when:
+    - gaming_steam_enabled | bool
+    - __gaming_steam_package | default('') | length > 0
+
+- name: Install | RetroArch
+  ansible.builtin.package:
+    name: '{{ __gaming_retroarch_package }}'
+    state: present
+  when:
+    - gaming_retroarch_enabled | bool
+    - __gaming_retroarch_package | default('') | length > 0
+
+- name: Install | PCSX2
+  ansible.builtin.package:
+    name: '{{ __gaming_pcsx2_package }}'
+    state: present
+  when:
+    - gaming_pcsx2_enabled | bool
+    - __gaming_pcsx2_package | default('') | length > 0
+    - ansible_facts['os_family'] != 'Archlinux'
+
+- name: Install | Dolphin Emulator
+  ansible.builtin.package:
+    name: '{{ __gaming_dolphin_package }}'
+    state: present
+  when:
+    - gaming_dolphin_enabled | bool
+    - __gaming_dolphin_package | default('') | length > 0
+
+- name: Install | Moonlight
+  ansible.builtin.package:
+    name: '{{ __gaming_moonlight_package }}'
+    state: present
+  when:
+    - gaming_moonlight_enabled | bool
+    - __gaming_moonlight_package | default('') | length > 0
+
+#
+# AUR Packages (Arch Linux)
+#
+
+- name: Install | Heroic Games Launcher from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __gaming_aur_packages.heroic }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - gaming_heroic_enabled | bool
+
+- name: Install | Playback from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __gaming_aur_packages.playback }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - gaming_playback_enabled | bool
+
+- name: Install | PCSX2 from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __gaming_aur_packages.pcsx2 }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - gaming_pcsx2_enabled | bool

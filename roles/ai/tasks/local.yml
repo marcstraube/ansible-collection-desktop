@@ -1,0 +1,86 @@
+---
+#
+# Local AI Tools Installation
+#
+
+# Ollama
+
+- name: Local | Install Ollama
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_ollama_package }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_ollama_enabled | bool
+    - __ai_ollama_package | length > 0
+
+- name: Local | Download Ollama install script (non-Arch)
+  become: true
+  ansible.builtin.get_url:
+    url: 'https://ollama.com/install.sh'
+    dest: '/tmp/ollama-install.sh'
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_ollama_enabled | bool
+
+- name: Local | Run Ollama install script (non-Arch)
+  become: true
+  ansible.builtin.command:
+    cmd: '/tmp/ollama-install.sh'
+    creates: '/usr/local/bin/ollama'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_ollama_enabled | bool
+
+- name: Local | Remove Ollama install script
+  ansible.builtin.file:
+    path: '/tmp/ollama-install.sh'
+    state: absent
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_ollama_enabled | bool
+
+- name: Local | Manage Ollama service
+  become: true
+  ansible.builtin.systemd_service:
+    name: '{{ __ai_ollama_service }}'
+    enabled: "{{ ai_ollama_service_enabled | bool }}"
+    state: "{{ ai_ollama_service_enabled | bool | ternary('started', 'stopped') }}"
+  when:
+    - ai_ollama_enabled | bool
+
+- name: Local | Pull Ollama models
+  ansible.builtin.command:
+    cmd: 'ollama pull {{ item }}'
+  loop: '{{ ai_ollama_models }}'
+  when:
+    - ai_ollama_enabled | bool
+    - ai_ollama_models | length > 0
+  register: __ai_ollama_pull
+  changed_when: "'pulling' in __ai_ollama_pull.stdout"
+
+# LM Studio
+
+- name: Local | Install LM Studio from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.lmstudio }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_lmstudio_enabled | bool
+
+- name: Local | LM Studio not available (non-Arch)
+  ansible.builtin.debug:
+    msg: >
+      LM Studio is not available in standard repositories for
+      {{ ansible_facts['os_family'] }}. Download from https://lmstudio.ai/
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_lmstudio_enabled | bool
+    - __ai_lmstudio_package | length == 0

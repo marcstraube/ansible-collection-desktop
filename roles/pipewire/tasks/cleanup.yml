@@ -1,0 +1,10 @@
+---
+#
+# PulseAudio Cleanup Tasks
+#
+
+- name: Cleanup | Remove PulseAudio packages
+  ansible.builtin.package:
+    name: '{{ __pipewire_pulseaudio_packages }}'
+    state: absent
+  notify: Restart PipeWire

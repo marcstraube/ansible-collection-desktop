@@ -1,0 +1,18 @@
+---
+#
+# Development User Configuration
+#
+
+- name: Users | Configure Git for users
+  ansible.builtin.include_tasks:
+    file: users_git.yml
+    apply:
+      tags:
+        - development
+        - development:users
+  loop: '{{ development_users }}'
+  loop_control:
+    loop_var: dev_user
+  tags:
+    - development
+    - development:users

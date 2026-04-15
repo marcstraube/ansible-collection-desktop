@@ -1,0 +1,27 @@
+{{ ansible_managed | comment }}
+{% if wine_debug | length > 0 %}
+
+# Suppress Wine debug output
+export WINEDEBUG="{{ wine_debug }}"
+{% endif %}
+{% if wine_sync | length > 0 %}
+{% if wine_sync == 'ntsync' %}
+
+# NTsync synchronization (kernel 6.14+, Wine 11+)
+export WINESYNC=1
+{% elif wine_sync == 'fsync' %}
+
+# Futex-based synchronization (kernel 5.16+)
+export WINEFSYNC=1
+{% elif wine_sync == 'esync' %}
+
+# Eventfd-based synchronization
+export WINEESYNC=1
+{% endif %}
+{% endif %}
+{% if wine_env | length > 0 %}
+{% for key, value in wine_env | dictsort %}
+
+export {{ key }}="{{ value }}"
+{% endfor %}
+{% endif %}

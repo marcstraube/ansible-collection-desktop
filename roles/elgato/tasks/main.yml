@@ -1,0 +1,39 @@
+---
+#
+# Elgato Devices Main Tasks
+#
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+      skip: true
+  tags:
+    - elgato
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when: elgato_enabled | bool
+  tags:
+    - elgato
+    - elgato:install
+
+- name: Main | Include Wave:3 WirePlumber config
+  ansible.builtin.include_tasks:
+    file: wave3.yml
+    apply:
+      tags:
+        - elgato
+        - elgato:wave3
+  when:
+    - elgato_enabled | bool
+    - elgato_wave3_enabled | bool
+  tags:
+    - elgato
+    - elgato:wave3

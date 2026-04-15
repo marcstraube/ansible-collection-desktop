@@ -1,0 +1,22 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    gaming_enabled: true
+    # All gaming packages need non-standard repos (multilib, non-free,
+    # RPM Fusion) — disable everything for Docker-based molecule tests
+    gaming_lutris_enabled: false
+    gaming_retroarch_enabled: false
+    gaming_steam_enabled: false
+    gaming_playback_enabled: false
+    gaming_heroic_enabled: false
+    gaming_pcsx2_enabled: false
+    gaming_dolphin_enabled: false
+    gaming_moonlight_enabled: false
+
+  tasks:
+    - name: Converge | Include gaming role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

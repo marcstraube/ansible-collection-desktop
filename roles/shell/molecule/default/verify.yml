@@ -1,0 +1,98 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # Zsh
+    #
+
+    - name: Verify | Check zsh installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __shell_zsh_package }}'
+      register: _shell_zsh_arch
+      changed_when: false
+      failed_when: _shell_zsh_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __shell_zsh_package | default('') | length > 0
+
+    - name: Verify | Check zsh installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __shell_zsh_package }}'
+      register: _shell_zsh_deb
+      changed_when: false
+      failed_when: _shell_zsh_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __shell_zsh_package | default('') | length > 0
+
+    - name: Verify | Check zsh installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __shell_zsh_package }}'
+      register: _shell_zsh_rpm
+      changed_when: false
+      failed_when: _shell_zsh_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __shell_zsh_package | default('') | length > 0
+
+    #
+    # Fzf
+    #
+
+    - name: Verify | Check fzf installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __shell_fzf_package }}'
+      register: _shell_fzf_arch
+      changed_when: false
+      failed_when: _shell_fzf_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __shell_fzf_package | default('') | length > 0
+
+    - name: Verify | Check fzf installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __shell_fzf_package }}'
+      register: _shell_fzf_deb
+      changed_when: false
+      failed_when: _shell_fzf_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __shell_fzf_package | default('') | length > 0
+
+    - name: Verify | Check fzf installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __shell_fzf_package }}'
+      register: _shell_fzf_rpm
+      changed_when: false
+      failed_when: _shell_fzf_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __shell_fzf_package | default('') | length > 0
+
+    #
+    # Starship (Arch only)
+    #
+
+    - name: Verify | Check starship installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __shell_starship_package }}'
+      register: _shell_starship_arch
+      changed_when: false
+      failed_when: _shell_starship_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __shell_starship_package | default('') | length > 0

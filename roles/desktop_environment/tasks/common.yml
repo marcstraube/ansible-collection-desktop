@@ -1,0 +1,30 @@
+---
+#
+# Common Desktop Applications
+#
+
+- name: Common | Build package list
+  ansible.builtin.set_fact:
+    __desktop_environment_common_install_packages: >-
+      {{
+        [__desktop_environment_file_managers[desktop_environment_file_manager] | default('')] +
+        (desktop_environment_archive_manager_enabled | bool | ternary(
+          [__desktop_environment_archive_managers[desktop_environment_list | first] |
+           default(__desktop_environment_archive_managers['default'])], [])) +
+        (desktop_environment_calculator_enabled | bool | ternary(
+          [__desktop_environment_calculators[desktop_environment_list | first] |
+           default(__desktop_environment_calculators['default'])], [])) +
+        [__desktop_environment_text_editors[desktop_environment_text_editor] | default('')]
+      }}
+
+- name: Common | Filter empty packages
+  ansible.builtin.set_fact:
+    __desktop_environment_common_install_packages: >-
+      {{ __desktop_environment_common_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: Common | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_common_install_packages }}'
+    state: present
+  when:
+    - __desktop_environment_common_install_packages | length > 0

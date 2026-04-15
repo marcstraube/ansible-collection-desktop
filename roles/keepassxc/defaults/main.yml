@@ -1,0 +1,116 @@
+---
+#
+# Role Control
+#
+
+# Enable the keepassxc role
+keepassxc_enabled: true
+
+#
+# Installation
+#
+
+# Install keepassxc package
+keepassxc_install_package_enabled: true
+
+#
+# Browser Integration
+#
+# Browser extension installation is handled by marcstraube.desktop.browser
+# role via policies.json. This approach:
+# - Works on all platforms (not just ArchLinux)
+# - Avoids conflicts between package and policy-based installation
+# - Provides automatic updates from browser extension stores
+#
+# The browser role includes KeePassXC-Browser extension by default.
+# See: browser_firefox_extensions and browser_chromium_extensions
+
+# Enable browser integration in KeePassXC settings
+keepassxc_browser_integration_enabled: true
+
+#
+# Secret Service Integration
+#
+
+# Enable Secret Service (freedesktop.org) integration
+keepassxc_secret_service_enabled: false
+
+# Install Secret Service globally (system-wide) or per-user
+keepassxc_secret_service_global: false
+
+#
+# SSH Agent Integration
+#
+
+# Enable KeePassXC SSH agent (serves SSH keys from database entries)
+keepassxc_ssh_agent_enabled: false
+
+#
+# Systemd Autostart
+#
+
+# Enable KeePassXC autostart via systemd user service
+keepassxc_autostart_enabled: false
+
+#
+# Configuration
+#
+
+# Deploy default configuration file
+keepassxc_deploy_config_enabled: false
+
+# Default mode when user entry has no 'mode' key
+# managed = always deploy/overwrite config
+# initial = deploy only when user is newly created
+# disabled = skip config deployment for this user
+keepassxc_user_config_mode: 'managed'
+
+#
+# Users
+#
+
+# Users list (single source of truth, typically mapped from users_list)
+# Per-user opt-out: set autostart/secret_service to false
+keepassxc_users: []
+# Example:
+#   - name: 'johndoe'
+#     group: 'johndoe'                    # Optional, defaults to name
+#     mode: 'managed'                     # managed/initial/disabled
+#     autostart: true                     # Opt-out with false (default: true)
+#     secret_service: true                # Opt-out with false (default: true)
+#     browser_integration: true           # Override global setting
+#     config:                             # Override specific config values
+#       Security:
+#         LockDatabaseIdleSeconds: 600    # User prefers longer timeout
+
+# Configuration directory (relative to home)
+keepassxc_config_dir: '.config/keepassxc'
+
+# Configuration settings (Browser.Enabled is controlled by keepassxc_browser_integration_enabled)
+keepassxc_config:
+  General:
+    ConfigVersion: 2
+  Browser:
+    CustomProxyLocation: ''
+  GUI:
+    MinimizeToTray: true
+    ShowTrayIcon: true
+    DarkTrayIcon: false
+    HidePasswords: true
+    HideUsernames: false
+  Security:
+    # Lock triggers
+    LockDatabaseScreenLock: true      # Primary: lock with screen
+    LockDatabaseIdle: true            # Fallback for longer screen lock times
+    LockDatabaseIdleSeconds: 300      # 5 min - reasonable fallback
+    LockDatabaseMinimize: false       # Don't lock on minimize (annoying)
+    RelockAutoType: false             # Don't relock after autotype
+    # Clipboard security
+    ClearClipboard: true
+    ClearClipboardTimeout: 10         # Seconds
+    # Privacy
+    IconDownloadFallback: false       # No favicon tracking
+    HideNotes: true
+  PasswordGenerator:
+    AdditionalChars: ''
+    ExcludedChars: ''

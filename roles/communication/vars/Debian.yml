@@ -1,0 +1,23 @@
+---
+#
+# Debian-Specific Variables
+#
+
+# Telegram package
+__communication_telegram_package: 'telegram-desktop'
+
+# Sieve email filtering (KDE PIM suite includes sieve editor)
+__communication_sieve_package: 'kmail'
+
+# KDE Connect package
+__communication_kdeconnect_package: 'kdeconnect'
+
+# Packages not available without external repos
+__communication_slack_package: ''
+__communication_signal_package: ''
+__communication_discord_package: ''
+__communication_element_package: ''
+__communication_threema_package: ''
+__communication_zoom_package: ''
+__communication_teams_package: ''
+__communication_jitsi_package: ''

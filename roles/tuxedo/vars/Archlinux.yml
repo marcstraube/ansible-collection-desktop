@@ -1,0 +1,20 @@
+---
+#
+# Arch Linux Variables for Tuxedo
+#
+
+# AUR packages
+__tuxedo_aur_packages:
+  drivers:
+    - tuxedo-drivers-dkms
+  control_center:
+    - tuxedo-control-center-bin
+  yt6801:
+    - tuxedo-yt6801-dkms-git
+
+# DKMS prerequisite
+__tuxedo_dkms_package: 'dkms'
+
+# Services
+__tuxedo_tccd_service: 'tccd.service'
+__tuxedo_tccd_sleep_service: 'tccd-sleep.service'

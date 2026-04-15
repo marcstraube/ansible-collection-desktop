@@ -1,0 +1,16 @@
+---
+#
+# RedHat Variables (Latest: Rocky 10 / EPEL 10)
+#
+
+# Not in EPEL 10
+__downloads_transmission_package: ''
+# Not in EPEL 10 (EPEL 9 only)
+__downloads_qbittorrent_package: ''
+# Not in EPEL 9 or EPEL 10
+__downloads_deluge_package: ''
+# Not in EPEL 9 or EPEL 10
+__downloads_ytdlp_package: ''
+__downloads_aria2_package: 'aria2'
+# Not in EPEL 9 or EPEL 10
+__downloads_uget_package: ''

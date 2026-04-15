@@ -1,0 +1,107 @@
+---
+#
+# IDEs Installation
+#
+
+# VSCodium (Arch AUR)
+
+- name: IDEs | Manage VSCodium from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_vscodium }}'
+    state: "{{ 'present' if development_vscodium_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_vscodium | default([]) | length > 0
+
+- name: IDEs | VSCodium not available notice (non-Arch)
+  ansible.builtin.debug:
+    msg: 'VSCodium requires Flatpak or external repository on {{ ansible_facts["os_family"] }}.'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_vscodium_enabled | bool
+
+# VS Code (Arch AUR)
+
+- name: IDEs | Manage VS Code from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_vscode }}'
+    state: "{{ 'present' if development_vscode_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_vscode | default([]) | length > 0
+
+# PHPStorm (Arch AUR)
+
+- name: IDEs | Manage PHPStorm from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_phpstorm }}'
+    state: "{{ 'present' if development_phpstorm_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_phpstorm | default([]) | length > 0
+
+# Zed (Arch AUR)
+
+- name: IDEs | Manage Zed from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_zed }}'
+    state: "{{ 'present' if development_zed_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_zed | default([]) | length > 0
+
+# JetBrains Toolbox (Arch AUR)
+
+- name: IDEs | Manage JetBrains Toolbox from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_jetbrains }}'
+    state: "{{ 'present' if development_jetbrains_toolbox_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_jetbrains | default([]) | length > 0
+
+# Postman (Arch AUR)
+
+- name: IDEs | Manage Postman from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.api_tools_postman }}'
+    state: "{{ 'present' if development_postman_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.api_tools_postman | default([]) | length > 0
+
+# Insomnia (Arch AUR)
+
+- name: IDEs | Manage Insomnia from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.api_tools_insomnia }}'
+    state: "{{ 'present' if development_insomnia_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.api_tools_insomnia | default([]) | length > 0
+
+# Bruno (Arch AUR)
+
+- name: IDEs | Manage Bruno from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.api_tools_bruno }}'
+    state: "{{ 'present' if development_bruno_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.api_tools_bruno | default([]) | length > 0

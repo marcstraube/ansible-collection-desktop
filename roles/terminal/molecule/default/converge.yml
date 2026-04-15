@@ -1,0 +1,15 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    terminal_enabled: true
+    terminal_emulators:
+      - 'foot'
+    terminal_default: 'foot'
+
+  tasks:
+    - name: Converge | Include terminal role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

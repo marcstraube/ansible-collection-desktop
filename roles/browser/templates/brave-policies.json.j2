@@ -1,0 +1,36 @@
+{{ ansible_managed | comment('cblock') }}
+{
+{% if browser_brave_extensions | length > 0 %}
+  "ExtensionSettings": {
+    "*": {
+      "blocked_install_message": "Extension installation is managed by system policy.",
+      "installation_mode": "{{ browser_extension_default_mode }}"
+    }{% if browser_brave_extensions | length > 0 %},{% endif %}
+
+{% for ext_id, ext_config in browser_brave_extensions | dictsort %}
+    "{{ ext_id }}": {
+      "installation_mode": "{{ ext_config.mode | default('normal_installed') }}"{% if ext_config.url is defined %},
+      "update_url": "{{ ext_config.url }}"{% endif %}
+
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  },
+{% endif %}
+{% if browser_brave_homepage | length > 0 %}
+  "HomepageLocation": "{{ browser_brave_homepage }}",
+  "HomepageIsNewTabPage": false,
+{% endif %}
+{% if browser_brave_search_provider is defined %}
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "{{ browser_brave_search_provider.name | default('DuckDuckGo') }}",
+  "DefaultSearchProviderSearchURL": "{{ browser_brave_search_provider.url | default('https://duckduckgo.com/?q={searchTerms}') }}",
+{% endif %}
+  "BrowserSignin": {{ browser_brave_signin | default(0) }},
+  "SyncDisabled": {{ browser_brave_sync_disabled | default(true) | lower }},
+  "MetricsReportingEnabled": {{ browser_brave_metrics | default(false) | lower }},
+  "SafeBrowsingEnabled": {{ browser_brave_safe_browsing | default(true) | lower }},
+  "PasswordManagerEnabled": {{ browser_brave_password_manager | default(false) | lower }},
+  "AutofillAddressEnabled": {{ browser_brave_autofill_address | default(false) | lower }},
+  "AutofillCreditCardEnabled": {{ browser_brave_autofill_credit_card | default(false) | lower }}
+}

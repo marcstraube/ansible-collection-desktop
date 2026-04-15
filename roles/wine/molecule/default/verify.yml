@@ -1,0 +1,63 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Package Verification
+    #
+
+    - name: Verify | Check Wine binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/wine
+      register: __wine_binary
+
+    - name: Verify | Check Wine64 binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/wine64
+      register: __wine64_binary
+
+    - name: Verify | Assert Wine is installed
+      ansible.builtin.assert:
+        that: __wine_binary.stat.exists or __wine64_binary.stat.exists
+        fail_msg: 'Wine binary not found at /usr/bin/wine or /usr/bin/wine64'
+
+    - name: Verify | Check winetricks binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/winetricks
+      register: __wine_winetricks_binary
+      when: ansible_facts['os_family'] != 'RedHat'
+
+    - name: Verify | Assert winetricks is installed
+      ansible.builtin.assert:
+        that: __wine_winetricks_binary.stat.exists
+        fail_msg: 'winetricks binary not found at /usr/bin/winetricks'
+      when: ansible_facts['os_family'] != 'RedHat'
+
+    #
+    # Environment Configuration
+    #
+
+    - name: Verify | Check Wine environment file exists
+      ansible.builtin.stat:
+        path: /etc/profile.d/wine.sh
+      register: __wine_env_file
+
+    - name: Verify | Assert Wine environment file is deployed
+      ansible.builtin.assert:
+        that: __wine_env_file.stat.exists
+        fail_msg: 'Wine environment file not found at /etc/profile.d/wine.sh'
+
+    - name: Verify | Check Wine environment file permissions
+      ansible.builtin.assert:
+        that:
+          - __wine_env_file.stat.mode == '0644'
+          - __wine_env_file.stat.pw_name == 'root'
+          - __wine_env_file.stat.gr_name == 'root'
+        fail_msg: 'Wine environment file has incorrect permissions'
+
+    - name: Verify | Check Wine environment file contains WINEDEBUG
+      ansible.builtin.command:
+        cmd: grep -q 'WINEDEBUG' /etc/profile.d/wine.sh
+      changed_when: false

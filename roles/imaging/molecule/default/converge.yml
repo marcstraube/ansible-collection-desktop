@@ -1,0 +1,22 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    imaging_enabled: true
+    imaging_sane_enabled: true
+    # Skip AUR-only package on Arch containers
+    imaging_xsane_enabled: false
+    imaging_simple_scan_enabled: true
+    imaging_imagemagick_enabled: true
+    imaging_graphicsmagick_enabled: true
+    # Skip AUR-only packages in containers
+    imaging_vuescan_enabled: false
+    # Skip KDE-only packages on non-KDE containers
+    imaging_skanlite_enabled: false
+
+  tasks:
+    - name: Converge | Include imaging role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

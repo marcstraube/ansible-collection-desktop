@@ -1,0 +1,6 @@
+---
+#
+# RedHat Variables
+#
+
+__security_apps_packages: {}

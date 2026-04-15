@@ -1,0 +1,10 @@
+---
+#
+# OS-Independent Variables
+#
+
+# ComfyUI Git repository URL
+__ai_comfyui_repo_url: 'https://github.com/comfyanonymous/ComfyUI.git'
+
+# ComfyUI-Manager Git repository URL
+__ai_comfyui_manager_repo_url: 'https://github.com/ltdrdata/ComfyUI-Manager.git'

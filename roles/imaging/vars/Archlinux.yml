@@ -1,0 +1,25 @@
+---
+#
+# Scanning Packages
+#
+
+__imaging_sane_package: sane
+__imaging_simple_scan_package: simple-scan
+__imaging_skanlite_package: skanlite
+
+#
+# Image Processing Packages
+#
+
+__imaging_imagemagick_package: imagemagick
+__imaging_graphicsmagick_package: graphicsmagick
+
+#
+# AUR Packages
+#
+
+__imaging_aur_packages:
+  vuescan:
+    - vuescan-bin
+  xsane:
+    - xsane

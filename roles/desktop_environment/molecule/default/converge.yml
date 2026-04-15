@@ -1,0 +1,25 @@
+---
+#
+# Converge playbook for molecule testing
+#
+
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    desktop_environment_enabled: true
+    desktop_environment_list:
+      - 'xfce'
+    desktop_environment_wayland_utils_enabled: false
+    desktop_environment_xfce_goodies_enabled: false
+    desktop_environment_xfce_whiskermenu_enabled: false
+    desktop_environment_file_manager: 'none'
+    desktop_environment_archive_manager_enabled: false
+    desktop_environment_calculator_enabled: false
+    desktop_environment_text_editor: 'none'
+
+  tasks:
+    - name: Converge | Include desktop_environment role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

@@ -1,0 +1,105 @@
+---
+#
+# LibreOffice
+#
+
+__office_libreoffice_fresh_package: 'libreoffice-fresh'
+__office_libreoffice_still_package: 'libreoffice-still'
+__office_libreoffice_i18n_package: >-
+  {{ office_libreoffice_fresh_enabled | bool |
+     ternary('libreoffice-fresh', 'libreoffice-still') }}-{{ office_libreoffice_i18n }}
+
+#
+# PDF
+#
+
+__office_pdf_viewers:
+  evince: 'evince'
+  okular: 'okular'
+  zathura: 'zathura'
+  mupdf: 'mupdf'
+
+__office_pdf_tools_packages:
+  - 'pdftk'
+  - 'qpdf'
+  - 'poppler'
+
+#
+# Email
+#
+
+__office_thunderbird_package: 'thunderbird'
+__office_thunderbird_i18n_package: 'thunderbird-i18n-{{ office_thunderbird_i18n }}'
+__office_evolution_package: 'evolution'
+
+#
+# Calendar / PIM
+#
+
+__office_gnome_calendar_package: 'gnome-calendar'
+__office_gnome_contacts_package: 'gnome-contacts'
+
+#
+# OCR
+#
+
+__office_tesseract_package: 'tesseract'
+__office_tesseract_lang_prefix: 'tesseract-data-'
+
+#
+# Scanning
+#
+
+__office_simple_scan_package: 'simple-scan'
+__office_gscan2pdf_package: 'gscan2pdf'
+
+#
+# Ebook
+#
+
+__office_calibre_package: 'calibre'
+__office_foliate_package: 'foliate'
+
+#
+# LaTeX
+#
+
+__office_texstudio_package: 'texstudio'
+
+#
+# Spell Checking
+#
+
+__office_hunspell_packages:
+  - 'hunspell'
+  - 'hunspell-en_us'
+  - 'hunspell-de'
+
+#
+# Fonts
+#
+
+__office_fonts_packages:
+  - 'ttf-liberation'
+  - 'ttf-dejavu'
+  - 'noto-fonts'
+
+#
+# AUR Packages
+#
+
+__office_aur_packages:
+  onlyoffice:
+    - 'onlyoffice-bin'
+  wps:
+    - 'wps-office'
+  obsidian:
+    - 'obsidian'
+  logseq:
+    - 'logseq-desktop-bin'
+  joplin:
+    - 'joplin-appimage'
+  simplenote:
+    - 'simplenote-electron-bin'
+  typora:
+    - 'typora'

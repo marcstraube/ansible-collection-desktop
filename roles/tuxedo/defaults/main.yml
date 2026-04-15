@@ -1,0 +1,37 @@
+---
+#
+# Role Control
+#
+
+# Enable the tuxedo role
+tuxedo_enabled: true
+
+#
+# Packages
+#
+
+# Install tuxedo-drivers-dkms (keyboard, backlight, fan, Fn keys)
+tuxedo_drivers_enabled: true
+
+# Install Tuxedo Control Center (fan curves, power profiles, backlight GUI/daemon)
+tuxedo_control_center_enabled: true
+
+# Install YT6801 Ethernet driver (Gen9/Gen10 models only)
+tuxedo_yt6801_ethernet_enabled: false
+
+#
+# Services
+#
+
+# Enable tccd.service (Tuxedo Control Center daemon)
+tuxedo_tccd_enabled: true
+
+# Enable tccd-sleep.service (suspend/resume handling)
+tuxedo_tccd_sleep_enabled: true
+
+#
+# Warnings
+#
+
+# Warn about auto-cpufreq conflict with tccd power profiles
+tuxedo_warn_conflicts: true

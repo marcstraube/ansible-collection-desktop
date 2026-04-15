@@ -1,0 +1,147 @@
+---
+#
+# Hyprland Installation
+#
+
+- name: Hyprland | Build package list
+  ansible.builtin.set_fact:
+    __desktop_environment_hyprland_install_packages: >-
+      {{
+        __desktop_environment_hyprland_packages +
+        ((desktop_environment_hyprland_hypridle_enabled | bool and
+          __desktop_environment_hyprland_hypridle_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hypridle_package], [])) +
+        ((desktop_environment_hyprland_hyprlock_enabled | bool and
+          __desktop_environment_hyprland_hyprlock_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprlock_package], [])) +
+        ((desktop_environment_hyprland_hyprpaper_enabled | bool and
+          __desktop_environment_hyprland_hyprpaper_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprpaper_package], [])) +
+        ((desktop_environment_hyprland_hyprpicker_enabled | bool and
+          __desktop_environment_hyprland_hyprpicker_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprpicker_package], [])) +
+        ((desktop_environment_hyprland_hyprcursor_enabled | bool and
+          __desktop_environment_hyprland_hyprcursor_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprcursor_package], [])) +
+        ((desktop_environment_hyprland_hyprshot_enabled | bool and
+          __desktop_environment_hyprland_hyprshot_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprshot_package], [])) +
+        ((desktop_environment_hyprland_hyprsunset_enabled | bool and
+          __desktop_environment_hyprland_hyprsunset_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprsunset_package], [])) +
+        ((desktop_environment_hyprland_hyprlauncher_enabled | bool and
+          __desktop_environment_hyprland_hyprlauncher_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprlauncher_package], [])) +
+        ((desktop_environment_hyprland_hyprpwcenter_enabled | bool and
+          __desktop_environment_hyprland_hyprpwcenter_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_hyprpwcenter_package], [])) +
+        ((desktop_environment_hyprland_portal_enabled | bool and
+          __desktop_environment_hyprland_portal_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_portal_package], [])) +
+        ((desktop_environment_hyprland_polkit_enabled | bool and
+          __desktop_environment_hyprland_polkit_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_polkit_package], [])) +
+        ((desktop_environment_hyprland_uwsm_enabled | bool and
+          __desktop_environment_hyprland_uwsm_package | default('') | length > 0)
+          | ternary([__desktop_environment_hyprland_uwsm_package], []))
+      }}
+
+- name: Hyprland | Filter empty packages
+  ansible.builtin.set_fact:
+    __desktop_environment_hyprland_install_packages: >-
+      {{ __desktop_environment_hyprland_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: Hyprland | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_hyprland_install_packages }}'
+    state: present
+  when:
+    - __desktop_environment_hyprland_install_packages | length > 0
+
+- name: Hyprland | Build AUR package list
+  ansible.builtin.set_fact:
+    __desktop_environment_hyprland_install_aur_packages: >-
+      {{
+        ((desktop_environment_hyprland_hyprqt6engine_enabled | bool and
+          __desktop_environment_aur_packages.hyprqt6engine | default([]) | length > 0)
+          | ternary(__desktop_environment_aur_packages.hyprqt6engine | default([]), [])) +
+        ((desktop_environment_hyprland_hyprshutdown_enabled | bool and
+          __desktop_environment_aur_packages.hyprshutdown | default([]) | length > 0)
+          | ternary(__desktop_environment_aur_packages.hyprshutdown | default([]), [])) +
+        ((desktop_environment_hyprland_shader_enabled | bool and
+          __desktop_environment_aur_packages.hyprshade | default([]) | length > 0)
+          | ternary(__desktop_environment_aur_packages.hyprshade | default([]), []))
+      }}
+  when: ansible_facts['os_family'] == 'Archlinux'
+
+- name: Hyprland | Install AUR packages (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __desktop_environment_hyprland_install_aur_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __desktop_environment_hyprland_install_aur_packages | default([]) | length > 0
+
+# uwsm Desktop Entry
+- name: Hyprland | Create wayland-sessions directory
+  ansible.builtin.file:
+    path: '/usr/share/wayland-sessions'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: desktop_environment_hyprland_uwsm_enabled | bool
+
+- name: Hyprland | Deploy uwsm desktop entry
+  ansible.builtin.template:
+    src: 'hyprland-uwsm.desktop.j2'
+    dest: '/usr/share/wayland-sessions/hyprland-uwsm.desktop'
+    owner: root
+    group: root
+    mode: '0644'
+  when: desktop_environment_hyprland_uwsm_enabled | bool
+
+# uwsm service automation (drop-ins + enable)
+- name: Hyprland | Create uwsm drop-in directories
+  ansible.builtin.file:
+    path: '/etc/systemd/user/{{ item }}.service.d'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop: '{{ desktop_environment_hyprland_uwsm_services }}'
+  when:
+    - desktop_environment_hyprland_uwsm_enabled | bool
+    - desktop_environment_hyprland_uwsm_services | length > 0
+
+- name: Hyprland | Deploy uwsm drop-in for Hyprland-only restriction
+  ansible.builtin.template:
+    src: 'hyprland-uwsm-dropin.conf.j2'
+    dest: '/etc/systemd/user/{{ item }}.service.d/10-hyprland-only.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  loop: '{{ desktop_environment_hyprland_uwsm_services }}'
+  when:
+    - desktop_environment_hyprland_uwsm_enabled | bool
+    - desktop_environment_hyprland_uwsm_services | length > 0
+  notify: Reload systemd user daemon
+
+- name: Hyprland | Enable uwsm user services
+  ansible.builtin.systemd_service:
+    name: '{{ item.1 }}'
+    scope: user
+    enabled: true
+  become: true
+  become_user: '{{ item.0 }}'
+  loop: >-
+    {{ desktop_environment_users
+       | product(desktop_environment_hyprland_uwsm_services) | list }}
+  loop_control:
+    label: '{{ item.0 }}: {{ item.1 }}'
+  when:
+    - desktop_environment_hyprland_uwsm_enabled | bool
+    - desktop_environment_users | length > 0
+    - desktop_environment_hyprland_uwsm_services | length > 0

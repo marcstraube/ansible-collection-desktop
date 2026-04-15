@@ -1,0 +1,43 @@
+---
+#
+# KeePassXC Autostart Tasks
+#
+
+- name: Autostart | Create systemd user service directories
+  ansible.builtin.file:
+    path: '/home/{{ item.name }}/.config/systemd/user/'
+    state: directory
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0755'
+  when: item.autostart | default(true)
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Autostart | Deploy systemd user service
+  ansible.builtin.template:
+    src: 'keepassxc.service.j2'
+    dest: '/home/{{ item.name }}/.config/systemd/user/keepassxc.service'
+    owner: '{{ item.name }}'
+    group: '{{ item.group | default(item.name) }}'
+    mode: '0644'
+  when: item.autostart | default(true)
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+
+- name: Autostart | Manage KeePassXC autostart service
+  ansible.builtin.systemd_service:
+    name: keepassxc.service
+    enabled: "{{ item.autostart | default(true) | bool }}"
+    state: "{{ item.autostart | default(true) | bool | ternary('started', 'stopped') }}"
+    scope: user
+    daemon_reload: true
+  become: true
+  become_user: '{{ item.name }}'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  # Systemd user scope not available in containers (molecule)
+  failed_when: false

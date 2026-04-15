@@ -1,0 +1,24 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+
+    # Skip AUR/external packages in CI containers
+    ai_claude_code_enabled: false
+    ai_gemini_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: false
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

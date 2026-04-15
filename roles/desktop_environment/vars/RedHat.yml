@@ -1,0 +1,141 @@
+---
+#
+# RedHat Variables
+#
+
+#
+# Hyprland
+#
+
+__desktop_environment_hyprland_packages:
+  - 'hyprland'
+
+# Extras (available in EPEL)
+__desktop_environment_hyprland_hypridle_package: 'hypridle'
+__desktop_environment_hyprland_hyprlock_package: 'hyprlock'
+__desktop_environment_hyprland_hyprpaper_package: 'hyprpaper'
+__desktop_environment_hyprland_hyprpicker_package: 'hyprpicker'
+__desktop_environment_hyprland_hyprcursor_package: 'hyprcursor'
+__desktop_environment_hyprland_hyprshot_package: ''
+__desktop_environment_hyprland_hyprsunset_package: ''
+
+# Extras (not available on RedHat)
+__desktop_environment_hyprland_hyprlauncher_package: ''
+__desktop_environment_hyprland_hyprpwcenter_package: ''
+
+__desktop_environment_hyprland_portal_package: 'xdg-desktop-portal-hyprland'
+__desktop_environment_hyprland_polkit_package: ''
+__desktop_environment_hyprland_uwsm_package: ''
+
+#
+# Sway
+#
+
+__desktop_environment_sway_packages:
+  - 'sway'
+
+__desktop_environment_sway_extras_packages:
+  - 'swaylock'
+  - 'swayidle'
+  - 'swaybg'
+
+__desktop_environment_sway_portal_package: 'xdg-desktop-portal-wlr'
+
+#
+# i3
+#
+
+__desktop_environment_i3_packages:
+  - 'i3'
+
+__desktop_environment_i3_status_packages:
+  i3status: 'i3status'
+  i3blocks: 'i3blocks'
+  polybar: 'polybar'
+
+__desktop_environment_i3_dmenu_package: 'dmenu'
+__desktop_environment_i3_picom_package: 'picom'
+
+#
+# KDE
+#
+
+__desktop_environment_kde_minimal_packages:
+  - '@kde-desktop-environment'
+
+__desktop_environment_kde_full_packages:
+  - '@kde-desktop-environment'
+
+__desktop_environment_kde_app_packages:
+  dolphin: 'dolphin'
+  konsole: 'konsole'
+  kate: 'kate'
+  okular: 'okular'
+  gwenview: 'gwenview'
+  ark: 'ark'
+  spectacle: 'spectacle'
+  kcalc: 'kcalc'
+
+#
+# GNOME
+#
+
+__desktop_environment_gnome_minimal_packages:
+  - 'gnome-shell'
+
+__desktop_environment_gnome_full_packages:
+  - '@gnome-desktop'
+
+__desktop_environment_gnome_extras_package: ''
+__desktop_environment_gnome_tweaks_package: 'gnome-tweaks'
+
+#
+# XFCE
+#
+
+__desktop_environment_xfce_packages:
+  - '@xfce-desktop-environment'
+
+# Included in group
+__desktop_environment_xfce_goodies_package: ''
+__desktop_environment_xfce_whiskermenu_package: 'xfce4-whiskermenu-plugin'
+
+#
+# LXDE
+#
+
+__desktop_environment_lxde_minimal_packages:
+  - 'lxde-common'
+  - 'lxsession'
+  - 'openbox'
+  - 'lxpanel'
+  - 'pcmanfm'
+
+__desktop_environment_lxde_full_packages:
+  - '@lxde-desktop-environment'
+
+#
+# LXQt
+#
+
+__desktop_environment_lxqt_packages:
+  - '@lxqt-desktop-environment'
+
+__desktop_environment_lxqt_icon_packages:
+  breeze-icons: 'breeze-icon-theme'
+  oxygen-icons: 'oxygen-icon-theme'
+
+#
+# Themes
+#
+
+__desktop_environment_cursor_theme_packages:
+  adwaita: 'adwaita-cursor-theme'
+  breeze: 'breeze-cursor-theme'
+  capitaine: ''
+
+__desktop_environment_icon_theme_packages:
+  adwaita: 'adwaita-icon-theme'
+  breeze: 'breeze-icon-theme'
+  papirus: 'papirus-icon-theme'
+  hicolor: 'hicolor-icon-theme'

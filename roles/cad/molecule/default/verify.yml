@@ -1,0 +1,156 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    - name: Verify | Check OpenSCAD installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q openscad
+      register: __cad_openscad_check
+      changed_when: false
+      failed_when: __cad_openscad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __cad_openscad_package | default('') | length > 0
+
+    - name: Verify | Check OpenSCAD installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l openscad
+      register: __cad_openscad_check
+      changed_when: false
+      failed_when: __cad_openscad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __cad_openscad_package | default('') | length > 0
+
+    - name: Verify | Check OpenSCAD installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q openscad
+      register: __cad_openscad_check
+      changed_when: false
+      failed_when: __cad_openscad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __cad_openscad_package | default('') | length > 0
+
+    - name: Verify | Check FreeCAD installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q freecad
+      register: __cad_freecad_check
+      changed_when: false
+      failed_when: __cad_freecad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __cad_freecad_package | default('') | length > 0
+
+    - name: Verify | Check FreeCAD installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l freecad
+      register: __cad_freecad_check
+      changed_when: false
+      failed_when: __cad_freecad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __cad_freecad_package | default('') | length > 0
+
+    - name: Verify | Check LibreCAD installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q librecad
+      register: __cad_librecad_check
+      changed_when: false
+      failed_when: __cad_librecad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __cad_librecad_package | default('') | length > 0
+
+    - name: Verify | Check LibreCAD installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l librecad
+      register: __cad_librecad_check
+      changed_when: false
+      failed_when: __cad_librecad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __cad_librecad_package | default('') | length > 0
+
+    - name: Verify | Check Blender installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q blender
+      register: __cad_blender_check
+      changed_when: false
+      failed_when: __cad_blender_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __cad_blender_package | default('') | length > 0
+
+    - name: Verify | Check Blender installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l blender
+      register: __cad_blender_check
+      changed_when: false
+      failed_when: __cad_blender_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __cad_blender_package | default('') | length > 0
+
+    - name: Verify | Check Blender installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q blender
+      register: __cad_blender_check
+      changed_when: false
+      failed_when: __cad_blender_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __cad_blender_package | default('') | length > 0
+
+    - name: Verify | Check KiCad installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q kicad
+      register: __cad_kicad_check
+      changed_when: false
+      failed_when: __cad_kicad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __cad_kicad_package | default('') | length > 0
+
+    - name: Verify | Check KiCad installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l kicad
+      register: __cad_kicad_check
+      changed_when: false
+      failed_when: __cad_kicad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __cad_kicad_package | default('') | length > 0
+
+    - name: Verify | Check QCAD installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q qcad
+      register: __cad_qcad_check
+      changed_when: false
+      failed_when: __cad_qcad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __cad_qcad_package | default('') | length > 0
+
+    - name: Verify | Check QCAD installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q qcad
+      register: __cad_qcad_check
+      changed_when: false
+      failed_when: __cad_qcad_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __cad_qcad_package | default('') | length > 0

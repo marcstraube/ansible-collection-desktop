@@ -1,0 +1,190 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # Transmission
+    #
+
+    - name: Verify | Check Transmission installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __downloads_transmission_package }}
+      register: __downloads_transmission_check
+      changed_when: false
+      failed_when: __downloads_transmission_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __downloads_transmission_package | default('') | length > 0
+
+    - name: Verify | Check Transmission installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __downloads_transmission_package }}
+      register: __downloads_transmission_check
+      changed_when: false
+      failed_when: __downloads_transmission_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __downloads_transmission_package | default('') | length > 0
+
+    - name: Verify | Check Transmission installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __downloads_transmission_package }}
+      register: __downloads_transmission_check
+      changed_when: false
+      failed_when: __downloads_transmission_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __downloads_transmission_package | default('') | length > 0
+
+    #
+    # qBittorrent
+    #
+
+    - name: Verify | Check qBittorrent installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __downloads_qbittorrent_package }}
+      register: __downloads_qbittorrent_check
+      changed_when: false
+      failed_when: __downloads_qbittorrent_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __downloads_qbittorrent_package | default('') | length > 0
+
+    - name: Verify | Check qBittorrent installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __downloads_qbittorrent_package }}
+      register: __downloads_qbittorrent_check
+      changed_when: false
+      failed_when: __downloads_qbittorrent_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __downloads_qbittorrent_package | default('') | length > 0
+
+    - name: Verify | Check qBittorrent installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __downloads_qbittorrent_package }}
+      register: __downloads_qbittorrent_check
+      changed_when: false
+      failed_when: __downloads_qbittorrent_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __downloads_qbittorrent_package | default('') | length > 0
+
+    #
+    # Deluge
+    #
+
+    - name: Verify | Check Deluge installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __downloads_deluge_package }}
+      register: __downloads_deluge_check
+      changed_when: false
+      failed_when: __downloads_deluge_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __downloads_deluge_package | default('') | length > 0
+
+    - name: Verify | Check Deluge installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __downloads_deluge_package }}
+      register: __downloads_deluge_check
+      changed_when: false
+      failed_when: __downloads_deluge_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __downloads_deluge_package | default('') | length > 0
+
+    #
+    # yt-dlp
+    #
+
+    - name: Verify | Check yt-dlp installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __downloads_ytdlp_package }}
+      register: __downloads_ytdlp_check
+      changed_when: false
+      failed_when: __downloads_ytdlp_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __downloads_ytdlp_package | default('') | length > 0
+
+    - name: Verify | Check yt-dlp installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __downloads_ytdlp_package }}
+      register: __downloads_ytdlp_check
+      changed_when: false
+      failed_when: __downloads_ytdlp_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __downloads_ytdlp_package | default('') | length > 0
+
+    #
+    # aria2
+    #
+
+    - name: Verify | Check aria2 installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __downloads_aria2_package }}
+      register: __downloads_aria2_check
+      changed_when: false
+      failed_when: __downloads_aria2_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __downloads_aria2_package | default('') | length > 0
+
+    - name: Verify | Check aria2 installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __downloads_aria2_package }}
+      register: __downloads_aria2_check
+      changed_when: false
+      failed_when: __downloads_aria2_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __downloads_aria2_package | default('') | length > 0
+
+    - name: Verify | Check aria2 installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __downloads_aria2_package }}
+      register: __downloads_aria2_check
+      changed_when: false
+      failed_when: __downloads_aria2_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __downloads_aria2_package | default('') | length > 0
+
+    #
+    # uGet
+    #
+
+    - name: Verify | Check uGet installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __downloads_uget_package }}
+      register: __downloads_uget_check
+      changed_when: false
+      failed_when: __downloads_uget_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __downloads_uget_package | default('') | length > 0
+
+    - name: Verify | Check uGet installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __downloads_uget_package }}
+      register: __downloads_uget_check
+      changed_when: false
+      failed_when: __downloads_uget_check.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __downloads_uget_package | default('') | length > 0

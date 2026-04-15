@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  author: Marc Straube
+  description: Install and configure Wine Windows compatibility layer
+  license: MIT
+  min_ansible_version: '2.17'
+
+  platforms:
+    - name: ArchLinux
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - trixie
+    - name: EL
+      versions:
+        - all
+
+  galaxy_tags:
+    - wine
+    - windows
+    - compatibility
+    - gaming
+    - desktop
+
+dependencies: []

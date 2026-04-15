@@ -1,0 +1,57 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Cameractrls (Facecam)
+    #
+
+    - name: Verify | Check cameractrls installed
+      ansible.builtin.command:
+        cmd: pacman -Q cameractrls
+      register: __elgato_cameractrls_check
+      changed_when: false
+      failed_when: __elgato_cameractrls_check.rc != 0
+
+    #
+    # Wave:3 WirePlumber Config
+    #
+
+    - name: Verify | Get testuser home directory
+      ansible.builtin.getent:
+        database: passwd
+        key: testuser
+
+    - name: Verify | Check WirePlumber config directory exists
+      ansible.builtin.stat:
+        path: '{{ getent_passwd["testuser"][4] }}/.config/wireplumber/wireplumber.conf.d'
+      register: __elgato_wireplumber_dir
+      failed_when: not __elgato_wireplumber_dir.stat.isdir
+
+    - name: Verify | Check Wave:3 config file exists with correct ownership
+      ansible.builtin.stat:
+        path: '{{ getent_passwd["testuser"][4] }}/.config/wireplumber/wireplumber.conf.d/51-elgato-wave3.conf'
+      register: __elgato_wave3_config
+      failed_when: >-
+        not __elgato_wave3_config.stat.exists or
+        __elgato_wave3_config.stat.pw_name != 'testuser'
+
+    - name: Verify | Check Wave:3 config contains ansible_managed header
+      ansible.builtin.command:
+        cmd: >-
+          grep -c 'Ansible managed'
+          '{{ getent_passwd["testuser"][4] }}/.config/wireplumber/wireplumber.conf.d/51-elgato-wave3.conf'
+      register: __elgato_managed_check
+      changed_when: false
+      failed_when: __elgato_managed_check.rc != 0
+
+    - name: Verify | Check Wave:3 config contains required settings
+      ansible.builtin.command:
+        cmd: >-
+          grep -c 'node.always-process'
+          '{{ getent_passwd["testuser"][4] }}/.config/wireplumber/wireplumber.conf.d/51-elgato-wave3.conf'
+      register: __elgato_settings_check
+      changed_when: false
+      failed_when: __elgato_settings_check.rc != 0

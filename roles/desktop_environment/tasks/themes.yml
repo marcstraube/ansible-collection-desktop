@@ -1,0 +1,52 @@
+---
+#
+# Theme Installation (Cursor and Icon Themes)
+#
+
+- name: Themes | Build cursor theme package list
+  ansible.builtin.set_fact:
+    __desktop_environment_cursor_install_packages: >-
+      {{ desktop_environment_cursor_themes
+         | map('extract', __desktop_environment_cursor_theme_packages, default='')
+         | select('string') | reject('equalto', '') | list }}
+    __desktop_environment_cursor_install_aur_packages: >-
+      {{ desktop_environment_cursor_themes
+         | map('extract', __desktop_environment_cursor_theme_aur_packages | default({}), default='')
+         | select('string') | reject('equalto', '') | list }}
+
+- name: Themes | Build icon theme package list
+  ansible.builtin.set_fact:
+    __desktop_environment_icon_install_packages: >-
+      {{ desktop_environment_icon_themes
+         | map('extract', __desktop_environment_icon_theme_packages, default='')
+         | select('string') | reject('equalto', '') | list }}
+    __desktop_environment_icon_install_aur_packages: >-
+      {{ desktop_environment_icon_themes
+         | map('extract', __desktop_environment_icon_theme_aur_packages | default({}), default='')
+         | select('string') | reject('equalto', '') | list }}
+
+- name: Themes | Combine all theme packages
+  ansible.builtin.set_fact:
+    __desktop_environment_themes_packages: >-
+      {{ (__desktop_environment_cursor_install_packages +
+          __desktop_environment_icon_install_packages) | unique | list }}
+    __desktop_environment_themes_aur_packages: >-
+      {{ (__desktop_environment_cursor_install_aur_packages +
+          __desktop_environment_icon_install_aur_packages) | unique | list }}
+
+- name: Themes | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_themes_packages }}'
+    state: present
+  when:
+    - __desktop_environment_themes_packages | length > 0
+
+- name: Themes | Install AUR packages (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __desktop_environment_themes_aur_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __desktop_environment_themes_aur_packages | length > 0

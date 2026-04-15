@@ -1,0 +1,177 @@
+---
+# =============================================================================
+# Laptop Playbook (Base Configuration)
+# =============================================================================
+# Complete laptop setup with:
+# - All base desktop features (from desktop_workstation.yml)
+# - Laptop-specific power management
+# - Battery optimization
+# - Mobile hardware support (WiFi, Bluetooth, touchpad)
+# - Suspend/hibernate tuning
+#
+# Usage:
+#   ansible-playbook marcstraube.desktop.laptop
+# =============================================================================
+
+- name: Import base workstation setup
+  ansible.builtin.import_playbook: desktop_workstation.yml
+
+- name: Deploy Laptop-Specific Features
+  hosts: laptops
+  become: true
+  gather_facts: true
+
+  vars:
+    # =========================================================================
+    # LAPTOP HARDWARE & POWER MANAGEMENT
+    # =========================================================================
+
+    # Power management
+    laptop_power_management_enabled: true
+    laptop_tlp_enabled: true
+    laptop_auto_cpufreq_enabled: false  # Alternative to TLP (choose one)
+
+    # Battery optimization
+    laptop_battery_threshold_enabled: true  # ThinkPad battery threshold
+    laptop_battery_start_threshold: 75     # Start charging at 75%
+    laptop_battery_stop_threshold: 80      # Stop charging at 80%
+
+    # Suspend/Hibernate
+    laptop_hibernate_enabled: true
+    laptop_suspend_then_hibernate: true    # Suspend, then hibernate after timeout
+    laptop_suspend_then_hibernate_delay: 3600  # 1 hour
+
+    # Display
+    laptop_backlight_enabled: true
+    laptop_auto_brightness: true
+    laptop_night_light: true
+
+    # Input devices
+    laptop_touchpad_enabled: true
+    laptop_trackpoint_enabled: true  # ThinkPad TrackPoint
+    laptop_touchpad_gestures: true
+
+    # WiFi optimization
+    laptop_wifi_powersave: true
+    laptop_wifi_roaming: true
+
+    # Bluetooth
+    laptop_bluetooth_enabled: true
+    laptop_bluetooth_auto_power_on: false  # Save battery, manual enable
+
+    # =========================================================================
+    # LAPTOP SECURITY (STRICTER THAN DESKTOP)
+    # =========================================================================
+
+    # Physical security
+    desktop_usb_guard_enabled: true         # Prevent USB attacks
+    desktop_bluetooth_hardening_enabled: true
+
+    # Session security (shorter timeouts for mobile)
+    desktop_idle_timeout: 120               # 2 minutes (vs 10 min desktop)
+    desktop_screen_lock_timeout: 60         # 1 minute
+    desktop_screen_lock_on_suspend: true
+
+    # Network security (public WiFi protection)
+    desktop_vpn_killswitch_enabled: true    # Kill internet if VPN drops
+    desktop_secure_dns_enabled: true        # DNS-over-TLS mandatory
+    laptop_public_wifi_warning: true        # Warn on unknown networks
+
+    # Camera/microphone privacy
+    laptop_camera_hardware_killswitch: false  # ThinkPad physical switch
+    laptop_camera_software_block: true        # Software block
+    laptop_microphone_mute_led: true          # Mute LED indicator
+
+    # Firewall (more restrictive for mobile)
+    firewall_default_zone: 'drop'
+    firewall_allowed_services: []
+
+    # =========================================================================
+    # LAPTOP-SPECIFIC APPLICATIONS
+    # =========================================================================
+
+    # Network management
+    laptop_network_manager_enabled: true
+    laptop_network_manager_applet: true
+
+    # System monitors
+    laptop_battery_monitor: true
+    laptop_system_monitor_applet: true
+
+  tasks:
+    # =========================================================================
+    # ENERGY MANAGEMENT (replaces tlp, battery_threshold, suspend, backlight)
+    # =========================================================================
+    # Configured via host_vars: energy_management_* variables
+    # Desktop workstation playbook already includes the role for base
+    # logind/sleep config. Here we just ensure laptop-specific overrides apply.
+
+    - name: Energy | Include energy_management role (laptop overrides)
+      ansible.builtin.include_role:
+        name: marcstraube.common.energy_management
+      when: energy_management_enabled | default(true) | bool
+      tags:
+        - laptop
+        - energy
+        - power
+
+    # =========================================================================
+    # INPUT DEVICES
+    # =========================================================================
+
+    - name: Input | Configure touchpad
+      ansible.builtin.include_role:
+        name: marcstraube.common.touchpad
+      when: laptop_touchpad_enabled | bool
+      tags:
+        - laptop
+        - input
+
+    - name: Input | Configure TrackPoint (ThinkPad)
+      ansible.builtin.include_role:
+        name: marcstraube.common.trackpoint
+      when:
+        - laptop_trackpoint_enabled | bool
+        - ansible_facts['product_name'] is search("ThinkPad")
+      tags:
+        - laptop
+        - input
+
+    # =========================================================================
+    # VENDOR-SPECIFIC HARDWARE
+    # =========================================================================
+
+    - name: Tuxedo | Include tuxedo role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.tuxedo
+      tags: [tuxedo]
+      when: tuxedo_enabled | default(false) | bool
+
+  post_tasks:
+    - name: Summary | Display laptop configuration
+      ansible.builtin.debug:
+        msg:
+          - "============================================================"
+          - "Laptop Deployment Complete!"
+          - "============================================================"
+          - ""
+          - "Laptop Features:"
+          - "  - Power Management (TLP): {{ 'ENABLED' if laptop_tlp_enabled else 'DISABLED' }}"
+          - "  - Battery Threshold: {{ 'ENABLED' if laptop_battery_threshold_enabled else 'DISABLED' }}"
+          - "  - Hibernate: {{ 'ENABLED' if laptop_hibernate_enabled else 'DISABLED' }}"
+          - "  - Touchpad: {{ 'ENABLED' if laptop_touchpad_enabled else 'DISABLED' }}"
+          - "  - TrackPoint: {{ 'ENABLED' if laptop_trackpoint_enabled else 'DISABLED' }}"
+          - ""
+          - "Security (Laptop-Enhanced):"
+          - "  - USB Guard: {{ 'ENABLED' if desktop_usb_guard_enabled else 'DISABLED' }}"
+          - "  - VPN Killswitch: {{ 'ENABLED' if desktop_vpn_killswitch_enabled else 'DISABLED' }}"
+          - "  - Screen Lock: {{ desktop_screen_lock_timeout }}s idle timeout"
+          - "  - Firewall: {{ firewall_default_zone }} zone"
+          - ""
+          - "Next Steps:"
+          - "  1. Run security playbook: ansible-playbook marcstraube.desktop.security"
+          - "  2. Configure WiFi networks"
+          - "  3. Set up VPN (if using VPN killswitch)"
+          - "  4. Test suspend/hibernate"
+          - "  5. Calibrate battery (full discharge/charge cycle)"
+          - "============================================================"

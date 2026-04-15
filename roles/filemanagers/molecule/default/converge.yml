@@ -1,0 +1,23 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    filemanagers_enabled: true
+    filemanagers_vifm_enabled: true
+    filemanagers_mc_enabled: true
+    filemanagers_ranger_enabled: true
+    filemanagers_nnn_enabled: true
+    filemanagers_lf_enabled: true
+    filemanagers_thunar_enabled: false
+    filemanagers_dolphin_enabled: false
+    filemanagers_nautilus_enabled: false
+    filemanagers_pcmanfm_enabled: false
+    filemanagers_nemo_enabled: false
+    filemanagers_doublecmd_enabled: false
+
+  tasks:
+    - name: Converge | Include filemanagers role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

@@ -1,0 +1,34 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    office_enabled: true
+    office_libreoffice_enabled: false
+    office_onlyoffice_enabled: false
+    office_wps_enabled: false
+    office_pdf_viewer: 'evince'
+    office_pdf_tools_enabled: false
+    office_thunderbird_enabled: false
+    office_evolution_enabled: false
+    office_gnome_calendar_enabled: false
+    office_gnome_contacts_enabled: false
+    office_obsidian_enabled: false
+    office_logseq_enabled: false
+    office_joplin_enabled: false
+    office_simplenote_enabled: false
+    office_typora_enabled: false
+    office_texstudio_enabled: false
+    office_ocr_enabled: false
+    office_simple_scan_enabled: false
+    office_gscan2pdf_enabled: false
+    office_calibre_enabled: false
+    office_foliate_enabled: false
+    office_hunspell_enabled: true
+    office_fonts_enabled: false
+
+  tasks:
+    - name: Converge | Include office role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

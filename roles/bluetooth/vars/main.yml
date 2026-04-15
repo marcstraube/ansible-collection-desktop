@@ -1,0 +1,17 @@
+---
+#
+# Service
+#
+
+# Bluetooth service name
+__bluetooth_service_name: 'bluetooth.service'
+
+#
+# Paths
+#
+
+# Bluetooth configuration directory
+__bluetooth_config_dir: '/etc/bluetooth'
+
+# Bluetooth main configuration file
+__bluetooth_config_file: '/etc/bluetooth/main.conf'

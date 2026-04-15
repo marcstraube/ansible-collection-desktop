@@ -1,0 +1,23 @@
+---
+__bluetooth_packages:
+  - 'bluez'
+  - 'bluez-utils'
+
+__bluetooth_deprecated_package: 'bluez-deprecated-tools'
+__bluetooth_obex_package: 'bluez-obex'
+
+__bluetooth_audio_packages:
+  pipewire: []
+  pulseaudio: ['pulseaudio-bluetooth']
+  alsa: []
+  none: []
+
+__bluetooth_aur_packages:
+  alsa:
+    - bluez-alsa-git
+
+__bluetooth_gui_packages:
+  blueman: ['blueman']
+  gnome: ['gnome-bluetooth-3.0']
+  kde: ['bluedevil']
+  none: []

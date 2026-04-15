@@ -1,0 +1,48 @@
+---
+#
+# Role Control
+#
+
+# Enable the filemanagers role
+filemanagers_enabled: true
+
+#
+# Terminal File Managers
+#
+
+# Enable vifm (Vi-like file manager)
+filemanagers_vifm_enabled: false
+
+# Enable Midnight Commander (Norton Commander clone)
+filemanagers_mc_enabled: false
+
+# Enable ranger (Vi-like file manager with file previews)
+filemanagers_ranger_enabled: false
+
+# Enable nnn (fast file manager)
+filemanagers_nnn_enabled: false
+
+# Enable lf (terminal file manager inspired by ranger)
+filemanagers_lf_enabled: false
+
+#
+# GUI File Managers
+#
+
+# Enable Thunar (Xfce file manager)
+filemanagers_thunar_enabled: false
+
+# Enable Dolphin (KDE file manager)
+filemanagers_dolphin_enabled: false
+
+# Enable Nautilus (GNOME file manager)
+filemanagers_nautilus_enabled: false
+
+# Enable PCManFM (lightweight file manager)
+filemanagers_pcmanfm_enabled: false
+
+# Enable Nemo (Cinnamon file manager, fork of Nautilus)
+filemanagers_nemo_enabled: false
+
+# Enable Double Commander (two-panel file manager)
+filemanagers_doublecmd_enabled: false

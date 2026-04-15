@@ -1,0 +1,19 @@
+---
+#
+# Archlinux Variables
+#
+
+__downloads_transmission_package: 'transmission-gtk'
+__downloads_qbittorrent_package: 'qbittorrent'
+__downloads_deluge_package: 'deluge'
+__downloads_ytdlp_package: 'yt-dlp'
+__downloads_aria2_package: 'aria2'
+__downloads_uget_package: 'uget'
+
+#
+# AUR Packages
+#
+
+__downloads_aur_packages:
+  jdownloader:
+    - jdownloader2

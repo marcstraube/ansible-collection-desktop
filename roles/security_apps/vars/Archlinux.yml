@@ -1,0 +1,21 @@
+---
+#
+# Archlinux Variables
+#
+
+__security_apps_packages:
+  veracrypt: ['veracrypt']
+  clamtk: ['clamtk']
+  gufw: ['gufw']
+
+#
+# AUR Packages
+#
+
+__security_apps_aur_packages:
+  cypherock:
+    - cypherock-cysync-appimage
+  ledger:
+    - ledger-live-bin
+  trezor:
+    - trezor-suite-bin

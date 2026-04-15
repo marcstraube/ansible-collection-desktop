@@ -1,0 +1,54 @@
+---
+- name: Users LibreWolf | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ browser_user.username }}'
+
+- name: Users LibreWolf | Set user home fact
+  ansible.builtin.set_fact:
+    __browser_user_home: '{{ getent_passwd[browser_user.username][4] }}'
+
+- name: Users LibreWolf | Check for existing profile
+  ansible.builtin.find:
+    paths: '{{ __browser_user_home }}/.librewolf'
+    patterns: '{{ __browser_librewolf_profile_pattern }}'
+    file_type: directory
+  register: __browser_librewolf_existing_profiles
+  # Profile directory may not exist yet on first run
+  failed_when: false
+
+- name: Users LibreWolf | Create profile if none exists
+  ansible.builtin.command:
+    cmd: 'librewolf --headless -CreateProfile "default"'
+  become: true
+  become_user: '{{ browser_user.username }}'
+  register: __browser_create_librewolf_profile
+  changed_when: __browser_create_librewolf_profile.rc == 0
+  when: >-
+    __browser_librewolf_existing_profiles.files is not defined or
+    __browser_librewolf_existing_profiles.files | length == 0
+
+- name: Users LibreWolf | Find profile after creation
+  ansible.builtin.find:
+    paths: '{{ __browser_user_home }}/.librewolf'
+    patterns: '{{ __browser_librewolf_profile_pattern }}'
+    file_type: directory
+  register: __browser_librewolf_profiles
+  when: >-
+    __browser_librewolf_existing_profiles.files is not defined or
+    __browser_librewolf_existing_profiles.files | length == 0
+
+- name: Users LibreWolf | Set profile path fact
+  ansible.builtin.set_fact:
+    __browser_librewolf_profile_path: >-
+      {{ ((__browser_librewolf_profiles | default(__browser_librewolf_existing_profiles)).files
+         | sort(attribute='path') | first).path }}
+
+- name: Users LibreWolf | Deploy user-overrides.js
+  ansible.builtin.template:
+    src: user.js.j2
+    dest: '{{ __browser_librewolf_profile_path }}/user-overrides.js'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0644'
+  when: browser_librewolf_preferences | length > 0

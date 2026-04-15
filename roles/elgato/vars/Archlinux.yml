@@ -1,0 +1,15 @@
+---
+#
+# Arch Linux Variables
+#
+
+# AUR packages keyed by purpose
+__elgato_aur_packages:
+  streamdeck:
+    - streamcontroller-git
+  keylight:
+    - elgato-keylight
+
+# Facecam package (official extra repo)
+__elgato_facecam_packages:
+  - cameractrls

@@ -1,0 +1,152 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # Terminal File Managers
+    #
+
+    - name: Verify | Check vifm installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __filemanagers_vifm_package }}
+      register: __verify_vifm_arch
+      changed_when: false
+      failed_when: __verify_vifm_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check vifm installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __filemanagers_vifm_package }}
+      register: __verify_vifm_debian
+      changed_when: false
+      failed_when: __verify_vifm_debian.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check vifm installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __filemanagers_vifm_package }}
+      register: __verify_vifm_redhat
+      changed_when: false
+      failed_when: __verify_vifm_redhat.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Midnight Commander
+    #
+
+    - name: Verify | Check Midnight Commander installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __filemanagers_mc_package }}
+      register: __verify_mc_arch
+      changed_when: false
+      failed_when: __verify_mc_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check Midnight Commander installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __filemanagers_mc_package }}
+      register: __verify_mc_debian
+      changed_when: false
+      failed_when: __verify_mc_debian.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check Midnight Commander installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __filemanagers_mc_package }}
+      register: __verify_mc_redhat
+      changed_when: false
+      failed_when: __verify_mc_redhat.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # ranger
+    #
+
+    - name: Verify | Check ranger installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __filemanagers_ranger_package }}
+      register: __verify_ranger_arch
+      changed_when: false
+      failed_when: __verify_ranger_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check ranger installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __filemanagers_ranger_package }}
+      register: __verify_ranger_debian
+      changed_when: false
+      failed_when: __verify_ranger_debian.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check ranger installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __filemanagers_ranger_package }}
+      register: __verify_ranger_redhat
+      changed_when: false
+      failed_when: __verify_ranger_redhat.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # nnn
+    #
+
+    - name: Verify | Check nnn installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __filemanagers_nnn_package }}
+      register: __verify_nnn_arch
+      changed_when: false
+      failed_when: __verify_nnn_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check nnn installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __filemanagers_nnn_package }}
+      register: __verify_nnn_debian
+      changed_when: false
+      failed_when: __verify_nnn_debian.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check nnn installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: rpm -q {{ __filemanagers_nnn_package }}
+      register: __verify_nnn_redhat
+      changed_when: false
+      failed_when: __verify_nnn_redhat.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # lf
+    #
+
+    - name: Verify | Check lf installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __filemanagers_lf_package }}
+      register: __verify_lf_arch
+      changed_when: false
+      failed_when: __verify_lf_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __filemanagers_lf_package | default('') | length > 0
+
+    - name: Verify | Check lf installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __filemanagers_lf_package }}
+      register: __verify_lf_debian
+      changed_when: false
+      failed_when: __verify_lf_debian.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __filemanagers_lf_package | default('') | length > 0

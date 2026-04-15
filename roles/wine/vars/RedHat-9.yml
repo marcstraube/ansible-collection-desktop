@@ -1,0 +1,7 @@
+---
+__wine_package_variants:
+  stable: wine
+
+__wine_winetricks_package: ''
+__wine_mono_package: ''
+__wine_gecko_package: ''

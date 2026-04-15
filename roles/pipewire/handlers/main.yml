@@ -1,0 +1,18 @@
+---
+#
+# PipeWire Handlers
+#
+
+- name: Restart PipeWire
+  ansible.builtin.systemd_service:
+    name: '{{ item.1 }}'
+    state: restarted
+    scope: user
+  become: true
+  become_user: '{{ item.0.name }}'
+  loop: "{{ pipewire_users | default([]) | product(__pipewire_user_services | default([])) | list }}"
+  loop_control:
+    label: '{{ item.0.name }}: {{ item.1 }}'
+  when: pipewire_service_enabled | bool
+  # Systemd user scope not available in containers (molecule)
+  failed_when: false

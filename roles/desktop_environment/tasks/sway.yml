@@ -1,0 +1,26 @@
+---
+#
+# Sway Installation
+#
+
+- name: Sway | Build package list
+  ansible.builtin.set_fact:
+    __desktop_environment_sway_install_packages: >-
+      {{
+        __desktop_environment_sway_packages +
+        (desktop_environment_sway_extras_enabled | bool | ternary(__desktop_environment_sway_extras_packages, [])) +
+        ((desktop_environment_sway_portal_enabled | bool and __desktop_environment_sway_portal_package | length > 0)
+          | ternary([__desktop_environment_sway_portal_package], []))
+      }}
+
+- name: Sway | Filter empty packages
+  ansible.builtin.set_fact:
+    __desktop_environment_sway_install_packages: >-
+      {{ __desktop_environment_sway_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: Sway | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_sway_install_packages }}'
+    state: present
+  when:
+    - __desktop_environment_sway_install_packages | length > 0

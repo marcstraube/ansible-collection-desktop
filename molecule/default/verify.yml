@@ -1,0 +1,31 @@
+---
+# Verify smoke test for marcstraube.desktop collection
+
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Check if zsh is installed
+      ansible.builtin.stat:
+        path: /usr/bin/zsh
+      register: zsh_binary
+
+    - name: Verify zsh installation
+      ansible.builtin.assert:
+        that:
+          - zsh_binary.stat.exists
+        fail_msg: "zsh not found"
+        success_msg: "zsh is installed"
+
+    - name: Check if alacritty or kitty is installed
+      ansible.builtin.shell: |
+        which alacritty || which kitty || echo "none"
+      changed_when: false
+      register: terminal_check
+
+    - name: Display verification results
+      ansible.builtin.debug:
+        msg:
+          - "Shell: zsh present"
+          - "Terminal: {{ terminal_check.stdout }}"
+          - "Desktop smoke test verified"

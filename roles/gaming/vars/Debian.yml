@@ -1,0 +1,12 @@
+---
+#
+# Debian-Specific Variables
+#
+
+# Package names
+__gaming_lutris_package: 'lutris'
+__gaming_retroarch_package: 'retroarch'
+__gaming_steam_package: ''
+__gaming_pcsx2_package: 'pcsx2'
+__gaming_dolphin_package: 'dolphin-emu'
+__gaming_moonlight_package: ''

@@ -1,0 +1,87 @@
+---
+#
+# Terminal File Managers
+#
+
+- name: Install | vifm
+  ansible.builtin.package:
+    name: '{{ __filemanagers_vifm_package }}'
+    state: present
+  when:
+    - filemanagers_vifm_enabled | bool
+
+- name: Install | Midnight Commander
+  ansible.builtin.package:
+    name: '{{ __filemanagers_mc_package }}'
+    state: present
+  when:
+    - filemanagers_mc_enabled | bool
+
+- name: Install | ranger
+  ansible.builtin.package:
+    name: '{{ __filemanagers_ranger_package }}'
+    state: present
+  when:
+    - filemanagers_ranger_enabled | bool
+
+- name: Install | nnn
+  ansible.builtin.package:
+    name: '{{ __filemanagers_nnn_package }}'
+    state: present
+  when:
+    - filemanagers_nnn_enabled | bool
+
+- name: Install | lf
+  ansible.builtin.package:
+    name: '{{ __filemanagers_lf_package }}'
+    state: present
+  when:
+    - filemanagers_lf_enabled | bool
+    - __filemanagers_lf_package | default('') | length > 0
+
+#
+# GUI File Managers
+#
+
+- name: Install | Thunar
+  ansible.builtin.package:
+    name: '{{ __filemanagers_thunar_package }}'
+    state: present
+  when:
+    - filemanagers_thunar_enabled | bool
+
+- name: Install | Dolphin
+  ansible.builtin.package:
+    name: '{{ __filemanagers_dolphin_package }}'
+    state: present
+  when:
+    - filemanagers_dolphin_enabled | bool
+
+- name: Install | Nautilus
+  ansible.builtin.package:
+    name: '{{ __filemanagers_nautilus_package }}'
+    state: present
+  when:
+    - filemanagers_nautilus_enabled | bool
+
+- name: Install | PCManFM
+  ansible.builtin.package:
+    name: '{{ __filemanagers_pcmanfm_package }}'
+    state: present
+  when:
+    - filemanagers_pcmanfm_enabled | bool
+
+- name: Install | Nemo
+  ansible.builtin.package:
+    name: '{{ __filemanagers_nemo_package }}'
+    state: present
+  when:
+    - filemanagers_nemo_enabled | bool
+
+- name: Install | Double Commander
+  ansible.builtin.package:
+    name: '{{ __filemanagers_doublecmd_package }}'
+    state: present
+  when:
+    - filemanagers_doublecmd_enabled | bool
+    - __filemanagers_doublecmd_package | default('') | length > 0

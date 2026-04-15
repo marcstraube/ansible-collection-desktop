@@ -1,0 +1,16 @@
+{{ ansible_managed | comment('c') }}
+//
+// Firefox locked preferences (system-wide)
+// Reference: https://support.mozilla.org/en-US/kb/customizing-firefox-using-autoconfig
+
+{% for key, value in browser_firefox_preferences | dictsort %}
+{% if value is sameas true %}
+lockPref("{{ key }}", true);
+{% elif value is sameas false %}
+lockPref("{{ key }}", false);
+{% elif value is number %}
+lockPref("{{ key }}", {{ value }});
+{% else %}
+lockPref("{{ key }}", "{{ value }}");
+{% endif %}
+{% endfor %}

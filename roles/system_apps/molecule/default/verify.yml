@@ -1,0 +1,443 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Load Variables
+    #
+
+    - name: Verify | Load role variables
+      ansible.builtin.include_vars:
+        file: '../../vars/main.yml'
+
+    #
+    # GParted
+    #
+
+    - name: Verify | Check GParted installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_gparted_package }}
+      register: _sa_gparted_arch
+      changed_when: false
+      failed_when: _sa_gparted_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_gparted_package
+          | default('') | length > 0
+
+    - name: Verify | Check GParted installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_gparted_package }}
+      register: _sa_gparted_deb
+      changed_when: false
+      failed_when: _sa_gparted_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_gparted_package
+          | default('') | length > 0
+
+    - name: Verify | Check GParted installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_gparted_package }}
+      register: _sa_gparted_rpm
+      changed_when: false
+      failed_when: _sa_gparted_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_gparted_package
+          | default('') | length > 0
+
+    #
+    # Filelight
+    #
+
+    - name: Verify | Check Filelight installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_filelight_package }}
+      register: _sa_filelight_arch
+      changed_when: false
+      failed_when: _sa_filelight_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_filelight_package
+          | default('') | length > 0
+
+    - name: Verify | Check Filelight installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_filelight_package }}
+      register: _sa_filelight_deb
+      changed_when: false
+      failed_when: _sa_filelight_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_filelight_package
+          | default('') | length > 0
+
+    - name: Verify | Check Filelight installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_filelight_package }}
+      register: _sa_filelight_rpm
+      changed_when: false
+      failed_when: _sa_filelight_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_filelight_package
+          | default('') | length > 0
+
+    #
+    # Baobab
+    #
+
+    - name: Verify | Check Baobab installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_baobab_package }}
+      register: _sa_baobab_arch
+      changed_when: false
+      failed_when: _sa_baobab_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_baobab_package
+          | default('') | length > 0
+
+    - name: Verify | Check Baobab installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_baobab_package }}
+      register: _sa_baobab_deb
+      changed_when: false
+      failed_when: _sa_baobab_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_baobab_package
+          | default('') | length > 0
+
+    - name: Verify | Check Baobab installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_baobab_package }}
+      register: _sa_baobab_rpm
+      changed_when: false
+      failed_when: _sa_baobab_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_baobab_package
+          | default('') | length > 0
+
+    #
+    # GNOME System Monitor
+    #
+
+    - name: Verify | Check GNOME System Monitor installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_gnome_system_monitor_package }}
+      register: _sa_gsm_arch
+      changed_when: false
+      failed_when: _sa_gsm_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_gnome_system_monitor_package
+          | default('') | length > 0
+
+    - name: Verify | Check GNOME System Monitor installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_gnome_system_monitor_package }}
+      register: _sa_gsm_deb
+      changed_when: false
+      failed_when: _sa_gsm_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_gnome_system_monitor_package
+          | default('') | length > 0
+
+    - name: Verify | Check GNOME System Monitor installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_gnome_system_monitor_package }}
+      register: _sa_gsm_rpm
+      changed_when: false
+      failed_when: _sa_gsm_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_gnome_system_monitor_package
+          | default('') | length > 0
+
+    #
+    # Plasma System Monitor
+    #
+
+    - name: Verify | Check Plasma System Monitor installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_plasma_system_monitor_package }}
+      register: _sa_psm_arch
+      changed_when: false
+      failed_when: _sa_psm_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_plasma_system_monitor_package
+          | default('') | length > 0
+
+    - name: Verify | Check Plasma System Monitor installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_plasma_system_monitor_package }}
+      register: _sa_psm_deb
+      changed_when: false
+      failed_when: _sa_psm_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_plasma_system_monitor_package
+          | default('') | length > 0
+
+    - name: Verify | Check Plasma System Monitor installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_plasma_system_monitor_package }}
+      register: _sa_psm_rpm
+      changed_when: false
+      failed_when: _sa_psm_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_plasma_system_monitor_package
+          | default('') | length > 0
+
+    #
+    # Solaar
+    #
+
+    - name: Verify | Check Solaar installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_solaar_package }}
+      register: _sa_solaar_arch
+      changed_when: false
+      failed_when: _sa_solaar_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_solaar_package
+          | default('') | length > 0
+
+    - name: Verify | Check Solaar installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_solaar_package }}
+      register: _sa_solaar_deb
+      changed_when: false
+      failed_when: _sa_solaar_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_solaar_package
+          | default('') | length > 0
+
+    - name: Verify | Check Solaar installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_solaar_package }}
+      register: _sa_solaar_rpm
+      changed_when: false
+      failed_when: _sa_solaar_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_solaar_package
+          | default('') | length > 0
+
+    #
+    # Timeshift
+    #
+
+    - name: Verify | Check Timeshift installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_timeshift_package }}
+      register: _sa_timeshift_arch
+      changed_when: false
+      failed_when: _sa_timeshift_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_timeshift_package
+          | default('') | length > 0
+
+    - name: Verify | Check Timeshift installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_timeshift_package }}
+      register: _sa_timeshift_deb
+      changed_when: false
+      failed_when: _sa_timeshift_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_timeshift_package
+          | default('') | length > 0
+
+    - name: Verify | Check Timeshift installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_timeshift_package }}
+      register: _sa_timeshift_rpm
+      changed_when: false
+      failed_when: _sa_timeshift_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_timeshift_package
+          | default('') | length > 0
+
+    #
+    # Deja Dup
+    #
+
+    - name: "Verify | Check D\xE9j\xE0 Dup installed (Arch)"
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_deja_dup_package }}
+      register: _sa_dejdup_arch
+      changed_when: false
+      failed_when: _sa_dejdup_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_deja_dup_package
+          | default('') | length > 0
+
+    - name: "Verify | Check D\xE9j\xE0 Dup installed (Debian)"
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_deja_dup_package }}
+      register: _sa_dejdup_deb
+      changed_when: false
+      failed_when: _sa_dejdup_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_deja_dup_package
+          | default('') | length > 0
+
+    - name: "Verify | Check D\xE9j\xE0 Dup installed (RedHat)"
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_deja_dup_package }}
+      register: _sa_dejdup_rpm
+      changed_when: false
+      failed_when: _sa_dejdup_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_deja_dup_package
+          | default('') | length > 0
+
+    #
+    # Seahorse
+    #
+
+    - name: Verify | Check Seahorse installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_seahorse_package }}
+      register: _sa_seahorse_arch
+      changed_when: false
+      failed_when: _sa_seahorse_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_seahorse_package
+          | default('') | length > 0
+
+    - name: Verify | Check Seahorse installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_seahorse_package }}
+      register: _sa_seahorse_deb
+      changed_when: false
+      failed_when: _sa_seahorse_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_seahorse_package
+          | default('') | length > 0
+
+    - name: Verify | Check Seahorse installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_seahorse_package }}
+      register: _sa_seahorse_rpm
+      changed_when: false
+      failed_when: _sa_seahorse_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_seahorse_package
+          | default('') | length > 0
+
+    #
+    # dconf Editor
+    #
+
+    - name: Verify | Check dconf Editor installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __system_apps_dconf_editor_package }}
+      register: _sa_dconf_arch
+      changed_when: false
+      failed_when: _sa_dconf_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __system_apps_dconf_editor_package
+          | default('') | length > 0
+
+    - name: Verify | Check dconf Editor installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __system_apps_dconf_editor_package }}
+      register: _sa_dconf_deb
+      changed_when: false
+      failed_when: _sa_dconf_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __system_apps_dconf_editor_package
+          | default('') | length > 0
+
+    - name: Verify | Check dconf Editor installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __system_apps_dconf_editor_package }}
+      register: _sa_dconf_rpm
+      changed_when: false
+      failed_when: _sa_dconf_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __system_apps_dconf_editor_package
+          | default('') | length > 0

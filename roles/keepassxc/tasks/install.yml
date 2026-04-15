@@ -1,0 +1,24 @@
+---
+#
+# KeePassXC Install Tasks
+#
+
+- name: Install | KeePassXC package
+  ansible.builtin.package:
+    name: '{{ __keepassxc_package }}'
+    state: present
+  when: keepassxc_install_package_enabled | bool
+
+- name: Install | Verify KeePassXC binary exists
+  ansible.builtin.command:
+    cmd: which keepassxc
+  register: __keepassxc_binary
+  changed_when: false
+  failed_when: false
+
+- name: Install | Assert KeePassXC is installed
+  ansible.builtin.assert:
+    that:
+      - __keepassxc_binary.rc == 0
+    fail_msg: "KeePassXC binary not found after installation"
+    success_msg: "KeePassXC installed successfully"

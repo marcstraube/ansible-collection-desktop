@@ -1,0 +1,110 @@
+---
+#
+# Role Control
+#
+
+# Enable the pipewire role
+pipewire_enabled: true
+
+# Enable and start PipeWire services
+pipewire_service_enabled: true
+
+#
+# Users
+#
+
+# Users for PipeWire user-session service management
+pipewire_users: []
+# Example:
+#   pipewire_users:
+#     - name: 'johndoe'
+
+#
+# Components
+#
+
+# Install PipeWire audio support
+pipewire_audio_enabled: true
+
+# Session manager: wireplumber (recommended) or pipewire-media-session (legacy)
+pipewire_session_manager: 'wireplumber'
+
+#
+# Compatibility Layers
+#
+
+# Enable PulseAudio replacement (pipewire-pulse)
+pipewire_pulseaudio_enabled: true
+
+# Enable ALSA integration (pipewire-alsa)
+pipewire_alsa_enabled: true
+
+# Enable JACK replacement (pipewire-jack) for pro audio applications
+pipewire_jack_enabled: false
+
+#
+# Bluetooth
+#
+
+# Enable Bluetooth audio support (handled by PipeWire natively)
+pipewire_bluetooth_enabled: true
+
+#
+# Network Audio
+#
+
+# Enable Zeroconf/Avahi network audio discovery
+pipewire_zeroconf_enabled: false
+
+#
+# 32-Bit Support
+#
+
+# Install 32-bit libraries (for Steam, Wine, etc.)
+pipewire_32bit_enabled: false
+
+#
+# Real-Time Scheduling
+#
+
+# Enable real-time scheduling for better audio performance
+pipewire_realtime_enabled: true
+
+# Users to add to realtime group (empty = all users from users_list)
+pipewire_realtime_users: []
+
+#
+# GUI Tools
+#
+
+# Install volume control GUI: pavucontrol, none
+pipewire_volume_control: 'pavucontrol'
+
+# Install patchbay/graph editor: helvum, qpwgraph, none
+pipewire_patchbay: 'none'
+
+#
+# Configuration
+#
+
+# Enable custom PipeWire configuration
+pipewire_custom_config_enabled: false
+
+# Default sample rate (44100, 48000, 96000, etc.)
+pipewire_sample_rate: 48000
+
+# Default buffer size (quantum) - lower = less latency, more CPU
+pipewire_quantum: 1024
+
+# Minimum quantum (for low-latency applications)
+pipewire_min_quantum: 32
+
+# Maximum quantum
+pipewire_max_quantum: 2048
+
+#
+# Cleanup
+#
+
+# Remove conflicting PulseAudio packages
+pipewire_remove_pulseaudio_enabled: true

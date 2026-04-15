@@ -1,0 +1,73 @@
+---
+#
+# Arch Linux Variables
+#
+
+# Version control
+__development_git_packages:
+  - 'git'
+  - 'git-lfs'
+  - 'git-delta'
+
+__development_github_cli_package: 'github-cli'
+__development_gitlab_cli_package: 'glab'
+
+# Python
+__development_python_packages:
+  - 'python'
+  - 'python-pip'
+  - 'python-pipx'
+
+# Rust
+__development_rust_packages:
+  - 'rust'
+
+# Go
+__development_go_packages:
+  - 'go'
+
+# Java
+__development_java_package: 'jdk-openjdk'
+
+# Build tools
+__development_build_packages:
+  - 'base-devel'
+  - 'make'
+  - 'cmake'
+  - 'meson'
+  - 'ninja'
+
+# Database tools
+__development_dbeaver_package: 'dbeaver'
+__development_pgadmin_package: 'pgadmin4'
+
+# API tools
+__development_httpie_package: 'httpie'
+
+# Misc tools
+__development_misc_packages:
+  - 'jq'
+  - 'yq'
+  - 'direnv'
+  - 'pre-commit'
+  - 'shellcheck'
+
+# AUR packages
+__development_aur_packages:
+  ides_vscodium:
+    - 'vscodium-bin'
+  ides_vscode:
+    - 'visual-studio-code-bin'
+  ides_jetbrains:
+    - 'jetbrains-toolbox'
+  ides_phpstorm:
+    - 'phpstorm'
+    - 'phpstorm-jre'
+  ides_zed:
+    - 'zed-editor'
+  api_tools_postman:
+    - 'postman-bin'
+  api_tools_insomnia:
+    - 'insomnia-bin'
+  api_tools_bruno:
+    - 'bruno-bin'

@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+[Autologin]
+User={{ display_manager_autologin_user }}
+{% if display_manager_autologin_session %}
+Session={{ display_manager_autologin_session }}
+{% endif %}

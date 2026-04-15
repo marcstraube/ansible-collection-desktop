@@ -1,0 +1,44 @@
+---
+#
+# Elgato Device Tools Installation
+#
+
+#
+# Stream Deck / Stream Deck Pedal
+#
+
+- name: Install | StreamController from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __elgato_aur_packages.streamdeck }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - elgato_streamdeck_enabled | bool
+
+#
+# Facecam
+#
+
+- name: Install | cameractrls packages
+  ansible.builtin.package:
+    name: '{{ __elgato_facecam_packages }}'
+    state: present
+  when:
+    - elgato_facecam_enabled | bool
+    - __elgato_facecam_packages | default([]) | length > 0
+
+#
+# Key Light
+#
+
+- name: Install | elgato-keylight from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __elgato_aur_packages.keylight }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - elgato_keylight_enabled | bool

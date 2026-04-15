@@ -1,0 +1,39 @@
+---
+#
+# Tuxedo Laptop Main Tasks
+#
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+      skip: true
+  tags:
+    - tuxedo
+
+- name: Main | Import validation tasks
+  ansible.builtin.import_tasks: validate.yml
+  when: tuxedo_enabled | bool
+  tags:
+    - tuxedo
+    - tuxedo:validate
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when: tuxedo_enabled | bool
+  tags:
+    - tuxedo
+    - tuxedo:install
+
+- name: Main | Import service tasks
+  ansible.builtin.import_tasks: service.yml
+  when: tuxedo_enabled | bool
+  tags:
+    - tuxedo
+    - tuxedo:service

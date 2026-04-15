@@ -1,0 +1,21 @@
+---
+#
+# Archlinux-Specific Variables
+#
+
+# Package names
+__gaming_lutris_package: 'lutris'
+__gaming_retroarch_package: 'retroarch'
+__gaming_steam_package: 'steam'
+__gaming_pcsx2_package: ''
+__gaming_dolphin_package: 'dolphin-emu'
+__gaming_moonlight_package: 'moonlight-qt'
+
+# AUR packages grouped by purpose
+__gaming_aur_packages:
+  heroic:
+    - heroic-games-launcher-bin
+  playback:
+    - playback-appimage
+  pcsx2:
+    - pcsx2

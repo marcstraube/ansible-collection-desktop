@@ -1,0 +1,19 @@
+---
+#
+# Tuxedo Service Management
+#
+
+- name: Service | Manage tccd service
+  ansible.builtin.systemd_service:
+    name: '{{ __tuxedo_tccd_service }}'
+    enabled: "{{ tuxedo_tccd_enabled | bool }}"
+    state: "{{ tuxedo_tccd_enabled | bool | ternary('started', 'stopped') }}"
+    daemon_reload: true
+  when: tuxedo_tccd_enabled | bool
+
+- name: Service | Manage tccd-sleep service
+  ansible.builtin.systemd_service:
+    name: '{{ __tuxedo_tccd_sleep_service }}'
+    enabled: "{{ tuxedo_tccd_sleep_enabled | bool }}"
+    state: "{{ tuxedo_tccd_sleep_enabled | bool | ternary('started', 'stopped') }}"
+  when: tuxedo_tccd_sleep_enabled | bool

@@ -1,0 +1,13 @@
+---
+# ansible-lint configuration for marcstraube.desktop collection
+
+# Skip var-naming for roles where semantic prefixes make more sense than role prefixes
+# Examples: hyprland_*, firefox_*, vscode_* in desktop roles
+skip_list:
+  - var-naming[no-role-prefix]
+  - command-instead-of-shell  # command -v is a shell built-in, requires shell
+  - role-name[path]  # molecule converge uses {{ playbook_dir }}/../.. by design
+
+# Warn about these rules but don't fail
+warn_list:
+  - experimental

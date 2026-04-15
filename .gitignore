@@ -1,0 +1,14 @@
+.ansible/
+.claude/
+__pycache__/
+*.py[cod]
+.molecule/
+molecule/**/instance_config.yml
+*.retry
+*.log
+*.tar.gz
+.venv/
+.cache/
+
+# Temporarily removed — needs redesign for proprietary package handling
+roles/tabletop/

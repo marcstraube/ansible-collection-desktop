@@ -1,0 +1,112 @@
+---
+#
+# i386 Architecture (Debian)
+#
+
+- name: Install | Check i386 architecture (Debian)
+  ansible.builtin.command:
+    cmd: dpkg --print-foreign-architectures
+  register: __wine_foreign_archs
+  changed_when: false
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Install | Enable i386 architecture (Debian)
+  ansible.builtin.command:
+    cmd: dpkg --add-architecture i386
+  changed_when: true
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - "'i386' not in (__wine_foreign_archs.stdout_lines | default([]))"
+  notify: Update apt cache
+
+- name: Install | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+#
+# Wine Packages
+#
+
+- name: Install | Wine packages
+  ansible.builtin.package:
+    name: '{{ __wine_package_variants[wine_variant] | default(__wine_package_variants["stable"]) }}'
+    state: present
+
+- name: Install | Winetricks
+  ansible.builtin.package:
+    name: '{{ __wine_winetricks_package }}'
+    state: present
+  when:
+    - wine_winetricks_enabled | bool
+    - __wine_winetricks_package | default('') | length > 0
+
+- name: Install | Wine Mono
+  ansible.builtin.package:
+    name: '{{ __wine_mono_package }}'
+    state: present
+  when:
+    - wine_mono_enabled | bool
+    - __wine_mono_package | default('') | length > 0
+
+- name: Install | Wine Gecko
+  ansible.builtin.package:
+    name: '{{ __wine_gecko_package }}'
+    state: present
+  when:
+    - wine_gecko_enabled | bool
+    - __wine_gecko_package | default('') | length > 0
+
+#
+# 32-bit Support (Arch Linux)
+#
+
+- name: Install | lib32 packages (Arch)
+  ansible.builtin.package:
+    name: '{{ wine_lib32_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - wine_lib32_packages | default([]) | length > 0
+
+#
+# GPU Vulkan Driver Detection (Arch Linux)
+#
+
+- name: Install | Detect GPU vendor
+  ansible.builtin.command:
+    cmd: lspci -nn
+  register: __wine_lspci
+  changed_when: false
+  failed_when: false
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - wine_vulkan_driver == 'auto'
+
+- name: Install | Resolve GPU vendor
+  ansible.builtin.set_fact:
+    __wine_gpu_vendor: >-
+      {{ __wine_lspci.stdout_lines | default([])
+         | select('search', '(?i)(VGA|3D|Display) controller')
+         | map('regex_search', '(?i)(intel|amd|nvidia|advanced micro devices)')
+         | select('string')
+         | map('replace', 'advanced micro devices', 'amd')
+         | map('lower')
+         | first | default('none') }}
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - wine_vulkan_driver == 'auto'
+
+- name: Install | Set GPU vendor from override
+  ansible.builtin.set_fact:
+    __wine_gpu_vendor: '{{ wine_vulkan_driver }}'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - wine_vulkan_driver != 'auto'
+
+- name: Install | lib32 Vulkan driver (Arch)
+  ansible.builtin.package:
+    name: '{{ __wine_vulkan_drivers[__wine_gpu_vendor] }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __wine_gpu_vendor | default('none') != 'none'
+    - __wine_gpu_vendor in (__wine_vulkan_drivers | default({}))

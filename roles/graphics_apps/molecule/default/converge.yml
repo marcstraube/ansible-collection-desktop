@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    graphics_apps_enabled: true
+    graphics_apps_gimp_enabled: true
+    graphics_apps_krita_enabled: true
+    graphics_apps_inkscape_enabled: true
+    # Skip AUR packages in molecule tests
+    graphics_apps_xnconvert_enabled: false
+    graphics_apps_xnview_enabled: false
+    graphics_apps_gimp_plugins: []
+
+  tasks:
+    - name: Converge | Include graphics_apps role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

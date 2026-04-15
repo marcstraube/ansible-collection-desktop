@@ -1,0 +1,18 @@
+---
+#
+# RedHat Variables
+#
+
+# Terminal emulator packages
+__terminal_packages:
+  ghostty: ''
+  alacritty: 'alacritty'
+  kitty: 'kitty'
+  foot: 'foot'
+  wezterm: ''
+  konsole: 'konsole'
+  gnome-terminal: 'gnome-terminal'
+
+# Kitty extras for image support
+__terminal_kitty_image_packages:
+  - 'ImageMagick'

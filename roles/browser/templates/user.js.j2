@@ -1,0 +1,16 @@
+{{ ansible_managed | comment('c') }}
+//
+// Firefox user preferences
+// Reference: https://kb.mozillazine.org/About:config_entries
+
+{% for key, value in browser_firefox_preferences | dictsort %}
+{% if value is sameas true %}
+user_pref("{{ key }}", true);
+{% elif value is sameas false %}
+user_pref("{{ key }}", false);
+{% elif value is number %}
+user_pref("{{ key }}", {{ value }});
+{% else %}
+user_pref("{{ key }}", "{{ value }}");
+{% endif %}
+{% endfor %}

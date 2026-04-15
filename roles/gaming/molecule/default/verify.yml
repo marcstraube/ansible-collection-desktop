@@ -1,0 +1,142 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Role Completion
+    #
+
+    - name: Verify | Confirm role completed successfully
+      ansible.builtin.assert:
+        that: true
+        fail_msg: 'gaming role did not complete'
+
+    #
+    # Lutris
+    #
+
+    - name: Verify | Check Lutris binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/lutris
+      register: __gaming_lutris_binary
+      when: gaming_lutris_enabled | default(false) | bool
+
+    - name: Verify | Assert Lutris is installed
+      ansible.builtin.assert:
+        that: __gaming_lutris_binary.stat.exists
+        fail_msg: 'Lutris binary not found at /usr/bin/lutris'
+      when: gaming_lutris_enabled | default(false) | bool
+
+    #
+    # Steam
+    #
+
+    - name: Verify | Check Steam binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/steam
+      register: __gaming_steam_binary
+      when: gaming_steam_enabled | default(false) | bool
+
+    - name: Verify | Assert Steam is installed
+      ansible.builtin.assert:
+        that: __gaming_steam_binary.stat.exists
+        fail_msg: 'Steam binary not found at /usr/bin/steam'
+      when: gaming_steam_enabled | default(false) | bool
+
+    #
+    # Heroic Games Launcher
+    #
+
+    - name: Verify | Check Heroic binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/heroic
+      register: __gaming_heroic_binary
+      when: gaming_heroic_enabled | default(false) | bool
+
+    - name: Verify | Assert Heroic Games Launcher is installed
+      ansible.builtin.assert:
+        that: __gaming_heroic_binary.stat.exists
+        fail_msg: 'Heroic binary not found at /usr/bin/heroic'
+      when: gaming_heroic_enabled | default(false) | bool
+
+    #
+    # RetroArch
+    #
+
+    - name: Verify | Check RetroArch binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/retroarch
+      register: __gaming_retroarch_binary
+      when: gaming_retroarch_enabled | default(false) | bool
+
+    - name: Verify | Assert RetroArch is installed
+      ansible.builtin.assert:
+        that: __gaming_retroarch_binary.stat.exists
+        fail_msg: 'RetroArch binary not found at /usr/bin/retroarch'
+      when: gaming_retroarch_enabled | default(false) | bool
+
+    #
+    # Playback
+    #
+
+    - name: Verify | Check Playback binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/playback
+      register: __gaming_playback_binary
+      when: gaming_playback_enabled | default(false) | bool
+
+    - name: Verify | Assert Playback is installed
+      ansible.builtin.assert:
+        that: __gaming_playback_binary.stat.exists
+        fail_msg: 'Playback binary not found at /usr/bin/playback'
+      when: gaming_playback_enabled | default(false) | bool
+
+    #
+    # PCSX2
+    #
+
+    - name: Verify | Check PCSX2 binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/pcsx2
+      register: __gaming_pcsx2_binary
+      when: gaming_pcsx2_enabled | default(false) | bool
+
+    - name: Verify | Assert PCSX2 is installed
+      ansible.builtin.assert:
+        that: __gaming_pcsx2_binary.stat.exists
+        fail_msg: 'PCSX2 binary not found at /usr/bin/pcsx2'
+      when: gaming_pcsx2_enabled | default(false) | bool
+
+    #
+    # Dolphin Emulator
+    #
+
+    - name: Verify | Check Dolphin binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/dolphin-emu
+      register: __gaming_dolphin_binary
+      when: gaming_dolphin_enabled | default(false) | bool
+
+    - name: Verify | Assert Dolphin Emulator is installed
+      ansible.builtin.assert:
+        that: __gaming_dolphin_binary.stat.exists
+        fail_msg: 'Dolphin binary not found at /usr/bin/dolphin-emu'
+      when: gaming_dolphin_enabled | default(false) | bool
+
+    #
+    # Moonlight
+    #
+
+    - name: Verify | Check Moonlight binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/moonlight
+      register: __gaming_moonlight_binary
+      when: gaming_moonlight_enabled | default(false) | bool
+
+    - name: Verify | Assert Moonlight is installed
+      ansible.builtin.assert:
+        that: __gaming_moonlight_binary.stat.exists
+        fail_msg: 'Moonlight binary not found at /usr/bin/moonlight'
+      when: gaming_moonlight_enabled | default(false) | bool

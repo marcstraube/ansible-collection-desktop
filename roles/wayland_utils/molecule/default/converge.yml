@@ -1,0 +1,32 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    wayland_utils_enabled: true
+    wayland_utils_clipboard_enabled: true
+    wayland_utils_cliphist_enabled: false  # May not be in all repos
+    wayland_utils_grim_enabled: true
+    wayland_utils_slurp_enabled: true
+    wayland_utils_swappy_enabled: false
+    wayland_utils_recorder_enabled: false
+    wayland_utils_obs_enabled: false
+    wayland_utils_notifications: 'none'
+    wayland_utils_launcher: 'none'
+    wayland_utils_bar: 'none'
+    wayland_utils_idle: 'none'
+    wayland_utils_locker: 'none'
+    wayland_utils_wallpaper: 'none'
+    wayland_utils_wlr_randr_enabled: true
+    wayland_utils_kanshi_enabled: false
+    wayland_utils_nwg_displays_enabled: false
+    wayland_utils_portal: 'gtk'
+    wayland_utils_wev_enabled: false
+    wayland_utils_wtype_enabled: false
+    wayland_utils_ydotool_enabled: false
+
+  tasks:
+    - name: Converge | Include wayland_utils role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

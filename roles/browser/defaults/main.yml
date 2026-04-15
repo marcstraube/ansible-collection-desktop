@@ -1,0 +1,284 @@
+---
+#
+# Role Control
+#
+
+# Enable the browser role
+browser_enabled: true
+
+#
+# Browsers to Install
+#
+
+# Install Firefox
+browser_firefox_enabled: true
+
+# Install LibreWolf
+browser_librewolf_enabled: false
+
+# Install Chromium
+browser_chromium_enabled: true
+
+# Install Brave
+browser_brave_enabled: false
+
+# Install Tor Browser
+browser_tor_enabled: false
+
+# Install Zen Browser (Firefox fork)
+browser_zen_enabled: false
+
+# Default browser for xdg-settings
+browser_default: 'firefox'
+
+#
+# Firefox Options
+#
+
+# Language pack (empty = none)
+browser_firefox_i18n: ''
+
+# Deploy policies.json for extensions and settings
+browser_firefox_policies_enabled: true
+
+# Deploy user.js for additional preferences (arkenfox-based hardening)
+browser_firefox_user_js_enabled: true
+
+#
+# LibreWolf Options
+#
+
+# LibreWolf already has good defaults, fewer customizations needed
+browser_librewolf_policies_enabled: true
+
+#
+# Chromium Options
+#
+
+# Deploy extension policies
+browser_chromium_policies_enabled: true
+
+# Wayland touchpad gesture support (pacman hook, Arch only)
+browser_chromium_wayland_gestures_enabled: true
+
+#
+# Brave Options
+#
+
+# Deploy extension policies
+browser_brave_policies_enabled: true
+
+#
+# Extensions - Firefox/LibreWolf
+#
+# Uses policies.json ExtensionSettings
+# Modes: force_installed (can't remove), normal_installed (can disable), blocked
+#
+# Extensions are installed from Mozilla Add-ons store, not as system packages!
+# This avoids update conflicts and signature issues.
+
+browser_firefox_extensions:
+  # uBlock Origin - Essential ad blocker
+  'uBlock0@raymondhill.net':
+    url: 'https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi'
+    mode: 'force_installed'
+
+  # ClearURLs - Remove tracking parameters from URLs
+  '{74145f27-f039-47ce-a470-a662b129930a}':
+    url: 'https://addons.mozilla.org/firefox/downloads/latest/clearurls/latest.xpi'
+    mode: 'force_installed'
+
+  # LocalCDN - Emulate CDN locally for privacy
+  '{b86e4813-687a-43e6-ab65-0bde4ab75758}':
+    url: 'https://addons.mozilla.org/firefox/downloads/latest/localcdn-fork-of-decentraleyes/latest.xpi'
+    mode: 'force_installed'
+
+  # KeePassXC-Browser - Password manager integration
+  'keepassxc-browser@keepassxc.org':
+    url: 'https://addons.mozilla.org/firefox/downloads/latest/keepassxc-browser/latest.xpi'
+    mode: 'normal_installed'
+
+# Optional extensions (disabled by default)
+# Example:
+#   browser_firefox_extensions_optional:
+#     # Cookie AutoDelete - Auto-delete cookies
+#     '{b86e4813-687a-43e6-ab65-0bde4ab75758}':
+#       url: >-
+#         https://addons.mozilla.org/firefox/downloads/latest/cookie-autodelete/latest.xpi
+#       mode: 'normal_installed'
+#     # Skip Redirect - Skip intermediate redirect pages
+#     'skipredirect@nickthedick.org':
+#       url: >-
+#         https://addons.mozilla.org/firefox/downloads/latest/skip-redirect/latest.xpi
+#       mode: 'normal_installed'
+#     # Dark Reader - Dark mode for websites
+#     'addon@darkreader.org':
+#       url: 'https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi'
+#       mode: 'normal_installed'
+browser_firefox_extensions_optional: {}
+
+#
+# Extensions - Chromium/Brave
+#
+# Uses ExtensionSettings policy
+# update_url is always Chrome Web Store for auto-updates
+
+browser_chromium_extensions:
+  # uBlock Origin
+  'cjpalhdlnbpafiamejdnhcphjbkeiagm':
+    mode: 'force_installed'
+
+  # ClearURLs
+  'lckanjgmijmafbedllaakclkaicjfmnk':
+    mode: 'force_installed'
+
+  # LocalCDN
+  'njdfdhgcmkocbgbhcioffdbicglldapd':
+    mode: 'force_installed'
+
+  # KeePassXC-Browser
+  'oboonakemofpalcgghocfoadofidjkkk':
+    mode: 'normal_installed'
+
+#
+# Firefox Preferences (user.js)
+#
+# Only applied if browser_firefox_user_js_enabled: true
+# These are merged with arkenfox/user.js recommendations
+
+browser_firefox_preferences:
+  # Privacy
+  'privacy.trackingprotection.enabled': true
+  'privacy.trackingprotection.socialtracking.enabled': true
+  'network.cookie.cookieBehavior': 5      # Reject cross-site and social media trackers
+
+  # Disable telemetry
+  'toolkit.telemetry.enabled': false
+  'datareporting.healthreport.uploadEnabled': false
+  'datareporting.policy.dataSubmissionEnabled': false
+
+  # Disable Pocket
+  'extensions.pocket.enabled': false
+
+  # Disable Firefox accounts
+  'identity.fxaccounts.enabled': false
+
+  # HTTPS-only mode
+  'dom.security.https_only_mode': true
+  'dom.security.https_only_mode_ever_enabled': true
+
+  # Disable prefetching
+  'network.prefetch-next': false
+  'network.dns.disablePrefetch': true
+
+  # Resist fingerprinting (can break some sites)
+  # 'privacy.resistFingerprinting': true
+
+#
+# Firefox Policies (additional)
+#
+# These are merged into policies.json alongside extensions
+
+browser_firefox_policy_settings:
+  DisableTelemetry: true
+  DisableFirefoxStudies: true
+  DisablePocket: true
+  DisableFirefoxAccounts: false           # Set true to completely disable sync
+  DisableFormHistory: false
+  DisablePasswordReveal: false
+  DontCheckDefaultBrowser: true
+  EnableTrackingProtection:
+    Value: true
+    Cryptomining: true
+    Fingerprinting: true
+  EncryptedMediaExtensions:
+    Enabled: true                         # DRM for Netflix etc.
+  FirefoxHome:
+    Search: true
+    TopSites: false
+    SponsoredTopSites: false
+    Highlights: false
+    Pocket: false
+    SponsoredPocket: false
+    Snippets: false
+  HttpsOnlyMode: 'force_enabled'
+  PasswordManagerEnabled: false           # Using KeePassXC instead
+  SanitizeOnShutdown:
+    Cache: true
+    Cookies: false                        # Keep cookies, use containers instead
+    Downloads: false
+    FormData: false
+    History: false
+    Sessions: false
+    SiteSettings: false
+    OfflineApps: true
+    Locked: false
+
+#
+# Chromium Policy Settings
+#
+
+browser_chromium_policy_settings:
+  PasswordManagerEnabled: false
+  AutofillAddressEnabled: false
+  AutofillCreditCardEnabled: false
+  MetricsReportingEnabled: false
+  SafeBrowsingProtectionLevel: 1          # Standard protection
+  HttpsOnlyMode: 'force_enabled'
+  DefaultBrowserSettingEnabled: false
+
+#
+# Extension Default Mode
+#
+# Affects unmanaged extensions in all browsers
+# 'allowed' = user can install any extension
+# 'blocked' = only policy-managed extensions allowed (more secure)
+
+browser_extension_default_mode: 'blocked'
+
+#
+# LibreWolf Additional Settings
+#
+
+browser_librewolf_preferences: {}
+browser_librewolf_extensions: '{{ browser_firefox_extensions }}'
+browser_librewolf_disable_telemetry: true
+browser_librewolf_disable_pocket: true
+browser_librewolf_disable_firefox_studies: true
+browser_librewolf_homepage: ''
+browser_librewolf_no_default_bookmarks: true
+browser_librewolf_offer_to_save_logins: false
+browser_librewolf_password_manager: false
+
+#
+# Brave Additional Settings
+#
+
+browser_brave_extensions: '{{ browser_chromium_extensions }}'
+browser_brave_homepage: ''
+browser_brave_signin: 0                   # 0 = disabled, 1 = enabled, 2 = required
+browser_brave_sync_disabled: true
+browser_brave_metrics: false
+browser_brave_safe_browsing: true
+browser_brave_password_manager: false
+browser_brave_autofill_address: false
+browser_brave_autofill_credit_card: false
+
+#
+# User Configuration
+#
+# Users for whom to deploy per-user browser settings (user.js)
+# Firefox/LibreWolf profiles are auto-detected or created via --headless
+#
+# Modes:
+#   managed  — always deploy/overwrite user config (default)
+#   initial  — deploy only when user is newly created
+#   disabled — skip config deployment for this user
+
+browser_users: []
+# browser_users:
+#   - username: 'johndoe'
+#     mode: 'managed'
+
+# Default mode when user entry has no 'mode' key
+browser_user_config_mode: 'managed'

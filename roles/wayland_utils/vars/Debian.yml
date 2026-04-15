@@ -1,0 +1,92 @@
+---
+#
+# Debian Variables
+#
+
+# Clipboard
+__wayland_utils_clipboard_packages:
+  - 'wl-clipboard'
+__wayland_utils_cliphist_package: ''  # Not in Debian repos
+
+# Screenshots
+__wayland_utils_grim_package: 'grim'
+__wayland_utils_slurp_package: 'slurp'
+__wayland_utils_swappy_package: ''  # Not in Debian repos
+
+# Screen recording
+__wayland_utils_recorder_package: 'wf-recorder'
+__wayland_utils_screenrec_package: ''  # Not in repos
+__wayland_utils_obs_packages:
+  - 'obs-studio'
+
+# Notifications
+__wayland_utils_notification_packages:
+  mako: 'mako-notifier'
+  dunst: 'dunst'
+  fnott: ''  # Not in repos
+  none: ''
+
+# Launchers
+__wayland_utils_launcher_packages:
+  hyprlauncher: ''  # Not in repos
+  wofi: 'wofi'
+  fuzzel: 'fuzzel'
+  bemenu: 'bemenu'
+  rofi: 'rofi'
+  none: ''
+
+# Status bars
+__wayland_utils_bar_packages:
+  waybar: 'waybar'
+  hyprpanel: ''  # Not in repos
+  yambar: 'yambar'
+  none: ''
+
+# Idle daemons
+__wayland_utils_idle_packages:
+  swayidle: 'swayidle'
+  hypridle: ''  # Not in repos
+  none: ''
+
+# Screen lockers
+__wayland_utils_locker_packages:
+  swaylock: 'swaylock'
+  hyprlock: ''  # Not in repos
+  waylock: ''
+  none: ''
+
+# Wallpaper
+__wayland_utils_wallpaper_packages:
+  swww: ''  # Not in repos
+  swaybg: 'swaybg'
+  hyprpaper: ''  # Not in repos
+  wpaperd: ''
+  none: ''
+
+# Display management
+__wayland_utils_wlr_randr_package: 'wlr-randr'
+__wayland_utils_kanshi_package: 'kanshi'
+__wayland_utils_nwg_displays_package: ''  # Not in repos
+
+# Portals
+__wayland_utils_portal_packages:
+  gtk: 'xdg-desktop-portal-gtk'
+  wlr: 'xdg-desktop-portal-wlr'
+  hyprland: ''  # Not in repos
+  kde: 'xdg-desktop-portal-kde'
+  gnome: 'xdg-desktop-portal-gnome'
+
+__wayland_utils_portal_base: 'xdg-desktop-portal'
+
+# Media and brightness
+__wayland_utils_brightnessctl_package: 'brightnessctl'
+__wayland_utils_playerctl_package: 'playerctl'
+
+# Misc
+__wayland_utils_wev_package: 'wev'
+__wayland_utils_wtype_package: 'wtype'
+__wayland_utils_ydotool_package: 'ydotool'
+
+# Shell Framework
+# Not in Debian repos
+__wayland_utils_quickshell_package: ''

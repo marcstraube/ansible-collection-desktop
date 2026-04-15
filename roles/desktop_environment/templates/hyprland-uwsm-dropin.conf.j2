@@ -1,0 +1,5 @@
+{{ ansible_managed | comment }}
+
+# Restrict service to Hyprland sessions only
+[Service]
+ExecCondition=/usr/lib/systemd/systemd-xdg-autostart-condition "Hyprland" ""

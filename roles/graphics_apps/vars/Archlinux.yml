@@ -1,0 +1,18 @@
+---
+#
+# Archlinux Packages
+#
+
+__graphics_apps_gimp_package: 'gimp'
+__graphics_apps_krita_package: 'krita'
+__graphics_apps_inkscape_package: 'inkscape'
+
+#
+# AUR Packages
+#
+
+__graphics_apps_aur_packages:
+  xnconvert:
+    - xnconvert
+  xnview:
+    - xnviewmp

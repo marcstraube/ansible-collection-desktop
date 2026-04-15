@@ -1,0 +1,138 @@
+---
+#
+# Role Control
+#
+
+# Enable the wayland_utils role
+wayland_utils_enabled: true
+
+#
+# Clipboard
+#
+
+# Enable wl-clipboard (wl-copy, wl-paste)
+wayland_utils_clipboard_enabled: true
+
+# Enable cliphist (clipboard history manager)
+wayland_utils_cliphist_enabled: true
+
+#
+# Screenshots
+#
+
+# Enable grim (screenshot tool)
+wayland_utils_grim_enabled: true
+
+# Enable slurp (region selection)
+wayland_utils_slurp_enabled: true
+
+# Enable swappy (screenshot annotation)
+wayland_utils_swappy_enabled: true
+
+#
+# Screen Recording
+#
+
+# Enable wf-recorder (screen recorder)
+wayland_utils_recorder_enabled: false
+
+# Enable wl-screenrec (GPU-accelerated screen recorder)
+wayland_utils_screenrec_enabled: false
+
+# Enable OBS Studio (streaming/recording)
+wayland_utils_obs_enabled: false
+
+#
+# Notifications
+#
+
+# Notification daemon: mako, dunst, fnott, none
+# Set to 'none' if DE provides its own (KDE, GNOME, HyprPanel)
+wayland_utils_notifications: 'none'
+
+#
+# Application Launcher
+#
+
+# Launcher: hyprlauncher, rofi, wofi, fuzzel, bemenu, none
+# Set to 'none' if DE provides its own (KDE, GNOME, HyprPanel)
+wayland_utils_launcher: 'none'
+
+#
+# Status Bar
+#
+
+# Status bar: waybar, hyprpanel, yambar, none
+# Set to 'none' by default — configure in inventory
+wayland_utils_bar: 'none'
+
+#
+# Idle and Lock
+#
+
+# Idle daemon: swayidle, hypridle, none
+# Usually set by DE role, but can override here
+wayland_utils_idle: 'none'
+
+# Screen locker: swaylock, hyprlock, waylock, none
+# Usually set by DE role, but can override here
+wayland_utils_locker: 'none'
+
+#
+# Wallpaper
+#
+
+# Wallpaper tool: swww, swaybg, hyprpaper, wpaperd, none
+# Usually set by DE role
+wayland_utils_wallpaper: 'none'
+
+#
+# Display Management
+#
+
+# Enable wlr-randr (xrandr for wlroots)
+wayland_utils_wlr_randr_enabled: true
+
+# Enable kanshi (autorandr for Wayland)
+wayland_utils_kanshi_enabled: false
+
+# Enable nwg-displays (GUI display config)
+wayland_utils_nwg_displays_enabled: false
+
+#
+# Portals
+#
+
+# XDG Desktop Portal for screen sharing, file picker, etc.
+# Usually set by DE role, options: gtk, wlr, hyprland, kde, gnome
+wayland_utils_portal: 'gtk'
+
+#
+# Shell Framework
+#
+
+# Enable quickshell (Qt6/QML toolkit for building desktop shells)
+wayland_utils_quickshell_enabled: false
+
+#
+# Media and Brightness
+#
+
+# Enable brightnessctl (screen brightness control)
+wayland_utils_brightnessctl_enabled: true
+
+# Enable playerctl (media player control)
+wayland_utils_playerctl_enabled: true
+
+#
+# Misc
+#
+
+# Enable wev (wayland event viewer, like xev)
+wayland_utils_wev_enabled: true
+
+# Enable wtype (xdotool for Wayland)
+wayland_utils_wtype_enabled: false
+
+# Enable ydotool (input automation)
+wayland_utils_ydotool_enabled: false

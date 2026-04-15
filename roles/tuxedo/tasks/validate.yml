@@ -1,0 +1,38 @@
+---
+#
+# Tuxedo Validation Tasks
+#
+
+- name: Validate | Assert Arch Linux
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Archlinux'
+    fail_msg: >-
+      Tuxedo role is only supported on Arch Linux.
+      Detected OS family: {{ ansible_facts['os_family'] }}
+
+- name: Validate | Warn if not running on Tuxedo hardware
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: System vendor is '{{ ansible_facts['sys_vendor'] | default('unknown') }}',
+      not 'TUXEDO'. Tuxedo packages may not work correctly on non-Tuxedo hardware.
+  when: ansible_facts['sys_vendor'] | default('') != 'TUXEDO'
+
+- name: Validate | Check for auto-cpufreq conflict
+  ansible.builtin.command:
+    cmd: pacman -Qi auto-cpufreq
+  register: __tuxedo_auto_cpufreq_check
+  changed_when: false
+  # pacman -Qi exits 1 when package is not installed
+  failed_when: false
+  when: tuxedo_warn_conflicts | bool
+
+- name: Validate | Warn about auto-cpufreq conflict
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: auto-cpufreq is installed. It may conflict with Tuxedo Control
+      Center power profiles. Consider removing auto-cpufreq or disabling its
+      service to avoid unexpected behavior.
+  when:
+    - tuxedo_warn_conflicts | bool
+    - __tuxedo_auto_cpufreq_check.rc | default(1) == 0

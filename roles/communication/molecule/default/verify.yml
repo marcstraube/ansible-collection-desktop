@@ -1,0 +1,224 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Load OS-Specific Variables
+    #
+
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # Telegram
+    #
+
+    - name: Verify | Check Telegram installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __communication_telegram_package }}'
+      register: _comm_telegram_arch
+      changed_when: false
+      failed_when: _comm_telegram_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __communication_telegram_package | default('') | length > 0
+
+    - name: Verify | Check Telegram installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __communication_telegram_package }}'
+      register: _comm_telegram_deb
+      changed_when: false
+      failed_when: _comm_telegram_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __communication_telegram_package | default('') | length > 0
+
+    - name: Verify | Check Telegram installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __communication_telegram_package }}'
+      register: _comm_telegram_rpm
+      changed_when: false
+      failed_when: _comm_telegram_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __communication_telegram_package | default('') | length > 0
+
+    #
+    # Signal
+    #
+
+    - name: Verify | Check Signal installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __communication_signal_package }}'
+      register: _comm_signal_arch
+      changed_when: false
+      failed_when: _comm_signal_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __communication_signal_package | default('') | length > 0
+
+    - name: Verify | Check Signal installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __communication_signal_package }}'
+      register: _comm_signal_deb
+      changed_when: false
+      failed_when: _comm_signal_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __communication_signal_package | default('') | length > 0
+
+    - name: Verify | Check Signal installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __communication_signal_package }}'
+      register: _comm_signal_rpm
+      changed_when: false
+      failed_when: _comm_signal_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __communication_signal_package | default('') | length > 0
+
+    #
+    # Discord
+    #
+
+    - name: Verify | Check Discord installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __communication_discord_package }}'
+      register: _comm_discord_arch
+      changed_when: false
+      failed_when: _comm_discord_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __communication_discord_package | default('') | length > 0
+
+    - name: Verify | Check Discord installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __communication_discord_package }}'
+      register: _comm_discord_deb
+      changed_when: false
+      failed_when: _comm_discord_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __communication_discord_package | default('') | length > 0
+
+    - name: Verify | Check Discord installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __communication_discord_package }}'
+      register: _comm_discord_rpm
+      changed_when: false
+      failed_when: _comm_discord_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __communication_discord_package | default('') | length > 0
+
+    #
+    # Element
+    #
+
+    - name: Verify | Check Element installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __communication_element_package }}'
+      register: _comm_element_arch
+      changed_when: false
+      failed_when: _comm_element_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __communication_element_package | default('') | length > 0
+
+    - name: Verify | Check Element installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __communication_element_package }}'
+      register: _comm_element_deb
+      changed_when: false
+      failed_when: _comm_element_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __communication_element_package | default('') | length > 0
+
+    - name: Verify | Check Element installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __communication_element_package }}'
+      register: _comm_element_rpm
+      changed_when: false
+      failed_when: _comm_element_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __communication_element_package | default('') | length > 0
+
+    #
+    # Sieve (KMail)
+    #
+
+    - name: Verify | Check Sieve installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __communication_sieve_package }}'
+      register: _comm_sieve_arch
+      changed_when: false
+      failed_when: _comm_sieve_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __communication_sieve_package | default('') | length > 0
+
+    - name: Verify | Check Sieve installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __communication_sieve_package }}'
+      register: _comm_sieve_deb
+      changed_when: false
+      failed_when: _comm_sieve_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __communication_sieve_package | default('') | length > 0
+
+    - name: Verify | Check Sieve installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __communication_sieve_package }}'
+      register: _comm_sieve_rpm
+      changed_when: false
+      failed_when: _comm_sieve_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __communication_sieve_package | default('') | length > 0
+
+    #
+    # KDE Connect
+    #
+
+    - name: Verify | Check KDE Connect installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q {{ __communication_kdeconnect_package }}'
+      register: _comm_kdeconnect_arch
+      changed_when: false
+      failed_when: _comm_kdeconnect_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __communication_kdeconnect_package | default('') | length > 0
+
+    - name: Verify | Check KDE Connect installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l {{ __communication_kdeconnect_package }}'
+      register: _comm_kdeconnect_deb
+      changed_when: false
+      failed_when: _comm_kdeconnect_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __communication_kdeconnect_package | default('') | length > 0
+
+    - name: Verify | Check KDE Connect installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q {{ __communication_kdeconnect_package }}'
+      register: _comm_kdeconnect_rpm
+      changed_when: false
+      failed_when: _comm_kdeconnect_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __communication_kdeconnect_package | default('') | length > 0

@@ -1,0 +1,94 @@
+---
+#
+# Arch Linux Variables
+#
+
+# Clipboard
+__wayland_utils_clipboard_packages:
+  - 'wl-clipboard'
+__wayland_utils_cliphist_package: 'cliphist'
+
+# Screenshots
+__wayland_utils_grim_package: 'grim'
+__wayland_utils_slurp_package: 'slurp'
+__wayland_utils_swappy_package: 'swappy'
+
+# Screen recording
+__wayland_utils_recorder_package: 'wf-recorder'
+__wayland_utils_screenrec_package: 'wl-screenrec'
+__wayland_utils_obs_packages:
+  - 'obs-studio'
+
+# Notifications
+__wayland_utils_notification_packages:
+  mako: 'mako'
+  dunst: 'dunst'
+  fnott: 'fnott'
+  none: ''
+
+# Launchers
+__wayland_utils_launcher_packages:
+  hyprlauncher: 'hyprlauncher'
+  wofi: 'wofi'
+  fuzzel: 'fuzzel'
+  bemenu: 'bemenu-wayland'
+  rofi: 'rofi'
+  none: ''
+
+# Status bars
+__wayland_utils_bar_packages:
+  waybar: 'waybar'
+  hyprpanel: ''  # AUR
+  yambar: 'yambar'
+  none: ''
+
+# AUR packages
+__wayland_utils_aur_bar_packages: {}
+
+# Idle daemons
+__wayland_utils_idle_packages:
+  swayidle: 'swayidle'
+  hypridle: 'hypridle'
+  none: ''
+
+# Screen lockers
+__wayland_utils_locker_packages:
+  swaylock: 'swaylock'
+  hyprlock: 'hyprlock'
+  waylock: 'waylock'
+  none: ''
+
+# Wallpaper
+__wayland_utils_wallpaper_packages:
+  swww: 'swww'
+  swaybg: 'swaybg'
+  hyprpaper: 'hyprpaper'
+  wpaperd: 'wpaperd'
+  none: ''
+
+# Display management
+__wayland_utils_wlr_randr_package: 'wlr-randr'
+__wayland_utils_kanshi_package: 'kanshi'
+__wayland_utils_nwg_displays_package: 'nwg-displays'
+
+# Portals
+__wayland_utils_portal_packages:
+  gtk: 'xdg-desktop-portal-gtk'
+  wlr: 'xdg-desktop-portal-wlr'
+  hyprland: 'xdg-desktop-portal-hyprland'
+  kde: 'xdg-desktop-portal-kde'
+  gnome: 'xdg-desktop-portal-gnome'
+
+__wayland_utils_portal_base: 'xdg-desktop-portal'
+
+# Media and brightness
+__wayland_utils_brightnessctl_package: 'brightnessctl'
+__wayland_utils_playerctl_package: 'playerctl'
+
+# Shell framework
+__wayland_utils_quickshell_package: 'quickshell'
+
+# Misc
+__wayland_utils_wev_package: 'wev'
+__wayland_utils_wtype_package: 'wtype'
+__wayland_utils_ydotool_package: 'ydotool'

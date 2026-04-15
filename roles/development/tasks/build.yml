@@ -1,0 +1,22 @@
+---
+#
+# Build Tools Installation
+#
+
+- name: Build | Manage build tools (Arch)
+  community.general.pacman:
+    name: '{{ __development_build_packages }}'
+    state: "{{ 'present' if development_make_enabled | bool else 'absent' }}"
+  when: ansible_facts['os_family'] == 'Archlinux'
+
+- name: Build | Manage build tools (Debian)
+  ansible.builtin.apt:
+    name: '{{ __development_build_packages }}'
+    state: "{{ 'present' if development_make_enabled | bool else 'absent' }}"
+  when: ansible_facts['os_family'] == 'Debian'
+
+- name: Build | Manage build tools (RedHat)
+  ansible.builtin.dnf:
+    name: '{{ __development_build_packages }}'
+    state: "{{ 'present' if development_make_enabled | bool else 'absent' }}"
+  when: ansible_facts['os_family'] == 'RedHat'

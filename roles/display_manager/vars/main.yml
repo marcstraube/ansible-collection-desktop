@@ -1,0 +1,42 @@
+---
+#
+# Display Manager Shared Variables
+#
+
+# Service unit names
+__display_manager_services:
+  sddm: 'sddm.service'
+  gdm: 'gdm.service'
+  lightdm: 'lightdm.service'
+  greetd: 'greetd.service'
+
+# Graphical greeters that need a compositor wrapper
+__display_manager_greetd_graphical_greeters:
+  - 'gtkgreet'
+  - 'regreet'
+
+# Greeter commands (used inside compositor config)
+__display_manager_greetd_greeter_cmds:
+  gtkgreet: 'gtkgreet -l -s /usr/share/wayland-sessions'
+  regreet: 'regreet'
+
+# Compositor binary names
+__display_manager_greetd_compositor_binaries:
+  hyprland: 'start-hyprland --'
+  sway: 'sway'
+
+# Compositor exit commands
+__display_manager_greetd_compositor_exit_cmds:
+  hyprland: 'hyprctl dispatch exit'
+  sway: 'swaymsg exit'
+
+# Compositor packages for graphical greeters (empty = already installed)
+__display_manager_greetd_compositor_packages:
+  hyprland: ''
+  sway: ''
+  cage: 'cage'
+
+# Config paths (shared across OS families)
+__display_manager_sddm_config_dir: '/etc/sddm.conf.d'
+__display_manager_lightdm_config_file: '/etc/lightdm/lightdm.conf'
+__display_manager_greetd_config_file: '/etc/greetd/config.toml'

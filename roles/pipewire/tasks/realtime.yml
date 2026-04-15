@@ -1,0 +1,30 @@
+---
+#
+# Real-Time Scheduling Tasks
+#
+
+- name: Realtime | Install realtime package
+  ansible.builtin.package:
+    name: '{{ __pipewire_realtime_package }}'
+    state: present
+  when: __pipewire_realtime_package | length > 0
+
+- name: Realtime | Ensure realtime group exists
+  ansible.builtin.group:
+    name: '{{ __pipewire_realtime_group }}'
+    state: present
+    system: true
+
+- name: Realtime | Get users to add to realtime group
+  ansible.builtin.set_fact:
+    __pipewire_rt_users: >-
+      {{ pipewire_realtime_users if pipewire_realtime_users | length > 0
+         else (users_list | default([]) | map(attribute='name') | list) }}
+
+- name: Realtime | Add users to realtime group
+  ansible.builtin.user:
+    name: '{{ item }}'
+    groups: '{{ __pipewire_realtime_group }}'
+    append: true
+  loop: '{{ __pipewire_rt_users }}'
+  when: __pipewire_rt_users | length > 0

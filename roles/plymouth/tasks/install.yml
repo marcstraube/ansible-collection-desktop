@@ -1,0 +1,15 @@
+---
+#
+# Plymouth Package Installation
+#
+
+- name: Install | Build package list
+  ansible.builtin.set_fact:
+    __plymouth_install_packages: >-
+      {{ __plymouth_packages + plymouth_extra_packages }}
+
+- name: Install | Packages
+  ansible.builtin.package:
+    name: '{{ __plymouth_install_packages }}'
+    state: present
+  when: __plymouth_install_packages | length > 0

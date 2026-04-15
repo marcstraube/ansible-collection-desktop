@@ -1,0 +1,7 @@
+---
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when: system_apps_enabled | bool
+  tags:
+    - system-apps
+    - system-apps:install

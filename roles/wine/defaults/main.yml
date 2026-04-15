@@ -1,0 +1,91 @@
+---
+#
+# Role Control
+#
+
+# Enable the wine role
+wine_enabled: true
+
+#
+# Wine Variant
+#
+
+# Wine variant to install (Arch Linux only)
+# 'stable' = wine, 'staging' = wine-staging (experimental patches)
+# Debian and RedHat always install the stable version from distribution repos
+wine_variant: 'stable'
+
+#
+# Companion Packages
+#
+
+# Install winetricks helper script
+wine_winetricks_enabled: true
+
+# Install wine-mono (.NET Framework replacement, Arch only)
+wine_mono_enabled: true
+
+# Install wine-gecko (Internet Explorer replacement, Arch only)
+wine_gecko_enabled: true
+
+#
+# 32-bit Support (Arch Linux)
+#
+# Debian handles 32-bit automatically via multiarch.
+# EL9 uses WoW64 mode (no separate 32-bit packages needed).
+
+# lib32 packages for 32-bit Windows application support
+wine_lib32_packages:
+  - lib32-mesa
+  - lib32-vulkan-icd-loader
+  - lib32-gnutls
+  - lib32-alsa-lib
+  - lib32-alsa-plugins
+  - lib32-libpulse
+
+# GPU Vulkan driver for 32-bit support
+# 'auto' = detect via lspci, or specify: 'amd', 'intel', 'nvidia', 'none'
+wine_vulkan_driver: 'auto'
+
+#
+# Environment
+#
+
+# Deploy Wine environment configuration (/etc/profile.d/wine.sh)
+wine_env_enabled: true
+
+# Wine debug output level
+# '-all' suppresses all debug messages (recommended for normal use)
+# '' (empty) uses Wine default debug output
+wine_debug: '-all'
+
+# Wine synchronization primitive for performance
+# 'ntsync' = NTsync (kernel 6.14+, Wine 11+, best performance)
+# 'fsync' = futex-based (kernel 5.16+)
+# 'esync' = eventfd-based (fallback)
+# '' (empty) = let Wine auto-detect the best available method
+wine_sync: ''
+
+# Additional Wine environment variables for /etc/profile.d/wine.sh
+wine_env: {}
+# Example:
+#   WINEDLLOVERRIDES: 'winemenubuilder.exe=d'
+
+#
+# User Configuration
+#
+
+# Default config mode for users without explicit mode
+# managed = always ensure prefix exists and is initialized
+# initial = create prefix only if it does not exist
+# disabled = skip prefix creation
+wine_user_config_mode: 'managed'
+
+# Users for Wine prefix initialization
+wine_users: []
+# Example:
+#   - username: 'johndoe'
+#     group: 'johndoe'               # Optional, defaults to username
+#     mode: 'managed'                # managed/initial/disabled
+#     prefix: '~/.wine'             # Optional, default WINEPREFIX location
+#     arch: 'win64'                  # Optional, win32 or win64

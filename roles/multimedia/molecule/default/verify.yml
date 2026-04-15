@@ -1,0 +1,27 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Package Verification
+    #
+
+    - name: Verify | Check VLC package is installed
+      ansible.builtin.package:
+        name: vlc
+        state: present
+      check_mode: true
+      register: __verify_vlc_pkg
+      failed_when: __verify_vlc_pkg.changed
+
+    - name: Verify | Check VLC binary exists
+      ansible.builtin.stat:
+        path: /usr/bin/vlc
+      register: __verify_vlc_binary
+
+    - name: Verify | Assert VLC binary exists
+      ansible.builtin.assert:
+        that:
+          - __verify_vlc_binary.stat.exists

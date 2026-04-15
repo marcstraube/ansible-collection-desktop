@@ -1,0 +1,10 @@
+---
+#
+# Display Manager Service
+#
+
+- name: Service | Manage display manager service
+  ansible.builtin.systemd_service:
+    name: '{{ __display_manager_services[display_manager_name] }}'
+    enabled: "{{ display_manager_service_enabled | bool }}"
+    state: "{{ display_manager_service_enabled | bool | ternary('started', 'stopped') }}"

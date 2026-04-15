@@ -1,0 +1,97 @@
+---
+- name: Install | VueScan from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __imaging_aur_packages.vuescan }}'
+    state: present
+  register: __imaging_vuescan_result
+  failed_when: false
+  when:
+    - imaging_vuescan_enabled | bool
+    - ansible_facts['os_family'] == 'Archlinux'
+  tags:
+    - imaging
+    - imaging:vuescan
+
+- name: Install | Warn if VueScan installation failed
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: VueScan (AUR) installation failed. The package downloads
+      directly from hamrick.com and may be temporarily unavailable.
+      Install manually with: paru -S vuescan-bin
+  when:
+    - __imaging_vuescan_result is defined
+    - __imaging_vuescan_result is failed
+  tags:
+    - imaging
+    - imaging:vuescan
+
+- name: Install | SANE scanner backend
+  ansible.builtin.package:
+    name: '{{ __imaging_sane_package }}'
+    state: present
+  when: imaging_sane_enabled | bool
+  tags:
+    - imaging
+    - imaging:sane
+
+- name: Install | XSane from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __imaging_aur_packages.xsane }}'
+    state: present
+  when:
+    - imaging_xsane_enabled | bool
+    - ansible_facts['os_family'] == 'Archlinux'
+  tags:
+    - imaging
+    - imaging:xsane
+
+- name: Install | XSane scanning frontend
+  ansible.builtin.package:
+    name: '{{ __imaging_xsane_package }}'
+    state: present
+  when:
+    - imaging_xsane_enabled | bool
+    - ansible_facts['os_family'] != 'Archlinux'
+  tags:
+    - imaging
+    - imaging:xsane
+
+- name: Install | Simple Scan
+  ansible.builtin.package:
+    name: '{{ __imaging_simple_scan_package }}'
+    state: present
+  when: imaging_simple_scan_enabled | bool
+  tags:
+    - imaging
+    - imaging:simple-scan
+
+- name: Install | Skanlite scanning application
+  ansible.builtin.package:
+    name: '{{ __imaging_skanlite_package }}'
+    state: present
+  when: imaging_skanlite_enabled | bool
+  tags:
+    - imaging
+    - imaging:skanlite
+
+- name: Install | ImageMagick
+  ansible.builtin.package:
+    name: '{{ __imaging_imagemagick_package }}'
+    state: present
+  when: imaging_imagemagick_enabled | bool
+  tags:
+    - imaging
+    - imaging:imagemagick
+
+- name: Install | GraphicsMagick
+  ansible.builtin.package:
+    name: '{{ __imaging_graphicsmagick_package }}'
+    state: present
+  when: imaging_graphicsmagick_enabled | bool
+  tags:
+    - imaging
+    - imaging:graphicsmagick

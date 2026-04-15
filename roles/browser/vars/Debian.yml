@@ -1,0 +1,18 @@
+---
+# Packages
+__browser_firefox_package: 'firefox-esr'
+__browser_firefox_i18n_package: 'firefox-esr-l10n-{{ browser_firefox_i18n }}'
+__browser_chromium_package: 'chromium'
+__browser_tor_package: 'torbrowser-launcher'
+
+# Policy paths
+__browser_firefox_policies_path: '/etc/firefox-esr/policies'
+__browser_firefox_autoconfig_path: '/usr/lib/firefox-esr/defaults/pref'
+__browser_firefox_config_path: '/usr/lib/firefox-esr'
+__browser_librewolf_policies_path: ''
+__browser_chromium_policies_path: '/etc/chromium/policies'
+__browser_brave_policies_path: ''
+
+# Firefox profile directory pattern (for find)
+__browser_firefox_profile_pattern: '*.default-esr'
+__browser_librewolf_profile_pattern: '*.default-default'

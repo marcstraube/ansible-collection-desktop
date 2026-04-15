@@ -1,0 +1,169 @@
+---
+#
+# Role Control
+#
+
+# Enable the development role
+development_enabled: true
+
+#
+# Version Control
+#
+
+# Enable git installation
+development_git_enabled: true
+
+# Enable git-lfs support
+development_git_lfs_enabled: true
+
+# Enable GitHub CLI (gh)
+development_github_cli_enabled: true
+
+# Enable GitLab CLI (glab)
+development_gitlab_cli_enabled: true
+
+# Git global configuration
+development_git_config:
+  core.editor: 'nvim'
+  init.defaultBranch: 'main'
+  pull.rebase: 'true'
+  push.autoSetupRemote: 'true'
+
+#
+# Programming Languages
+#
+
+# Python
+
+# Enable Python installation
+development_python_enabled: true
+
+# Python tools to install via pipx (Debian/RedHat only, Arch uses native packages)
+development_python_tools: []
+# Example:
+#   development_python_tools:
+#     - 'black'
+#     - 'flake8'
+#     - 'mypy'
+
+# Node.js (installed via marcstraube.common.nodejs role)
+
+# Enable Node.js
+development_nodejs_enabled: true
+
+# Rust
+
+# Enable Rust installation
+development_rust_enabled: false
+
+# Rust components to install via rustup (Debian/RedHat only, Arch uses native packages)
+development_rust_components: []
+# Example:
+#   development_rust_components:
+#     - 'rustfmt'
+#     - 'clippy'
+
+# Go
+
+# Enable Go installation
+development_go_enabled: false
+
+# Java (OpenJDK)
+
+# Enable Java installation
+development_java_enabled: false
+
+# Java version to install
+development_java_version: '21'
+
+#
+# Build Tools
+#
+
+# Enable make and core build tools
+development_make_enabled: true
+
+# Enable cmake
+development_cmake_enabled: false
+
+# Enable meson
+development_meson_enabled: false
+
+# Enable ninja
+development_ninja_enabled: false
+
+#
+# IDEs and Editors
+#
+
+# Enable VS Code
+development_vscode_enabled: false
+
+# Enable VSCodium
+development_vscodium_enabled: true
+
+# Enable JetBrains Toolbox (manages all JetBrains IDEs)
+development_jetbrains_toolbox_enabled: false
+
+# Enable PHPStorm
+development_phpstorm_enabled: false
+
+# Enable Zed Editor
+development_zed_enabled: false
+
+#
+# Database Tools
+#
+
+# Enable DBeaver
+development_dbeaver_enabled: false
+
+# Enable pgAdmin
+development_pgadmin_enabled: false
+
+#
+# API Tools
+#
+
+# Enable httpie CLI HTTP client
+development_httpie_enabled: true
+
+# Enable Postman
+development_postman_enabled: false
+
+# Enable Insomnia
+development_insomnia_enabled: false
+
+# Enable Bruno (open-source Postman alternative)
+development_bruno_enabled: false
+
+#
+# Misc Tools
+#
+
+# Enable jq JSON processor
+development_jq_enabled: true
+
+# Enable yq YAML processor
+development_yq_enabled: true
+
+# Enable direnv directory-based env vars
+development_direnv_enabled: true
+
+# Enable pre-commit git hooks
+development_pre_commit_enabled: true
+
+# Enable shellcheck shell script linter
+development_shellcheck_enabled: true
+
+#
+# User Configuration
+#
+
+# Users to configure with git settings
+development_users: []
+# Example:
+#   - username: 'johndoe'
+#     git_name: 'John Doe'
+#     git_email: 'john@example.com'
+#     git_signing_key: '0x1234567890ABCDEF'

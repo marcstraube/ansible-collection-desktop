@@ -1,0 +1,40 @@
+---
+#
+# Archlinux-Specific Variables
+#
+
+# Telegram package
+__communication_telegram_package: 'telegram-desktop'
+
+# Signal package
+__communication_signal_package: 'signal-desktop'
+
+# Discord package
+__communication_discord_package: 'discord'
+
+# Element package
+__communication_element_package: 'element-desktop'
+
+# Sieve email filtering (KDE PIM suite includes sieve editor)
+__communication_sieve_package: 'kmail'
+
+# KDE Connect package
+__communication_kdeconnect_package: 'kdeconnect'
+
+#
+# AUR Packages
+#
+
+__communication_aur_packages:
+  slack:
+    - slack-desktop
+  slack_wayland:
+    - slack-desktop-wayland
+  threema:
+    - threema-desktop-bin
+  zoom:
+    - zoom
+  teams:
+    - teams-for-linux
+  jitsi:
+    - jitsi-meet-desktop

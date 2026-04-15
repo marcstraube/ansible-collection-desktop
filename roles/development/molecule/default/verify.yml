@@ -1,0 +1,210 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # Git
+    #
+
+    - name: Verify | Check git installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q git'
+      register: _dev_git_arch
+      changed_when: false
+      failed_when: _dev_git_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check git installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l git'
+      register: _dev_git_deb
+      changed_when: false
+      failed_when: _dev_git_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: >-
+        Verify | Check git installed
+        (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q git'
+      register: _dev_git_rpm
+      changed_when: false
+      failed_when: _dev_git_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Python
+    #
+
+    - name: Verify | Check python installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q python'
+      register: _dev_python_arch
+      changed_when: false
+      failed_when: _dev_python_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check python3 installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l python3'
+      register: _dev_python_deb
+      changed_when: false
+      failed_when: _dev_python_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: >-
+        Verify | Check python3 installed
+        (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q python3'
+      register: _dev_python_rpm
+      changed_when: false
+      failed_when: _dev_python_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Build Tools
+    #
+
+    - name: Verify | Check make installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q make'
+      register: _dev_make_arch
+      changed_when: false
+      failed_when: _dev_make_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check make installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l make'
+      register: _dev_make_deb
+      changed_when: false
+      failed_when: _dev_make_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: >-
+        Verify | Check make installed
+        (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q make'
+      register: _dev_make_rpm
+      changed_when: false
+      failed_when: _dev_make_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # httpie
+    #
+
+    - name: Verify | Check httpie installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q
+          {{ __development_httpie_package }}
+      register: _dev_httpie_arch
+      changed_when: false
+      failed_when: _dev_httpie_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __development_httpie_package
+          | default('') | length > 0
+
+    - name: Verify | Check httpie installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l
+          {{ __development_httpie_package }}
+      register: _dev_httpie_deb
+      changed_when: false
+      failed_when: _dev_httpie_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __development_httpie_package
+          | default('') | length > 0
+
+    - name: >-
+        Verify | Check httpie installed
+        (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q
+          {{ __development_httpie_package }}
+      register: _dev_httpie_rpm
+      changed_when: false
+      failed_when: _dev_httpie_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __development_httpie_package
+          | default('') | length > 0
+
+    #
+    # Misc Tools
+    #
+
+    - name: Verify | Check jq installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q jq'
+      register: _dev_jq_arch
+      changed_when: false
+      failed_when: _dev_jq_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check jq installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l jq'
+      register: _dev_jq_deb
+      changed_when: false
+      failed_when: _dev_jq_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: >-
+        Verify | Check jq installed
+        (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q jq'
+      register: _dev_jq_rpm
+      changed_when: false
+      failed_when: _dev_jq_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Verify | Check shellcheck installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q shellcheck'
+      register: _dev_sc_arch
+      changed_when: false
+      failed_when: _dev_sc_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: >-
+        Verify | Check shellcheck installed
+        (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l shellcheck'
+      register: _dev_sc_deb
+      changed_when: false
+      failed_when: _dev_sc_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: >-
+        Verify | Check ShellCheck installed
+        (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q ShellCheck'
+      register: _dev_sc_rpm
+      changed_when: false
+      failed_when: _dev_sc_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'

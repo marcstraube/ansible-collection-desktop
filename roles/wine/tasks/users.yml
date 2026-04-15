@@ -1,0 +1,23 @@
+---
+- name: Users | Get home directory
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ __wine_user.username }}'
+
+- name: Users | Set prefix path
+  ansible.builtin.set_fact:
+    __wine_user_prefix: >-
+      {{ __wine_user.prefix
+         | default(getent_passwd[__wine_user.username][4] + '/.wine') }}
+
+- name: Users | Initialize Wine prefix
+  become: true
+  become_user: '{{ __wine_user.username }}'
+  ansible.builtin.command:
+    cmd: wineboot --init
+    creates: '{{ __wine_user_prefix }}/system.reg'
+  environment:
+    WINEPREFIX: '{{ __wine_user_prefix }}'
+    WINEARCH: '{{ __wine_user.arch | default("win64") }}'
+    DISPLAY: ''
+    WINEDEBUG: '-all'

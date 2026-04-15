@@ -1,0 +1,40 @@
+---
+#
+# Display Manager Installation
+#
+
+- name: Install | Build package list
+  ansible.builtin.set_fact:
+    __display_manager_install_packages: >-
+      {{
+        [__display_manager_packages[display_manager_name]] +
+        ((display_manager_name == 'sddm'
+          and display_manager_sddm_virtual_keyboard | bool)
+          | ternary([__display_manager_sddm_virtual_keyboard_package], [])) +
+        ((display_manager_name == 'lightdm')
+          | ternary([__display_manager_lightdm_greeter_packages[
+                       display_manager_lightdm_greeter]], [])) +
+        ((display_manager_name == 'greetd'
+          and display_manager_greetd_greeter
+          in __display_manager_greetd_greeter_packages.keys())
+          | ternary([__display_manager_greetd_greeter_packages[
+                       display_manager_greetd_greeter]], [])) +
+        ((display_manager_name == 'greetd'
+          and display_manager_greetd_greeter
+          in __display_manager_greetd_graphical_greeters
+          and display_manager_greetd_greeter_compositor
+          in __display_manager_greetd_compositor_packages.keys())
+          | ternary([__display_manager_greetd_compositor_packages[
+                       display_manager_greetd_greeter_compositor]], []))
+      }}
+
+- name: Install | Filter empty packages
+  ansible.builtin.set_fact:
+    __display_manager_install_packages: >-
+      {{ __display_manager_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: Install | Display manager packages
+  ansible.builtin.package:
+    name: '{{ __display_manager_install_packages }}'
+    state: present
+  when: __display_manager_install_packages | length > 0

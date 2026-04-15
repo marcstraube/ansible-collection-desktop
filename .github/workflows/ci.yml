@@ -1,0 +1,274 @@
+---
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # =============================================================================
+  # LINT (always runs)
+  # =============================================================================
+  lint:
+    name: Ansible Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install ansible-core ansible-lint
+
+      - name: Install collection dependencies
+        run: |
+          ansible-galaxy collection install marcstraube.common community.general ansible.posix kewlfft.aur
+
+      - name: Run ansible-lint
+        run: ansible-lint
+
+  # =============================================================================
+  # MARKDOWN LINT (always runs)
+  # =============================================================================
+  markdown-lint:
+    name: Markdown Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Run markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v23
+
+  # =============================================================================
+  # YAML LINT (always runs)
+  # =============================================================================
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint
+        run: yamllint -c .yamllint .
+
+  # =============================================================================
+  # MOLECULE FORWARD-COMPATIBILITY (ansible-core 2.20, representative subset)
+  # Tests a diverse subset of roles on latest ansible-core to catch
+  # deprecations and breaking changes early.
+  # =============================================================================
+  molecule-compat:
+    name: Compat ${{ matrix.role }} (ansible-2.20)
+    runs-on: ubuntu-latest
+    needs: [lint, markdown-lint, yaml-lint]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { role: browser, platform: browser-archlinux }
+          - { role: pipewire, platform: pipewire-archlinux }
+          - { role: shell, platform: shell-archlinux }
+          - { role: keepassxc, platform: keepassxc-archlinux }
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install "ansible-core~=2.20.0" \
+                      molecule \
+                      molecule-plugins[podman] \
+                      passlib
+
+      - name: Install collection dependencies
+        run: |
+          ansible-galaxy collection install marcstraube.common community.general ansible.posix kewlfft.aur containers.podman
+
+      - name: Run Molecule test
+        working-directory: roles/${{ matrix.role }}
+        run: molecule test
+        env:
+          MOLECULE_PLATFORM_NAME: ${{ matrix.platform }}
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+
+  # =============================================================================
+  # DETECT CHANGED ROLES
+  # Determines which roles need molecule testing based on git diff.
+  # Only substantive changes trigger tests (not README-only edits).
+  # Shared file changes (galaxy.yml, plugins/, meta/runtime.yml) test all roles.
+  # tabletop is excluded (deferred — proprietary package redesign needed).
+  # =============================================================================
+  detect-changes:
+    name: Detect Changed Roles
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_roles: ${{ steps.set-matrix.outputs.has_roles }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Determine changed roles
+        id: set-matrix
+        run: |
+          ALL_PODMAN_ROLES="ai bluetooth browser cad communication desktop_environment development display_manager downloads elgato filemanagers gaming graphics_apps imaging keepassxc multimedia office pipewire plymouth remote_access security_apps shell system_apps terminal tuxedo wayland_utils wine"
+
+          # Determine base commit for diff
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          elif [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            BASE="${{ github.event.before }}"
+          else
+            # Force push or initial push — test all roles
+            echo "Initial or force push — testing all roles"
+            BASE=""
+          fi
+
+          # If no valid base, test all podman roles
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE" 2>/dev/null; then
+            ROLES="$ALL_PODMAN_ROLES"
+          else
+            CHANGED=$(git diff --name-only "$BASE" "${{ github.sha }}")
+
+            # Shared files that require testing all roles
+            if echo "$CHANGED" | grep -qE '^(galaxy\.yml|requirements\.yml|plugins/|meta/runtime\.yml)'; then
+              echo "Shared files changed — testing all roles"
+              ROLES="$ALL_PODMAN_ROLES"
+            else
+              # Find roles with substantive changes (skip README-only)
+              ROLES=$(echo "$CHANGED" \
+                | grep '^roles/' \
+                | grep -v '/README\.md$' \
+                | sed 's|^roles/\([^/]*\)/.*|\1|' \
+                | sort -u \
+                | tr '\n' ' ')
+
+              # Filter to podman roles only
+              FILTERED=""
+              for role in $ROLES; do
+                if echo " $ALL_PODMAN_ROLES " | grep -q " $role "; then
+                  FILTERED="$FILTERED $role"
+                fi
+              done
+              ROLES="$FILTERED"
+            fi
+          fi
+
+          # Build JSON matrix
+          MATRIX="["
+          FIRST=true
+          for role in $ROLES; do
+            [ -z "$role" ] && continue
+            platform="$(echo "$role" | tr '_' '-')-archlinux"
+            if [ "$FIRST" = "true" ]; then
+              FIRST=false
+            else
+              MATRIX="${MATRIX},"
+            fi
+            MATRIX="${MATRIX}{\"role\":\"${role}\",\"platform\":\"${platform}\"}"
+          done
+          MATRIX="${MATRIX}]"
+
+          if [ "$MATRIX" = "[]" ]; then
+            echo "has_roles=false" >> "$GITHUB_OUTPUT"
+            echo "No roles to test"
+          else
+            echo "has_roles=true" >> "$GITHUB_OUTPUT"
+            echo "Roles to test: $ROLES"
+          fi
+
+          echo "matrix={\"include\":${MATRIX}}" >> "$GITHUB_OUTPUT"
+
+  # =============================================================================
+  # MOLECULE ROLE-BY-ROLE (changed roles only, Arch Linux)
+  # =============================================================================
+  molecule-roles:
+    name: Molecule ${{ matrix.role }} (${{ matrix.platform }})
+    runs-on: ubuntu-latest
+    needs: [lint, markdown-lint, yaml-lint, detect-changes]
+    if: needs.detect-changes.outputs.has_roles == 'true'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install "ansible-core~=2.17.0" \
+                      molecule \
+                      molecule-plugins[podman] \
+                      passlib
+
+      - name: Install collection dependencies
+        run: |
+          ansible-galaxy collection install marcstraube.common community.general ansible.posix kewlfft.aur containers.podman
+
+      - name: Run Molecule test
+        working-directory: roles/${{ matrix.role }}
+        run: molecule test
+        env:
+          MOLECULE_PLATFORM_NAME: ${{ matrix.platform }}
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+
+  # =============================================================================
+  # BUILD (always runs)
+  # =============================================================================
+  build:
+    name: Build Collection
+    runs-on: ubuntu-latest
+    needs: [lint, markdown-lint, yaml-lint]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Ansible
+        run: pip install ansible-core
+
+      - name: Build collection
+        run: ansible-galaxy collection build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: collection-tarball
+          path: '*.tar.gz'
+          retention-days: 30

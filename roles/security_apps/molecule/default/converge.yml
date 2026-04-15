@@ -1,0 +1,20 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    security_apps_enabled: true
+    # Official repository packages only (skip AUR for molecule tests)
+    security_apps_veracrypt_enabled: true
+    security_apps_clamtk_enabled: true
+    security_apps_gufw_enabled: true
+    # Skip AUR packages (require aur_builder user)
+    security_apps_cypherock_enabled: false
+    security_apps_ledger_enabled: false
+    security_apps_trezor_enabled: false
+
+  tasks:
+    - name: Converge | Include security_apps role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

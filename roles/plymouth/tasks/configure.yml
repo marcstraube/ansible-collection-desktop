@@ -1,0 +1,75 @@
+---
+#
+# Plymouth Configuration
+#
+
+# Theme
+- name: Configure | Get current default theme
+  ansible.builtin.command:
+    cmd: plymouth-set-default-theme
+  register: __plymouth_current_theme
+  changed_when: false
+
+- name: Configure | Set Plymouth theme
+  ansible.builtin.command:
+    cmd: plymouth-set-default-theme -R {{ plymouth_theme }}
+  changed_when: true
+  when: __plymouth_current_theme.stdout | trim != plymouth_theme
+  notify: regenerate initramfs
+
+#
+# Arch Linux — mkinitcpio Hooks
+#
+# Debian/RedHat integrate plymouth automatically via initramfs-tools/dracut.
+
+- name: Configure | Read current mkinitcpio hooks (Arch)
+  ansible.builtin.command:
+    cmd: grep '^HOOKS=' {{ __plymouth_mkinitcpio_conf }}
+  register: __plymouth_current_hooks
+  changed_when: false
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_mkinitcpio_conf | length > 0
+
+- name: Configure | Check for GPG hook incompatibility (Arch)
+  ansible.builtin.set_fact:
+    __plymouth_gpg_conflict: "{{ 'gpg' in __plymouth_current_hooks.stdout }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_current_hooks is defined
+
+- name: Configure | Warn about GPG hook incompatibility (Arch)
+  ansible.builtin.debug:
+    msg: >-
+      Plymouth hook insertion SKIPPED — mkinitcpio 'gpg' hook detected.
+      GPG-based LUKS unlock requires interactive console for PIN entry,
+      which Plymouth would break by taking over console I/O.
+      Plymouth theme is configured but the splash will not show during boot.
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_gpg_conflict | default(false) | bool
+
+- name: Configure | Determine insert-after hook (Arch)
+  ansible.builtin.set_fact:
+    __plymouth_insert_after: >-
+      {{ 'systemd' if (plymouth_hook_position == 'auto' and
+      'systemd' in __plymouth_current_hooks.stdout)
+      else 'udev' if plymouth_hook_position == 'auto'
+      else plymouth_hook_position }}
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_current_hooks is defined
+    - "'plymouth' not in __plymouth_current_hooks.stdout"
+    - not (__plymouth_gpg_conflict | default(false) | bool)
+
+- name: Configure | Add plymouth to mkinitcpio hooks (Arch)
+  ansible.builtin.replace:
+    path: '{{ __plymouth_mkinitcpio_conf }}'
+    regexp: '^(HOOKS=.*{{ __plymouth_insert_after }})([\s)])'
+    replace: '\1 plymouth\2'
+    backup: true
+  notify: regenerate initramfs
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_insert_after is defined
+    - not (__plymouth_gpg_conflict | default(false) | bool)

@@ -1,0 +1,67 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Package Verification
+    #
+
+    - name: Verify | Check keepassxc installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q keepassxc'
+      register: _keepassxc_arch
+      changed_when: false
+      failed_when: _keepassxc_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check keepassxc installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l keepassxc'
+      register: _keepassxc_deb
+      changed_when: false
+      failed_when: _keepassxc_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check keepassxc installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q keepassxc'
+      register: _keepassxc_rpm
+      changed_when: false
+      failed_when: _keepassxc_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Secret Service Verification
+    #
+
+    - name: Verify | Check global Secret Service file
+      ansible.builtin.stat:
+        path: /usr/local/share/dbus-1/services/org.freedesktop.secrets.service
+      register: _keepassxc_secret_service
+
+    - name: Verify | Assert global Secret Service file exists
+      ansible.builtin.assert:
+        that:
+          - _keepassxc_secret_service.stat.exists
+          - _keepassxc_secret_service.stat.isreg
+          - _keepassxc_secret_service.stat.mode == '0644'
+        fail_msg: >-
+          Global Secret Service file missing or wrong permissions
+
+    - name: Verify | Read Secret Service file content
+      ansible.builtin.slurp:
+        src: /usr/local/share/dbus-1/services/org.freedesktop.secrets.service
+      register: _keepassxc_secret_content
+
+    - name: Verify | Assert Secret Service configuration
+      ansible.builtin.assert:
+        that:
+          - >-
+            'org.freedesktop.secrets'
+            in (_keepassxc_secret_content.content | b64decode)
+          - >-
+            '/usr/bin/keepassxc'
+            in (_keepassxc_secret_content.content | b64decode)
+        fail_msg: 'Secret Service configuration incorrect'

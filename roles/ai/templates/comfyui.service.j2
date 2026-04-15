@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=ComfyUI - Stable Diffusion Node Editor
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ ai_comfyui_user }}
+Group={{ ai_comfyui_group }}
+WorkingDirectory={{ ai_comfyui_install_dir }}
+ExecStart={{ ai_comfyui_install_dir }}/venv/bin/python main.py --listen {{ ai_comfyui_listen }} --port {{ ai_comfyui_port }}
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

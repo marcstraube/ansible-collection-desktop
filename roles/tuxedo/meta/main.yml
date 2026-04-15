@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author: Marc Straube
+  description: Install Tuxedo kernel drivers and control center
+  license: MIT
+  min_ansible_version: '2.17'
+
+  platforms:
+    - name: ArchLinux
+      versions:
+        - all
+
+  galaxy_tags:
+    - tuxedo
+    - laptop
+    - hardware
+    - dkms
+    - desktop
+
+dependencies: []

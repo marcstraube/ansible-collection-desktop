@@ -1,0 +1,54 @@
+{{ ansible_managed | comment('cblock') }}
+{
+  "policies": {
+{% if browser_librewolf_disable_telemetry | bool %}
+    "DisableTelemetry": true,
+{% endif %}
+{% if browser_librewolf_disable_pocket | bool %}
+    "DisablePocket": true,
+{% endif %}
+{% if browser_librewolf_disable_firefox_studies | bool %}
+    "DisableFirefoxStudies": true,
+{% endif %}
+{% if browser_librewolf_dns_over_https is defined %}
+    "DNSOverHTTPS": {
+      "Enabled": {{ browser_librewolf_dns_over_https.enabled | default(true) | lower }},
+      "ProviderURL": "{{ browser_librewolf_dns_over_https.provider | default('https://mozilla.cloudflare-dns.com/dns-query') }}",
+      "Locked": {{ browser_librewolf_dns_over_https.locked | default(false) | lower }}
+    },
+{% endif %}
+{% if browser_librewolf_extensions | length > 0 %}
+    "ExtensionSettings": {
+      "*": {
+        "blocked_install_message": "Extension installation is managed by system policy.",
+        "installation_mode": "{{ browser_extension_default_mode }}"
+      }{% if browser_librewolf_extensions | length > 0 %},{% endif %}
+
+{% for ext_id, ext_config in browser_librewolf_extensions | dictsort %}
+      "{{ ext_id }}": {
+        "installation_mode": "{{ ext_config.mode | default('normal_installed') }}"{% if ext_config.url is defined %},
+        "install_url": "{{ ext_config.url }}"{% endif %}
+
+      }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+    },
+{% endif %}
+{% if browser_librewolf_homepage | length > 0 %}
+    "Homepage": {
+      "URL": "{{ browser_librewolf_homepage }}",
+      "Locked": false,
+      "StartPage": "homepage"
+    },
+{% endif %}
+{% if browser_librewolf_search_engines is defined %}
+    "SearchEngines": {
+      "Default": "{{ browser_librewolf_search_engines.default | default('DuckDuckGo') }}",
+      "Remove": {{ browser_librewolf_search_engines.remove | default([]) | to_json }}
+    },
+{% endif %}
+    "NoDefaultBookmarks": {{ browser_librewolf_no_default_bookmarks | default(true) | lower }},
+    "OfferToSaveLogins": {{ browser_librewolf_offer_to_save_logins | default(false) | lower }},
+    "PasswordManagerEnabled": {{ browser_librewolf_password_manager | default(false) | lower }}
+  }
+}

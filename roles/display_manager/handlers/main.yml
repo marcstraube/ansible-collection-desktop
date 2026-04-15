@@ -1,0 +1,17 @@
+---
+#
+# Display Manager Handlers
+#
+
+- name: Reload display manager systemd units
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  # Container-safety for molecule
+  failed_when: false
+  when: display_manager_enabled | bool
+
+- name: Restart display manager
+  ansible.builtin.systemd_service:
+    name: '{{ __display_manager_services[display_manager_name] }}'
+    state: restarted
+  when: display_manager_service_enabled | bool

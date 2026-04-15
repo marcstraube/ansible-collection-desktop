@@ -1,0 +1,40 @@
+{{ ansible_managed | comment('cblock') }}
+{
+  "policies": {
+{% if browser_firefox_extensions | length > 0 or browser_firefox_extensions_optional | default({}) | length > 0 %}
+    "ExtensionSettings": {
+      "*": {
+        "blocked_install_message": "Extension installation is managed by system policy.",
+        "installation_mode": "{{ browser_extension_default_mode }}",
+        "allowed_types": ["extension", "theme"]
+      }{% if browser_firefox_extensions | length > 0 or browser_firefox_extensions_optional | default({}) | length > 0 %},{% endif %}
+
+{% for ext_id, ext_config in (browser_firefox_extensions | combine(browser_firefox_extensions_optional | default({}))) | dictsort %}
+      "{{ ext_id }}": {
+        "installation_mode": "{{ ext_config.mode | default('force_installed') }}",
+        "install_url": "{{ ext_config.url }}"
+      }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+    },
+{% endif %}
+{% for key, value in browser_firefox_policy_settings | dictsort %}
+{% if value is mapping %}
+    "{{ key }}": {{ value | to_nice_json(indent=6) | indent(4) }}{% if not loop.last %},{% endif %}
+
+{% elif value is iterable and value is not string %}
+    "{{ key }}": {{ value | to_json }}{% if not loop.last %},{% endif %}
+
+{% elif value is sameas true or value is sameas false %}
+    "{{ key }}": {{ value | lower }}{% if not loop.last %},{% endif %}
+
+{% elif value is number %}
+    "{{ key }}": {{ value }}{% if not loop.last %},{% endif %}
+
+{% else %}
+    "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+
+{% endif %}
+{% endfor %}
+  }
+}

@@ -1,0 +1,87 @@
+---
+#
+# Role Control
+#
+
+# Enable the ai role
+ai_enabled: true
+
+#
+# CLI Tools
+#
+# Command-line AI assistants
+
+# Enable Claude Code (Anthropic CLI)
+ai_claude_code_enabled: true
+
+# Enable Gemini CLI (Google)
+ai_gemini_cli_enabled: false
+
+# Enable OpenAI Codex CLI
+ai_codex_enabled: false
+
+# Enable OpenCode (open-source coding agent)
+ai_opencode_enabled: false
+
+# Enable auth plugin for Claude credentials
+ai_opencode_claude_auth_enabled: false
+
+# Enable auth plugin for Gemini credentials
+ai_opencode_gemini_auth_enabled: false
+
+# Enable Aider (AI pair programming)
+ai_aider_enabled: false
+
+#
+# Desktop Applications
+#
+# GUI-based AI tools
+
+# Enable Claude Desktop (official Anthropic app)
+ai_claude_desktop_enabled: false
+
+# Enable OpenCode Desktop (Tauri-based GUI)
+ai_opencode_desktop_enabled: false
+
+#
+# Local AI / Inference
+#
+# Self-hosted AI inference
+
+# Enable Ollama (local LLM server)
+ai_ollama_enabled: false
+
+# Models to pull after installation
+ai_ollama_models: []
+# Example:
+#   ai_ollama_models:
+#     - 'llama3.2'
+#     - 'codellama'
+#     - 'mistral'
+
+# Enable and start the Ollama service
+ai_ollama_service_enabled: true
+
+# Enable LM Studio
+ai_lmstudio_enabled: false
+
+# Enable ComfyUI (Stable Diffusion node-based UI)
+ai_comfyui_enabled: false
+# GPU backend (nvidia or amd)
+ai_comfyui_gpu: 'nvidia'
+# Git branch/tag
+ai_comfyui_version: 'master'
+# Installation directory
+ai_comfyui_install_dir: '/opt/comfyui'
+# Listen address
+ai_comfyui_listen: '127.0.0.1'
+# Web UI port
+ai_comfyui_port: 8188
+# Service user
+ai_comfyui_user: 'comfyui'
+# Service group
+ai_comfyui_group: 'comfyui'
+# Enable ComfyUI-Manager
+ai_comfyui_manager_enabled: true
+# Enable and start the ComfyUI service
+ai_comfyui_service_enabled: true

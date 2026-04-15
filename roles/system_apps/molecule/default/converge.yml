@@ -1,0 +1,22 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    system_apps_enabled: true
+    system_apps_gparted_enabled: true
+    system_apps_filelight_enabled: true
+    system_apps_baobab_enabled: true
+    system_apps_solaar_enabled: true
+    system_apps_gnome_system_monitor_enabled: true
+    system_apps_plasma_system_monitor_enabled: true
+    system_apps_timeshift_enabled: true
+    system_apps_deja_dup_enabled: true
+    system_apps_seahorse_enabled: true
+    system_apps_dconf_editor_enabled: true
+
+  tasks:
+    - name: Converge | Include system_apps role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

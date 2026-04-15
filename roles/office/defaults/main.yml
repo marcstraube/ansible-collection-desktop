@@ -1,0 +1,136 @@
+---
+#
+# Role Control
+#
+
+# Enable the office role
+office_enabled: true
+
+#
+# Office Suites
+#
+
+# LibreOffice
+
+# Enable LibreOffice installation
+office_libreoffice_enabled: true
+
+# Use LibreOffice Fresh (newer) instead of Still
+office_libreoffice_fresh_enabled: true
+
+# Language pack for LibreOffice
+office_libreoffice_i18n: 'de'
+
+# Enable OnlyOffice Desktop installation (AUR only)
+office_onlyoffice_enabled: false
+
+# Enable WPS Office installation (AUR only)
+office_wps_enabled: false
+
+#
+# PDF Tools
+#
+
+# PDF viewer to install
+# Valid values: evince, okular, zathura, mupdf
+office_pdf_viewer: 'evince'
+
+# Enable PDF command line tools (pdftk, qpdf, etc.)
+office_pdf_tools_enabled: true
+
+#
+# Email Clients
+#
+
+# Enable Thunderbird installation
+office_thunderbird_enabled: false
+
+# Thunderbird language pack
+office_thunderbird_i18n: 'de'
+
+# Enable Evolution installation
+office_evolution_enabled: false
+
+#
+# Calendar / PIM
+#
+
+# Enable GNOME Calendar installation
+office_gnome_calendar_enabled: false
+
+# Enable GNOME Contacts installation
+office_gnome_contacts_enabled: false
+
+#
+# Note Taking
+#
+
+# Enable Obsidian installation (AUR only)
+office_obsidian_enabled: false
+
+# Enable Logseq installation (AUR only)
+office_logseq_enabled: false
+
+# Enable Joplin installation (AUR only)
+office_joplin_enabled: false
+
+# Enable Simplenote installation (AUR only)
+office_simplenote_enabled: false
+
+#
+# Document Tools
+#
+
+# Markdown Editors
+
+# Enable Typora installation (AUR only)
+office_typora_enabled: false
+
+# LaTeX
+
+# Enable TeXstudio installation
+office_texstudio_enabled: false
+
+# OCR
+
+# Enable OCR tools (tesseract) installation
+office_ocr_enabled: false
+
+# OCR language data packages to install
+office_ocr_languages:
+  - 'eng'
+  - 'deu'
+
+#
+# Scanning
+#
+
+# Enable Simple Scan installation
+office_simple_scan_enabled: false
+
+# Enable gscan2pdf installation
+office_gscan2pdf_enabled: false
+
+#
+# Ebook
+#
+
+# Enable Calibre installation
+office_calibre_enabled: false
+
+# Enable Foliate ebook reader installation
+office_foliate_enabled: false
+
+#
+# Misc
+#
+
+# Spell Checking
+
+# Enable Hunspell spell checking installation
+office_hunspell_enabled: true
+
+# Fonts
+
+# Enable office fonts installation
+office_fonts_enabled: true

@@ -1,0 +1,82 @@
+---
+#
+# Official Repository Packages
+#
+
+- name: Install | Remmina packages
+  ansible.builtin.package:
+    name: '{{ __remote_access_remmina_package }}'
+    state: present
+  when:
+    - remote_access_remmina_enabled | bool
+    - __remote_access_remmina_package | default('') | length > 0
+
+- name: Install | TigerVNC packages
+  ansible.builtin.package:
+    name: '{{ __remote_access_tigervnc_package }}'
+    state: present
+  when:
+    - remote_access_tigervnc_enabled | bool
+    - __remote_access_tigervnc_package | default('') | length > 0
+
+- name: Install | FreeRDP packages
+  ansible.builtin.package:
+    name: '{{ __remote_access_freerdp_package }}'
+    state: present
+  when:
+    - remote_access_freerdp_enabled | bool
+    - __remote_access_freerdp_package | default('') | length > 0
+
+#
+# AUR Packages (Arch Only)
+#
+
+- name: Install | RustDesk from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __remote_access_aur_packages.rustdesk }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - remote_access_rustdesk_enabled | bool
+
+- name: Install | Asbru from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __remote_access_aur_packages.asbru }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - remote_access_asbru_enabled | bool
+
+- name: Install | RealVNC Viewer from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __remote_access_aur_packages.realvnc }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - remote_access_realvnc_enabled | bool
+
+- name: Install | AnyDesk from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __remote_access_aur_packages.anydesk }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - remote_access_anydesk_enabled | bool
+
+- name: Install | TeamViewer from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __remote_access_aur_packages.teamviewer }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - remote_access_teamviewer_enabled | bool

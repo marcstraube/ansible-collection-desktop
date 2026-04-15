@@ -1,0 +1,37 @@
+---
+#
+# Role Control
+#
+
+# Enable the graphics_apps role
+graphics_apps_enabled: true
+
+#
+# Image Editing
+#
+
+# Enable GIMP (GNU Image Manipulation Program)
+graphics_apps_gimp_enabled: true
+
+# Enable Krita (digital painting application)
+graphics_apps_krita_enabled: true
+
+# Additional GIMP plugin packages to install
+graphics_apps_gimp_plugins: []
+
+#
+# Vector Graphics
+#
+
+# Enable Inkscape (vector graphics editor)
+graphics_apps_inkscape_enabled: true
+
+#
+# Image Conversion/Viewing
+#
+
+# Enable XnConvert (batch image converter, Arch only)
+graphics_apps_xnconvert_enabled: true
+
+# Enable XnView (image viewer, Arch only)
+graphics_apps_xnview_enabled: false

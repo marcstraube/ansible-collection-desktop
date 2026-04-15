@@ -1,0 +1,18 @@
+---
+#
+# PipeWire Service Management
+#
+
+- name: Service | Manage PipeWire user services
+  ansible.builtin.systemd_service:
+    name: '{{ item.1 }}'
+    enabled: "{{ pipewire_service_enabled | bool }}"
+    state: "{{ pipewire_service_enabled | bool | ternary('started', 'stopped') }}"
+    scope: user
+  become: true
+  become_user: '{{ item.0.name }}'
+  loop: "{{ pipewire_users | default([]) | product(__pipewire_user_services) | list }}"
+  loop_control:
+    label: '{{ item.0.name }}: {{ item.1 }}'
+  # Systemd user scope not available in containers (molecule)
+  failed_when: false

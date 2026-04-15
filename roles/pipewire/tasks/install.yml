@@ -1,0 +1,36 @@
+---
+#
+# PipeWire Package Installation
+#
+
+- name: Install | Build package list
+  ansible.builtin.set_fact:
+    __pipewire_install_packages: >-
+      {{
+        __pipewire_packages +
+        (pipewire_audio_enabled | bool | ternary(__pipewire_audio_packages | default([]), [])) +
+        [__pipewire_session_managers[pipewire_session_manager]] +
+        (pipewire_pulseaudio_enabled | bool | ternary([__pipewire_pulse_package], [])) +
+        (pipewire_alsa_enabled | bool | ternary([__pipewire_alsa_package], [])) +
+        (pipewire_jack_enabled | bool | ternary([__pipewire_jack_package], [])) +
+        (pipewire_bluetooth_enabled | bool | ternary(__pipewire_bluetooth_packages | default([]), [])) +
+        ((pipewire_zeroconf_enabled | bool and __pipewire_zeroconf_package | length > 0)
+          | ternary([__pipewire_zeroconf_package], [])) +
+        (pipewire_32bit_enabled | bool | ternary(__pipewire_32bit_packages, [])) +
+        ([__pipewire_volume_control_packages[pipewire_volume_control]] |
+          select('string') | reject('equalto', '') | list) +
+        ([__pipewire_patchbay_packages[pipewire_patchbay]] |
+          select('string') | reject('equalto', '') | list)
+      }}
+
+- name: Install | Filter empty package names
+  ansible.builtin.set_fact:
+    __pipewire_install_packages: >-
+      {{ __pipewire_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: Install | PipeWire packages
+  ansible.builtin.package:
+    name: '{{ __pipewire_install_packages }}'
+    state: present
+  when: __pipewire_install_packages | length > 0
+  notify: Restart PipeWire

@@ -1,0 +1,114 @@
+---
+#
+# Desktop Environment Main Tasks
+#
+
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - desktop-environment
+
+- name: Main | Derive desktop users from users_list (exclude root and system users)
+  ansible.builtin.set_fact:
+    desktop_environment_users: >-
+      {{ (users_list | default([])
+          | rejectattr('name', 'equalto', 'root')
+          | selectattr('system', 'undefined') | list
+          + users_list | default([])
+          | rejectattr('name', 'equalto', 'root')
+          | selectattr('system', 'defined')
+          | rejectattr('system', 'equalto', true) | list)
+         | map(attribute='name') | list }}
+  when:
+    - desktop_environment_enabled | bool
+    - desktop_environment_users | length == 0
+    - users_list is defined
+    - users_list | length > 0
+  tags:
+    - desktop-environment
+
+- name: Main | Check if any Wayland DE selected
+  ansible.builtin.set_fact:
+    __desktop_environment_needs_wayland: >-
+      {{ desktop_environment_list | intersect(__desktop_environment_wayland_des) | length > 0 }}
+  when: desktop_environment_enabled | bool
+  tags:
+    - desktop-environment
+
+- name: Main | Build wayland_utils config for Hyprland
+  ansible.builtin.set_fact:
+    __desktop_environment_wayland_utils_config: >-
+      {{ desktop_environment_wayland_utils_hyprland_config | combine(desktop_environment_wayland_utils_config) }}
+  when:
+    - desktop_environment_enabled | bool
+    - "'hyprland' in desktop_environment_list"
+  tags:
+    - desktop-environment
+    - desktop-environment:wayland
+
+- name: Main | Build wayland_utils config for non-Hyprland
+  ansible.builtin.set_fact:
+    __desktop_environment_wayland_utils_config: '{{ desktop_environment_wayland_utils_config }}'
+  when:
+    - desktop_environment_enabled | bool
+    - "'hyprland' not in desktop_environment_list"
+  tags:
+    - desktop-environment
+    - desktop-environment:wayland
+
+- name: Main | Apply wayland_utils overrides
+  ansible.builtin.set_fact:
+    '{{ item.key }}': '{{ item.value }}'
+  loop: '{{ __desktop_environment_wayland_utils_config | dict2items }}'
+  when:
+    - desktop_environment_enabled | bool
+    - __desktop_environment_wayland_utils_config | length > 0
+  tags:
+    - desktop-environment
+    - desktop-environment:wayland
+
+- name: Main | Include wayland_utils role
+  ansible.builtin.include_role:
+    name: 'marcstraube.desktop.wayland_utils'
+  when:
+    - desktop_environment_enabled | bool
+    - desktop_environment_wayland_utils_enabled | bool
+    - __desktop_environment_needs_wayland | bool
+  tags:
+    - desktop-environment
+    - desktop-environment:wayland
+
+- name: Main | Include desktop environment tasks
+  ansible.builtin.include_tasks:
+    file: '{{ desktop_environment_item }}.yml'
+    apply:
+      tags:
+        - desktop-environment
+  loop: '{{ desktop_environment_list }}'
+  loop_control:
+    loop_var: desktop_environment_item
+  when: desktop_environment_enabled | bool
+  tags:
+    - desktop-environment
+
+- name: Main | Import common tasks
+  ansible.builtin.import_tasks: common.yml
+  when: desktop_environment_enabled | bool
+  tags:
+    - desktop-environment
+    - desktop-environment:common
+
+- name: Main | Import theme tasks
+  ansible.builtin.import_tasks: themes.yml
+  when: desktop_environment_enabled | bool
+  tags:
+    - desktop-environment
+    - desktop-environment:themes

@@ -1,0 +1,18 @@
+---
+#
+# LXDE Installation
+#
+
+- name: LXDE | Build package list
+  ansible.builtin.set_fact:
+    __desktop_environment_lxde_install_packages: >-
+      {{ desktop_environment_lxde_full_enabled | bool
+         | ternary(__desktop_environment_lxde_full_packages,
+                   __desktop_environment_lxde_minimal_packages) }}
+
+- name: LXDE | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_lxde_install_packages }}'
+    state: present
+  when:
+    - __desktop_environment_lxde_install_packages | length > 0

@@ -1,0 +1,26 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  pre_tasks:
+    - name: Converge | Create test user for Wave:3 config
+      ansible.builtin.user:
+        name: testuser
+        state: present
+        create_home: true
+        shell: /bin/bash
+
+  vars:
+    elgato_enabled: true
+    elgato_streamdeck_enabled: false
+    elgato_facecam_enabled: true
+    elgato_keylight_enabled: false
+    elgato_wave3_enabled: true
+    elgato_wave3_users:
+      - 'testuser'
+
+  tasks:
+    - name: Converge | Include elgato role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

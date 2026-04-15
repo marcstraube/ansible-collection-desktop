@@ -1,0 +1,26 @@
+---
+#
+# RedHat/Rocky-specific variables for AI tools
+#
+
+# CLI Tools (via npm/pipx on RedHat)
+__ai_codex_package: ''
+
+# Desktop Apps
+__ai_claude_desktop_package: ''
+__ai_opencode_desktop_url: >-
+  https://github.com/anomalyco/opencode/releases/latest/download/opencode-desktop-linux-x86_64.rpm
+
+# Local AI
+__ai_ollama_package: ''
+__ai_lmstudio_package: ''
+
+# Service names
+__ai_ollama_service: 'ollama.service'
+
+# ComfyUI
+__ai_comfyui_python: 'python3'
+__ai_comfyui_venv_packages:
+  - 'python3'
+  - 'python3-pip'
+  - 'git'

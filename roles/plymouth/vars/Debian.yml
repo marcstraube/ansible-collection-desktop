@@ -1,0 +1,14 @@
+---
+#
+# Debian Variables
+#
+
+__plymouth_packages:
+  - 'plymouth'
+  - 'plymouth-themes'
+
+__plymouth_mkinitcpio_conf: ''
+__plymouth_initramfs_command: 'update-initramfs -u'
+
+__plymouth_grub_default_file: '/etc/default/grub'
+__plymouth_grub_mkconfig_command: 'update-grub'

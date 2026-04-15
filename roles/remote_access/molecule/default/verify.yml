@@ -1,0 +1,118 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # Remmina
+    #
+
+    - name: Verify | Check Remmina installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __remote_access_remmina_package }}
+      register: _ra_remmina_arch
+      changed_when: false
+      failed_when: _ra_remmina_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __remote_access_remmina_package | default('') | length > 0
+
+    - name: Verify | Check Remmina installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __remote_access_remmina_package }}
+      register: _ra_remmina_deb
+      changed_when: false
+      failed_when: _ra_remmina_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __remote_access_remmina_package | default('') | length > 0
+
+    - name: Verify | Check Remmina installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: rpm -q {{ __remote_access_remmina_package }}
+      register: _ra_remmina_rpm
+      changed_when: false
+      failed_when: _ra_remmina_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __remote_access_remmina_package | default('') | length > 0
+
+    #
+    # TigerVNC
+    #
+
+    - name: Verify | Check TigerVNC installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __remote_access_tigervnc_package }}
+      register: _ra_tigervnc_arch
+      changed_when: false
+      failed_when: _ra_tigervnc_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __remote_access_tigervnc_package | default('') | length > 0
+
+    - name: Verify | Check TigerVNC installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __remote_access_tigervnc_package }}
+      register: _ra_tigervnc_deb
+      changed_when: false
+      failed_when: _ra_tigervnc_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __remote_access_tigervnc_package | default('') | length > 0
+
+    - name: Verify | Check TigerVNC installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: rpm -q {{ __remote_access_tigervnc_package }}
+      register: _ra_tigervnc_rpm
+      changed_when: false
+      failed_when: _ra_tigervnc_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __remote_access_tigervnc_package | default('') | length > 0
+
+    #
+    # FreeRDP
+    #
+
+    - name: Verify | Check FreeRDP installed (Arch)
+      ansible.builtin.command:
+        cmd: pacman -Q {{ __remote_access_freerdp_package }}
+      register: _ra_freerdp_arch
+      changed_when: false
+      failed_when: _ra_freerdp_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __remote_access_freerdp_package | default('') | length > 0
+
+    - name: Verify | Check FreeRDP installed (Debian)
+      ansible.builtin.command:
+        cmd: dpkg -l {{ __remote_access_freerdp_package }}
+      register: _ra_freerdp_deb
+      changed_when: false
+      failed_when: _ra_freerdp_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - __remote_access_freerdp_package | default('') | length > 0
+
+    - name: Verify | Check FreeRDP installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: rpm -q {{ __remote_access_freerdp_package }}
+      register: _ra_freerdp_rpm
+      changed_when: false
+      failed_when: _ra_freerdp_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - __remote_access_freerdp_package | default('') | length > 0

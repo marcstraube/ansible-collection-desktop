@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Confirm running on Arch Linux
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] == 'Archlinux'
+        fail_msg: 'Expected Arch Linux'
+
+    - name: Verify | Confirm tuxedo-drivers-dkms is NOT installed (disabled)
+      ansible.builtin.command:
+        cmd: pacman -Q tuxedo-drivers-dkms
+      register: __tuxedo_drivers_check
+      changed_when: false
+      failed_when: __tuxedo_drivers_check.rc == 0
+
+    - name: Verify | Confirm tuxedo-control-center-bin is NOT installed (disabled)
+      ansible.builtin.command:
+        cmd: pacman -Q tuxedo-control-center-bin
+      register: __tuxedo_tcc_check
+      changed_when: false
+      failed_when: __tuxedo_tcc_check.rc == 0

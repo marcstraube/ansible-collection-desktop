@@ -1,0 +1,49 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # Package Verification
+    #
+
+    - name: Verify | Check SDDM installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q sddm'
+      register: _dm_sddm_arch
+      changed_when: false
+      failed_when: _dm_sddm_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check SDDM installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l sddm'
+      register: _dm_sddm_deb
+      changed_when: false
+      failed_when: _dm_sddm_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check SDDM installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q sddm'
+      register: _dm_sddm_rpm
+      changed_when: false
+      failed_when: _dm_sddm_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Configuration
+    #
+
+    - name: Verify | Check SDDM config directory exists
+      ansible.builtin.stat:
+        path: /etc/sddm.conf.d
+      register: _dm_sddm_config_dir
+      failed_when: not _dm_sddm_config_dir.stat.exists
+
+    - name: Verify | Check SDDM service file exists
+      ansible.builtin.stat:
+        path: /usr/lib/systemd/system/sddm.service
+      register: _dm_sddm_service_file
+      failed_when: not _dm_sddm_service_file.stat.exists

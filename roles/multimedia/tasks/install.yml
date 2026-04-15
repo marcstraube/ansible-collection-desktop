@@ -1,0 +1,97 @@
+---
+- name: Install | VLC packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_vlc_package }}'
+    state: present
+  when: multimedia_vlc_enabled | bool
+
+- name: Install | MPV packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_mpv_package }}'
+    state: present
+  when: multimedia_mpv_enabled | bool
+
+- name: Install | Audacity packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_audacity_package }}'
+    state: present
+  when: multimedia_audacity_enabled | bool
+
+- name: Install | Ardour packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_ardour_package }}'
+    state: present
+  when:
+    - multimedia_ardour_enabled | bool
+    - __multimedia_ardour_package | length > 0
+
+- name: Install | Kdenlive packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_kdenlive_package }}'
+    state: present
+  when: multimedia_kdenlive_enabled | bool
+
+- name: Install | OpenShot packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_openshot_package }}'
+    state: present
+  when: multimedia_openshot_enabled | bool
+
+- name: Install | FFMultiConverter from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __multimedia_aur_packages.ffmulticonverter }}'
+    state: present
+  when:
+    - multimedia_ffmulticonverter_enabled | bool
+    - ansible_facts['os_family'] == 'Archlinux'
+
+- name: Install | FFMultiConverter packages (Debian)
+  ansible.builtin.package:
+    name: '{{ __multimedia_ffmulticonverter_package }}'
+    state: present
+  when:
+    - multimedia_ffmulticonverter_enabled | bool
+    - ansible_facts['os_family'] != 'Archlinux'
+    - __multimedia_ffmulticonverter_package | length > 0
+
+- name: Install | HandBrake packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_handbrake_package }}'
+    state: present
+  when:
+    - multimedia_handbrake_enabled | bool
+    - __multimedia_handbrake_package | length > 0
+
+- name: Install | Peek packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_peek_package }}'
+    state: present
+  when: multimedia_peek_enabled | bool
+
+- name: Install | OBS Studio packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_obs_package }}'
+    state: present
+  when: multimedia_obs_enabled | bool
+
+- name: Install | SimpleScreenRecorder packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_simplescreenrecorder_package }}'
+    state: present
+  when:
+    - multimedia_simplescreenrecorder_enabled | bool
+    - __multimedia_simplescreenrecorder_package | length > 0
+
+- name: Install | Rhythmbox packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_rhythmbox_package }}'
+    state: present
+  when: multimedia_rhythmbox_enabled | bool
+
+- name: Install | Cava packages
+  ansible.builtin.package:
+    name: '{{ __multimedia_cava_package }}'
+    state: present
+  when: multimedia_cava_enabled | bool

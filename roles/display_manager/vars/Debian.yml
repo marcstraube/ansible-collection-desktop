@@ -1,0 +1,34 @@
+---
+#
+# Debian Variables
+#
+
+# Display manager packages
+__display_manager_packages:
+  sddm: 'sddm'
+  gdm: 'gdm3'
+  lightdm: 'lightdm'
+  greetd: 'greetd'
+
+# SDDM virtual keyboard package
+__display_manager_sddm_virtual_keyboard_package: 'qtvirtualkeyboard-plugin'
+
+# LightDM greeter packages
+__display_manager_lightdm_greeter_packages:
+  gtk: 'lightdm-gtk-greeter'
+  slick: 'slick-greeter'
+
+# LightDM greeter session names
+__display_manager_lightdm_greeter_names:
+  gtk: 'lightdm-gtk-greeter'
+  slick: 'slick-greeter'
+
+# greetd greeter packages
+__display_manager_greetd_greeter_packages:
+  gtkgreet: 'greetd-gtkgreet'
+  regreet: 'greetd-regreet'
+  tuigreet: 'greetd-tuigreet'
+  agreety: ''
+
+# GDM config path
+__display_manager_gdm_config_file: '/etc/gdm3/custom.conf'

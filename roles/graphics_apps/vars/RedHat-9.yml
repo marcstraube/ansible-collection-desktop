@@ -1,0 +1,7 @@
+---
+#
+# RedHat 9 Packages (Rocky 9 / EPEL 9)
+#
+
+# Not in EPEL 9
+__graphics_apps_krita_package: ''

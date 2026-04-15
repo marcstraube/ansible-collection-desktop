@@ -1,0 +1,38 @@
+{{ ansible_managed | comment('cblock') }}
+{
+{% if browser_chromium_extensions | length > 0 %}
+  "ExtensionSettings": {
+    "*": {
+      "blocked_install_message": "Extension installation is managed by system policy.",
+      "installation_mode": "{{ browser_extension_default_mode }}"
+    }{% if browser_chromium_extensions | length > 0 %},{% endif %}
+
+{% for ext_id, ext_config in browser_chromium_extensions | dictsort %}
+    "{{ ext_id }}": {
+      "installation_mode": "{{ ext_config.mode | default('force_installed') }}",
+      "update_url": "{{ ext_config.update_url | default('https://clients2.google.com/service/update2/crx') }}"
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  }{% if browser_chromium_policy_settings | length > 0 %},{% endif %}
+
+{% endif %}
+{% for key, value in browser_chromium_policy_settings | dictsort %}
+{% if value is mapping %}
+  "{{ key }}": {{ value | to_nice_json(indent=4) | indent(2) }}{% if not loop.last %},{% endif %}
+
+{% elif value is iterable and value is not string %}
+  "{{ key }}": {{ value | to_json }}{% if not loop.last %},{% endif %}
+
+{% elif value is sameas true or value is sameas false %}
+  "{{ key }}": {{ value | lower }}{% if not loop.last %},{% endif %}
+
+{% elif value is number %}
+  "{{ key }}": {{ value }}{% if not loop.last %},{% endif %}
+
+{% else %}
+  "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+
+{% endif %}
+{% endfor %}
+}

@@ -1,0 +1,7 @@
+---
+#
+# Debian Variables
+#
+
+__security_apps_packages:
+  gufw: ['gufw']

@@ -1,0 +1,45 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Check wl-copy installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q wl-clipboard'
+      register: wayland_utils_wlclip_check
+      changed_when: false
+      failed_when: wayland_utils_wlclip_check.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check grim installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q grim'
+      register: wayland_utils_grim_check
+      changed_when: false
+      failed_when: wayland_utils_grim_check.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check xdg-desktop-portal installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q xdg-desktop-portal'
+      register: wayland_utils_portal_check
+      changed_when: false
+      failed_when: wayland_utils_portal_check.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check packages installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l wl-clipboard'
+      register: wayland_utils_deb_check
+      changed_when: false
+      failed_when: wayland_utils_deb_check.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check wl-clipboard installed (RedHat)  # noqa: command-instead-of-module
+      ansible.builtin.command:
+        cmd: 'rpm -q wl-clipboard'
+      register: wayland_utils_rpm_check
+      changed_when: false
+      failed_when: wayland_utils_rpm_check.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'

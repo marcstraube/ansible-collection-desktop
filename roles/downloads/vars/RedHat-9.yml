@@ -1,0 +1,15 @@
+---
+#
+# RedHat 9 Variables (Rocky 9 / EPEL 9)
+#
+
+# No -gtk split on EPEL
+__downloads_transmission_package: 'transmission'
+__downloads_qbittorrent_package: 'qbittorrent'
+# Not in EPEL 9
+__downloads_deluge_package: ''
+# Not in EPEL 9
+__downloads_ytdlp_package: ''
+__downloads_aria2_package: 'aria2'
+# Not in EPEL 9
+__downloads_uget_package: ''

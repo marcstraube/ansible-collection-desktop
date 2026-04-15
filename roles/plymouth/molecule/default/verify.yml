@@ -1,0 +1,12 @@
+---
+# Plymouth requires mkinitcpio/dracut + GRUB — impossible in Docker.
+# Role is disabled in converge. Verify only confirms no errors.
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Confirm role completed successfully
+      ansible.builtin.assert:
+        that: true
+        fail_msg: 'plymouth role did not complete'

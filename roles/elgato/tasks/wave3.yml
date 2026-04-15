@@ -1,0 +1,32 @@
+---
+#
+# Elgato Wave:3 WirePlumber Configuration
+#
+# Fix for simultaneous playback + recording on the Wave:3 microphone.
+# Deploys a WirePlumber rule that sets node.always-process = true for the
+# Wave:3 ALSA input node.
+
+- name: Wave3 | Get user info for Wave:3 config
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ item }}'
+  loop: '{{ elgato_wave3_users }}'
+  register: __elgato_wave3_user_info
+
+- name: Wave3 | Ensure WirePlumber config directory exists
+  ansible.builtin.file:
+    path: '{{ getent_passwd[item][4] }}/.config/wireplumber/wireplumber.conf.d'
+    state: directory
+    owner: '{{ item }}'
+    group: '{{ item }}'
+    mode: '0755'
+  loop: '{{ elgato_wave3_users }}'
+
+- name: Wave3 | Deploy WirePlumber config for Wave:3
+  ansible.builtin.template:
+    src: 51-elgato-wave3.conf.j2
+    dest: '{{ getent_passwd[item][4] }}/.config/wireplumber/wireplumber.conf.d/51-elgato-wave3.conf'
+    owner: '{{ item }}'
+    group: '{{ item }}'
+    mode: '0644'
+  loop: '{{ elgato_wave3_users }}'

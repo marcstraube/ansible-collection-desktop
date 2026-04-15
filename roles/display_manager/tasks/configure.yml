@@ -1,0 +1,85 @@
+---
+#
+# Display Manager Configuration
+#
+
+# SDDM
+
+- name: Configure | Create SDDM config directory
+  ansible.builtin.file:
+    path: '{{ __display_manager_sddm_config_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: display_manager_name == 'sddm'
+
+- name: Configure | Deploy SDDM autologin config
+  ansible.builtin.template:
+    src: 'sddm-autologin.conf.j2'
+    dest: '{{ __display_manager_sddm_config_dir }}/autologin.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - display_manager_name == 'sddm'
+    - display_manager_autologin_enabled | bool
+  notify: Restart display manager
+
+# GDM
+
+- name: Configure | Deploy GDM config
+  ansible.builtin.template:
+    src: 'gdm-custom.conf.j2'
+    dest: '{{ __display_manager_gdm_config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+  when: display_manager_name == 'gdm'
+  notify: Restart display manager
+
+# LightDM
+
+- name: Configure | Deploy LightDM config
+  ansible.builtin.template:
+    src: 'lightdm.conf.j2'
+    dest: '{{ __display_manager_lightdm_config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+  when: display_manager_name == 'lightdm'
+  notify: Restart display manager
+
+# greetd
+
+- name: Configure | Create greetd config directory
+  ansible.builtin.file:
+    path: '/etc/greetd'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: display_manager_name == 'greetd'
+
+- name: Configure | Deploy greetd config
+  ansible.builtin.template:
+    src: 'greetd-config.toml.j2'
+    dest: '{{ __display_manager_greetd_config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+  when: display_manager_name == 'greetd'
+  notify: Restart display manager
+
+- name: Configure | Deploy greeter compositor config
+  ansible.builtin.template:
+    src: 'greetd-{{ display_manager_greetd_greeter_compositor }}.conf.j2'
+    dest: '/etc/greetd/{{ display_manager_greetd_greeter_compositor }}.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - display_manager_name == 'greetd'
+    - display_manager_greetd_greeter in __display_manager_greetd_graphical_greeters
+    - display_manager_greetd_greeter_compositor in ['hyprland', 'sway']
+  notify: Restart display manager

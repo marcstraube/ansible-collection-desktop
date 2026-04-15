@@ -1,0 +1,74 @@
+---
+#
+# Torrent Clients
+#
+
+- name: Install | Transmission
+  ansible.builtin.package:
+    name: '{{ __downloads_transmission_package }}'
+    state: present
+  when:
+    - downloads_transmission_enabled | bool
+    - __downloads_transmission_package | default('') | length > 0
+
+- name: Install | qBittorrent
+  ansible.builtin.package:
+    name: '{{ __downloads_qbittorrent_package }}'
+    state: present
+  when:
+    - downloads_qbittorrent_enabled | bool
+    - __downloads_qbittorrent_package | default('') | length > 0
+
+- name: Install | Deluge
+  ansible.builtin.package:
+    name: '{{ __downloads_deluge_package }}'
+    state: present
+  when:
+    - downloads_deluge_enabled | bool
+    - __downloads_deluge_package | default('') | length > 0
+
+#
+# Video Downloaders
+#
+
+- name: Install | yt-dlp
+  ansible.builtin.package:
+    name: '{{ __downloads_ytdlp_package }}'
+    state: present
+  when:
+    - downloads_ytdlp_enabled | bool
+    - __downloads_ytdlp_package | default('') | length > 0
+
+#
+# Download Managers
+#
+
+- name: Install | aria2
+  ansible.builtin.package:
+    name: '{{ __downloads_aria2_package }}'
+    state: present
+  when:
+    - downloads_aria2_enabled | bool
+    - __downloads_aria2_package | default('') | length > 0
+
+- name: Install | uGet
+  ansible.builtin.package:
+    name: '{{ __downloads_uget_package }}'
+    state: present
+  when:
+    - downloads_uget_enabled | bool
+    - __downloads_uget_package | default('') | length > 0
+
+#
+# AUR Packages
+#
+
+- name: Install | JDownloader from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __downloads_aur_packages.jdownloader }}'
+    state: present
+  when:
+    - downloads_jdownloader_enabled | bool
+    - ansible_facts['os_family'] == 'Archlinux'

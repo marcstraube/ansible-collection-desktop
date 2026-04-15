@@ -1,0 +1,6 @@
+---
+- name: Restart Bluetooth
+  ansible.builtin.systemd_service:
+    name: '{{ __bluetooth_service_name }}'
+    state: restarted
+  when: bluetooth_service_enabled | bool

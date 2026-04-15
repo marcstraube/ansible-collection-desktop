@@ -1,0 +1,11 @@
+---
+#
+# Plymouth Handlers
+#
+
+- name: Regenerate initramfs
+  ansible.builtin.command:
+    cmd: '{{ __plymouth_initramfs_command }}'
+  changed_when: true
+  when: plymouth_enabled | bool
+  listen: regenerate initramfs

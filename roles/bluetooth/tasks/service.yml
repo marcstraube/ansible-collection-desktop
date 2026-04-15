@@ -1,0 +1,6 @@
+---
+- name: Service | Manage bluetooth service
+  ansible.builtin.systemd_service:
+    name: '{{ __bluetooth_service_name }}'
+    enabled: '{{ bluetooth_service_enabled | bool }}'
+    state: '{{ bluetooth_service_enabled | bool | ternary("started", "stopped") }}'

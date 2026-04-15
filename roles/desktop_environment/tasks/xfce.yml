@@ -1,0 +1,27 @@
+---
+#
+# XFCE Installation
+#
+
+- name: XFCE | Build package list
+  ansible.builtin.set_fact:
+    __desktop_environment_xfce_install_packages: >-
+      {{
+        __desktop_environment_xfce_packages +
+        ((desktop_environment_xfce_goodies_enabled | bool and __desktop_environment_xfce_goodies_package | length > 0)
+          | ternary([__desktop_environment_xfce_goodies_package], [])) +
+        (desktop_environment_xfce_whiskermenu_enabled | bool |
+          ternary([__desktop_environment_xfce_whiskermenu_package], []))
+      }}
+
+- name: XFCE | Filter empty packages
+  ansible.builtin.set_fact:
+    __desktop_environment_xfce_install_packages: >-
+      {{ __desktop_environment_xfce_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: XFCE | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_xfce_install_packages }}'
+    state: present
+  when:
+    - __desktop_environment_xfce_install_packages | length > 0

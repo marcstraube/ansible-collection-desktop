@@ -1,0 +1,42 @@
+---
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+      skip: true
+  tags:
+    - wine
+
+- name: Main | Warn about unsupported EL version
+  ansible.builtin.debug:
+    msg: >-
+      Wine is not available for EL {{ ansible_facts['distribution_major_version'] }}.
+      No EPEL package exists for this version. Skipping wine role.
+  when:
+    - wine_enabled | bool
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] | int > 9
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  when:
+    - wine_enabled | bool
+    - not (ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int > 9)
+  tags:
+    - wine
+    - wine:install
+
+- name: Main | Import configure tasks
+  ansible.builtin.import_tasks: configure.yml
+  when:
+    - wine_enabled | bool
+    - not (ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] | int > 9)
+  tags:
+    - wine
+    - wine:configure

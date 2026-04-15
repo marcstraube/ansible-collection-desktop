@@ -1,0 +1,11 @@
+---
+#
+# Debian Packages
+#
+
+__cad_openscad_package: 'openscad'
+__cad_freecad_package: 'freecad'
+__cad_librecad_package: 'librecad'
+__cad_qcad_package: ''          # Not in Debian repos
+__cad_blender_package: 'blender'
+__cad_kicad_package: 'kicad'

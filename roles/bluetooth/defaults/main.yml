@@ -1,0 +1,132 @@
+---
+#
+# Role Control
+#
+
+# Enable the bluetooth role
+bluetooth_enabled: true
+
+# Enable and start the bluetooth service
+bluetooth_service_enabled: true
+
+#
+# Packages
+#
+
+# Install deprecated/legacy tools (hcitool, rfcomm, etc.)
+bluetooth_deprecated_tools: false
+
+# Install OBEX support for file transfers
+bluetooth_obex: true
+
+#
+# Audio Integration
+#
+
+# Audio backend: pipewire (default, modern), pulseaudio, alsa (Arch only/AUR), none
+bluetooth_audio: 'pipewire'
+
+#
+# GUI Tools
+#
+
+# Install GUI tool: blueman, gnome, kde, none
+# - blueman: GTK-based, works with any DE
+# - gnome: GNOME Bluetooth (gnome-bluetooth)
+# - kde: Bluedevil (for KDE Plasma)
+# - none: CLI only (bluetoothctl)
+bluetooth_gui: 'none'
+
+#
+# General Settings
+#
+
+# Auto-enable Bluetooth adapter on boot
+bluetooth_auto_enable: true
+
+# Discoverable timeout in seconds (0 = always discoverable - INSECURE)
+bluetooth_discoverable_timeout: 180
+
+# Pairable timeout in seconds (0 = always pairable - INSECURE)
+bluetooth_pairable_timeout: 180
+
+# Always allow pairing without registered agent (INSECURE)
+bluetooth_always_pairable: false
+
+# Default device class (empty = default)
+# Example: '0x000100' for computer
+bluetooth_device_class: ''
+
+# Device name (empty = use hostname)
+# Supports %h (hostname), %d (adapter id)
+bluetooth_device_name: ''
+
+# Transport restriction: dual, bredr, le
+bluetooth_controller_mode: 'dual'
+
+# Resolve remote device names after inquiry
+bluetooth_name_resolving: true
+
+# Temporary device retention in seconds
+bluetooth_temporary_timeout: 30
+
+#
+# Security
+#
+
+# Privacy mode: off, device, network, limited-device, limited-network
+# device = MAC address randomization (recommended)
+bluetooth_privacy: 'device'
+
+# Secure Connections mode: off, on, only
+# on = prefer SC, only = require SC (may break older devices)
+bluetooth_secure_connections: 'on'
+
+# Just Works pairing policy: always, confirm, never
+bluetooth_just_works_repairing: 'always'
+
+#
+# Controller Settings
+#
+
+# Fast connectable mode (reduces latency but increases power)
+bluetooth_fast_connectable: false
+
+#
+# Reconnection
+#
+
+# Number of reconnection attempts after link loss (0 = disabled)
+bluetooth_reconnect_attempts: 7
+
+# Intervals between reconnection attempts in seconds
+bluetooth_reconnect_intervals: '1,2,4,8,16,32,64'
+
+# Delay in seconds after system resume before reconnecting
+bluetooth_resume_delay: 2
+
+#
+# GATT
+#
+
+# GATT attribute cache: always, yes, no
+# always = cache for all devices (recommended for desktop)
+# yes = only cache paired devices
+# no = never cache
+bluetooth_gatt_cache: 'always'
+
+# ATT channels (1 disables EATT, max 6)
+bluetooth_gatt_channels: 3
+
+#
+# Advanced
+#
+
+# Experimental D-Bus interfaces (may be unstable)
+bluetooth_experimental: false
+
+# Kernel experimental features
+bluetooth_kernel_experimental: false
+
+# Extra [General] section options (raw key=value pairs)
+bluetooth_extra_config: {}

@@ -1,0 +1,187 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    #
+    # GIMP
+    #
+
+    - name: Verify | Check GIMP installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __graphics_apps_gimp_package }}
+      register: _gfx_gimp_arch
+      changed_when: false
+      failed_when: _gfx_gimp_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __graphics_apps_gimp_package
+          | default('') | length > 0
+
+    - name: Verify | Check GIMP installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __graphics_apps_gimp_package }}
+      register: _gfx_gimp_deb
+      changed_when: false
+      failed_when: _gfx_gimp_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __graphics_apps_gimp_package
+          | default('') | length > 0
+
+    - name: Verify | Check GIMP installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __graphics_apps_gimp_package }}
+      register: _gfx_gimp_rpm
+      changed_when: false
+      failed_when: _gfx_gimp_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __graphics_apps_gimp_package
+          | default('') | length > 0
+
+    #
+    # Krita
+    #
+    # Not available on Rocky 9 (not in EPEL 9); skipped when package var is empty.
+
+    - name: Verify | Check Krita installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __graphics_apps_krita_package }}
+      register: _gfx_krita_arch
+      changed_when: false
+      failed_when: _gfx_krita_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __graphics_apps_krita_package
+          | default('') | length > 0
+
+    - name: Verify | Check Krita installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __graphics_apps_krita_package }}
+      register: _gfx_krita_deb
+      changed_when: false
+      failed_when: _gfx_krita_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __graphics_apps_krita_package
+          | default('') | length > 0
+
+    - name: Verify | Check Krita installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __graphics_apps_krita_package }}
+      register: _gfx_krita_rpm
+      changed_when: false
+      failed_when: _gfx_krita_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __graphics_apps_krita_package
+          | default('') | length > 0
+
+    #
+    # Inkscape
+    #
+
+    - name: Verify | Check Inkscape installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ __graphics_apps_inkscape_package }}
+      register: _gfx_inkscape_arch
+      changed_when: false
+      failed_when: _gfx_inkscape_arch.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - >-
+          __graphics_apps_inkscape_package
+          | default('') | length > 0
+
+    - name: Verify | Check Inkscape installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ __graphics_apps_inkscape_package }}
+      register: _gfx_inkscape_deb
+      changed_when: false
+      failed_when: _gfx_inkscape_deb.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - >-
+          __graphics_apps_inkscape_package
+          | default('') | length > 0
+
+    - name: Verify | Check Inkscape installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ __graphics_apps_inkscape_package }}
+      register: _gfx_inkscape_rpm
+      changed_when: false
+      failed_when: _gfx_inkscape_rpm.rc != 0
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - >-
+          __graphics_apps_inkscape_package
+          | default('') | length > 0
+
+    #
+    # GIMP Plugins
+    #
+    # Skipped when graphics_apps_gimp_plugins is empty (default).
+
+    - name: Verify | Check GIMP plugins installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ item }}
+      register: _gfx_gimp_plugin_arch
+      changed_when: false
+      failed_when: _gfx_gimp_plugin_arch.rc != 0
+      loop: "{{ graphics_apps_gimp_plugins | default([]) }}"
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - graphics_apps_gimp_plugins | default([]) | length > 0
+
+    - name: Verify | Check GIMP plugins installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ item }}
+      register: _gfx_gimp_plugin_deb
+      changed_when: false
+      failed_when: _gfx_gimp_plugin_deb.rc != 0
+      loop: "{{ graphics_apps_gimp_plugins | default([]) }}"
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - graphics_apps_gimp_plugins | default([]) | length > 0
+
+    - name: Verify | Check GIMP plugins installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ item }}
+      register: _gfx_gimp_plugin_rpm
+      changed_when: false
+      failed_when: _gfx_gimp_plugin_rpm.rc != 0
+      loop: "{{ graphics_apps_gimp_plugins | default([]) }}"
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - graphics_apps_gimp_plugins | default([]) | length > 0

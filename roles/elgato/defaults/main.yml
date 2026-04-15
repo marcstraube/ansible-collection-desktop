@@ -1,0 +1,32 @@
+---
+#
+# Role Control
+#
+
+# Enable the elgato role
+elgato_enabled: true
+
+#
+# Device Tools
+#
+
+# Enable StreamController for Stream Deck / Stream Deck Pedal
+elgato_streamdeck_enabled: false
+
+# Enable cameractrls for Facecam
+elgato_facecam_enabled: false
+
+# Enable elgato-keylight for Key Light
+elgato_keylight_enabled: false
+
+# Enable Wave:3 WirePlumber config fix for simultaneous playback+recording
+elgato_wave3_enabled: false
+
+#
+# User Configuration
+#
+
+# Users for whom to deploy WirePlumber config (Wave:3)
+elgato_wave3_users: []
+# Example:
+#   - 'johndoe'

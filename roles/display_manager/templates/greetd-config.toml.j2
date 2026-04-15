@@ -1,0 +1,30 @@
+{{ ansible_managed | comment }}
+[terminal]
+# VT to run the greeter on
+vt = {{ display_manager_greetd_vt }}
+
+[default_session]
+{% if display_manager_autologin_enabled | bool and display_manager_autologin_user | length > 0 %}
+# Autologin configuration
+command = "{{ display_manager_autologin_session if display_manager_autologin_session | length > 0 else display_manager_greetd_default_session }}"
+user = "{{ display_manager_autologin_user }}"
+{% else %}
+# Greeter configuration
+{% if display_manager_greetd_greeter_command | length > 0 %}
+# Custom greeter command override
+command = "{{ display_manager_greetd_greeter_command }}"
+{% elif display_manager_greetd_greeter in __display_manager_greetd_graphical_greeters and display_manager_greetd_greeter_compositor | length > 0 %}
+{#- Graphical greeters need a compositor wrapper -#}
+{% if display_manager_greetd_greeter_compositor == 'cage' %}
+command = "cage -s -- {{ __display_manager_greetd_greeter_cmds[display_manager_greetd_greeter] }}"
+{% elif display_manager_greetd_greeter_compositor in ['hyprland', 'sway'] %}
+command = "{{ __display_manager_greetd_compositor_binaries[display_manager_greetd_greeter_compositor] }} --config /etc/greetd/{{ display_manager_greetd_greeter_compositor }}.conf"
+{% endif %}
+{% elif display_manager_greetd_greeter == 'tuigreet' %}
+command = "tuigreet --cmd {{ display_manager_greetd_default_session }}"
+{% else %}
+# agreety (built-in fallback)
+command = "agreety --cmd {{ display_manager_greetd_default_session }}"
+{% endif %}
+user = "greeter"
+{% endif %}

@@ -1,0 +1,49 @@
+---
+#
+# RedHat Variables
+#
+
+__pipewire_packages:
+  - pipewire
+  - pipewire-utils
+
+__pipewire_audio_packages: []
+
+__pipewire_session_managers:
+  wireplumber: wireplumber
+  pipewire-media-session: pipewire-media-session
+
+__pipewire_pulse_package: pipewire-pulseaudio
+__pipewire_alsa_package: pipewire-alsa
+__pipewire_jack_package: pipewire-jack-audio-connection-kit
+__pipewire_zeroconf_package: ''
+
+__pipewire_bluetooth_packages:
+  - pipewire-codec-aptx
+
+__pipewire_32bit_packages:
+  - pipewire.i686
+
+__pipewire_realtime_package: realtime-setup
+__pipewire_realtime_group: realtime
+
+__pipewire_volume_control_packages:
+  pavucontrol: pavucontrol
+  none: ''
+
+__pipewire_patchbay_packages:
+  helvum: helvum
+  qpwgraph: qpwgraph
+  none: ''
+
+__pipewire_pulseaudio_packages:
+  - pulseaudio
+  - pulseaudio-module-bluetooth
+
+__pipewire_config_dir: /etc/pipewire
+__pipewire_user_config_dir: .config/pipewire
+
+__pipewire_user_services:
+  - pipewire.service
+  - pipewire-pulse.service
+  - wireplumber.service

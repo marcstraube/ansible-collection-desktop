@@ -1,0 +1,11 @@
+---
+#
+# RedHat Packages (Rocky 10 / EPEL 10)
+#
+
+__cad_openscad_package: 'openscad'
+__cad_freecad_package: ''       # Not in EPEL 9 or EPEL 10
+__cad_librecad_package: ''      # Not in EPEL 9 or EPEL 10
+__cad_qcad_package: ''          # Not in EPEL 9 or EPEL 10
+__cad_blender_package: ''       # EPEL 9 only (not in EPEL 10)
+__cad_kicad_package: ''         # Not in EPEL 9 or EPEL 10

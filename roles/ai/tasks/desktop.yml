@@ -1,0 +1,59 @@
+---
+#
+# AI Desktop Applications Installation
+#
+
+# Claude Desktop
+
+- name: Desktop | Install Claude Desktop from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.claude_desktop }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_claude_desktop_enabled | bool
+
+- name: Desktop | Claude Desktop not available (non-Arch)
+  ansible.builtin.debug:
+    msg: >
+      Claude Desktop is not available in standard repositories for
+      {{ ansible_facts['os_family'] }}. Install via AppImage or Flatpak.
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_claude_desktop_enabled | bool
+    - __ai_claude_desktop_package | length == 0
+
+# OpenCode Desktop
+
+- name: Desktop | Install OpenCode Desktop from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.opencode_desktop }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_opencode_desktop_enabled | bool
+
+- name: Desktop | Download OpenCode Desktop (Debian)
+  become: true
+  ansible.builtin.apt:
+    deb: '{{ __ai_opencode_desktop_url }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - ai_opencode_desktop_enabled | bool
+    - __ai_opencode_desktop_url is defined
+
+- name: Desktop | Download OpenCode Desktop (RedHat)
+  become: true
+  ansible.builtin.dnf:
+    name: '{{ __ai_opencode_desktop_url }}'
+    state: present
+    disable_gpg_check: true
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ai_opencode_desktop_enabled | bool
+    - __ai_opencode_desktop_url is defined

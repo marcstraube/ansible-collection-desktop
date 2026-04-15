@@ -1,0 +1,40 @@
+---
+#
+# Role Control
+#
+
+# Enable the downloads role
+downloads_enabled: true
+
+#
+# Torrent Clients
+#
+
+# Install Transmission BitTorrent client
+downloads_transmission_enabled: true
+
+# Install qBittorrent BitTorrent client
+downloads_qbittorrent_enabled: false
+
+# Install Deluge BitTorrent client
+downloads_deluge_enabled: false
+
+#
+# Video Downloaders
+#
+
+# Install yt-dlp video downloader
+downloads_ytdlp_enabled: false
+
+#
+# Download Managers
+#
+
+# Install aria2 command-line download utility
+downloads_aria2_enabled: false
+
+# Install uGet download manager
+downloads_uget_enabled: false
+
+# Install JDownloader (Arch Linux only, AUR)
+downloads_jdownloader_enabled: false

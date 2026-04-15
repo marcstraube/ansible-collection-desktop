@@ -1,0 +1,24 @@
+---
+#
+# LXQt Installation
+#
+
+- name: LXQt | Build package list
+  ansible.builtin.set_fact:
+    __desktop_environment_lxqt_install_packages: >-
+      {{
+        __desktop_environment_lxqt_packages +
+        [__desktop_environment_lxqt_icon_packages[desktop_environment_lxqt_icons] | default('')]
+      }}
+
+- name: LXQt | Filter empty packages
+  ansible.builtin.set_fact:
+    __desktop_environment_lxqt_install_packages: >-
+      {{ __desktop_environment_lxqt_install_packages | select('string') | reject('equalto', '') | list }}
+
+- name: LXQt | Install packages
+  ansible.builtin.package:
+    name: '{{ __desktop_environment_lxqt_install_packages }}'
+    state: present
+  when:
+    - __desktop_environment_lxqt_install_packages | length > 0

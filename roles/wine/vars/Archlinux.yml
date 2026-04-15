@@ -1,0 +1,13 @@
+---
+__wine_package_variants:
+  stable: wine
+  staging: wine-staging
+
+__wine_winetricks_package: winetricks
+__wine_mono_package: wine-mono
+__wine_gecko_package: wine-gecko
+
+__wine_vulkan_drivers:
+  amd: lib32-vulkan-radeon
+  intel: lib32-vulkan-intel
+  nvidia: lib32-nvidia-utils

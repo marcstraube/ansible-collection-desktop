@@ -1,0 +1,67 @@
+---
+#
+# Verify playbook for molecule testing
+#
+
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # XFCE Package Verification
+    #
+
+    - name: Verify | Check xfce4 group installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Qg xfce4'
+      register: _de_xfce_arch
+      changed_when: false
+      failed_when: _de_xfce_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check xfce4 meta-package installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg -l xfce4'
+      register: _de_xfce_deb
+      changed_when: false
+      failed_when: _de_xfce_deb.rc != 0
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check xfce4-session installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: 'rpm -q xfce4-session'
+      register: _de_xfce_rpm
+      changed_when: false
+      failed_when: _de_xfce_rpm.rc != 0
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Configuration Directories
+    #
+
+    - name: Verify | Check xfce4 share directory exists
+      ansible.builtin.stat:
+        path: /usr/share/xfce4
+      register: _de_xfce_share_dir
+
+    - name: Verify | Assert xfce4 share directory exists
+      ansible.builtin.assert:
+        that:
+          - _de_xfce_share_dir.stat.exists
+        fail_msg: 'xfce4 share directory not found'
+
+    #
+    # Session File
+    #
+
+    - name: Verify | Check xfce session desktop file exists
+      ansible.builtin.stat:
+        path: /usr/share/xsessions/xfce.desktop
+      register: _de_xfce_session_file
+
+    - name: Verify | Assert xfce.desktop exists
+      ansible.builtin.assert:
+        that:
+          - _de_xfce_session_file.stat.exists
+        fail_msg: 'xfce.desktop session file not found'

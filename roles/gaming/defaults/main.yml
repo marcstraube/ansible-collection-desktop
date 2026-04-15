@@ -1,0 +1,43 @@
+---
+#
+# Role Control
+#
+
+# Enable the gaming role
+gaming_enabled: true
+
+#
+# Gaming Platforms
+#
+
+# Lutris gaming platform
+gaming_lutris_enabled: true
+
+# Steam game store
+gaming_steam_enabled: false
+
+# Heroic Games Launcher (Epic/GOG)
+gaming_heroic_enabled: false
+
+#
+# Emulation
+#
+
+# RetroArch emulator frontend
+gaming_retroarch_enabled: true
+
+# Playback game recording/replay viewer
+gaming_playback_enabled: true
+
+# PCSX2 PlayStation 2 emulator
+gaming_pcsx2_enabled: false
+
+# Dolphin GameCube/Wii emulator
+gaming_dolphin_enabled: false
+
+#
+# Game Streaming
+#
+
+# Moonlight NVIDIA GameStream client
+gaming_moonlight_enabled: false

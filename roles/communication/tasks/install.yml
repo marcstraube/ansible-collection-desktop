@@ -1,0 +1,118 @@
+---
+#
+# Repository Packages
+#
+
+- name: Install | Telegram
+  ansible.builtin.package:
+    name: '{{ __communication_telegram_package }}'
+    state: present
+  when:
+    - communication_telegram_enabled | bool
+    - __communication_telegram_package | default('') | length > 0
+
+- name: Install | Signal
+  ansible.builtin.package:
+    name: '{{ __communication_signal_package }}'
+    state: present
+  when:
+    - communication_signal_enabled | bool
+    - __communication_signal_package | default('') | length > 0
+
+- name: Install | Discord
+  ansible.builtin.package:
+    name: '{{ __communication_discord_package }}'
+    state: present
+  when:
+    - communication_discord_enabled | bool
+    - __communication_discord_package | default('') | length > 0
+
+- name: Install | Element
+  ansible.builtin.package:
+    name: '{{ __communication_element_package }}'
+    state: present
+  when:
+    - communication_element_enabled | bool
+    - __communication_element_package | default('') | length > 0
+
+- name: Install | Sieve
+  ansible.builtin.package:
+    name: '{{ __communication_sieve_package }}'
+    state: present
+  when:
+    - communication_sieve_enabled | bool
+    - __communication_sieve_package | default('') | length > 0
+
+- name: Install | KDE Connect
+  ansible.builtin.package:
+    name: '{{ __communication_kdeconnect_package }}'
+    state: present
+  when:
+    - communication_kdeconnect_enabled | bool
+    - __communication_kdeconnect_package | default('') | length > 0
+
+#
+# AUR Packages (Arch)
+#
+
+- name: Install | Slack from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __communication_aur_packages.slack }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_slack_enabled | bool
+    - not (communication_slack_wayland_enabled | bool)
+
+- name: Install | Slack Wayland from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __communication_aur_packages.slack_wayland }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_slack_enabled | bool
+    - communication_slack_wayland_enabled | bool
+
+- name: Install | Threema from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __communication_aur_packages.threema }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_threema_enabled | bool
+
+- name: Install | Zoom from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __communication_aur_packages.zoom }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_zoom_enabled | bool
+
+- name: Install | Teams from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __communication_aur_packages.teams }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_teams_enabled | bool
+
+- name: Install | Jitsi Meet from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __communication_aur_packages.jitsi }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_jitsi_enabled | bool

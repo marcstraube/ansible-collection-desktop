@@ -1,0 +1,87 @@
+---
+#
+# Plymouth Kernel Parameters
+#
+# Follows apparmor role GRUB pattern (common/roles/apparmor/tasks/kernel.yml)
+
+- name: Kernel | Check if 'splash' is in GRUB config
+  ansible.builtin.command:
+    cmd: grep -cP '\bsplash\b' {{ __plymouth_grub_default_file }}
+  register: __plymouth_grub_check
+  check_mode: false
+  changed_when: false
+  failed_when: false
+
+- name: Kernel | Add 'splash' to GRUB_CMDLINE_LINUX_DEFAULT
+  ansible.builtin.replace:
+    path: '{{ __plymouth_grub_default_file }}'
+    regexp: '^(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*)'
+    replace: '\1 splash'
+    backup: true
+  register: __plymouth_grub_changed
+  when: __plymouth_grub_check.stdout | default('0') | int == 0
+
+#
+# GRUB Update Chain (runs immediately, not as handler)
+#
+# Same pattern as common/roles/apparmor/tasks/kernel.yml:
+#   1. grub-mkconfig   — regenerate config
+#   2. sbctl sign-all  — re-sign boot files (Secure Boot)
+#   3. pause           — warn about TPM re-seal after reboot
+
+- name: Kernel | Regenerate GRUB config  # noqa: no-handler
+  ansible.builtin.command:
+    cmd: '{{ __plymouth_grub_mkconfig_command }}'
+  changed_when: true
+  when:
+    - __plymouth_grub_changed is changed
+
+- name: Kernel | Re-sign boot files (sbctl)
+  ansible.builtin.command:
+    cmd: sbctl sign-all
+  changed_when: true
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_grub_changed is defined
+    - __plymouth_grub_changed is changed
+    - archlinux_secureboot is defined
+    - archlinux_secureboot.enabled | default(false) | bool
+    - archlinux_secureboot.method | default('sbctl') != 'hsm'
+
+- name: Kernel | Re-sign boot files (HSM)
+  ansible.builtin.command:
+    cmd: /usr/local/bin/secureboot-hsm-sign.sh
+  changed_when: true
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_grub_changed is defined
+    - __plymouth_grub_changed is changed
+    - archlinux_secureboot is defined
+    - archlinux_secureboot.enabled | default(false) | bool
+    - archlinux_secureboot.method | default('sbctl') == 'hsm'
+
+- name: Kernel | TPM re-seal required after reboot (PCR 4 bound)
+  ansible.builtin.pause:
+    prompt: |
+
+      ================================================================
+        WARNING: GRUB configuration has changed.
+
+        This system binds TPM to PCR 4 (boot manager).
+        grub.cfg changes invalidate PCR 4 measurements.
+
+        After reboot, TPM auto-unlock will fail.
+        Boot with passphrase/recovery key, then run:
+          {{ (archlinux_luks_tpm.mode | default('separate') == 'seal_gpg')
+          | ternary('sudo tpm-reseal.sh', 'sudo tpm-reenroll.sh') }}
+
+        Press ENTER to continue.
+      ================================================================
+
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __plymouth_grub_changed is defined
+    - __plymouth_grub_changed is changed
+    - archlinux_luks_tpm is defined
+    - archlinux_luks_tpm.enabled | default(false) | bool
+    - 4 in (archlinux_luks_tpm.pcrs | default([0, 7]))

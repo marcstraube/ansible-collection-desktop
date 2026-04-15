@@ -1,0 +1,208 @@
+---
+#
+# Role Control
+#
+
+# Enable the desktop_environment role
+desktop_environment_enabled: true
+
+#
+# Users
+#
+
+# List of usernames for user-scoped service management
+# Map from inventory:
+# desktop_environment_users: "{{ users_list | rejectattr('name', 'equalto', 'root') | map(attribute='name') | list }}"
+desktop_environment_users: []
+
+#
+# Desktop Environments
+#
+
+# List of desktop environments to install
+# Options: hyprland, sway, i3, kde, gnome, xfce, lxde, lxqt
+desktop_environment_list:
+  - 'hyprland'
+
+# Default session for display manager
+desktop_environment_default: '{{ desktop_environment_list | first }}'
+
+#
+# Wayland Utilities
+#
+
+# Auto-install wayland_utils for Wayland DEs (hyprland, sway, kde, gnome)
+desktop_environment_wayland_utils_enabled: true
+
+# Per-DE wayland_utils overrides (passed as vars to wayland_utils role)
+desktop_environment_wayland_utils_config: {}
+
+# Hyprland-specific wayland_utils settings
+desktop_environment_wayland_utils_hyprland_config:
+  wayland_utils_idle: 'hypridle'
+  wayland_utils_locker: 'hyprlock'
+  wayland_utils_wallpaper: 'swww'
+
+#
+# Hyprland Options
+#
+
+# Install hypridle idle daemon
+desktop_environment_hyprland_hypridle_enabled: true
+
+# Install hyprlock lock screen
+desktop_environment_hyprland_hyprlock_enabled: true
+
+# Install hyprpaper wallpaper daemon
+desktop_environment_hyprland_hyprpaper_enabled: true
+
+# Install hyprpicker color picker
+desktop_environment_hyprland_hyprpicker_enabled: true
+
+# Install hyprcursor cursor theme engine
+desktop_environment_hyprland_hyprcursor_enabled: true
+
+# Install hyprshot screenshot tool
+desktop_environment_hyprland_hyprshot_enabled: true
+
+# Install hyprsunset blue-light filter
+desktop_environment_hyprland_hyprsunset_enabled: true
+
+# Install hyprlauncher app launcher
+desktop_environment_hyprland_hyprlauncher_enabled: true
+
+# Install hyprpwcenter password center
+desktop_environment_hyprland_hyprpwcenter_enabled: true
+
+# Install hyprqt6engine Qt6 theme provider (AUR, currently broken)
+desktop_environment_hyprland_hyprqt6engine_enabled: false
+
+# Install hyprshutdown shutdown dialog (AUR)
+desktop_environment_hyprland_hyprshutdown_enabled: true
+
+# Install xdg-desktop-portal-hyprland
+desktop_environment_hyprland_portal_enabled: true
+
+# Install hyprpolkitagent
+desktop_environment_hyprland_polkit_enabled: true
+
+# Enable Universal Wayland Session Manager
+desktop_environment_hyprland_uwsm_enabled: false
+
+# uwsm drop-ins + enable for these services
+# Empty list = no service automation
+# Override in inventory when external config (e.g. hyprdsktp) manages services itself
+desktop_environment_hyprland_uwsm_services:
+  - hypridle
+  - hyprpaper
+  - hyprsunset
+  - hyprpolkitagent
+
+# Install hyprshade screen shader (AUR)
+desktop_environment_hyprland_shader_enabled: false
+
+#
+# Sway Options
+#
+
+# Install swaylock, swayidle, swaybg
+desktop_environment_sway_extras_enabled: true
+
+# Install xdg-desktop-portal-wlr
+desktop_environment_sway_portal_enabled: true
+
+#
+# i3 Options
+#
+
+# i3 status bar (i3status, i3blocks, polybar)
+desktop_environment_i3_status: 'i3status'
+
+# Install dmenu
+desktop_environment_i3_dmenu_enabled: true
+
+# Install picom compositor
+desktop_environment_i3_picom_enabled: true
+
+#
+# KDE Options
+#
+
+# Install plasma-meta (full) instead of plasma-desktop (minimal)
+desktop_environment_kde_full_enabled: false
+
+# Additional KDE apps (dolphin, konsole, kate, etc.)
+desktop_environment_kde_apps: []
+
+#
+# GNOME Options
+#
+
+# Install gnome (full) instead of gnome-shell (minimal)
+desktop_environment_gnome_full_enabled: false
+
+# Install gnome-extra group
+desktop_environment_gnome_extras_enabled: false
+
+# Install gnome-tweaks for customization
+desktop_environment_gnome_tweaks_enabled: true
+
+#
+# XFCE Options
+#
+
+# Install xfce4-goodies group
+desktop_environment_xfce_goodies_enabled: true
+
+# Install modern application menu
+desktop_environment_xfce_whiskermenu_enabled: true
+
+#
+# LXDE Options
+#
+
+# Install full lxde group instead of minimal
+desktop_environment_lxde_full_enabled: true
+
+#
+# LXQt Options
+#
+
+# Install full lxqt group instead of minimal
+desktop_environment_lxqt_full_enabled: true
+
+# Icon theme (breeze-icons, oxygen-icons)
+desktop_environment_lxqt_icons: 'breeze-icons'
+
+#
+# Common Options
+#
+
+# File manager (if DE doesn't include one or for standalone WMs)
+# Options: thunar, pcmanfm, dolphin, nautilus, nemo, none
+desktop_environment_file_manager: 'none'
+
+# Install archive manager (file-roller, ark, xarchiver based on DE)
+desktop_environment_archive_manager_enabled: false
+
+# Install calculator (gnome-calculator, kcalc, galculator)
+desktop_environment_calculator_enabled: false
+
+# Text editor (simple)
+# Options: gedit, kate, mousepad, leafpad, none
+desktop_environment_text_editor: 'none'
+
+#
+# Theme Options
+#
+
+# Cursor themes to install (list of theme keys, empty = none)
+# Options: adwaita, breeze, capitaine, bibata
+desktop_environment_cursor_themes: []
+
+# Cursor size (used by some DEs/WMs when themes are installed)
+desktop_environment_cursor_size: 24
+
+# Icon themes to install (list of theme keys, empty = none)
+# Options: adwaita, breeze, papirus, hicolor
+desktop_environment_icon_themes: []

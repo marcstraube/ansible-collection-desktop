@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+monitor.alsa.rules = [
+  {
+    matches = [
+      { node.name = "~alsa_input.usb-Elgato_Systems_Elgato_Wave_3_*" }
+    ]
+    actions = {
+      update-props = { node.always-process = true }
+    }
+  }
+]

@@ -1,0 +1,25 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    communication_enabled: true
+    # Official repository packages (testable in containers)
+    communication_telegram_enabled: true
+    communication_signal_enabled: true
+    communication_discord_enabled: true
+    communication_element_enabled: true
+    communication_sieve_enabled: true
+    communication_kdeconnect_enabled: true
+    # Skip AUR packages (require aur_builder user setup)
+    communication_slack_enabled: false
+    communication_threema_enabled: false
+    communication_zoom_enabled: false
+    communication_teams_enabled: false
+    communication_jitsi_enabled: false
+
+  tasks:
+    - name: Converge | Include communication role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

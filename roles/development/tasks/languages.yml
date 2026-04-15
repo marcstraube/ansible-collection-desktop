@@ -1,0 +1,123 @@
+---
+#
+# Programming Languages Installation
+#
+# Languages use 'when' skip (not present/absent) because runtimes often have
+# reverse dependencies from other packages (e.g. jdk-openjdk -> pdftk).
+# Removing them would cascade and break unrelated software.
+
+# Python
+
+- name: Languages | Install Python (Arch)
+  community.general.pacman:
+    name: '{{ __development_python_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_python_enabled | bool
+
+- name: Languages | Install Python (Debian)
+  ansible.builtin.apt:
+    name: '{{ __development_python_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - development_python_enabled | bool
+
+- name: Languages | Install Python (RedHat)
+  ansible.builtin.dnf:
+    name: '{{ __development_python_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - development_python_enabled | bool
+
+- name: Languages | Install Python tools via pipx (non-Arch)
+  community.general.pipx:
+    name: '{{ item }}'
+    state: present
+  loop: '{{ development_python_tools }}'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_python_enabled | bool
+    - development_python_tools | length > 0
+
+# Node.js
+
+# Node.js is installed by the marcstraube.common.nodejs role.
+# The development role only toggles whether nodejs should be included
+# via the development_nodejs_enabled variable (used by the playbook).
+
+# Rust
+
+- name: Languages | Install Rust (Arch)
+  community.general.pacman:
+    name: '{{ __development_rust_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_rust_enabled | bool
+    - __development_rust_packages | length > 0
+
+- name: Languages | Install Rust components via rustup (non-Arch)
+  ansible.builtin.command:
+    cmd: 'rustup component add {{ item }}'
+  loop: '{{ development_rust_components }}'
+  register: __development_rustup_result
+  changed_when: "'is up to date' not in __development_rustup_result.stderr"
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_rust_enabled | bool
+    - development_rust_components | length > 0
+
+# Go
+
+- name: Languages | Install Go (Arch)
+  community.general.pacman:
+    name: '{{ __development_go_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_go_enabled | bool
+
+- name: Languages | Install Go (Debian)
+  ansible.builtin.apt:
+    name: '{{ __development_go_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - development_go_enabled | bool
+
+- name: Languages | Install Go (RedHat)
+  ansible.builtin.dnf:
+    name: '{{ __development_go_packages }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - development_go_enabled | bool
+
+# Java
+
+- name: Languages | Install Java (Arch)
+  community.general.pacman:
+    name: '{{ __development_java_package }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_java_enabled | bool
+
+- name: Languages | Install Java (Debian)
+  ansible.builtin.apt:
+    name: '{{ __development_java_package }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - development_java_enabled | bool
+
+- name: Languages | Install Java (RedHat)
+  ansible.builtin.dnf:
+    name: '{{ __development_java_package }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - development_java_enabled | bool

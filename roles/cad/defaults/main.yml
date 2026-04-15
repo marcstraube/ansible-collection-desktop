@@ -1,0 +1,29 @@
+---
+#
+# Role Control
+#
+
+# Enable the cad role
+cad_enabled: true
+
+#
+# CAD Applications
+#
+
+# Install OpenSCAD
+cad_openscad_enabled: true
+
+# Install FreeCAD
+cad_freecad_enabled: false
+
+# Install LibreCAD
+cad_librecad_enabled: false
+
+# Install QCAD
+cad_qcad_enabled: false
+
+# Install Blender
+cad_blender_enabled: false
+
+# Install KiCad
+cad_kicad_enabled: false

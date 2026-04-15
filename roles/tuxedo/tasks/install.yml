@@ -1,0 +1,65 @@
+---
+#
+# Tuxedo Package Installation
+#
+
+# Prerequisites — DKMS + kernel headers
+
+- name: Install | DKMS
+  ansible.builtin.package:
+    name: '{{ __tuxedo_dkms_package }}'
+    state: present
+  when:
+    - tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
+    - __tuxedo_dkms_package | default('') | length > 0
+
+- name: Install | Detect running kernel package
+  ansible.builtin.command:
+    cmd: pacman -Qqo /usr/lib/modules/{{ ansible_facts['kernel'] }}/vmlinuz
+  register: __tuxedo_kernel_package
+  changed_when: false
+  when: tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
+
+- name: Install | Kernel headers for running kernel
+  ansible.builtin.package:
+    name: '{{ __tuxedo_kernel_package.stdout }}-headers'
+    state: present
+  when:
+    - tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
+    - __tuxedo_kernel_package is not skipped
+
+# Tuxedo drivers (DKMS)
+
+- name: Install | Tuxedo drivers from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __tuxedo_aur_packages.drivers }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - tuxedo_drivers_enabled | bool
+
+# Tuxedo Control Center
+
+- name: Install | Tuxedo Control Center from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __tuxedo_aur_packages.control_center }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - tuxedo_control_center_enabled | bool
+
+# YT6801 Ethernet driver (optional, Gen9/Gen10)
+
+- name: Install | YT6801 Ethernet driver from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __tuxedo_aur_packages.yt6801 }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - tuxedo_yt6801_ethernet_enabled | bool

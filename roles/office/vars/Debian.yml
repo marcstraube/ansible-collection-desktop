@@ -1,0 +1,83 @@
+---
+#
+# LibreOffice
+#
+
+__office_libreoffice_fresh_package: 'libreoffice'
+__office_libreoffice_still_package: 'libreoffice'
+__office_libreoffice_i18n_package: 'libreoffice-l10n-{{ office_libreoffice_i18n }}'
+
+#
+# PDF
+#
+
+__office_pdf_viewers:
+  evince: 'evince'
+  okular: 'okular'
+  zathura: 'zathura'
+  mupdf: 'mupdf'
+
+__office_pdf_tools_packages:
+  - 'pdftk-java'
+  - 'qpdf'
+  - 'poppler-utils'
+
+#
+# Email
+#
+
+__office_thunderbird_package: 'thunderbird'
+__office_thunderbird_i18n_package: 'thunderbird-l10n-{{ office_thunderbird_i18n }}'
+__office_evolution_package: 'evolution'
+
+#
+# Calendar / PIM
+#
+
+__office_gnome_calendar_package: 'gnome-calendar'
+__office_gnome_contacts_package: 'gnome-contacts'
+
+#
+# OCR
+#
+
+__office_tesseract_package: 'tesseract-ocr'
+__office_tesseract_lang_prefix: 'tesseract-ocr-'
+
+#
+# Scanning
+#
+
+__office_simple_scan_package: 'simple-scan'
+__office_gscan2pdf_package: 'gscan2pdf'
+
+#
+# Ebook
+#
+
+__office_calibre_package: 'calibre'
+__office_foliate_package: 'foliate'
+
+#
+# LaTeX
+#
+
+__office_texstudio_package: 'texstudio'
+
+#
+# Spell Checking
+#
+
+__office_hunspell_packages:
+  - 'hunspell'
+  - 'hunspell-en-us'
+  - 'hunspell-de-de'
+
+#
+# Fonts
+#
+
+__office_fonts_packages:
+  - 'fonts-liberation'
+  - 'fonts-dejavu'
+  - 'fonts-noto'

@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    shell_enabled: true
+    shell_default: 'zsh'
+    shell_zsh_enabled: true
+    shell_zsh_plugins:
+      - 'completions'
+    shell_fish_enabled: false
+    shell_bash_completion_enabled: true
+    shell_starship_enabled: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
+    shell_fzf_enabled: true
+    shell_users: []
+
+  tasks:
+    - name: Converge | Include shell role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

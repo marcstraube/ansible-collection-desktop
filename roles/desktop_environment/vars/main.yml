@@ -1,0 +1,42 @@
+---
+#
+# OS-Independent Variables
+#
+
+# Wayland DEs (for auto wayland_utils detection)
+__desktop_environment_wayland_des:
+  - 'hyprland'
+  - 'sway'
+  - 'kde'
+  - 'gnome'
+
+#
+# Common Apps
+#
+
+__desktop_environment_file_managers:
+  thunar: 'thunar'
+  pcmanfm: 'pcmanfm'
+  dolphin: 'dolphin'
+  nautilus: 'nautilus'
+  nemo: 'nemo'
+  none: ''
+
+__desktop_environment_archive_managers:
+  gnome: 'file-roller'
+  kde: 'ark'
+  xfce: 'xarchiver'
+  default: 'file-roller'
+
+__desktop_environment_calculators:
+  gnome: 'gnome-calculator'
+  kde: 'kcalc'
+  xfce: 'galculator'
+  default: 'gnome-calculator'
+
+__desktop_environment_text_editors:
+  gedit: 'gedit'
+  kate: 'kate'
+  mousepad: 'mousepad'
+  leafpad: 'leafpad'
+  none: ''

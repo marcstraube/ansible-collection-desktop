@@ -1,0 +1,109 @@
+---
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+        - '{{ ansible_facts["distribution"] }}.yml'
+        - '{{ ansible_facts["os_family"] }}.yml'
+      paths:
+        - 'vars'
+  tags:
+    - browser
+
+- name: Main | Import install tasks
+  ansible.builtin.import_tasks:
+    file: install.yml
+  when:
+    - browser_enabled | bool
+  tags:
+    - browser
+    - browser:install
+
+- name: Main | Include Firefox tasks
+  ansible.builtin.include_tasks:
+    file: firefox.yml
+    apply:
+      tags:
+        - browser
+        - browser:firefox
+  tags:
+    - browser
+    - browser:firefox
+  when:
+    - browser_enabled | bool
+    - browser_firefox_enabled | bool
+    - browser_firefox_policies_enabled | bool
+
+- name: Main | Include LibreWolf tasks
+  ansible.builtin.include_tasks:
+    file: librewolf.yml
+    apply:
+      tags:
+        - browser
+        - browser:librewolf
+  tags:
+    - browser
+    - browser:librewolf
+  when:
+    - browser_enabled | bool
+    - browser_librewolf_enabled | bool
+    - browser_librewolf_policies_enabled | bool
+
+- name: Main | Include Chromium tasks
+  ansible.builtin.include_tasks:
+    file: chromium.yml
+    apply:
+      tags:
+        - browser
+        - browser:chromium
+  tags:
+    - browser
+    - browser:chromium
+  when:
+    - browser_enabled | bool
+    - browser_chromium_enabled | bool
+    - browser_chromium_policies_enabled | bool
+
+- name: Main | Include Brave tasks
+  ansible.builtin.include_tasks:
+    file: brave.yml
+    apply:
+      tags:
+        - browser
+        - browser:brave
+  tags:
+    - browser
+    - browser:brave
+  when:
+    - browser_enabled | bool
+    - browser_brave_enabled | bool
+    - browser_brave_policies_enabled | bool
+
+- name: Main | Include user profile tasks
+  ansible.builtin.include_tasks:
+    file: users.yml
+    apply:
+      tags:
+        - browser
+        - browser:configure
+  tags:
+    - browser
+    - browser:configure
+  when:
+    - browser_enabled | bool
+    - browser_users | length > 0
+
+- name: Main | Set default browser
+  ansible.builtin.command:
+    cmd: 'xdg-settings set default-web-browser {{ browser_default }}.desktop'
+  changed_when: false
+  # xdg-settings requires a display server, fails in containers/headless
+  failed_when: false
+  when:
+    - browser_enabled | bool
+    - browser_default | length > 0
+  tags:
+    - browser
+    - browser:default

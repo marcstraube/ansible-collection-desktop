@@ -1,0 +1,61 @@
+---
+#
+# RedHat Variables
+#
+
+# Version control
+__development_git_packages:
+  - 'git'
+  - 'git-lfs'
+
+__development_github_cli_package: 'gh'
+__development_gitlab_cli_package: 'glab'
+
+# Python
+__development_python_packages:
+  - 'python3'
+  - 'python3-pip'
+  - 'pipx'
+
+# Rust
+__development_rust_packages:
+  - 'rust'
+  - 'cargo'
+
+# Go
+__development_go_packages:
+  - 'golang'
+
+# Java
+__development_java_package: 'java-21-openjdk-devel'
+
+# Build tools
+__development_build_packages:
+  - '@development-tools'
+  - 'make'
+  - 'cmake'
+  - 'meson'
+  - 'ninja-build'
+
+# IDEs
+__development_vscodium_package: ''
+__development_vscode_package: ''
+__development_jetbrains_toolbox_package: ''
+__development_phpstorm_packages: []
+__development_zed_package: ''
+
+# Database tools
+__development_dbeaver_package: ''
+__development_pgadmin_package: 'pgadmin4'
+
+# API tools
+__development_httpie_package: 'httpie'
+__development_postman_package: ''
+__development_bruno_package: ''
+
+# Misc tools
+__development_misc_packages:
+  - 'jq'
+  - 'direnv'
+  - 'pre-commit'
+  - 'ShellCheck'

@@ -1,0 +1,92 @@
+---
+#
+# Role Control
+#
+
+# Enable the display_manager role
+display_manager_enabled: true
+
+# Enable and start the display manager service
+display_manager_service_enabled: true
+
+#
+# Display Manager Selection
+#
+
+# Display manager: sddm, gdm, lightdm, greetd
+display_manager_name: 'sddm'
+
+#
+# SDDM Options
+#
+
+# SDDM theme (empty = default breeze)
+display_manager_sddm_theme: ''
+
+# Enable virtual keyboard
+display_manager_sddm_virtual_keyboard: false
+
+#
+# GDM Options
+#
+
+# Wayland session (false = use X11)
+display_manager_gdm_wayland: true
+
+#
+# LightDM Options
+#
+
+# Greeter: gtk, slick
+display_manager_lightdm_greeter: 'gtk'
+
+# Greeter theme (empty = default)
+display_manager_lightdm_theme: ''
+
+#
+# greetd Options
+#
+
+# Greeter: agreety (built-in), tuigreet, gtkgreet, regreet
+display_manager_greetd_greeter: 'agreety'
+
+# Compositor for graphical greeters (gtkgreet, regreet)
+# Options: hyprland, sway, cage
+# TUI greeters (tuigreet, agreety) don't need a compositor
+display_manager_greetd_greeter_compositor: ''
+
+# Greeter command override (auto-generated if empty)
+# Set this to completely override the generated greeter command
+display_manager_greetd_greeter_command: ''
+
+# Default session (shown in greeter / used by TUI greeters)
+display_manager_greetd_default_session: 'Hyprland'
+
+# VT to run on
+display_manager_greetd_vt: 1
+
+# Keyboard layout for greeter compositor (XKB format, e.g. 'de', 'us')
+# Empty = system default
+display_manager_greetd_keyboard_layout: ''
+display_manager_greetd_keyboard_variant: ''
+
+#
+# Autologin
+#
+
+# Enable autologin
+display_manager_autologin_enabled: false
+
+# Autologin user
+display_manager_autologin_user: ''
+
+# Autologin session (empty = default)
+# Find sessions in /usr/share/xsessions/ or /usr/share/wayland-sessions/
+display_manager_autologin_session: ''
+
+#
+# NumLock
+#
+
+# Enable NumLock on startup
+display_manager_numlock: false

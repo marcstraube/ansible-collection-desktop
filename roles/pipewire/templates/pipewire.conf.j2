@@ -1,0 +1,15 @@
+{{ ansible_managed | comment }}
+
+context.properties = {
+    # Default sample rate
+    default.clock.rate = {{ pipewire_sample_rate }}
+
+    # Allowed sample rates (for adaptive resampling)
+    default.clock.allowed-rates = [ 44100 48000 96000 ]
+
+    # Buffer size (quantum) - affects latency
+    # Lower = less latency, more CPU usage
+    default.clock.quantum = {{ pipewire_quantum }}
+    default.clock.min-quantum = {{ pipewire_min_quantum }}
+    default.clock.max-quantum = {{ pipewire_max_quantum }}
+}

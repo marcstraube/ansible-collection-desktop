@@ -1,0 +1,237 @@
+---
+#
+# Office Suites
+#
+
+- name: Install | LibreOffice packages
+  ansible.builtin.package:
+    name: >-
+      {{ office_libreoffice_fresh_enabled | bool |
+         ternary(__office_libreoffice_fresh_package, __office_libreoffice_still_package) }}
+    state: present
+  when: office_libreoffice_enabled | bool
+
+- name: Install | LibreOffice language pack
+  ansible.builtin.package:
+    name: '{{ __office_libreoffice_i18n_package }}'
+    state: present
+  when:
+    - office_libreoffice_enabled | bool
+    - office_libreoffice_i18n | length > 0
+
+- name: Install | OnlyOffice from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.onlyoffice }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_onlyoffice_enabled | bool
+
+- name: Install | WPS Office from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.wps }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_wps_enabled | bool
+
+#
+# PDF Tools
+#
+
+- name: Install | PDF viewer
+  ansible.builtin.package:
+    name: '{{ __office_pdf_viewers[office_pdf_viewer] }}'
+    state: present
+  when: office_pdf_viewer | length > 0
+
+- name: Install | PDF command line tools
+  ansible.builtin.package:
+    name: '{{ __office_pdf_tools_packages }}'
+    state: present
+  when: office_pdf_tools_enabled | bool
+
+#
+# Email Clients
+#
+
+- name: Install | Thunderbird
+  ansible.builtin.package:
+    name: '{{ __office_thunderbird_package }}'
+    state: present
+  when: office_thunderbird_enabled | bool
+
+- name: Install | Thunderbird language pack
+  ansible.builtin.package:
+    name: '{{ __office_thunderbird_i18n_package }}'
+    state: present
+  when:
+    - office_thunderbird_enabled | bool
+    - office_thunderbird_i18n | length > 0
+
+- name: Install | Evolution
+  ansible.builtin.package:
+    name: '{{ __office_evolution_package }}'
+    state: present
+  when: office_evolution_enabled | bool
+
+#
+# Calendar / PIM
+#
+
+- name: Install | GNOME Calendar
+  ansible.builtin.package:
+    name: '{{ __office_gnome_calendar_package }}'
+    state: present
+  when:
+    - office_gnome_calendar_enabled | bool
+    - __office_gnome_calendar_package | length > 0
+
+- name: Install | GNOME Contacts
+  ansible.builtin.package:
+    name: '{{ __office_gnome_contacts_package }}'
+    state: present
+  when:
+    - office_gnome_contacts_enabled | bool
+    - __office_gnome_contacts_package | length > 0
+
+#
+# Note Taking
+#
+
+- name: Install | Obsidian from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.obsidian }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_obsidian_enabled | bool
+
+- name: Install | Logseq from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.logseq }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_logseq_enabled | bool
+
+- name: Install | Joplin from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.joplin }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_joplin_enabled | bool
+
+- name: Install | Simplenote from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.simplenote }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_simplenote_enabled | bool
+
+#
+# Document Tools
+#
+
+- name: Install | Typora from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_aur_packages.typora }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - office_typora_enabled | bool
+
+- name: Install | TeXstudio
+  ansible.builtin.package:
+    name: '{{ __office_texstudio_package }}'
+    state: present
+  when: office_texstudio_enabled | bool
+
+#
+# OCR
+#
+
+- name: Install | Tesseract OCR engine
+  ansible.builtin.package:
+    name: '{{ __office_tesseract_package }}'
+    state: present
+  when: office_ocr_enabled | bool
+
+- name: Install | Tesseract language data
+  ansible.builtin.package:
+    name: '{{ __office_tesseract_lang_prefix }}{{ item }}'
+    state: present
+  loop: '{{ office_ocr_languages }}'
+  when: office_ocr_enabled | bool
+
+#
+# Scanning
+#
+
+- name: Install | Simple Scan
+  ansible.builtin.package:
+    name: '{{ __office_simple_scan_package }}'
+    state: present
+  when: office_simple_scan_enabled | bool
+
+- name: Install | gscan2pdf
+  ansible.builtin.package:
+    name: '{{ __office_gscan2pdf_package }}'
+    state: present
+  when:
+    - office_gscan2pdf_enabled | bool
+    - __office_gscan2pdf_package | length > 0
+
+#
+# Ebook
+#
+
+- name: Install | Calibre
+  ansible.builtin.package:
+    name: '{{ __office_calibre_package }}'
+    state: present
+  when: office_calibre_enabled | bool
+
+- name: Install | Foliate
+  ansible.builtin.package:
+    name: '{{ __office_foliate_package }}'
+    state: present
+  when:
+    - office_foliate_enabled | bool
+    - __office_foliate_package | length > 0
+
+#
+# Spell Checking
+#
+
+- name: Install | Hunspell packages
+  ansible.builtin.package:
+    name: '{{ __office_hunspell_packages }}'
+    state: present
+  when: office_hunspell_enabled | bool
+
+#
+# Fonts
+#
+
+- name: Install | Office fonts
+  ansible.builtin.package:
+    name: '{{ __office_fonts_packages }}'
+    state: present
+  when: office_fonts_enabled | bool
