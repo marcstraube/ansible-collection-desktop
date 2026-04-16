@@ -11,15 +11,7 @@
 ### Bug Fixes
 
 * Rename gaming_wine to wine_enabled in example playbooks ([23fd81b](https://github.com/marcstraube/ansible-collection-desktop/commit/23fd81b955a197cac08330bfcf281d1020d24e75))
-* Rename gaming_wine to wine_enabled in example playbooks ([1d00afa](https://github.com/marcstraube/ansible-collection-desktop/commit/1d00afab4fc7fc9552175a74467efefc6865ec2c))
-* Revert to YAML updater for galaxy.yml in release-please ([aaf550b](https://github.com/marcstraube/ansible-collection-desktop/commit/aaf550bb97716ee93aa116d8df09275dc94ab855))
-* Revert to YAML updater for galaxy.yml in release-please ([15e3c26](https://github.com/marcstraube/ansible-collection-desktop/commit/15e3c2645c7c2342dbc884dfe8f8df739d4cc0af))
-* Switch galaxy.yml to generic updater in release-please ([ef083f3](https://github.com/marcstraube/ansible-collection-desktop/commit/ef083f3713bf9b894655ae737c75e270049a1eb6))
-* Switch galaxy.yml to generic updater in release-please ([8019445](https://github.com/marcstraube/ansible-collection-desktop/commit/80194452bfbb7de109c6de6c9ff2f007366dedd2))
 * Use explicit generic updater for galaxy.yml in release-please ([c3167b1](https://github.com/marcstraube/ansible-collection-desktop/commit/c3167b163b1e22094b7d5e439b79d6e0a684b8b6))
-* Use explicit generic updater for galaxy.yml in release-please ([c8c3d80](https://github.com/marcstraube/ansible-collection-desktop/commit/c8c3d807e672851347135a05a90f4d216e324668))
-* Use YAML-aware updater for galaxy.yml in release-please ([9cb1d01](https://github.com/marcstraube/ansible-collection-desktop/commit/9cb1d015f3061251ffba54fe9d80ee2d935cc284))
-* Use YAML-aware updater for galaxy.yml in release-please ([e3bcd5d](https://github.com/marcstraube/ansible-collection-desktop/commit/e3bcd5de1b984550733fdcc3d7aca6977ecdf7f5))
 
 ## v1.0.0 (2026-04-15)
 
