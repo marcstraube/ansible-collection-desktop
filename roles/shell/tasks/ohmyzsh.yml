@@ -21,12 +21,12 @@
   loop: '{{ __shell_ohmyzsh_users }}'
   when: shell_user_config_mode != 'disabled'
 
-- name: OhMyZsh | Clone custom plugins
+- name: OhMyZsh | Clone custom plugins  # noqa: latest[git]
   ansible.builtin.git:
     repo: '{{ item.1.repo }}'
     dest: '/home/{{ item.0 }}/.oh-my-zsh/custom/plugins/{{ item.1.name }}'
     depth: 1
-    version: 'HEAD'
+    version: '{{ item.1.version | default("master") }}'
     update: "{{ shell_user_config_mode == 'managed' }}"
   become: true
   become_user: '{{ item.0 }}'

@@ -51,6 +51,7 @@ shell_ohmyzsh_plugins:
   - 'git'
 
 # Third-party plugins to install via git clone into custom/plugins
+# Each entry requires 'name' and 'repo'. Optional 'version' (default: master).
 shell_ohmyzsh_custom_plugins: []
 # Example:
 #   - name: 'zsh-autosuggestions'
