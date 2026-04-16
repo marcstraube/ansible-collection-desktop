@@ -80,3 +80,14 @@
         name: dbus-broker
         state: started
       when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Prepare | Install git
+      ansible.builtin.package:
+        name: git
+        state: present
+
+    - name: Prepare | Create test user
+      ansible.builtin.user:
+        name: testuser
+        create_home: true
+        shell: /bin/bash
