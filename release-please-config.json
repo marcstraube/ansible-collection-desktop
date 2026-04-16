@@ -16,7 +16,11 @@
         {"type": "ci", "section": "CI", "hidden": true}
       ],
       "extra-files": [
-        "galaxy.yml"
+        {
+          "type": "yaml",
+          "path": "galaxy.yml",
+          "jsonpath": "$.version"
+        }
       ],
       "bootstrap-sha": "c92f6337c29fadaaae55866c1fd4c0d4a5ed259e"
     }
