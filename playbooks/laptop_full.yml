@@ -82,9 +82,11 @@
     downloads_transmission: true
     downloads_qbittorrent: false  # Alternative to Transmission
 
+    # Wine
+    wine_enabled: true
+
     # Gaming
     gaming_enabled: true
-    gaming_wine: true
     gaming_lutris: true
     gaming_retroarch: true
     gaming_playback: true
