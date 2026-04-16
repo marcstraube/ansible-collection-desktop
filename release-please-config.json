@@ -17,9 +17,8 @@
       ],
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "galaxy.yml",
-          "jsonpath": "$.version"
+          "type": "generic",
+          "path": "galaxy.yml"
         }
       ],
       "bootstrap-sha": "c92f6337c29fadaaae55866c1fd4c0d4a5ed259e"
