@@ -26,18 +26,40 @@ shell_user_config_mode: 'managed'
 # Enable Zsh installation
 shell_zsh_enabled: true
 
-# Zsh plugins to install
+# Zsh framework: native (system packages) or ohmyzsh (Oh My Zsh per-user install)
+shell_zsh_framework: 'native'
+
+# Zsh plugins to install (native framework only)
 # Options: autosuggestions, syntax-highlighting, completions, history-substring-search
 shell_zsh_plugins:
   - 'completions'
   - 'autosuggestions'
   - 'syntax-highlighting'
 
-# Enable grml-zsh-config (Arch ISO defaults)
+# Enable grml-zsh-config (native framework only, Arch ISO defaults)
 shell_zsh_grml_enabled: false
 
-# Enable custom .zshrc skeleton deployment
-shell_zsh_skeleton_enabled: false
+#
+# Oh My Zsh (only when shell_zsh_framework == 'ohmyzsh')
+#
+
+# Oh My Zsh theme (set to '' to disable, e.g. when using Starship)
+shell_ohmyzsh_theme: 'robbyrussell'
+
+# Built-in Oh My Zsh plugins to activate
+shell_ohmyzsh_plugins:
+  - 'git'
+
+# Third-party plugins to install via git clone into custom/plugins
+# Each entry requires 'name' and 'repo'. Optional 'version' (default: master).
+shell_ohmyzsh_custom_plugins: []
+# Example:
+#   - name: 'zsh-autosuggestions'
+#     repo: 'https://github.com/zsh-users/zsh-autosuggestions.git'
+#   - name: 'zsh-syntax-highlighting'
+#     repo: 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
+#   - name: 'zsh-completions'
+#     repo: 'https://github.com/zsh-users/zsh-completions.git'
 
 #
 # Fish

@@ -37,12 +37,36 @@ overrides if needed.
 
 ### Zsh
 
-| Variable                     | Default    | Description                                |
-|------------------------------|------------|--------------------------------------------|
-| `shell_zsh_enabled`          | `true`     | Enable Zsh installation                    |
-| `shell_zsh_plugins`          | `[...]`    | Zsh plugins (completions, autosuggestions) |
-| `shell_zsh_grml_enabled`     | `false`    | Enable grml-zsh-config (Arch ISO defaults) |
-| `shell_zsh_skeleton_enabled` | `false`    | Enable custom .zshrc skeleton deployment   |
+| Variable                 | Default    | Description                                          |
+|--------------------------|------------|------------------------------------------------------|
+| `shell_zsh_enabled`      | `true`     | Enable Zsh installation                              |
+| `shell_zsh_framework`    | `'native'` | Zsh framework: `native` (system packages) or `ohmyzsh` |
+| `shell_zsh_plugins`      | `[...]`    | Zsh plugins (native framework only)                  |
+| `shell_zsh_grml_enabled` | `false`    | Enable grml-zsh-config (native framework only)       |
+
+### Oh My Zsh
+
+Only used when `shell_zsh_framework: 'ohmyzsh'`. Installs Oh My Zsh per-user via git
+clone and deploys a managed `.zshrc`. Requires `git` to be installed.
+
+| Variable                        | Default          | Description                                    |
+|---------------------------------|------------------|------------------------------------------------|
+| `shell_ohmyzsh_theme`           | `'robbyrussell'` | Oh My Zsh theme (set to `''` for Starship)     |
+| `shell_ohmyzsh_plugins`         | `['git']`        | Built-in Oh My Zsh plugins to activate         |
+| `shell_ohmyzsh_custom_plugins`  | `[]`             | Third-party plugins (list of name/repo dicts)  |
+
+Custom plugins example:
+
+```yaml
+shell_ohmyzsh_custom_plugins:
+  - name: 'zsh-autosuggestions'
+    repo: 'https://github.com/zsh-users/zsh-autosuggestions.git'
+  - name: 'zsh-syntax-highlighting'
+    repo: 'https://github.com/zsh-users/zsh-syntax-highlighting.git'
+```
+
+When `shell_starship_enabled` is `true`, the deployed `.zshrc` sets `ZSH_THEME=""`
+and adds Starship init automatically.
 
 ### Fish
 
@@ -79,11 +103,12 @@ overrides if needed.
 
 ## Tags
 
-| Tag             | Description              |
-|-----------------|--------------------------|
-| `shell`         | All shell tasks          |
-| `shell:install` | Package installation     |
-| `shell:users`   | User shell configuration |
+| Tag              | Description                    |
+|------------------|--------------------------------|
+| `shell`          | All shell tasks                |
+| `shell:install`  | Package installation           |
+| `shell:ohmyzsh`  | Oh My Zsh setup and config     |
+| `shell:users`    | User shell configuration       |
 
 ## Example Playbook
 

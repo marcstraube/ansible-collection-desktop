@@ -96,3 +96,45 @@
       when:
         - ansible_facts['os_family'] == 'Archlinux'
         - __shell_starship_package | default('') | length > 0
+
+    #
+    # Oh My Zsh
+    #
+
+    - name: Verify | Check Oh My Zsh directory exists
+      ansible.builtin.stat:
+        path: '/home/testuser/.oh-my-zsh'
+      register: _shell_ohmyzsh_dir
+      failed_when: not _shell_ohmyzsh_dir.stat.exists
+
+    - name: Verify | Check Oh My Zsh oh-my-zsh.sh exists
+      ansible.builtin.stat:
+        path: '/home/testuser/.oh-my-zsh/oh-my-zsh.sh'
+      register: _shell_ohmyzsh_sh
+      failed_when: not _shell_ohmyzsh_sh.stat.exists
+
+    - name: Verify | Check custom plugin cloned
+      ansible.builtin.stat:
+        path: '/home/testuser/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+      register: _shell_ohmyzsh_custom_plugin
+      failed_when: not _shell_ohmyzsh_custom_plugin.stat.exists
+
+    - name: Verify | Check .zshrc deployed
+      ansible.builtin.stat:
+        path: '/home/testuser/.zshrc'
+      register: _shell_ohmyzsh_zshrc
+      failed_when: not _shell_ohmyzsh_zshrc.stat.exists
+
+    - name: Verify | Check .zshrc contains Oh My Zsh source
+      ansible.builtin.command:
+        cmd: 'grep -q "source.*oh-my-zsh.sh" /home/testuser/.zshrc'
+      register: _shell_ohmyzsh_source
+      changed_when: false
+      failed_when: _shell_ohmyzsh_source.rc != 0
+
+    - name: Verify | Check .zshrc contains theme
+      ansible.builtin.command:
+        cmd: 'grep -q "ZSH_THEME=\"robbyrussell\"" /home/testuser/.zshrc'
+      register: _shell_ohmyzsh_theme
+      changed_when: false
+      failed_when: _shell_ohmyzsh_theme.rc != 0

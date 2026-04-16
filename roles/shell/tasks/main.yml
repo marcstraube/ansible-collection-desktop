@@ -24,6 +24,16 @@
     - shell
     - shell:install
 
+- name: Main | Import Oh My Zsh tasks
+  ansible.builtin.import_tasks: ohmyzsh.yml
+  when:
+    - shell_enabled | bool
+    - shell_zsh_enabled | bool
+    - shell_zsh_framework == 'ohmyzsh'
+  tags:
+    - shell
+    - shell:ohmyzsh
+
 - name: Main | Import user tasks
   ansible.builtin.import_tasks: users.yml
   when:
