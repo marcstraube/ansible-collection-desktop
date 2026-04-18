@@ -3,11 +3,6 @@
 # Arch Linux Variables
 #
 
-# Shell packages
-__shell_zsh_package: 'zsh'
-__shell_fish_package: 'fish'
-__shell_bash_completion_package: 'bash-completion'
-
 # Zsh plugins
 __shell_zsh_plugin_packages:
   completions: 'zsh-completions'
@@ -28,9 +23,3 @@ __shell_bat_package: 'bat'
 __shell_fd_package: 'fd'
 __shell_ripgrep_package: 'ripgrep'
 __shell_tldr_package: 'tldr'
-
-# Shell paths
-__shell_paths:
-  zsh: '/usr/bin/zsh'
-  fish: '/usr/bin/fish'
-  bash: '/bin/bash'

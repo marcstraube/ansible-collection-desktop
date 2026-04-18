@@ -30,8 +30,8 @@ Chromium on Rocky Linux requires EPEL.
 | -------------- | ------- | ------------ | --------- | ----- | ------ | ---- |
 | Arch Linux     | yes     | yes          | AUR       | AUR   | AUR    | AUR  |
 | Debian Trixie  | ESR     | yes          | no        | no    | yes    | no   |
-| Rocky Linux 9  | yes     | EPEL         | no        | no    | no     | no   |
-| Rocky Linux 10 | yes     | EPEL         | no        | no    | no     | no   |
+| EL 9           | yes     | EPEL         | no        | no    | no     | no   |
+| EL 10          | yes     | EPEL         | no        | no    | no     | no   |
 
 ## Role Variables
 

@@ -6,7 +6,7 @@
 
 ## Description
 
-Desktop workstation roles for Arch Linux, Debian Trixie, and Rocky Linux 9/10.
+Desktop workstation roles for Arch Linux, Debian Trixie, and EL 9/10.
 27 roles covering desktop environments, display managers, browsers,
 development tools, multimedia, office, and productivity applications.
 
@@ -14,8 +14,8 @@ development tools, multimedia, office, and productivity applications.
 
 - Arch Linux (primary)
 - Debian Trixie (13)
-- Rocky Linux 9 / EL 9 (Rocky, Alma, RHEL)
-- Rocky Linux 10 / EL 10 (Rocky, Alma, RHEL)
+- EL 9 (Rocky, Alma, RHEL)
+- EL 10 (Rocky, Alma, RHEL)
 
 ## Requirements
 

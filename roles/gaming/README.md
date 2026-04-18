@@ -5,7 +5,7 @@ Install gaming platforms and emulators.
 ## Description
 
 Installs Lutris, Steam, RetroArch, PCSX2, Dolphin, Moonlight, Heroic Games
-Launcher, and Playback across Arch Linux, Debian Trixie, and Rocky Linux 9/10.
+Launcher, and Playback across Arch Linux, Debian Trixie, and EL 9/10.
 Wine has been extracted into its own role (`marcstraube.desktop.wine`).
 
 Platform availability varies by OS — see the Role Variables table for details.
@@ -20,7 +20,7 @@ to exist on managed hosts.
 
 - ansible-core >= 2.17
 - `kewlfft.aur` collection (AUR packages on Arch Linux)
-- EPEL repository enabled (for Lutris on Rocky Linux 9/10)
+- EPEL repository enabled (for Lutris on EL 9/10)
 - `aur_builder` system user with passwordless sudo (Arch Linux only)
 
 ## Supported Platforms
