@@ -4,8 +4,8 @@ Install terminal and GUI file managers.
 
 ## Description
 
-Installs optional file managers: terminal-based (vifm, Midnight Commander, ranger,
-nnn, lf) and graphical (Thunar, Dolphin, Nautilus, PCManFM, Nemo, Double Commander).
+Installs optional file managers: graphical (Thunar, Dolphin, Nautilus, PCManFM, Nemo,
+Double Commander) and terminal-based (deprecated -- moving to `marcstraube.common.utils`).
 Each application has its own boolean toggle and is independently installable. Package
 availability varies by platform -- applications not packaged for a given OS are
 silently skipped.
@@ -36,15 +36,19 @@ overrides if needed.
 | ---------------------- | ------- | ------------------- |
 | `filemanagers_enabled` | `true`  | Enable/disable role |
 
-### Terminal File Managers
+### Terminal File Managers (DEPRECATED)
 
-| Variable                      | Default | Description                           |
-| ----------------------------- | ------- | ------------------------------------- |
-| `filemanagers_vifm_enabled`   | `false` | Enable vifm (Vi-like file manager)    |
-| `filemanagers_mc_enabled`     | `false` | Enable Midnight Commander             |
-| `filemanagers_ranger_enabled` | `false` | Enable ranger                         |
-| `filemanagers_nnn_enabled`    | `false` | Enable nnn                            |
-| `filemanagers_lf_enabled`     | `false` | Enable lf (not available on EL/EPEL)  |
+> **Deprecation Notice:** Terminal file managers have moved to
+> `marcstraube.common.utils` (category: File Managers). The variables below still
+> work but will be removed in v2.0.0. Use `utils_filemgr_*_enabled` instead.
+
+| Variable                      | Default | Replacement                    |
+| ----------------------------- | ------- | ------------------------------ |
+| `filemanagers_vifm_enabled`   | `false` | `utils_filemgr_vifm_enabled`   |
+| `filemanagers_mc_enabled`     | `false` | `utils_filemgr_mc_enabled`     |
+| `filemanagers_ranger_enabled` | `false` | `utils_filemgr_ranger_enabled` |
+| `filemanagers_nnn_enabled`    | `false` | `utils_filemgr_nnn_enabled`    |
+| `filemanagers_lf_enabled`     | `false` | `utils_filemgr_lf_enabled`     |
 
 ### GUI File Managers
 
