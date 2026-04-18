@@ -41,7 +41,7 @@ multimedia_openshot_enabled: false
 #
 
 # Enable FFMultiConverter media file converter
-multimedia_ffmulticonverter_enabled: true
+multimedia_ffmulticonverter_enabled: false
 
 # Enable HandBrake video transcoder
 multimedia_handbrake_enabled: false
@@ -51,7 +51,7 @@ multimedia_handbrake_enabled: false
 #
 
 # Enable Peek animated GIF recorder
-multimedia_peek_enabled: true
+multimedia_peek_enabled: false
 
 # Enable OBS Studio streaming and recording
 multimedia_obs_enabled: false
