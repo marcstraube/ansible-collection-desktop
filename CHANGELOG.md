@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v1.1.0...v1.2.0) (2026-04-19)
+
+
+### Features
+
+* Add network retry logic to transient tasks ([#23](https://github.com/marcstraube/ansible-collection-desktop/issues/23)) ([0866567](https://github.com/marcstraube/ansible-collection-desktop/commit/08665677c06554ef92e083045d5ecf64e36b7a62))
+* **filemanagers:** Deprecate CLI file managers ([#18](https://github.com/marcstraube/ansible-collection-desktop/issues/18)) ([dbbe857](https://github.com/marcstraube/ansible-collection-desktop/commit/dbbe8579fcb30ecf618221ce90004b0df49aab3e))
+
+
+### Bug Fixes
+
+* **multimedia:** Disable abandoned packages by default ([#21](https://github.com/marcstraube/ansible-collection-desktop/issues/21)) ([b15fe86](https://github.com/marcstraube/ansible-collection-desktop/commit/b15fe863d9477add368affcc769135262d2926a3))
+
 ## [1.1.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v1.0.0...v1.1.0) (2026-04-16)
 
 
