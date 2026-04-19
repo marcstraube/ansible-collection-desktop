@@ -116,10 +116,9 @@ jobs:
 
   # =============================================================================
   # DETECT CHANGED ROLES
-  # Determines which roles need molecule testing based on git diff.
+  # Determines which podman roles need molecule testing based on git diff.
   # Only substantive changes trigger tests (not README-only edits).
   # Shared file changes (galaxy.yml, plugins/, meta/runtime.yml) test all roles.
-  # tabletop is excluded (deferred — proprietary package redesign needed).
   # =============================================================================
   detect-changes:
     name: Detect Changed Roles
@@ -136,7 +135,14 @@ jobs:
       - name: Determine changed roles
         id: set-matrix
         run: |
-          ALL_PODMAN_ROLES="ai bluetooth browser cad communication desktop_environment development display_manager downloads elgato filemanagers gaming graphics_apps imaging keepassxc multimedia office pipewire plymouth remote_access security_apps shell system_apps terminal tuxedo wayland_utils wine"
+          # Auto-detect podman roles from molecule driver config
+          ALL_PODMAN_ROLES=""
+          for f in roles/*/molecule/default/molecule.yml; do
+            if grep -q 'name: podman' "$f"; then
+              role=$(echo "$f" | cut -d/ -f2)
+              ALL_PODMAN_ROLES="$ALL_PODMAN_ROLES $role"
+            fi
+          done
 
           # Determine base commit for diff
           if [ "${{ github.event_name }}" = "pull_request" ]; then
