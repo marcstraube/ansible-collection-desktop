@@ -24,12 +24,12 @@ API keys are managed by the user via environment variables (not by this role).
 
 ## Supported Platforms
 
-| Platform       | Notes                                      |
-| -------------- | ------------------------------------------ |
-| Arch Linux     | Native packages + AUR                      |
-| Debian Trixie  | npm/pipx/install scripts                   |
-| Rocky Linux 9  | npm/pipx/install scripts                   |
-| Rocky Linux 10 | npm/pipx/install scripts                   |
+| Platform                  | Notes                    |
+| ------------------------- | ------------------------ |
+| Arch Linux                | Native packages + AUR    |
+| Debian Trixie             | npm/pipx/install scripts |
+| EL 9 (Rocky, Alma, RHEL)  | npm/pipx/install scripts |
+| EL 10 (Rocky, Alma, RHEL) | npm/pipx/install scripts |
 
 ## Role Variables
 

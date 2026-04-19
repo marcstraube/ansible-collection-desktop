@@ -3,12 +3,23 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    __prepare_packages:
+      Debian:
+        - systemd
+        - systemd-timesyncd
+        - locales
+        - dbus
+      RedHat:
+        - glibc-langpack-en
+        - glibc-locale-source
+
   tasks:
     #
-    # Package Cache Updates
+    # Package Cache
     #
 
-    - name: Prepare | Full system update (Arch)
+    - name: Prepare | Update package cache (Arch)
       community.general.pacman:
         update_cache: true
         upgrade: true
@@ -28,16 +39,6 @@
     # Container Dependencies
     #
 
-    - name: Prepare | Install base packages (Debian)
-      ansible.builtin.apt:
-        name:
-          - systemd
-          - systemd-timesyncd
-          - locales
-          - dbus
-        state: present
-      when: ansible_facts['os_family'] == 'Debian'
-
     - name: Prepare | Replace curl-minimal with curl (RedHat)
       ansible.builtin.dnf:
         name:
@@ -46,13 +47,11 @@
         allowerasing: true
       when: ansible_facts['os_family'] == 'RedHat'
 
-    - name: Prepare | Install locale packages (RedHat)
-      ansible.builtin.dnf:
-        name:
-          - glibc-langpack-en
-          - glibc-locale-source
+    - name: Prepare | Install container dependencies
+      ansible.builtin.package:
+        name: '{{ __prepare_packages[ansible_facts["os_family"]] }}'
         state: present
-      when: ansible_facts['os_family'] == 'RedHat'
+      when: ansible_facts['os_family'] in __prepare_packages
 
     - name: Prepare | Start D-Bus (RedHat)
       ansible.builtin.systemd_service:
