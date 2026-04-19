@@ -14,6 +14,8 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_ollama_enabled | bool
     - __ai_ollama_package | length > 0
+  retries: 3
+  delay: 5
 
 - name: Local | Download Ollama install script (non-Arch)
   become: true
@@ -26,6 +28,8 @@
   when:
     - ansible_facts['os_family'] != 'Archlinux'
     - ai_ollama_enabled | bool
+  retries: 5
+  delay: 10
 
 - name: Local | Run Ollama install script (non-Arch)
   become: true
@@ -74,6 +78,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_lmstudio_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Local | LM Studio not available (non-Arch)
   ansible.builtin.debug:

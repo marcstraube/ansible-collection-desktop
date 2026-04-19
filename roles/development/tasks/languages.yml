@@ -15,6 +15,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - development_python_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Python (Debian)
   ansible.builtin.apt:
@@ -23,6 +25,8 @@
   when:
     - ansible_facts['os_family'] == 'Debian'
     - development_python_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Python (RedHat)
   ansible.builtin.dnf:
@@ -31,6 +35,8 @@
   when:
     - ansible_facts['os_family'] == 'RedHat'
     - development_python_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Python tools via pipx (non-Arch)
   community.general.pipx:
@@ -41,6 +47,8 @@
     - ansible_facts['os_family'] != 'Archlinux'
     - development_python_enabled | bool
     - development_python_tools | length > 0
+  retries: 3
+  delay: 5
 
 # Node.js
 
@@ -58,6 +66,8 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - development_rust_enabled | bool
     - __development_rust_packages | length > 0
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Rust components via rustup (non-Arch)
   ansible.builtin.command:
@@ -79,6 +89,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - development_go_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Go (Debian)
   ansible.builtin.apt:
@@ -87,6 +99,8 @@
   when:
     - ansible_facts['os_family'] == 'Debian'
     - development_go_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Go (RedHat)
   ansible.builtin.dnf:
@@ -95,6 +109,8 @@
   when:
     - ansible_facts['os_family'] == 'RedHat'
     - development_go_enabled | bool
+  retries: 3
+  delay: 5
 
 # Java
 
@@ -105,6 +121,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - development_java_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Java (Debian)
   ansible.builtin.apt:
@@ -113,6 +131,8 @@
   when:
     - ansible_facts['os_family'] == 'Debian'
     - development_java_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Languages | Install Java (RedHat)
   ansible.builtin.dnf:
@@ -121,3 +141,5 @@
   when:
     - ansible_facts['os_family'] == 'RedHat'
     - development_java_enabled | bool
+  retries: 3
+  delay: 5

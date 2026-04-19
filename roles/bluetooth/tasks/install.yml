@@ -21,6 +21,8 @@
     name: '{{ __bluetooth_install_packages }}'
     state: present
   when: __bluetooth_install_packages | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Install AUR audio packages
   become: true
@@ -31,3 +33,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - bluetooth_audio == 'alsa'
+  retries: 3
+  delay: 5

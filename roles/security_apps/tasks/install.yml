@@ -6,6 +6,8 @@
   when:
     - security_apps_veracrypt_enabled | bool
     - __security_apps_packages.veracrypt is defined
+  retries: 3
+  delay: 5
 
 - name: Install | ClamTk packages
   ansible.builtin.package:
@@ -14,6 +16,8 @@
   when:
     - security_apps_clamtk_enabled | bool
     - __security_apps_packages.clamtk is defined
+  retries: 3
+  delay: 5
 
 - name: Install | Gufw packages
   ansible.builtin.package:
@@ -22,6 +26,8 @@
   when:
     - security_apps_gufw_enabled | bool
     - __security_apps_packages.gufw is defined
+  retries: 3
+  delay: 5
 
 - name: Install | Cypherock CySync from AUR (Arch)
   become: true
@@ -32,6 +38,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - security_apps_cypherock_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Ledger Live from AUR (Arch)
   become: true
@@ -42,6 +50,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - security_apps_ledger_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Trezor Suite from AUR (Arch)
   become: true
@@ -52,3 +62,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - security_apps_trezor_enabled | bool
+  retries: 3
+  delay: 5

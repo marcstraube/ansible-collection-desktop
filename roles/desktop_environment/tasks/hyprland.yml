@@ -57,6 +57,8 @@
     state: present
   when:
     - __desktop_environment_hyprland_install_packages | length > 0
+  retries: 3
+  delay: 5
 
 - name: Hyprland | Build AUR package list
   ansible.builtin.set_fact:
@@ -83,6 +85,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __desktop_environment_hyprland_install_aur_packages | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # uwsm Desktop Entry
 - name: Hyprland | Create wayland-sessions directory

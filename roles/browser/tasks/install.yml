@@ -8,6 +8,8 @@
     name: '{{ __browser_firefox_package }}'
     state: present
   when: browser_firefox_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Firefox language pack
   ansible.builtin.package:
@@ -16,6 +18,8 @@
   when:
     - browser_firefox_enabled | bool
     - browser_firefox_i18n | length > 0
+  retries: 3
+  delay: 5
 
 #
 # LibreWolf (AUR on Arch, not available elsewhere)
@@ -30,6 +34,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - browser_librewolf_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | LibreWolf not available notice
   ansible.builtin.debug:
@@ -49,6 +55,8 @@
     name: '{{ __browser_chromium_package }}'
     state: present
   when: browser_chromium_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Brave (AUR on Arch, not available elsewhere)
@@ -63,6 +71,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - browser_brave_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Brave not available notice
   ansible.builtin.debug:
@@ -102,6 +112,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - browser_tor_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Tor Browser packages
   ansible.builtin.package:
@@ -111,6 +123,8 @@
     - ansible_facts['os_family'] != 'Archlinux'
     - browser_tor_enabled | bool
     - __browser_tor_package | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Zen Browser (AUR on Arch only)
@@ -125,6 +139,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - browser_zen_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Zen Browser not available notice
   ansible.builtin.debug:

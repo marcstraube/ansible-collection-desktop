@@ -14,6 +14,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.ides_vscodium | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 - name: IDEs | VSCodium not available notice (non-Arch)
   ansible.builtin.debug:
@@ -33,6 +35,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.ides_vscode | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # PHPStorm (Arch AUR)
 
@@ -45,6 +49,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.ides_phpstorm | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # Zed (Arch AUR)
 
@@ -57,6 +63,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.ides_zed | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # JetBrains Toolbox (Arch AUR)
 
@@ -69,6 +77,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.ides_jetbrains | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # Postman (Arch AUR)
 
@@ -81,6 +91,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.api_tools_postman | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # Insomnia (Arch AUR)
 
@@ -93,6 +105,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.api_tools_insomnia | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 # Bruno (Arch AUR)
 
@@ -105,3 +119,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __development_aur_packages.api_tools_bruno | default([]) | length > 0
+  retries: 3
+  delay: 5

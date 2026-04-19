@@ -6,6 +6,8 @@
   when:
     - cad_openscad_enabled | bool
     - __cad_openscad_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | FreeCAD
   ansible.builtin.package:
@@ -14,6 +16,8 @@
   when:
     - cad_freecad_enabled | bool
     - __cad_freecad_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | LibreCAD
   ansible.builtin.package:
@@ -22,6 +26,8 @@
   when:
     - cad_librecad_enabled | bool
     - __cad_librecad_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | QCAD
   ansible.builtin.package:
@@ -30,6 +36,8 @@
   when:
     - cad_qcad_enabled | bool
     - __cad_qcad_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Blender
   ansible.builtin.package:
@@ -38,6 +46,8 @@
   when:
     - cad_blender_enabled | bool
     - __cad_blender_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | KiCad
   ansible.builtin.package:
@@ -46,3 +56,5 @@
   when:
     - cad_kicad_enabled | bool
     - __cad_kicad_package | default('') | length > 0
+  retries: 3
+  delay: 5

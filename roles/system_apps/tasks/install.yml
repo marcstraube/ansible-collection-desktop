@@ -6,6 +6,8 @@
   when:
     - system_apps_gparted_enabled | bool
     - __system_apps_gparted_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Filelight
   ansible.builtin.package:
@@ -14,6 +16,8 @@
   when:
     - system_apps_filelight_enabled | bool
     - __system_apps_filelight_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Baobab
   ansible.builtin.package:
@@ -22,6 +26,8 @@
   when:
     - system_apps_baobab_enabled | bool
     - __system_apps_baobab_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Solaar
   ansible.builtin.package:
@@ -30,6 +36,8 @@
   when:
     - system_apps_solaar_enabled | bool
     - __system_apps_solaar_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | GNOME System Monitor
   ansible.builtin.package:
@@ -38,6 +46,8 @@
   when:
     - system_apps_gnome_system_monitor_enabled | bool
     - __system_apps_gnome_system_monitor_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Plasma System Monitor
   ansible.builtin.package:
@@ -46,6 +56,8 @@
   when:
     - system_apps_plasma_system_monitor_enabled | bool
     - __system_apps_plasma_system_monitor_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Timeshift
   ansible.builtin.package:
@@ -54,6 +66,8 @@
   when:
     - system_apps_timeshift_enabled | bool
     - __system_apps_timeshift_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: "Install | D\xE9j\xE0 Dup"
   ansible.builtin.package:
@@ -62,6 +76,8 @@
   when:
     - system_apps_deja_dup_enabled | bool
     - __system_apps_deja_dup_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Seahorse
   ansible.builtin.package:
@@ -70,6 +86,8 @@
   when:
     - system_apps_seahorse_enabled | bool
     - __system_apps_seahorse_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | dconf Editor
   ansible.builtin.package:
@@ -78,3 +96,5 @@
   when:
     - system_apps_dconf_editor_enabled | bool
     - __system_apps_dconf_editor_package | default('') | length > 0
+  retries: 3
+  delay: 5

@@ -16,6 +16,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - elgato_streamdeck_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Facecam
@@ -28,6 +30,8 @@
   when:
     - elgato_facecam_enabled | bool
     - __elgato_facecam_packages | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Key Light
@@ -42,3 +46,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - elgato_keylight_enabled | bool
+  retries: 3
+  delay: 5

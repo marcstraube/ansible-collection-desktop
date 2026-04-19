@@ -8,6 +8,8 @@
     name: '{{ __pipewire_realtime_package }}'
     state: present
   when: __pipewire_realtime_package | length > 0
+  retries: 3
+  delay: 5
 
 - name: Realtime | Ensure realtime group exists
   ansible.builtin.group:

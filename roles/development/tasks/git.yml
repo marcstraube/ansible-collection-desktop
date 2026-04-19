@@ -7,15 +7,21 @@
   ansible.builtin.package:
     name: '{{ __development_git_packages }}'
     state: present
+  retries: 3
+  delay: 5
 
 - name: Git | Manage GitHub CLI
   ansible.builtin.package:
     name: '{{ __development_github_cli_package }}'
     state: "{{ 'present' if development_github_cli_enabled | bool else 'absent' }}"
   when: __development_github_cli_package | length > 0
+  retries: 3
+  delay: 5
 
 - name: Git | Manage GitLab CLI
   ansible.builtin.package:
     name: '{{ __development_gitlab_cli_package }}'
     state: "{{ 'present' if development_gitlab_cli_enabled | bool else 'absent' }}"
   when: __development_gitlab_cli_package | length > 0
+  retries: 3
+  delay: 5

@@ -9,6 +9,8 @@
   ansible.builtin.package:
     name: '{{ __ai_comfyui_venv_packages }}'
     state: present
+  retries: 3
+  delay: 5
 
 - name: ComfyUI | Create ComfyUI service user
   become: true
@@ -37,6 +39,8 @@
     dest: '{{ ai_comfyui_install_dir }}'
     version: '{{ ai_comfyui_version }}'
     update: true
+  retries: 5
+  delay: 10
 
 - name: ComfyUI | Create ComfyUI Python virtual environment
   become: true
@@ -57,6 +61,8 @@
     extra_args: '--index-url https://download.pytorch.org/whl/cu126'
     virtualenv: '{{ ai_comfyui_install_dir }}/venv'
   when: ai_comfyui_gpu == 'nvidia'
+  retries: 3
+  delay: 5
 
 - name: ComfyUI | Install PyTorch (AMD ROCm)
   become: true
@@ -69,6 +75,8 @@
     extra_args: '--index-url https://download.pytorch.org/whl/rocm6.2.4'
     virtualenv: '{{ ai_comfyui_install_dir }}/venv'
   when: ai_comfyui_gpu == 'amd'
+  retries: 3
+  delay: 5
 
 - name: ComfyUI | Install ComfyUI requirements
   become: true
@@ -76,6 +84,8 @@
   ansible.builtin.pip:
     requirements: '{{ ai_comfyui_install_dir }}/requirements.txt'
     virtualenv: '{{ ai_comfyui_install_dir }}/venv'
+  retries: 3
+  delay: 5
 
 - name: ComfyUI | Clone ComfyUI-Manager
   become: true
@@ -86,6 +96,8 @@
     version: 'main'
     update: true
   when: ai_comfyui_manager_enabled | bool
+  retries: 5
+  delay: 10
 
 - name: ComfyUI | Deploy ComfyUI systemd service
   become: true

@@ -10,6 +10,8 @@
   when:
     - downloads_transmission_enabled | bool
     - __downloads_transmission_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | qBittorrent
   ansible.builtin.package:
@@ -18,6 +20,8 @@
   when:
     - downloads_qbittorrent_enabled | bool
     - __downloads_qbittorrent_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Deluge
   ansible.builtin.package:
@@ -26,6 +30,8 @@
   when:
     - downloads_deluge_enabled | bool
     - __downloads_deluge_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Video Downloaders
@@ -38,6 +44,8 @@
   when:
     - downloads_ytdlp_enabled | bool
     - __downloads_ytdlp_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Download Managers
@@ -50,6 +58,8 @@
   when:
     - downloads_aria2_enabled | bool
     - __downloads_aria2_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | uGet
   ansible.builtin.package:
@@ -58,6 +68,8 @@
   when:
     - downloads_uget_enabled | bool
     - __downloads_uget_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 #
 # AUR Packages
@@ -72,3 +84,5 @@
   when:
     - downloads_jdownloader_enabled | bool
     - ansible_facts['os_family'] == 'Archlinux'
+  retries: 3
+  delay: 5

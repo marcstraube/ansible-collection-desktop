@@ -44,6 +44,8 @@
     name: '{{ __wayland_utils_packages }}'
     state: present
   when: __wayland_utils_packages | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Build AUR package list (Arch)
   ansible.builtin.set_fact:
@@ -63,3 +65,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __wayland_utils_aur_install_list | length > 0
+  retries: 3
+  delay: 5
