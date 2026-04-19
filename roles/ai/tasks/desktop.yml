@@ -14,6 +14,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_claude_desktop_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Desktop | Claude Desktop not available (non-Arch)
   ansible.builtin.debug:
@@ -36,6 +38,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_opencode_desktop_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Desktop | Download OpenCode Desktop (Debian)
   become: true
@@ -46,6 +50,8 @@
     - ansible_facts['os_family'] == 'Debian'
     - ai_opencode_desktop_enabled | bool
     - __ai_opencode_desktop_url is defined
+  retries: 3
+  delay: 5
 
 - name: Desktop | Download OpenCode Desktop (RedHat)
   become: true
@@ -57,3 +63,5 @@
     - ansible_facts['os_family'] == 'RedHat'
     - ai_opencode_desktop_enabled | bool
     - __ai_opencode_desktop_url is defined
+  retries: 3
+  delay: 5

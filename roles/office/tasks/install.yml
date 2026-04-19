@@ -10,6 +10,8 @@
          ternary(__office_libreoffice_fresh_package, __office_libreoffice_still_package) }}
     state: present
   when: office_libreoffice_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | LibreOffice language pack
   ansible.builtin.package:
@@ -18,6 +20,8 @@
   when:
     - office_libreoffice_enabled | bool
     - office_libreoffice_i18n | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | OnlyOffice from AUR (Arch)
   become: true
@@ -28,6 +32,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_onlyoffice_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | WPS Office from AUR (Arch)
   become: true
@@ -38,6 +44,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_wps_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # PDF Tools
@@ -48,12 +56,16 @@
     name: '{{ __office_pdf_viewers[office_pdf_viewer] }}'
     state: present
   when: office_pdf_viewer | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | PDF command line tools
   ansible.builtin.package:
     name: '{{ __office_pdf_tools_packages }}'
     state: present
   when: office_pdf_tools_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Email Clients
@@ -64,6 +76,8 @@
     name: '{{ __office_thunderbird_package }}'
     state: present
   when: office_thunderbird_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Thunderbird language pack
   ansible.builtin.package:
@@ -72,12 +86,16 @@
   when:
     - office_thunderbird_enabled | bool
     - office_thunderbird_i18n | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Evolution
   ansible.builtin.package:
     name: '{{ __office_evolution_package }}'
     state: present
   when: office_evolution_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Calendar / PIM
@@ -90,6 +108,8 @@
   when:
     - office_gnome_calendar_enabled | bool
     - __office_gnome_calendar_package | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | GNOME Contacts
   ansible.builtin.package:
@@ -98,6 +118,8 @@
   when:
     - office_gnome_contacts_enabled | bool
     - __office_gnome_contacts_package | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Note Taking
@@ -112,6 +134,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_obsidian_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Logseq from AUR (Arch)
   become: true
@@ -122,6 +146,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_logseq_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Joplin from AUR (Arch)
   become: true
@@ -132,6 +158,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_joplin_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Simplenote from AUR (Arch)
   become: true
@@ -142,6 +170,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_simplenote_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Document Tools
@@ -156,12 +186,16 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - office_typora_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | TeXstudio
   ansible.builtin.package:
     name: '{{ __office_texstudio_package }}'
     state: present
   when: office_texstudio_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # OCR
@@ -172,6 +206,8 @@
     name: '{{ __office_tesseract_package }}'
     state: present
   when: office_ocr_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Tesseract language data
   ansible.builtin.package:
@@ -179,6 +215,8 @@
     state: present
   loop: '{{ office_ocr_languages }}'
   when: office_ocr_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Scanning
@@ -189,6 +227,8 @@
     name: '{{ __office_simple_scan_package }}'
     state: present
   when: office_simple_scan_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | gscan2pdf
   ansible.builtin.package:
@@ -197,6 +237,8 @@
   when:
     - office_gscan2pdf_enabled | bool
     - __office_gscan2pdf_package | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Ebook
@@ -207,6 +249,8 @@
     name: '{{ __office_calibre_package }}'
     state: present
   when: office_calibre_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Foliate
   ansible.builtin.package:
@@ -215,6 +259,8 @@
   when:
     - office_foliate_enabled | bool
     - __office_foliate_package | length > 0
+  retries: 3
+  delay: 5
 
 #
 # Spell Checking
@@ -225,6 +271,8 @@
     name: '{{ __office_hunspell_packages }}'
     state: present
   when: office_hunspell_enabled | bool
+  retries: 3
+  delay: 5
 
 #
 # Fonts
@@ -235,3 +283,5 @@
     name: '{{ __office_fonts_packages }}'
     state: present
   when: office_fonts_enabled | bool
+  retries: 3
+  delay: 5

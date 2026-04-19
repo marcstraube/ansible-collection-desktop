@@ -5,6 +5,8 @@
     state: present
   when:
     - graphics_apps_gimp_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | GIMP plugins
   ansible.builtin.package:
@@ -13,6 +15,8 @@
   when:
     - graphics_apps_gimp_enabled | bool
     - graphics_apps_gimp_plugins | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Krita
   ansible.builtin.package:
@@ -21,6 +25,8 @@
   when:
     - graphics_apps_krita_enabled | bool
     - __graphics_apps_krita_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Inkscape
   ansible.builtin.package:
@@ -28,6 +34,8 @@
     state: present
   when:
     - graphics_apps_inkscape_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | XnConvert from AUR (Arch)
   become: true
@@ -38,6 +46,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - graphics_apps_xnconvert_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | XnView from AUR (Arch)
   become: true
@@ -48,3 +58,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - graphics_apps_xnview_enabled | bool
+  retries: 3
+  delay: 5

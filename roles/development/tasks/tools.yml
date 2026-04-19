@@ -8,33 +8,45 @@
     name: '{{ __development_misc_packages }}'
     state: present
   when: ansible_facts['os_family'] == 'Archlinux'
+  retries: 3
+  delay: 5
 
 - name: Tools | Install misc tools (Debian)
   ansible.builtin.apt:
     name: '{{ __development_misc_packages }}'
     state: present
   when: ansible_facts['os_family'] == 'Debian'
+  retries: 3
+  delay: 5
 
 - name: Tools | Install misc tools (RedHat)
   ansible.builtin.dnf:
     name: '{{ __development_misc_packages }}'
     state: present
   when: ansible_facts['os_family'] == 'RedHat'
+  retries: 3
+  delay: 5
 
 - name: Tools | Manage httpie (Arch)
   community.general.pacman:
     name: '{{ __development_httpie_package }}'
     state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
   when: ansible_facts['os_family'] == 'Archlinux'
+  retries: 3
+  delay: 5
 
 - name: Tools | Manage httpie (Debian)
   ansible.builtin.apt:
     name: '{{ __development_httpie_package }}'
     state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
   when: ansible_facts['os_family'] == 'Debian'
+  retries: 3
+  delay: 5
 
 - name: Tools | Manage httpie (RedHat)
   ansible.builtin.dnf:
     name: '{{ __development_httpie_package }}'
     state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
   when: ansible_facts['os_family'] == 'RedHat'
+  retries: 3
+  delay: 5

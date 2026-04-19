@@ -34,3 +34,5 @@
     state: present
   when: __pipewire_install_packages | length > 0
   notify: Restart PipeWire
+  retries: 3
+  delay: 5

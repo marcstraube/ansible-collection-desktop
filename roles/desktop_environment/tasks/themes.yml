@@ -40,6 +40,8 @@
     state: present
   when:
     - __desktop_environment_themes_packages | length > 0
+  retries: 3
+  delay: 5
 
 - name: Themes | Install AUR packages (Arch)
   become: true
@@ -50,3 +52,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __desktop_environment_themes_aur_packages | length > 0
+  retries: 3
+  delay: 5

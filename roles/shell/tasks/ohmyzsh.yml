@@ -20,6 +20,8 @@
   become_user: '{{ item }}'
   loop: '{{ __shell_ohmyzsh_users }}'
   when: shell_user_config_mode != 'disabled'
+  retries: 5
+  delay: 10
 
 - name: OhMyZsh | Clone custom plugins  # noqa: latest[git]
   ansible.builtin.git:
@@ -36,6 +38,8 @@
   when:
     - shell_user_config_mode != 'disabled'
     - shell_ohmyzsh_custom_plugins | length > 0
+  retries: 5
+  delay: 10
 
 - name: OhMyZsh | Deploy .zshrc
   ansible.builtin.template:

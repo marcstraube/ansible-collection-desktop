@@ -30,6 +30,8 @@
   ansible.builtin.package:
     name: '{{ __wine_package_variants[wine_variant] | default(__wine_package_variants["stable"]) }}'
     state: present
+  retries: 3
+  delay: 5
 
 - name: Install | Winetricks
   ansible.builtin.package:
@@ -38,6 +40,8 @@
   when:
     - wine_winetricks_enabled | bool
     - __wine_winetricks_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Wine Mono
   ansible.builtin.package:
@@ -46,6 +50,8 @@
   when:
     - wine_mono_enabled | bool
     - __wine_mono_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | Wine Gecko
   ansible.builtin.package:
@@ -54,6 +60,8 @@
   when:
     - wine_gecko_enabled | bool
     - __wine_gecko_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 #
 # 32-bit Support (Arch Linux)
@@ -66,6 +74,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - wine_lib32_packages | default([]) | length > 0
+  retries: 3
+  delay: 5
 
 #
 # GPU Vulkan Driver Detection (Arch Linux)
@@ -110,3 +120,5 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - __wine_gpu_vendor | default('none') != 'none'
     - __wine_gpu_vendor in (__wine_vulkan_drivers | default({}))
+  retries: 3
+  delay: 5

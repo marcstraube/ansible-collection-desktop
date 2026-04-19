@@ -13,3 +13,5 @@
     name: '{{ __plymouth_install_packages }}'
     state: present
   when: __plymouth_install_packages | length > 0
+  retries: 3
+  delay: 5

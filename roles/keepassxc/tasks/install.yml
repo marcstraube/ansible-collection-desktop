@@ -8,6 +8,8 @@
     name: '{{ __keepassxc_package }}'
     state: present
   when: keepassxc_install_package_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Verify KeePassXC binary exists
   ansible.builtin.command:

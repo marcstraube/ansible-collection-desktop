@@ -9,6 +9,8 @@
     state: present
   when:
     - filemanagers_vifm_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Midnight Commander
   ansible.builtin.package:
@@ -16,6 +18,8 @@
     state: present
   when:
     - filemanagers_mc_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | ranger
   ansible.builtin.package:
@@ -23,6 +27,8 @@
     state: present
   when:
     - filemanagers_ranger_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | nnn
   ansible.builtin.package:
@@ -30,6 +36,8 @@
     state: present
   when:
     - filemanagers_nnn_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | lf
   ansible.builtin.package:
@@ -38,6 +46,8 @@
   when:
     - filemanagers_lf_enabled | bool
     - __filemanagers_lf_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 #
 # GUI File Managers
@@ -49,6 +59,8 @@
     state: present
   when:
     - filemanagers_thunar_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Dolphin
   ansible.builtin.package:
@@ -56,6 +68,8 @@
     state: present
   when:
     - filemanagers_dolphin_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Nautilus
   ansible.builtin.package:
@@ -63,6 +77,8 @@
     state: present
   when:
     - filemanagers_nautilus_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | PCManFM
   ansible.builtin.package:
@@ -70,6 +86,8 @@
     state: present
   when:
     - filemanagers_pcmanfm_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Nemo
   ansible.builtin.package:
@@ -77,6 +95,8 @@
     state: present
   when:
     - filemanagers_nemo_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Double Commander
   ansible.builtin.package:
@@ -85,3 +105,5 @@
   when:
     - filemanagers_doublecmd_enabled | bool
     - __filemanagers_doublecmd_package | default('') | length > 0
+  retries: 3
+  delay: 5

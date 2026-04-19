@@ -13,6 +13,8 @@
   tags:
     - imaging
     - imaging:vuescan
+  retries: 3
+  delay: 5
 
 - name: Install | Warn if VueScan installation failed
   ansible.builtin.debug:
@@ -35,6 +37,8 @@
   tags:
     - imaging
     - imaging:sane
+  retries: 3
+  delay: 5
 
 - name: Install | XSane from AUR (Arch)
   become: true
@@ -48,6 +52,8 @@
   tags:
     - imaging
     - imaging:xsane
+  retries: 3
+  delay: 5
 
 - name: Install | XSane scanning frontend
   ansible.builtin.package:
@@ -59,6 +65,8 @@
   tags:
     - imaging
     - imaging:xsane
+  retries: 3
+  delay: 5
 
 - name: Install | Simple Scan
   ansible.builtin.package:
@@ -68,6 +76,8 @@
   tags:
     - imaging
     - imaging:simple-scan
+  retries: 3
+  delay: 5
 
 - name: Install | Skanlite scanning application
   ansible.builtin.package:
@@ -77,6 +87,8 @@
   tags:
     - imaging
     - imaging:skanlite
+  retries: 3
+  delay: 5
 
 - name: Install | ImageMagick
   ansible.builtin.package:
@@ -86,6 +98,8 @@
   tags:
     - imaging
     - imaging:imagemagick
+  retries: 3
+  delay: 5
 
 - name: Install | GraphicsMagick
   ansible.builtin.package:
@@ -95,3 +109,5 @@
   tags:
     - imaging
     - imaging:graphicsmagick
+  retries: 3
+  delay: 5

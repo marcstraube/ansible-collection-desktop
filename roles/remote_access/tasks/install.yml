@@ -10,6 +10,8 @@
   when:
     - remote_access_remmina_enabled | bool
     - __remote_access_remmina_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | TigerVNC packages
   ansible.builtin.package:
@@ -18,6 +20,8 @@
   when:
     - remote_access_tigervnc_enabled | bool
     - __remote_access_tigervnc_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 - name: Install | FreeRDP packages
   ansible.builtin.package:
@@ -26,6 +30,8 @@
   when:
     - remote_access_freerdp_enabled | bool
     - __remote_access_freerdp_package | default('') | length > 0
+  retries: 3
+  delay: 5
 
 #
 # AUR Packages (Arch Only)
@@ -40,6 +46,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - remote_access_rustdesk_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | Asbru from AUR (Arch)
   become: true
@@ -50,6 +58,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - remote_access_asbru_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | RealVNC Viewer from AUR (Arch)
   become: true
@@ -60,6 +70,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - remote_access_realvnc_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | AnyDesk from AUR (Arch)
   become: true
@@ -70,6 +82,8 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - remote_access_anydesk_enabled | bool
+  retries: 3
+  delay: 5
 
 - name: Install | TeamViewer from AUR (Arch)
   become: true
@@ -80,3 +94,5 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - remote_access_teamviewer_enabled | bool
+  retries: 3
+  delay: 5

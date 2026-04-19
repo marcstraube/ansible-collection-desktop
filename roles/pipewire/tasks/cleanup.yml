@@ -8,3 +8,5 @@
     name: '{{ __pipewire_pulseaudio_packages }}'
     state: absent
   notify: Restart PipeWire
+  retries: 3
+  delay: 5
