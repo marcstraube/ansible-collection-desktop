@@ -11,6 +11,7 @@ shell_enabled: true
 #
 
 # Default shell for users: zsh, fish, bash
+# DEPRECATED: Default will change to 'bash' in v2.0.0
 shell_default: 'zsh'
 
 # Users to change shell for (empty = all users from users_list)
@@ -24,6 +25,7 @@ shell_user_config_mode: 'managed'
 #
 
 # Enable Zsh installation
+# DEPRECATED: Default will change to 'false' in v2.0.0
 shell_zsh_enabled: true
 
 # Zsh framework: native (system packages) or ohmyzsh (Oh My Zsh per-user install)
