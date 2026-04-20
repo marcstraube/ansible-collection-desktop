@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.1](https://github.com/marcstraube/ansible-collection-desktop/compare/v1.2.0...v1.2.1) (2026-04-20)
+
+
+### Bug Fixes
+
+* **playbooks:** Correct role gate conditions in desktop_workstation ([#28](https://github.com/marcstraube/ansible-collection-desktop/issues/28)) ([e553514](https://github.com/marcstraube/ansible-collection-desktop/commit/e553514208944b678fcbe9a4deade50c3eaafad7))
+
+
+### Documentation
+
+* **shell:** Add deprecation notice for zsh defaults ([#27](https://github.com/marcstraube/ansible-collection-desktop/issues/27)) ([f8bc54c](https://github.com/marcstraube/ansible-collection-desktop/commit/f8bc54c89855f744c4e47b55e564395e0fcad464))
+
 ## [1.2.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v1.1.0...v1.2.0) (2026-04-19)
 
 
