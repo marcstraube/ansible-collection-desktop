@@ -51,13 +51,13 @@
       ansible.builtin.include_role:
         name: marcstraube.desktop.terminal
       tags: [terminal]
-      when: terminal_ghostty_enabled | default(true) | bool
+      when: terminal_enabled | default(true) | bool
 
     - name: Shell | Include shell role
       ansible.builtin.include_role:
         name: marcstraube.desktop.shell
       tags: [shell]
-      when: shell_zsh_enabled | default(true) | bool
+      when: shell_enabled | default(true) | bool
 
     - name: PipeWire | Include pipewire role
       ansible.builtin.include_role:
@@ -84,7 +84,7 @@
       ansible.builtin.include_role:
         name: marcstraube.desktop.browser
       tags: [browser]
-      when: browser_firefox_enabled | default(true) | bool
+      when: browser_enabled | default(true) | bool
 
     - name: KeePassXC | Include keepassxc role
       ansible.builtin.include_role:
