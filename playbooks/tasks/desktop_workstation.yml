@@ -7,11 +7,15 @@
 #
 # Roles default to enabled or disabled as shown — override via inventory.
 # See each role's defaults/main.yml for available variables.
+#
+# Tag scheme:
+#   desktop       All roles in this file
+#   <role-name>   Individual role (e.g., browser, terminal)
 # =============================================================================
 
-# -----------------------------------------------------------------
-# DESKTOP ENVIRONMENT
-# -----------------------------------------------------------------
+#
+# Desktop Environment
+#
 - name: Desktop | Include desktop_environment role
   ansible.builtin.include_role:
     name: marcstraube.desktop.desktop_environment
@@ -36,9 +40,9 @@
     - display-manager
   when: display_manager_enabled | default(true) | bool
 
-# -----------------------------------------------------------------
-# CORE DESKTOP
-# -----------------------------------------------------------------
+#
+# Core Desktop
+#
 - name: Desktop | Include terminal role
   ansible.builtin.include_role:
     name: marcstraube.desktop.terminal
@@ -99,9 +103,9 @@
     - filemanagers
   when: filemanagers_enabled | default(false) | bool
 
-# -----------------------------------------------------------------
-# PRODUCTIVITY
-# -----------------------------------------------------------------
+#
+# Productivity
+#
 - name: Desktop | Include browser role
   ansible.builtin.include_role:
     name: marcstraube.desktop.browser
@@ -136,11 +140,11 @@
   tags:
     - desktop
     - office
-  when: office_libreoffice_enabled | default(true) | bool
+  when: office_enabled | default(true) | bool
 
-# -----------------------------------------------------------------
-# DEVELOPMENT
-# -----------------------------------------------------------------
+#
+# Development
+#
 - name: Desktop | Include development role
   ansible.builtin.include_role:
     name: marcstraube.desktop.development
@@ -153,9 +157,9 @@
     - development
   when: development_enabled | default(true) | bool
 
-# -----------------------------------------------------------------
-# AI TOOLS
-# -----------------------------------------------------------------
+#
+# AI Tools
+#
 - name: Desktop | Include ai role
   ansible.builtin.include_role:
     name: marcstraube.desktop.ai
@@ -168,9 +172,9 @@
     - ai
   when: ai_enabled | default(false) | bool
 
-# -----------------------------------------------------------------
-# APPLICATIONS
-# -----------------------------------------------------------------
+#
+# Applications
+#
 - name: Desktop | Include multimedia role
   ansible.builtin.include_role:
     name: marcstraube.desktop.multimedia
@@ -303,9 +307,9 @@
     - tabletop
   when: tabletop_enabled | default(false) | bool
 
-# -----------------------------------------------------------------
-# PERIPHERALS
-# -----------------------------------------------------------------
+#
+# Peripherals
+#
 - name: Desktop | Include elgato role
   ansible.builtin.include_role:
     name: marcstraube.desktop.elgato

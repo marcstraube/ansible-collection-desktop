@@ -17,20 +17,6 @@
   become: true
   gather_facts: true
 
-  pre_tasks:
-    - name: Pretasks | Display configuration
-      ansible.builtin.debug:
-        msg:
-          - '============================================================'
-          - 'DESKTOP WORKSTATION CONFIGURATION'
-          - '============================================================'
-          - 'Host:              {{ inventory_hostname }}'
-          - 'Desktop:           {{ desktop_environment_list | default(["hyprland"]) | join(", ") }}'
-          - 'Display manager:   {{ display_manager_name | default("greetd") }}'
-          - '============================================================'
-      tags:
-        - always
-
   tasks:
     - name: Desktop | Import desktop workstation tasks
       ansible.builtin.import_tasks:
