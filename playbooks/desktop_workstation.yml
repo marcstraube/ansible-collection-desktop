@@ -3,12 +3,13 @@
 # Desktop Workstation Playbook
 # =============================================================================
 # Desktop collection roles only. For a full deployment including base system,
-# security, and other cross-collection dependencies, use:
-#   ansible-playbook playbooks/desktop.yml
+# security, and other cross-collection dependencies, use the infra playbooks.
 #
 # Usage:
 #   ansible-playbook marcstraube.desktop.desktop_workstation \
 #     -i inventories/homelab --limit enterprise
+#   ansible-playbook marcstraube.desktop.desktop_workstation \
+#     -i inventories/homelab --tags browser
 # =============================================================================
 
 - name: Deploy Desktop Workstation
@@ -27,175 +28,10 @@
           - 'Desktop:           {{ desktop_environment_list | default(["hyprland"]) | join(", ") }}'
           - 'Display manager:   {{ display_manager_name | default("greetd") }}'
           - '============================================================'
+      tags:
+        - always
 
   tasks:
-    # -----------------------------------------------------------------
-    # DESKTOP ENVIRONMENT
-    # -----------------------------------------------------------------
-    - name: Desktop | Include desktop_environment role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.desktop_environment
-      tags: [desktop]
-      when: desktop_environment_enabled | default(true) | bool
-
-    - name: Display Manager | Include display_manager role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.display_manager
-      tags: [display-manager]
-      when: display_manager_enabled | default(true) | bool
-
-    # -----------------------------------------------------------------
-    # CORE DESKTOP
-    # -----------------------------------------------------------------
-    - name: Terminal | Include terminal role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.terminal
-      tags: [terminal]
-      when: terminal_enabled | default(true) | bool
-
-    - name: Shell | Include shell role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.shell
-      tags: [shell]
-      when: shell_enabled | default(true) | bool
-
-    - name: PipeWire | Include pipewire role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.pipewire
-      tags: [pipewire]
-      when: pipewire_enabled | default(true) | bool
-
-    - name: Bluetooth | Include bluetooth role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.bluetooth
-      tags: [bluetooth]
-      when: bluetooth_enabled | default(true) | bool
-
-    - name: File Managers | Include filemanagers role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.filemanagers
-      tags: [filemanagers]
-      when: filemanagers_enabled | default(false) | bool
-
-    # -----------------------------------------------------------------
-    # PRODUCTIVITY
-    # -----------------------------------------------------------------
-    - name: Browser | Include browser role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.browser
-      tags: [browser]
-      when: browser_enabled | default(true) | bool
-
-    - name: KeePassXC | Include keepassxc role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.keepassxc
-      tags: [keepassxc]
-      when: keepassxc_enabled | default(true) | bool
-
-    - name: Office | Include office role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.office
-      tags: [office]
-      when: office_libreoffice_enabled | default(true) | bool
-
-    # -----------------------------------------------------------------
-    # DEVELOPMENT
-    # -----------------------------------------------------------------
-    - name: Development | Include development role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.development
-      tags: [development]
-      when: development_enabled | default(true) | bool
-
-    # -----------------------------------------------------------------
-    # AI TOOLS
-    # -----------------------------------------------------------------
-    - name: AI | Include ai role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.ai
-      tags: [ai]
-      when: ai_enabled | default(false) | bool
-
-    # -----------------------------------------------------------------
-    # APPLICATIONS
-    # -----------------------------------------------------------------
-    - name: Multimedia | Include multimedia role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.multimedia
-      tags: [multimedia]
-      when: multimedia_enabled | default(false) | bool
-
-    - name: Graphics Apps | Include graphics_apps role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.graphics_apps
-      tags: [graphics-apps]
-      when: graphics_apps_enabled | default(false) | bool
-
-    - name: CAD | Include cad role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.cad
-      tags: [cad]
-      when: cad_enabled | default(false) | bool
-
-    - name: Imaging | Include imaging role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.imaging
-      tags: [imaging]
-      when: imaging_enabled | default(false) | bool
-
-    - name: Downloads | Include downloads role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.downloads
-      tags: [downloads]
-      when: downloads_enabled | default(false) | bool
-
-    - name: Gaming | Include gaming role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.gaming
-      tags: [gaming]
-      when: gaming_enabled | default(false) | bool
-
-    - name: Communication | Include communication role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.communication
-      tags: [communication]
-      when: communication_enabled | default(false) | bool
-
-    - name: Remote Access | Include remote_access role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.remote_access
-      tags: [remote-access]
-      when: remote_access_enabled | default(false) | bool
-
-    - name: Security Apps | Include security_apps role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.security_apps
-      tags: [security-apps]
-      when: security_apps_enabled | default(false) | bool
-
-    - name: System Apps | Include system_apps role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.system_apps
-      tags: [system-apps]
-      when: system_apps_enabled | default(false) | bool
-
-    - name: Tabletop | Include tabletop role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.tabletop
-      tags: [tabletop]
-      when: tabletop_enabled | default(false) | bool
-
-    # -----------------------------------------------------------------
-    # PERIPHERALS
-    # -----------------------------------------------------------------
-    - name: Elgato | Include elgato role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.elgato
-      tags: [elgato]
-      when: elgato_enabled | default(false) | bool
-
-    - name: Tuxedo | Include tuxedo role
-      ansible.builtin.include_role:
-        name: marcstraube.desktop.tuxedo
-      tags: [tuxedo]
-      when: tuxedo_enabled | default(false) | bool
+    - name: Desktop | Import desktop workstation tasks
+      ansible.builtin.import_tasks:
+        file: tasks/desktop_workstation.yml
