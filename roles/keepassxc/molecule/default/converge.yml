@@ -6,7 +6,7 @@
   vars:
     keepassxc_enabled: true
     keepassxc_secret_service_enabled: true
-    keepassxc_secret_service_global: true
+    keepassxc_secret_service_scope: 'global'  # pragma: allowlist secret
     keepassxc_autostart_enabled: false
 
   tasks:

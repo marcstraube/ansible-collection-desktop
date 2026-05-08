@@ -49,7 +49,7 @@ overrides if needed.
 | Variable                             | Default | Description                                         |
 | ------------------------------------ | ------- | --------------------------------------------------- |
 | `keepassxc_secret_service_enabled`   | `false` | Enable Secret Service (freedesktop.org) integration |
-| `keepassxc_secret_service_global`    | `false` | Install Secret Service globally or per-user         |
+| `keepassxc_secret_service_scope`     | `'user'`| Secret Service scope: `'user'` or `'global'`        |
 
 ### SSH Agent Integration
 

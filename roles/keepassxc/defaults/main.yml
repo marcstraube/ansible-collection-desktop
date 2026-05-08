@@ -35,8 +35,8 @@ keepassxc_browser_integration_enabled: true
 # Enable Secret Service (freedesktop.org) integration
 keepassxc_secret_service_enabled: false
 
-# Install Secret Service globally (system-wide) or per-user
-keepassxc_secret_service_global: false
+# Secret Service installation scope: 'user' or 'global'
+keepassxc_secret_service_scope: 'user'  # pragma: allowlist secret
 
 #
 # SSH Agent Integration
