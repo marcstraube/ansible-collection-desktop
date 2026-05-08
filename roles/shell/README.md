@@ -31,7 +31,7 @@ overrides if needed.
 
 | Variable                 | Default     | Description                                               |
 |--------------------------|-------------|-----------------------------------------------------------|
-| `shell_default`          | `'zsh'`     | Default shell for users: zsh, fish, bash                  |
+| `shell_default`          | `'bash'`    | Default shell for users: zsh, fish, bash                  |
 | `shell_users`            | `[]`        | Users to change shell (empty = all from users_list)       |
 | `shell_user_config_mode` | `'managed'` | User config mode: managed, initial (if absent), disabled  |
 
@@ -39,8 +39,8 @@ overrides if needed.
 
 | Variable                 | Default    | Description                                          |
 |--------------------------|------------|------------------------------------------------------|
-| `shell_zsh_enabled`      | `true`     | Enable Zsh installation                              |
-| `shell_zsh_framework`    | `'native'` | Zsh framework: `native` (system packages) or `ohmyzsh` |
+| `shell_zsh_enabled`      | `false`    | Enable Zsh installation                              |
+| `shell_zsh_framework`    | `'native'` | Zsh framework: native or ohmyzsh                     |
 | `shell_zsh_plugins`      | `[...]`    | Zsh plugins (native framework only)                  |
 | `shell_zsh_grml_enabled` | `false`    | Enable grml-zsh-config (native framework only)       |
 
