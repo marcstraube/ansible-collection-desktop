@@ -17,6 +17,11 @@
   become: true
   gather_facts: true
 
+  pre_tasks:
+    - name: Desktop | Import system update tasks
+      ansible.builtin.import_tasks:
+        file: tasks/system_update.yml
+
   tasks:
     - name: Desktop | Import desktop workstation tasks
       ansible.builtin.import_tasks:
