@@ -10,7 +10,7 @@
     tuxedo_yt6801_ethernet_enabled: false
     tuxedo_tccd_enabled: false
     tuxedo_tccd_sleep_enabled: false
-    tuxedo_warn_conflicts: true
+    tuxedo_warn_conflicts_enabled: true
 
   tasks:
     - name: Converge | Include tuxedo role  # noqa: role-name[path]

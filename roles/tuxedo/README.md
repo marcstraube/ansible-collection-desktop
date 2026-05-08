@@ -52,9 +52,9 @@ but are not actively tested. Use distro-specific vars overrides if needed.
 
 ### Warnings
 
-| Variable                | Default | Description                     |
-| ----------------------- | ------- | ------------------------------- |
-| `tuxedo_warn_conflicts` | `true`  | Check for auto-cpufreq conflict |
+| Variable                        | Default | Description                     |
+| ------------------------------- | ------- | ------------------------------- |
+| `tuxedo_warn_conflicts_enabled` | `true`  | Check for auto-cpufreq conflict |
 
 ## Tags
 

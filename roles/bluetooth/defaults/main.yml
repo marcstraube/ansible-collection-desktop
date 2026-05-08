@@ -14,10 +14,10 @@ bluetooth_service_enabled: true
 #
 
 # Install deprecated/legacy tools (hcitool, rfcomm, etc.)
-bluetooth_deprecated_tools: false
+bluetooth_deprecated_tools_enabled: false
 
 # Install OBEX support for file transfers
-bluetooth_obex: true
+bluetooth_obex_enabled: true
 
 #
 # Audio Integration

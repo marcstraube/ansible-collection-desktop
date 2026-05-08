@@ -25,7 +25,7 @@
   changed_when: false
   # pacman -Qi exits 1 when package is not installed
   failed_when: false
-  when: tuxedo_warn_conflicts | bool
+  when: tuxedo_warn_conflicts_enabled | bool
 
 - name: Validate | Warn about auto-cpufreq conflict
   ansible.builtin.debug:
@@ -34,5 +34,5 @@
       Center power profiles. Consider removing auto-cpufreq or disabling its
       service to avoid unexpected behavior.
   when:
-    - tuxedo_warn_conflicts | bool
+    - tuxedo_warn_conflicts_enabled | bool
     - __tuxedo_auto_cpufreq_check.rc | default(1) == 0

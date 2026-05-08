@@ -6,8 +6,8 @@
   vars:
     bluetooth_enabled: true
     bluetooth_service_enabled: false
-    bluetooth_deprecated_tools: false
-    bluetooth_obex: true
+    bluetooth_deprecated_tools_enabled: false
+    bluetooth_obex_enabled: true
     bluetooth_audio: 'pipewire'
     bluetooth_gui: 'none'
     bluetooth_auto_enable: true
