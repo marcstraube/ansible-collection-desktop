@@ -202,6 +202,10 @@
       - 'solokey'
 
   pre_tasks:
+    - name: Security | Import system update tasks
+      ansible.builtin.import_tasks:
+        file: tasks/system_update.yml
+
     - name: Pretasks | Check for full disk encryption
       ansible.builtin.shell: |
         set -o pipefail
