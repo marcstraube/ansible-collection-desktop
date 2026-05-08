@@ -5,12 +5,7 @@
 
   vars:
     filemanagers_enabled: true
-    filemanagers_vifm_enabled: true
-    filemanagers_mc_enabled: true
-    filemanagers_ranger_enabled: true
-    filemanagers_nnn_enabled: true
-    filemanagers_lf_enabled: true
-    filemanagers_thunar_enabled: false
+    filemanagers_thunar_enabled: true
     filemanagers_dolphin_enabled: false
     filemanagers_nautilus_enabled: false
     filemanagers_pcmanfm_enabled: false

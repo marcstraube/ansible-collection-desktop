@@ -7,27 +7,6 @@
 filemanagers_enabled: true
 
 #
-# Terminal File Managers
-# DEPRECATED: Moving to marcstraube.common.utils (removed in v2.0.0)
-# Use utils_filemgr_*_enabled instead
-#
-
-# DEPRECATED: Use utils_filemgr_vifm_enabled instead (removed in v2.0.0)
-filemanagers_vifm_enabled: false
-
-# DEPRECATED: Use utils_filemgr_mc_enabled instead (removed in v2.0.0)
-filemanagers_mc_enabled: false
-
-# DEPRECATED: Use utils_filemgr_ranger_enabled instead (removed in v2.0.0)
-filemanagers_ranger_enabled: false
-
-# DEPRECATED: Use utils_filemgr_nnn_enabled instead (removed in v2.0.0)
-filemanagers_nnn_enabled: false
-
-# DEPRECATED: Use utils_filemgr_lf_enabled instead (removed in v2.0.0)
-filemanagers_lf_enabled: false
-
-#
 # GUI File Managers
 #
 

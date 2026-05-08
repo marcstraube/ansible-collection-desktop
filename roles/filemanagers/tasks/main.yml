@@ -12,32 +12,6 @@
   tags:
     - filemanagers
 
-- name: Main | Warn about deprecated CLI file manager variables
-  ansible.builtin.debug:
-    msg: >-
-      DEPRECATION WARNING: '{{ item.old }}' is deprecated and will be removed in v2.0.0.
-      Terminal file managers have moved to marcstraube.common.utils.
-      Use '{{ item.new }}' instead.
-  when:
-    - filemanagers_enabled | bool
-    - lookup('vars', item.old, default='__undefined__') != '__undefined__'
-    - lookup('vars', item.old) | bool
-  loop:
-    - old: filemanagers_vifm_enabled
-      new: utils_filemgr_vifm_enabled
-    - old: filemanagers_mc_enabled
-      new: utils_filemgr_mc_enabled
-    - old: filemanagers_ranger_enabled
-      new: utils_filemgr_ranger_enabled
-    - old: filemanagers_nnn_enabled
-      new: utils_filemgr_nnn_enabled
-    - old: filemanagers_lf_enabled
-      new: utils_filemgr_lf_enabled
-  loop_control:
-    label: "{{ item.old }}"
-  tags:
-    - filemanagers
-
 - name: Main | Import install tasks
   ansible.builtin.import_tasks: install.yml
   when: filemanagers_enabled | bool

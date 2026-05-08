@@ -1,14 +1,16 @@
 # marcstraube.desktop.filemanagers
 
-Install terminal and GUI file managers.
+Install GUI file managers.
 
 ## Description
 
-Installs optional file managers: graphical (Thunar, Dolphin, Nautilus, PCManFM, Nemo,
-Double Commander) and terminal-based (deprecated -- moving to `marcstraube.common.utils`).
-Each application has its own boolean toggle and is independently installable. Package
-availability varies by platform -- applications not packaged for a given OS are
-silently skipped.
+Installs optional graphical file managers (Thunar, Dolphin, Nautilus, PCManFM, Nemo,
+Double Commander). Each application has its own boolean toggle and is independently
+installable. Package availability varies by platform -- applications not packaged for
+a given OS are silently skipped.
+
+Terminal file managers (mc, vifm, ranger, nnn, lf) are managed by
+`marcstraube.common.utils` -- use `utils_filemgr_*_enabled` there.
 
 ## Requirements
 
@@ -21,8 +23,8 @@ silently skipped.
 | -------------------------- | ----------------------------------------- |
 | Arch Linux                 |                                           |
 | Debian Trixie              |                                           |
-| EL 9 (Rocky, Alma, RHEL)   | lf and Double Commander not available     |
-| EL 10 (Rocky, Alma, RHEL)  | lf and Double Commander not available     |
+| EL 9 (Rocky, Alma, RHEL)   | Double Commander not available            |
+| EL 10 (Rocky, Alma, RHEL)  | Double Commander not available            |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
@@ -35,20 +37,6 @@ overrides if needed.
 | Variable               | Default | Description         |
 | ---------------------- | ------- | ------------------- |
 | `filemanagers_enabled` | `true`  | Enable/disable role |
-
-### Terminal File Managers (DEPRECATED)
-
-> **Deprecation Notice:** Terminal file managers have moved to
-> `marcstraube.common.utils` (category: File Managers). The variables below still
-> work but will be removed in v2.0.0. Use `utils_filemgr_*_enabled` instead.
-
-| Variable                      | Default | Replacement                    |
-| ----------------------------- | ------- | ------------------------------ |
-| `filemanagers_vifm_enabled`   | `false` | `utils_filemgr_vifm_enabled`   |
-| `filemanagers_mc_enabled`     | `false` | `utils_filemgr_mc_enabled`     |
-| `filemanagers_ranger_enabled` | `false` | `utils_filemgr_ranger_enabled` |
-| `filemanagers_nnn_enabled`    | `false` | `utils_filemgr_nnn_enabled`    |
-| `filemanagers_lf_enabled`     | `false` | `utils_filemgr_lf_enabled`     |
 
 ### GUI File Managers
 
@@ -93,8 +81,6 @@ molecule test
 
 ## Notes
 
-- **lf** is not available in EPEL repositories. It is available in official Arch
-  Linux repos (extra) and in Debian Trixie.
 - **Double Commander** is not available in EPEL repositories. The Arch package is
   `doublecmd-qt5` (GTK2 variant was dropped from official repos). Debian uses
   `doublecmd-gtk`.
