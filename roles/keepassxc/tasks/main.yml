@@ -3,6 +3,17 @@
 # KeePassXC Main Tasks
 #
 
+- name: Main | Validate secret service scope
+  ansible.builtin.assert:
+    that:
+      - keepassxc_secret_service_scope in ['user', 'global']
+    fail_msg: >-
+      keepassxc_secret_service_scope must be 'user' or 'global',
+      got '{{ keepassxc_secret_service_scope }}'
+  when: keepassxc_enabled | bool
+  tags:
+    - keepassxc
+
 - name: Main | Derive users from users_list (exclude root and system users)
   ansible.builtin.set_fact:
     keepassxc_users: >-
