@@ -4,9 +4,9 @@
     __bluetooth_install_packages: >-
       {{
         __bluetooth_packages +
-        ((bluetooth_deprecated_tools | bool and __bluetooth_deprecated_package | length > 0)
+        ((bluetooth_deprecated_tools_enabled | bool and __bluetooth_deprecated_package | length > 0)
           | ternary([__bluetooth_deprecated_package], [])) +
-        (bluetooth_obex | bool | ternary([__bluetooth_obex_package], [])) +
+        (bluetooth_obex_enabled | bool | ternary([__bluetooth_obex_package], [])) +
         (__bluetooth_audio_packages[bluetooth_audio] | default([])) +
         (__bluetooth_gui_packages[bluetooth_gui] | default([]))
       }}

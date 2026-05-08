@@ -34,4 +34,4 @@ tuxedo_tccd_sleep_enabled: true
 #
 
 # Warn about auto-cpufreq conflict with tccd power profiles
-tuxedo_warn_conflicts: true
+tuxedo_warn_conflicts_enabled: true

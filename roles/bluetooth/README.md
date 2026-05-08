@@ -42,12 +42,12 @@ overrides if needed.
 
 ### Packages
 
-| Variable                     | Default      | Description                                      |
-| ---------------------------- | ------------ | ------------------------------------------------ |
-| `bluetooth_deprecated_tools` | `false`      | Install deprecated tools (hcitool, rfcomm)       |
-| `bluetooth_obex`             | `true`       | Install OBEX file transfer support               |
-| `bluetooth_audio`            | `'pipewire'` | Audio backend: pipewire, pulseaudio, alsa, none  |
-| `bluetooth_gui`              | `'none'`     | GUI tool: blueman, gnome, kde, none              |
+| Variable                              | Default      | Description                                      |
+| ------------------------------------- | ------------ | ------------------------------------------------ |
+| `bluetooth_deprecated_tools_enabled`  | `false`      | Install deprecated tools (hcitool, rfcomm)       |
+| `bluetooth_obex_enabled`              | `true`       | Install OBEX file transfer support               |
+| `bluetooth_audio`                     | `'pipewire'` | Audio backend: pipewire, pulseaudio, alsa, none  |
+| `bluetooth_gui`                       | `'none'`     | GUI tool: blueman, gnome, kde, none              |
 
 ### General Settings
 
