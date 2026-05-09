@@ -20,9 +20,6 @@ display_manager_name: 'sddm'
 # SDDM Options
 #
 
-# SDDM theme (empty = default breeze)
-display_manager_sddm_theme: ''
-
 # Enable virtual keyboard
 display_manager_sddm_virtual_keyboard: false
 
@@ -39,9 +36,6 @@ display_manager_gdm_wayland: true
 
 # Greeter: gtk, slick
 display_manager_lightdm_greeter: 'gtk'
-
-# Greeter theme (empty = default)
-display_manager_lightdm_theme: ''
 
 #
 # greetd Options
