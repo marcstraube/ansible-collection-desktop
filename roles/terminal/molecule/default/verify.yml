@@ -8,19 +8,19 @@
     # Package Verification
     #
 
-    - name: Verify | Check foot package is installed
+    - name: Verify | Check kitty package is installed
       ansible.builtin.package:
-        name: foot
+        name: kitty
         state: present
       check_mode: true
-      register: __terminal_foot_pkg_check
-      failed_when: __terminal_foot_pkg_check.changed
+      register: __terminal_kitty_pkg_check
+      failed_when: __terminal_kitty_pkg_check.changed
 
     #
     # Terminfo Verification
     #
 
-    - name: Verify | Check foot terminfo exists
+    - name: Verify | Check kitty terminfo exists
       ansible.builtin.command:
         cmd: toe -a
       register: __terminal_terminfo
@@ -28,9 +28,24 @@
       # toe may not be available on all platforms (minimal containers)
       failed_when: false
 
-    - name: Verify | Assert foot terminfo is available
+    - name: Verify | Assert kitty terminfo is available
       ansible.builtin.assert:
         that:
-          - "'foot' in __terminal_terminfo.stdout"
-        fail_msg: 'foot terminfo not found'
+          - "'xterm-kitty' in __terminal_terminfo.stdout"
+        fail_msg: 'kitty terminfo (xterm-kitty) not found'
       when: __terminal_terminfo.rc == 0
+
+    #
+    # Default Terminal Env Verification
+    #
+
+    - name: Verify | Read /etc/environment.d/terminal.conf
+      ansible.builtin.slurp:
+        src: /etc/environment.d/terminal.conf
+      register: __terminal_env_file
+
+    - name: Verify | Assert TERMINAL=kitty is set
+      ansible.builtin.assert:
+        that:
+          - "'TERMINAL=kitty' in (__terminal_env_file.content | b64decode)"
+        fail_msg: 'TERMINAL=kitty not found in /etc/environment.d/terminal.conf'
