@@ -115,7 +115,7 @@ Chromium on Rocky Linux requires EPEL.
 | Variable                   | Default     | Description                            |
 | -------------------------- | ----------- | -------------------------------------- |
 | `browser_users`            | `[]`        | Users for per-user profile settings    |
-| `browser_user_config_mode` | `'managed'` | Default mode: managed/initial/disabled |
+| `browser_user_config_mode` | `'initial'` | Default mode: managed/initial/disabled |
 
 ## Tags
 
