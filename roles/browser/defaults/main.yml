@@ -281,4 +281,6 @@ browser_users: []
 #     mode: 'managed'
 
 # Default mode when user entry has no 'mode' key
-browser_user_config_mode: 'managed'
+# 'initial' preserves user customisations after first deploy.
+# Set to 'managed' for continuous reconciliation.
+browser_user_config_mode: 'initial'
