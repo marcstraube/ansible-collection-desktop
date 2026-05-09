@@ -42,10 +42,9 @@ overrides if needed.
 
 ### SDDM Options
 
-| Variable                                | Default | Description                         |
-|-----------------------------------------|---------|-------------------------------------|
-| `display_manager_sddm_theme`            | `''`    | SDDM theme (empty = default breeze) |
-| `display_manager_sddm_virtual_keyboard` | `false` | Enable virtual keyboard             |
+| Variable                                | Default | Description             |
+|-----------------------------------------|---------|-------------------------|
+| `display_manager_sddm_virtual_keyboard` | `false` | Enable virtual keyboard |
 
 ### GDM Options
 
@@ -55,10 +54,9 @@ overrides if needed.
 
 ### LightDM Options
 
-| Variable                          | Default | Description                     |
-|-----------------------------------|---------|---------------------------------|
-| `display_manager_lightdm_greeter` | `gtk`   | Greeter: gtk, slick             |
-| `display_manager_lightdm_theme`   | `''`    | Greeter theme (empty = default) |
+| Variable                          | Default | Description         |
+|-----------------------------------|---------|---------------------|
+| `display_manager_lightdm_greeter` | `gtk`   | Greeter: gtk, slick |
 
 ### greetd Options
 
