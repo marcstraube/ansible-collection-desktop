@@ -13,3 +13,18 @@ __shell_paths:
   zsh: '/usr/bin/zsh'
   fish: '/usr/bin/fish'
   bash: '/bin/bash'
+
+# Valid Starship presets (source: `starship preset --list`)
+__shell_starship_valid_presets:
+  - 'bracketed-segments'
+  - 'catppuccin-powerline'
+  - 'gruvbox-rainbow'
+  - 'jetpack'
+  - 'nerd-font-symbols'
+  - 'no-empty-icons'
+  - 'no-nerd-font'
+  - 'no-runtime-versions'
+  - 'pastel-powerline'
+  - 'plain-text-symbols'
+  - 'pure-preset'
+  - 'tokyo-night'

@@ -33,7 +33,7 @@ overrides if needed.
 |--------------------------|-------------|-----------------------------------------------------------|
 | `shell_default`          | `'bash'`    | Default shell for users: zsh, fish, bash                  |
 | `shell_users`            | `[]`        | Users to change shell (empty = all from users_list)       |
-| `shell_user_config_mode` | `'managed'` | User config mode: managed, initial (if absent), disabled  |
+| `shell_user_config_mode` | `'initial'` | User config mode: managed, initial (if absent), disabled  |
 
 ### Zsh
 
@@ -86,8 +86,22 @@ and adds Starship init automatically.
 |---------------------------------|-------------------|--------------------------------------------|
 | `shell_starship_enabled`        | `true`            | Enable Starship prompt installation        |
 | `shell_starship_config_enabled` | `false`           | Enable Starship config deployment          |
-| `shell_starship_preset`         | `''`              | Starship preset (see docs for options)     |
+| `shell_starship_preset`         | `''`              | Starship preset (empty = minimal default)  |
 | `shell_starship_shells`         | `['zsh', 'bash']` | Configure Starship for these shells        |
+
+When `shell_starship_config_enabled` is `true`, the role deploys
+`~/.config/starship.toml` per user (from `shell_users` or `users_list`).
+With a preset set, content is rendered via `starship preset <name>`. With
+an empty preset, a minimal placeholder is deployed. Deployment honours
+`shell_user_config_mode`: `'managed'` reconciles every run, `'initial'`
+only deploys if the file is absent, `'disabled'` skips entirely.
+
+Valid preset names (source: `starship preset --list`):
+`bracketed-segments`, `catppuccin-powerline`, `gruvbox-rainbow`,
+`jetpack`, `nerd-font-symbols`, `no-empty-icons`, `no-nerd-font`,
+`no-runtime-versions`, `pastel-powerline`, `plain-text-symbols`,
+`pure-preset`, `tokyo-night`. An invalid preset value fails the
+role at start with a clear assertion message.
 
 ### Additional Tools
 
@@ -103,12 +117,13 @@ and adds Starship init automatically.
 
 ## Tags
 
-| Tag              | Description                    |
-|------------------|--------------------------------|
-| `shell`          | All shell tasks                |
-| `shell:install`  | Package installation           |
-| `shell:ohmyzsh`  | Oh My Zsh setup and config     |
-| `shell:users`    | User shell configuration       |
+| Tag               | Description                    |
+|-------------------|--------------------------------|
+| `shell`           | All shell tasks                |
+| `shell:install`   | Package installation           |
+| `shell:ohmyzsh`   | Oh My Zsh setup and config     |
+| `shell:users`     | User shell configuration       |
+| `shell:starship`  | Starship per-user config       |
 
 ## Example Playbook
 

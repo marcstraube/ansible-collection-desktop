@@ -138,3 +138,22 @@
       register: _shell_ohmyzsh_theme
       changed_when: false
       failed_when: _shell_ohmyzsh_theme.rc != 0
+
+    #
+    # Starship config (Arch only)
+    #
+
+    - name: Verify | Check starship.toml deployed (Arch)
+      ansible.builtin.stat:
+        path: '/home/testuser/.config/starship.toml'
+      register: _shell_starship_toml
+      failed_when: not _shell_starship_toml.stat.exists
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Check starship.toml contains plain-text-symbols content (Arch)
+      ansible.builtin.command:
+        cmd: 'grep -q "success_symbol" /home/testuser/.config/starship.toml'
+      register: _shell_starship_content
+      changed_when: false
+      failed_when: _shell_starship_content.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'

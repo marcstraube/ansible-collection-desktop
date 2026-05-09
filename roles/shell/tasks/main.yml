@@ -17,6 +17,21 @@
     - shell
     - shell:vars
 
+- name: Main | Validate Starship preset
+  ansible.builtin.assert:
+    that:
+      - shell_starship_preset | length == 0
+        or shell_starship_preset in __shell_starship_valid_presets
+    fail_msg: >-
+      shell_starship_preset must be empty or one of
+      {{ __shell_starship_valid_presets }}, got: '{{ shell_starship_preset }}'
+  when:
+    - shell_enabled | bool
+    - shell_starship_enabled | bool
+    - shell_starship_config_enabled | bool
+  tags:
+    - shell
+
 - name: Main | Import install tasks
   ansible.builtin.import_tasks: install.yml
   when: shell_enabled | bool
@@ -42,3 +57,13 @@
   tags:
     - shell
     - shell:users
+
+- name: Main | Import Starship config tasks
+  ansible.builtin.import_tasks: starship.yml
+  when:
+    - shell_enabled | bool
+    - shell_starship_enabled | bool
+    - shell_starship_config_enabled | bool
+  tags:
+    - shell
+    - shell:starship

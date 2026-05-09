@@ -49,3 +49,27 @@
     - name: Converge | Include shell role (ohmyzsh)  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+
+- name: Converge — Starship config (Arch only — starship not in Debian/EL repos)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    shell_enabled: true
+    shell_default: 'bash'
+    shell_zsh_enabled: false
+    shell_fish_enabled: false
+    shell_bash_completion_enabled: false
+    shell_starship_enabled: true
+    shell_starship_config_enabled: true
+    shell_starship_preset: 'plain-text-symbols'
+    shell_user_config_mode: 'managed'
+    shell_users:
+      - 'testuser'
+    shell_fzf_enabled: false
+
+  tasks:
+    - name: Converge | Include shell role (starship)  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] == 'Archlinux'
