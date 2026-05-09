@@ -8,6 +8,9 @@
     keepassxc_secret_service_enabled: true
     keepassxc_secret_service_scope: 'global'  # pragma: allowlist secret
     keepassxc_autostart_enabled: false
+    keepassxc_users:
+      - name: 'testuser'
+        mode: 'managed'
 
   tasks:
     - name: Converge | Include keepassxc role  # noqa: role-name[path]

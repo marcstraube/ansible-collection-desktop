@@ -68,7 +68,7 @@ overrides if needed.
 | Variable                          | Default             | Description                                                |
 | --------------------------------- | ------------------- | ---------------------------------------------------------- |
 | `keepassxc_deploy_config_enabled` | `false`             | Deploy default configuration file                          |
-| `keepassxc_user_config_mode`      | `managed`           | Default config mode: `managed`, `initial`, or `disabled`   |
+| `keepassxc_user_config_mode`      | `initial`           | Default config mode: `managed`, `initial`, or `disabled`   |
 | `keepassxc_config_dir`            | `.config/keepassxc` | Configuration directory (relative to home)                 |
 | `keepassxc_config`                | *(see defaults)*    | Configuration settings dict                                |
 
@@ -77,6 +77,18 @@ overrides if needed.
 | Variable          | Default | Description                           |
 | ----------------- | ------- | ------------------------------------- |
 | `keepassxc_users` | `[]`    | Users list for per-user configuration |
+
+User config mode semantics:
+
+| Mode      | First run | Subsequent runs                          |
+|-----------|-----------|------------------------------------------|
+| `managed` | deploy    | overwrite (always reconcile to template) |
+| `initial` | deploy    | leave existing user customisations alone |
+| `disabled`| skip      | skip                                     |
+
+`'initial'` is the default: deploys when `~/.config/keepassxc/keepassxc.ini`
+is absent for the user, otherwise leaves the file untouched. Per-user
+override via `item.mode` takes precedence over the role-level default.
 
 Each user entry supports:
 
