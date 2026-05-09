@@ -44,10 +44,9 @@ overrides if needed.
 
 ### Desktop Environments
 
-| Variable                      | Default        | Description                         |
-|-------------------------------|----------------|-------------------------------------|
-| `desktop_environment_list`    | `['hyprland']` | Desktop environments to install     |
-| `desktop_environment_default` | first in list  | Default session for display manager |
+| Variable                   | Default        | Description                     |
+|----------------------------|----------------|---------------------------------|
+| `desktop_environment_list` | `['hyprland']` | Desktop environments to install |
 
 ### Wayland Utilities
 
@@ -123,10 +122,10 @@ overrides if needed.
 
 ### LXQt Options
 
-| Variable                                | Default          | Description             |
-|-----------------------------------------|------------------|-------------------------|
-| `desktop_environment_lxqt_full_enabled` | `true`           | Install full lxqt group |
-| `desktop_environment_lxqt_icons`        | `'breeze-icons'` | Icon theme              |
+| Variable                           | Default          | Description              |
+|------------------------------------|------------------|--------------------------|
+| `desktop_environment_lxqt_variant` | `'full'`         | Variant: minimal or full |
+| `desktop_environment_lxqt_icons`   | `'breeze-icons'` | Icon theme               |
 
 ### Common Options
 
@@ -142,7 +141,6 @@ overrides if needed.
 | Variable                            | Default | Description              |
 |-------------------------------------|---------|--------------------------|
 | `desktop_environment_cursor_themes` | `[]`    | Cursor themes to install |
-| `desktop_environment_cursor_size`   | `24`    | Cursor size              |
 | `desktop_environment_icon_themes`   | `[]`    | Icon themes to install   |
 
 ## Tags

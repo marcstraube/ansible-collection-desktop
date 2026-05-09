@@ -3,11 +3,20 @@
 # LXQt Installation
 #
 
+- name: LXQt | Pick variant package set
+  ansible.builtin.set_fact:
+    __desktop_environment_lxqt_variant_packages: >-
+      {{
+        __desktop_environment_lxqt_minimal_packages
+        if desktop_environment_lxqt_variant == 'minimal'
+        else __desktop_environment_lxqt_full_packages
+      }}
+
 - name: LXQt | Build package list
   ansible.builtin.set_fact:
     __desktop_environment_lxqt_install_packages: >-
       {{
-        __desktop_environment_lxqt_packages +
+        __desktop_environment_lxqt_variant_packages +
         [__desktop_environment_lxqt_icon_packages[desktop_environment_lxqt_icons] | default('')]
       }}
 

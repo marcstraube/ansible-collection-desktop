@@ -16,6 +16,19 @@
   tags:
     - desktop-environment
 
+- name: Main | Validate LXQt variant
+  ansible.builtin.assert:
+    that:
+      - desktop_environment_lxqt_variant in ['minimal', 'full']
+    fail_msg: >-
+      desktop_environment_lxqt_variant must be 'minimal' or 'full',
+      got: '{{ desktop_environment_lxqt_variant }}'
+  when:
+    - desktop_environment_enabled | bool
+    - "'lxqt' in desktop_environment_list"
+  tags:
+    - desktop-environment
+
 - name: Main | Derive desktop users from users_list (exclude root and system users)
   ansible.builtin.set_fact:
     desktop_environment_users: >-

@@ -127,7 +127,13 @@ __desktop_environment_lxde_full_packages:
 # LXQt
 #
 
-__desktop_environment_lxqt_packages:
+__desktop_environment_lxqt_minimal_packages:
+  - 'lxqt-session'
+  - 'lxqt-panel'
+  - 'lxqt-config'
+  - 'lxqt-policykit'
+
+__desktop_environment_lxqt_full_packages:
   - 'lxqt'
 
 __desktop_environment_lxqt_icon_packages:
