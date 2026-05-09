@@ -61,9 +61,11 @@ keepassxc_deploy_config_enabled: false
 
 # Default mode when user entry has no 'mode' key
 # managed = always deploy/overwrite config
-# initial = deploy only when user is newly created
+# initial = deploy only if keepassxc.ini does not yet exist for the user
 # disabled = skip config deployment for this user
-keepassxc_user_config_mode: 'managed'
+# 'initial' preserves user customisations after first deploy.
+# Set to 'managed' for continuous reconciliation.
+keepassxc_user_config_mode: 'initial'
 
 #
 # Users

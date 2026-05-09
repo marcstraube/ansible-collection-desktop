@@ -3,6 +3,33 @@
 # KeePassXC Configure Tasks
 #
 
+- name: Configure | Stat existing per-user keepassxc.ini
+  ansible.builtin.stat:
+    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+  loop: '{{ keepassxc_users }}'
+  loop_control:
+    label: '{{ item.name }}'
+  register: __keepassxc_config_stats
+  when:
+    - keepassxc_users | length > 0
+    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+
+- name: Configure | Build per-user deploy decision
+  ansible.builtin.set_fact:
+    __keepassxc_should_deploy: >-
+      {{
+        dict(__keepassxc_config_stats.results
+             | rejectattr('skipped', 'defined')
+             | map(attribute='item.name')
+             | zip(__keepassxc_config_stats.results
+                   | rejectattr('skipped', 'defined')
+                   | map(attribute='stat.exists')
+                   | map('ternary', false, true)))
+      }}
+  when:
+    - keepassxc_users | length > 0
+    - __keepassxc_config_stats is defined
+
 - name: Configure | Create config directories
   ansible.builtin.file:
     path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}'
@@ -16,6 +43,8 @@
   when:
     - keepassxc_users | length > 0
     - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.name] | default(true)
 
 # General
 - name: Configure | General settings
@@ -34,6 +63,8 @@
   when:
     - keepassxc_users | length > 0
     - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.name] | default(true)
 
 # Browser
 - name: Configure | Browser integration
@@ -52,6 +83,8 @@
   when:
     - keepassxc_users | length > 0
     - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.name] | default(true)
 
 # FdoSecrets
 - name: Configure | Secret Service (FdoSecrets)
@@ -70,6 +103,8 @@
   when:
     - keepassxc_users | length > 0
     - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.name] | default(true)
 
 # GUI
 - name: Configure | GUI settings
@@ -95,6 +130,8 @@
   when:
     - keepassxc_users | length > 0
     - (item.0.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.0.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.0.name] | default(true)
 
 # SSHAgent
 - name: Configure | SSH Agent
@@ -113,6 +150,8 @@
   when:
     - keepassxc_users | length > 0
     - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.name] | default(true)
 
 # Security
 - name: Configure | Security settings
@@ -151,3 +190,5 @@
   when:
     - keepassxc_users | length > 0
     - (item.0.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.0.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.0.name] | default(true)

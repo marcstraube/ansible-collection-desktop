@@ -65,3 +65,33 @@
             '/usr/bin/keepassxc'
             in (_keepassxc_secret_content.content | b64decode)
         fail_msg: 'Secret Service configuration incorrect'
+
+    #
+    # Per-user Config Verification (testuser, mode: managed)
+    #
+
+    - name: Verify | Check testuser keepassxc.ini exists
+      ansible.builtin.stat:
+        path: '/home/testuser/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_user_ini
+
+    - name: Verify | Assert testuser keepassxc.ini deployed
+      ansible.builtin.assert:
+        that:
+          - _keepassxc_user_ini.stat.exists
+          - _keepassxc_user_ini.stat.pw_name == 'testuser'
+          - _keepassxc_user_ini.stat.mode == '0600'
+        fail_msg: 'testuser keepassxc.ini missing or wrong ownership/permissions'
+
+    - name: Verify | Read testuser keepassxc.ini
+      ansible.builtin.slurp:
+        src: '/home/testuser/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_user_ini_content
+
+    - name: Verify | Assert managed-mode template values present
+      ansible.builtin.assert:
+        that:
+          - "'[FdoSecrets]' in (_keepassxc_user_ini_content.content | b64decode)"
+          - "'[Security]' in (_keepassxc_user_ini_content.content | b64decode)"
+          - "'ConfigVersion=2' in (_keepassxc_user_ini_content.content | b64decode)"
+        fail_msg: 'testuser keepassxc.ini missing expected sections/values'
