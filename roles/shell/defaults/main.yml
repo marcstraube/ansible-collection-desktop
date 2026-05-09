@@ -17,7 +17,9 @@ shell_default: 'bash'
 shell_users: []
 
 # User configuration mode: managed (always deploy), initial (only if absent), disabled
-shell_user_config_mode: 'managed'
+# 'initial' preserves user customisations after first deploy.
+# Set to 'managed' for continuous reconciliation.
+shell_user_config_mode: 'initial'
 
 #
 # Zsh
@@ -85,7 +87,12 @@ shell_starship_enabled: true
 # Enable Starship config deployment
 shell_starship_config_enabled: false
 
-# Starship preset: plain-text, nerd-font, no-nerd-font, pastel-powerline, tokyo-night, gruvbox-rainbow
+# Starship preset (empty = minimal default config)
+# Options: bracketed-segments, catppuccin-powerline, gruvbox-rainbow,
+#          jetpack, nerd-font-symbols, no-empty-icons, no-nerd-font,
+#          no-runtime-versions, pastel-powerline, plain-text-symbols,
+#          pure-preset, tokyo-night
+# Source: `starship preset --list`
 shell_starship_preset: ''
 
 # Configure Starship for shells (adds init to shell config)
