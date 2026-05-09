@@ -22,6 +22,39 @@
 # User Prefix Initialization
 #
 
+- name: Configure | Stat existing wine prefix per user
+  ansible.builtin.stat:
+    path: "{{ item.prefix | default('/home/' + item.username + '/.wine') }}/system.reg"
+  loop: '{{ wine_users }}'
+  loop_control:
+    label: '{{ item.username }}'
+  register: __wine_prefix_stats
+  when:
+    - wine_users | length > 0
+    - (item.mode | default(wine_user_config_mode)) != 'disabled'
+  tags:
+    - wine
+    - wine:configure
+
+- name: Configure | Build per-user deploy decision
+  ansible.builtin.set_fact:
+    __wine_should_deploy: >-
+      {{
+        dict(__wine_prefix_stats.results
+             | rejectattr('skipped', 'defined')
+             | map(attribute='item.username')
+             | zip(__wine_prefix_stats.results
+                   | rejectattr('skipped', 'defined')
+                   | map(attribute='stat.exists')
+                   | map('ternary', false, true)))
+      }}
+  when:
+    - wine_users | length > 0
+    - __wine_prefix_stats is defined
+  tags:
+    - wine
+    - wine:configure
+
 - name: Configure | Include user configuration tasks
   ansible.builtin.include_tasks:
     file: users.yml
@@ -36,6 +69,8 @@
   when:
     - wine_users | length > 0
     - (__wine_user.mode | default(wine_user_config_mode)) != 'disabled'
+    - (__wine_user.mode | default(wine_user_config_mode)) == 'managed'
+      or __wine_should_deploy[__wine_user.username] | default(true)
   tags:
     - wine
     - wine:configure

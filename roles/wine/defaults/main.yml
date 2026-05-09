@@ -79,7 +79,9 @@ wine_env: {}
 # managed = always ensure prefix exists and is initialized
 # initial = create prefix only if it does not exist
 # disabled = skip prefix creation
-wine_user_config_mode: 'managed'
+# 'initial' preserves user customisations after first deploy.
+# Set to 'managed' for continuous reconciliation.
+wine_user_config_mode: 'initial'
 
 # Users for Wine prefix initialization
 wine_users: []
