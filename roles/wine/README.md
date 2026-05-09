@@ -73,8 +73,20 @@ Debian handles 32-bit automatically via multiarch. EL 9 uses WoW64 mode.
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `wine_user_config_mode` | `'managed'` | Default mode (`managed`/`initial`/`disabled`) |
+| `wine_user_config_mode` | `'initial'` | Default mode (`managed`/`initial`/`disabled`) |
 | `wine_users` | `[]` | Users for Wine prefix initialization |
+
+User config mode semantics:
+
+| Mode       | First run | Subsequent runs                          |
+|------------|-----------|------------------------------------------|
+| `managed`  | deploy    | overwrite (always reconcile to template) |
+| `initial`  | deploy    | leave existing user customisations alone |
+| `disabled` | skip      | skip                                     |
+
+`'initial'` is the default: runs `wineboot --init` only when the user's
+`{prefix}/system.reg` is absent. Per-user override via `item.mode`
+takes precedence over the role-level default.
 
 User entry format:
 
