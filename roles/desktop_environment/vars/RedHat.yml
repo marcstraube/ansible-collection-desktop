@@ -118,7 +118,13 @@ __desktop_environment_lxde_full_packages:
 # LXQt
 #
 
-__desktop_environment_lxqt_packages:
+# LXQt is not packaged for EL 9/10 even with EPEL — the group reference
+# below is a placeholder; both variants will fail to install. Track in
+# a follow-up issue if LXQt-on-EL support is needed.
+__desktop_environment_lxqt_minimal_packages:
+  - '@lxqt-desktop-environment'
+
+__desktop_environment_lxqt_full_packages:
   - '@lxqt-desktop-environment'
 
 __desktop_environment_lxqt_icon_packages:

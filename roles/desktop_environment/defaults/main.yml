@@ -24,9 +24,6 @@ desktop_environment_users: []
 desktop_environment_list:
   - 'hyprland'
 
-# Default session for display manager
-desktop_environment_default: '{{ desktop_environment_list | first }}'
-
 #
 # Wayland Utilities
 #
@@ -168,8 +165,8 @@ desktop_environment_lxde_full_enabled: true
 # LXQt Options
 #
 
-# Install full lxqt group instead of minimal
-desktop_environment_lxqt_full_enabled: true
+# LXQt variant: 'minimal' (core lxqt panel/session) or 'full' (lxqt + extras)
+desktop_environment_lxqt_variant: 'full'
 
 # Icon theme (breeze-icons, oxygen-icons)
 desktop_environment_lxqt_icons: 'breeze-icons'
@@ -199,9 +196,6 @@ desktop_environment_text_editor: 'none'
 # Cursor themes to install (list of theme keys, empty = none)
 # Options: adwaita, breeze, capitaine, bibata
 desktop_environment_cursor_themes: []
-
-# Cursor size (used by some DEs/WMs when themes are installed)
-desktop_environment_cursor_size: 24
 
 # Icon themes to install (list of theme keys, empty = none)
 # Options: adwaita, breeze, papirus, hicolor
