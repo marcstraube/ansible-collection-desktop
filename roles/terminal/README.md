@@ -37,56 +37,33 @@ overrides if needed.
 
 ### Terminal Emulators
 
-| Variable             | Default                               | Description                              |
-|----------------------|---------------------------------------|------------------------------------------|
-| `terminal_emulators` | `['ghostty']`                         | List of terminal emulators to install    |
-| `terminal_default`   | `'{{ terminal_emulators \| first }}'` | Default terminal (for $TERMINAL env var) |
+| Variable             | Default                               | Description                                              |
+|----------------------|---------------------------------------|----------------------------------------------------------|
+| `terminal_emulators` | `['ghostty']`                         | List of terminal emulators to install                    |
+| `terminal_default`   | `'{{ terminal_emulators \| first }}'` | Default `$TERMINAL` (empty disables env file deployment) |
 
-### Ghostty Options
+When `terminal_default` is non-empty, the role writes
+`/etc/environment.d/terminal.conf` containing `TERMINAL=<value>`,
+exposing it as a system-wide environment variable for desktop sessions.
+Set `terminal_default: ''` to skip the env file (and remove it on
+existing systems).
 
-| Variable                          | Default | Description                  |
-|-----------------------------------|---------|------------------------------|
-| `terminal_ghostty_config_enabled` | `false` | Deploy custom Ghostty config |
-| `terminal_ghostty_font_family`    | `''`    | Ghostty font family          |
-| `terminal_ghostty_font_size`      | `12`    | Ghostty font size            |
-| `terminal_ghostty_theme`          | `''`    | Ghostty theme                |
-
-### Alacritty Options
-
-| Variable                            | Default       | Description                    |
-|-------------------------------------|---------------|--------------------------------|
-| `terminal_alacritty_config_enabled` | `false`       | Deploy custom Alacritty config |
-| `terminal_alacritty_font_family`    | `'monospace'` | Alacritty font family          |
-| `terminal_alacritty_font_size`      | `12.0`        | Alacritty font size            |
+Per-terminal configuration (fonts, themes, custom configs) is left to
+the user's dotfiles. Manage these via `~/.config/<terminal>/` directly.
 
 ### Kitty Options
 
-| Variable                        | Default       | Description                       |
-|---------------------------------|---------------|-----------------------------------|
-| `terminal_kitty_config_enabled` | `false`       | Deploy custom Kitty config        |
-| `terminal_kitty_font_family`    | `'monospace'` | Kitty font family                 |
-| `terminal_kitty_font_size`      | `12`          | Kitty font size                   |
-| `terminal_kitty_images_enabled` | `true`        | Enable Kitty image support (icat) |
-
-### Foot Options
-
-| Variable                       | Default               | Description               |
-|--------------------------------|-----------------------|---------------------------|
-| `terminal_foot_config_enabled` | `false`               | Deploy custom Foot config |
-| `terminal_foot_font`           | `'monospace:size=12'` | Foot font                 |
-
-### Wezterm Options
-
-| Variable                          | Default | Description                  |
-|-----------------------------------|---------|------------------------------|
-| `terminal_wezterm_config_enabled` | `false` | Deploy custom Wezterm config |
+| Variable                        | Default | Description                       |
+|---------------------------------|---------|-----------------------------------|
+| `terminal_kitty_images_enabled` | `true`  | Enable Kitty image support (icat) |
 
 ## Tags
 
-| Tag                | Scope                |
-|--------------------|----------------------|
-| `terminal`         | All role tasks       |
-| `terminal:install` | Package installation |
+| Tag                  | Scope                                    |
+|----------------------|------------------------------------------|
+| `terminal`           | All role tasks                           |
+| `terminal:install`   | Package installation                     |
+| `terminal:configure` | Default `$TERMINAL` env file in /etc/env |
 
 ## Example Playbook
 

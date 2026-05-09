@@ -6,8 +6,8 @@
   vars:
     terminal_enabled: true
     terminal_emulators:
-      - 'foot'
-    terminal_default: 'foot'
+      - 'kitty'
+    terminal_default: 'kitty'
 
   tasks:
     - name: Converge | Include terminal role  # noqa: role-name[path]

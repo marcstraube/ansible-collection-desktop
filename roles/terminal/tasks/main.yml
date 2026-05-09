@@ -18,3 +18,10 @@
   tags:
     - terminal
     - terminal:install
+
+- name: Main | Import configure tasks
+  ansible.builtin.import_tasks: configure.yml
+  when: terminal_enabled | bool
+  tags:
+    - terminal
+    - terminal:configure

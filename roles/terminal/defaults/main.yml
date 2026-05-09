@@ -15,67 +15,13 @@ terminal_enabled: true
 terminal_emulators:
   - 'ghostty'
 
-# Default terminal (for $TERMINAL env var)
+# Default terminal exposed via $TERMINAL in /etc/environment.d/terminal.conf.
+# Set to '' to skip deploying the env file.
 terminal_default: '{{ terminal_emulators | first }}'
-
-#
-# Ghostty Options
-#
-
-# Deploy custom Ghostty config
-terminal_ghostty_config_enabled: false
-
-# Ghostty font family
-terminal_ghostty_font_family: ''
-
-# Ghostty font size
-terminal_ghostty_font_size: 12
-
-# Ghostty theme
-terminal_ghostty_theme: ''
-
-#
-# Alacritty Options
-#
-
-# Deploy custom Alacritty config
-terminal_alacritty_config_enabled: false
-
-# Alacritty font family
-terminal_alacritty_font_family: 'monospace'
-
-# Alacritty font size
-terminal_alacritty_font_size: 12.0
 
 #
 # Kitty Options
 #
 
-# Deploy custom Kitty config
-terminal_kitty_config_enabled: false
-
-# Kitty font family
-terminal_kitty_font_family: 'monospace'
-
-# Kitty font size
-terminal_kitty_font_size: 12
-
-# Enable Kitty image support (icat)
+# Enable Kitty image support (icat) — installs kitty-icat helper packages
 terminal_kitty_images_enabled: true
-
-#
-# Foot Options
-#
-
-# Deploy custom Foot config
-terminal_foot_config_enabled: false
-
-# Foot font
-terminal_foot_font: 'monospace:size=12'
-
-#
-# Wezterm Options
-#
-
-# Deploy custom Wezterm config
-terminal_wezterm_config_enabled: false

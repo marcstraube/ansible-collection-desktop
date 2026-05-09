@@ -1,0 +1,28 @@
+---
+#
+# Default Terminal — $TERMINAL via /etc/environment.d
+#
+
+- name: Configure | Ensure /etc/environment.d exists
+  ansible.builtin.file:
+    path: /etc/environment.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: terminal_default | default('') | length > 0
+
+- name: Configure | Deploy default terminal env file
+  ansible.builtin.template:
+    src: terminal.conf.j2
+    dest: /etc/environment.d/terminal.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when: terminal_default | default('') | length > 0
+
+- name: Configure | Remove default terminal env file when unset
+  ansible.builtin.file:
+    path: /etc/environment.d/terminal.conf
+    state: absent
+  when: terminal_default | default('') | length == 0
