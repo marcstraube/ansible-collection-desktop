@@ -63,9 +63,9 @@ overrides if needed.
 | Variable                    | Default | Description                      |
 |-----------------------------|---------|----------------------------------|
 | `development_make_enabled`  | `true`  | Enable make and core build tools |
-| `development_cmake_enabled` | `false` | Enable cmake                     |
-| `development_meson_enabled` | `false` | Enable meson                     |
-| `development_ninja_enabled` | `false` | Enable ninja                     |
+| `development_cmake_enabled` | `true`  | Enable cmake                     |
+| `development_meson_enabled` | `true`  | Enable meson                     |
+| `development_ninja_enabled` | `true`  | Enable ninja                     |
 
 ### IDEs and Editors
 
