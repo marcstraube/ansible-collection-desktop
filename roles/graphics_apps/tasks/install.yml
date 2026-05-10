@@ -5,6 +5,7 @@
     state: present
   when:
     - graphics_apps_gimp_enabled | bool
+    - __graphics_apps_gimp_package | default('') | length > 0
   retries: 3
   delay: 5
 
@@ -34,6 +35,7 @@
     state: present
   when:
     - graphics_apps_inkscape_enabled | bool
+    - __graphics_apps_inkscape_package | default('') | length > 0
   retries: 3
   delay: 5
 
