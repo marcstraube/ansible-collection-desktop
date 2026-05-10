@@ -6,10 +6,10 @@
 # Version control
 __development_git_packages:
   - 'git'
-  - 'git-lfs'
 
+__development_git_lfs_package: 'git-lfs'
 __development_github_cli_package: 'gh'
-__development_gitlab_cli_package: 'glab'
+__development_gitlab_cli_package: ''  # not in EPEL 9/10
 
 # Python
 __development_python_packages:
@@ -31,11 +31,12 @@ __development_java_package: 'java-21-openjdk-devel'
 
 # Build tools
 __development_build_packages:
-  - '@development-tools'
+  - '@Development Tools'
   - 'make'
-  - 'cmake'
-  - 'meson'
-  - 'ninja-build'
+
+__development_cmake_package: 'cmake'
+__development_meson_package: 'meson'
+__development_ninja_package: 'ninja-build'
 
 # IDEs
 __development_vscodium_package: ''
@@ -54,8 +55,8 @@ __development_postman_package: ''
 __development_bruno_package: ''
 
 # Misc tools
-__development_misc_packages:
-  - 'jq'
-  - 'direnv'
-  - 'pre-commit'
-  - 'ShellCheck'
+__development_jq_package: 'jq'
+__development_yq_package: ''
+__development_direnv_package: 'direnv'
+__development_pre_commit_package: 'pre-commit'
+__development_shellcheck_package: 'ShellCheck'

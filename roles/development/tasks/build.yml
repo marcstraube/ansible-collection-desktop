@@ -3,26 +3,33 @@
 # Build Tools Installation
 #
 
-- name: Build | Manage build tools (Arch)
-  community.general.pacman:
+- name: Build | Manage build tools
+  ansible.builtin.package:
     name: '{{ __development_build_packages }}'
     state: "{{ 'present' if development_make_enabled | bool else 'absent' }}"
-  when: ansible_facts['os_family'] == 'Archlinux'
   retries: 3
   delay: 5
 
-- name: Build | Manage build tools (Debian)
-  ansible.builtin.apt:
-    name: '{{ __development_build_packages }}'
-    state: "{{ 'present' if development_make_enabled | bool else 'absent' }}"
-  when: ansible_facts['os_family'] == 'Debian'
+- name: Build | Manage cmake
+  ansible.builtin.package:
+    name: '{{ __development_cmake_package }}'
+    state: "{{ 'present' if development_cmake_enabled | bool else 'absent' }}"
+  when: __development_cmake_package | default('') | length > 0
   retries: 3
   delay: 5
 
-- name: Build | Manage build tools (RedHat)
-  ansible.builtin.dnf:
-    name: '{{ __development_build_packages }}'
-    state: "{{ 'present' if development_make_enabled | bool else 'absent' }}"
-  when: ansible_facts['os_family'] == 'RedHat'
+- name: Build | Manage meson
+  ansible.builtin.package:
+    name: '{{ __development_meson_package }}'
+    state: "{{ 'present' if development_meson_enabled | bool else 'absent' }}"
+  when: __development_meson_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Build | Manage ninja
+  ansible.builtin.package:
+    name: '{{ __development_ninja_package }}'
+    state: "{{ 'present' if development_ninja_enabled | bool else 'absent' }}"
+  when: __development_ninja_package | default('') | length > 0
   retries: 3
   delay: 5

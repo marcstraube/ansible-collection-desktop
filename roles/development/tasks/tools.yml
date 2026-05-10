@@ -3,50 +3,66 @@
 # Misc Development Tools Installation
 #
 
-- name: Tools | Install misc tools (Arch)
-  community.general.pacman:
-    name: '{{ __development_misc_packages }}'
-    state: present
-  when: ansible_facts['os_family'] == 'Archlinux'
+- name: Tools | Manage jq
+  ansible.builtin.package:
+    name: '{{ __development_jq_package }}'
+    state: "{{ 'present' if development_jq_enabled | bool else 'absent' }}"
+  when: __development_jq_package | default('') | length > 0
   retries: 3
   delay: 5
 
-- name: Tools | Install misc tools (Debian)
-  ansible.builtin.apt:
-    name: '{{ __development_misc_packages }}'
-    state: present
-  when: ansible_facts['os_family'] == 'Debian'
+- name: Tools | Manage yq
+  ansible.builtin.package:
+    name: '{{ __development_yq_package }}'
+    state: "{{ 'present' if development_yq_enabled | bool else 'absent' }}"
+  when: __development_yq_package | default('') | length > 0
   retries: 3
   delay: 5
 
-- name: Tools | Install misc tools (RedHat)
-  ansible.builtin.dnf:
-    name: '{{ __development_misc_packages }}'
-    state: present
-  when: ansible_facts['os_family'] == 'RedHat'
+- name: Tools | Manage direnv
+  ansible.builtin.package:
+    name: '{{ __development_direnv_package }}'
+    state: "{{ 'present' if development_direnv_enabled | bool else 'absent' }}"
+  when: __development_direnv_package | default('') | length > 0
   retries: 3
   delay: 5
 
-- name: Tools | Manage httpie (Arch)
-  community.general.pacman:
+- name: Tools | Manage pre-commit
+  ansible.builtin.package:
+    name: '{{ __development_pre_commit_package }}'
+    state: "{{ 'present' if development_pre_commit_enabled | bool else 'absent' }}"
+  when: __development_pre_commit_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Tools | Manage shellcheck
+  ansible.builtin.package:
+    name: '{{ __development_shellcheck_package }}'
+    state: "{{ 'present' if development_shellcheck_enabled | bool else 'absent' }}"
+  when: __development_shellcheck_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Tools | Manage DBeaver
+  ansible.builtin.package:
+    name: '{{ __development_dbeaver_package }}'
+    state: "{{ 'present' if development_dbeaver_enabled | bool else 'absent' }}"
+  when: __development_dbeaver_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Tools | Manage pgAdmin
+  ansible.builtin.package:
+    name: '{{ __development_pgadmin_package }}'
+    state: "{{ 'present' if development_pgadmin_enabled | bool else 'absent' }}"
+  when: __development_pgadmin_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Tools | Manage httpie
+  ansible.builtin.package:
     name: '{{ __development_httpie_package }}'
     state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
-  when: ansible_facts['os_family'] == 'Archlinux'
-  retries: 3
-  delay: 5
-
-- name: Tools | Manage httpie (Debian)
-  ansible.builtin.apt:
-    name: '{{ __development_httpie_package }}'
-    state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
-  when: ansible_facts['os_family'] == 'Debian'
-  retries: 3
-  delay: 5
-
-- name: Tools | Manage httpie (RedHat)
-  ansible.builtin.dnf:
-    name: '{{ __development_httpie_package }}'
-    state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
-  when: ansible_facts['os_family'] == 'RedHat'
+  when: __development_httpie_package | default('') | length > 0
   retries: 3
   delay: 5

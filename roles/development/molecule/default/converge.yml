@@ -6,6 +6,7 @@
   vars:
     development_enabled: true
     development_git_enabled: true
+    development_git_lfs_enabled: true
     development_python_enabled: true
     development_nodejs_enabled: false
     development_rust_enabled: false
@@ -14,6 +15,21 @@
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
+    # Build-tool toggles: enable cmake, disable meson and ninja
+    development_cmake_enabled: true
+    development_meson_enabled: false
+    development_ninja_enabled: false
+    # Misc toggles: enable jq + shellcheck (existing verify), disable rest
+    development_jq_enabled: true
+    development_yq_enabled: false
+    development_direnv_enabled: false
+    development_pre_commit_enabled: false
+    development_shellcheck_enabled: true
+    # Database tools off
+    development_dbeaver_enabled: false
+    development_pgadmin_enabled: false
+    # httpie disabled — EPEL 9 package has a broken pygments dep
+    development_httpie_enabled: false
     development_users: []
 
   tasks:

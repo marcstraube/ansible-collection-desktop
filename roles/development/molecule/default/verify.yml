@@ -104,52 +104,17 @@
       when: ansible_facts['os_family'] == 'RedHat'
 
     #
-    # httpie
+    # httpie (disabled in molecule converge — verify off-path)
     #
 
-    - name: Verify | Check httpie installed (Arch)
-      ansible.builtin.command:
-        cmd: >-
-          pacman -Q
-          {{ __development_httpie_package }}
-      register: _dev_httpie_arch
-      changed_when: false
-      failed_when: _dev_httpie_arch.rc != 0
-      when:
-        - ansible_facts['os_family'] == 'Archlinux'
-        - >-
-          __development_httpie_package
-          | default('') | length > 0
-
-    - name: Verify | Check httpie installed (Debian)
-      ansible.builtin.command:
-        cmd: >-
-          dpkg -l
-          {{ __development_httpie_package }}
-      register: _dev_httpie_deb
-      changed_when: false
-      failed_when: _dev_httpie_deb.rc != 0
-      when:
-        - ansible_facts['os_family'] == 'Debian'
-        - >-
-          __development_httpie_package
-          | default('') | length > 0
-
-    - name: >-
-        Verify | Check httpie installed
-        (RedHat)
-      ansible.builtin.command:  # noqa: command-instead-of-module
-        cmd: >-
-          rpm -q
-          {{ __development_httpie_package }}
-      register: _dev_httpie_rpm
-      changed_when: false
-      failed_when: _dev_httpie_rpm.rc != 0
-      when:
-        - ansible_facts['os_family'] == 'RedHat'
-        - >-
-          __development_httpie_package
-          | default('') | length > 0
+    - name: Verify | httpie disabled — package not installed
+      ansible.builtin.package:
+        name: '{{ __development_httpie_package }}'
+        state: absent
+      check_mode: true
+      register: _dev_httpie_check
+      failed_when: _dev_httpie_check.changed
+      when: __development_httpie_package | default('') | length > 0
 
     #
     # Misc Tools
@@ -208,3 +173,38 @@
       changed_when: false
       failed_when: _dev_sc_rpm.rc != 0
       when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Toggle verification: cmake enabled, meson disabled
+    #
+
+    - name: Verify | cmake enabled — package installed
+      ansible.builtin.package:
+        name: '{{ __development_cmake_package }}'
+        state: present
+      check_mode: true
+      register: _dev_cmake_check
+      failed_when: _dev_cmake_check.changed
+      when: __development_cmake_package | default('') | length > 0
+
+    - name: Verify | meson disabled — package not installed
+      ansible.builtin.package:
+        name: '{{ __development_meson_package }}'
+        state: absent
+      check_mode: true
+      register: _dev_meson_check
+      failed_when: _dev_meson_check.changed
+      when: __development_meson_package | default('') | length > 0
+
+    #
+    # git-lfs (enabled)
+    #
+
+    - name: Verify | git-lfs enabled — package installed
+      ansible.builtin.package:
+        name: '{{ __development_git_lfs_package }}'
+        state: present
+      check_mode: true
+      register: _dev_git_lfs_check
+      failed_when: _dev_git_lfs_check.changed
+      when: __development_git_lfs_package | default('') | length > 0
