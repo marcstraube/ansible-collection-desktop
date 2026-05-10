@@ -9,6 +9,7 @@
     state: present
   when:
     - filemanagers_thunar_enabled | bool
+    - __filemanagers_thunar_package | default('') | length > 0
   retries: 3
   delay: 5
 
@@ -18,6 +19,7 @@
     state: present
   when:
     - filemanagers_dolphin_enabled | bool
+    - __filemanagers_dolphin_package | default('') | length > 0
   retries: 3
   delay: 5
 
@@ -27,6 +29,7 @@
     state: present
   when:
     - filemanagers_nautilus_enabled | bool
+    - __filemanagers_nautilus_package | default('') | length > 0
   retries: 3
   delay: 5
 
@@ -36,6 +39,7 @@
     state: present
   when:
     - filemanagers_pcmanfm_enabled | bool
+    - __filemanagers_pcmanfm_package | default('') | length > 0
   retries: 3
   delay: 5
 
@@ -45,6 +49,7 @@
     state: present
   when:
     - filemanagers_nemo_enabled | bool
+    - __filemanagers_nemo_package | default('') | length > 0
   retries: 3
   delay: 5
 
