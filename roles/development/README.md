@@ -168,6 +168,21 @@ molecule test
 
 Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 
+## References
+
+- [Git](https://git-scm.com/) — Distributed version control system
+- [GitHub CLI](https://cli.github.com/) — `gh` command-line tool for GitHub
+- [glab](https://gitlab.com/gitlab-org/cli) — GitLab CLI
+- [pipx](https://pipx.pypa.io/) — Install Python applications in isolated environments
+- [rustup](https://rustup.rs/) — Rust toolchain installer (used on non-Arch)
+- [VSCodium](https://vscodium.com/) — Free/libre Code-OSS binaries (telemetry-free VS Code build)
+- [JetBrains Toolbox](https://www.jetbrains.com/toolbox-app/) — Manager for JetBrains IDEs
+- [Zed](https://zed.dev/) — High-performance multiplayer code editor
+- [HTTPie](https://httpie.io/) — Modern HTTP CLI client
+- [pre-commit](https://pre-commit.com/) — Multi-language git hook framework
+- [direnv](https://direnv.net/) — Per-directory environment variable loader
+- [ShellCheck](https://www.shellcheck.net/) — Shell script static analyser
+
 ## License
 
 MIT

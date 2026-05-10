@@ -190,6 +190,19 @@ molecule test
 
 Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 
+## References
+
+- [Hyprland](https://hypr.land/) — Dynamic tiling Wayland compositor
+- [Sway](https://swaywm.org/) — i3-compatible Wayland compositor
+- [i3](https://i3wm.org/) — Tiling window manager (X11)
+- [KDE Plasma](https://kde.org/plasma-desktop/) — Full-featured Qt desktop environment
+- [GNOME](https://www.gnome.org/) — Modern GTK desktop environment
+- [XFCE](https://xfce.org/) — Lightweight GTK desktop environment
+- [LXDE](https://lxde.org/) — Lightweight X11 desktop environment
+- [LXQt](https://lxqt-project.org/) — Lightweight Qt desktop environment
+- [UWSM](https://github.com/Vladimir-csp/uwsm) — Universal Wayland Session Manager
+- [hyprland-qt-support](https://github.com/hyprwm/hyprland-qt-support) and the Hypr* ecosystem (hypridle, hyprlock, hyprpaper, hyprpicker, hyprshot, hyprsunset, hyprlauncher) — Companion utilities to Hyprland
+
 ## License
 
 MIT

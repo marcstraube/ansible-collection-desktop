@@ -138,6 +138,15 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9
 - NTsync (`wine_sync: 'ntsync'`) requires kernel 6.14+ and Wine 11+ for best
   performance
 
+## References
+
+- [Wine](https://www.winehq.org/) — Compatibility layer for running Windows applications on POSIX systems
+- [Wine Wiki](https://gitlab.winehq.org/wine/wine/-/wikis/home) — Documentation, configuration, and troubleshooting
+- [Wine AppDB](https://appdb.winehq.org/) — Application compatibility database
+- [DXVK](https://github.com/doitsujin/dxvk) — Vulkan-based DirectX 9/10/11 implementation for Wine
+- [VKD3D-Proton](https://github.com/HansKristian-Work/vkd3d-proton) — Vulkan-based DirectX 12 implementation
+- [winetricks](https://github.com/Winetricks/winetricks) — Helper script for installing common Windows DLLs and apps
+
 ## License
 
 MIT

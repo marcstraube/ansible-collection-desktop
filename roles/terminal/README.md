@@ -84,6 +84,15 @@ molecule test
 
 Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 
+## References
+
+- [Ghostty](https://ghostty.org/) — Fast, native, GPU-accelerated terminal emulator
+- [Alacritty](https://alacritty.org/) — Cross-platform GPU-accelerated terminal emulator
+- [Kitty](https://sw.kovidgoyal.net/kitty/) — Fast, feature-rich, GPU-based terminal with image support
+- [Foot](https://codeberg.org/dnkl/foot) — Fast, lightweight, minimalist Wayland terminal emulator
+- [WezTerm](https://wezterm.org/) — GPU-accelerated cross-platform terminal emulator and multiplexer
+- [systemd.environment-generators(7)](https://www.freedesktop.org/software/systemd/man/latest/environment.d.html) — `/etc/environment.d/` reference
+
 ## License
 
 MIT
