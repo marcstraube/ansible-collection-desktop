@@ -22,7 +22,7 @@ platforms:
     tmpfs:
       /run: rw,nosuid,nodev,size=65536k
       /tmp: rw,nosuid,nodev
-  - name: browser-rocky9
+  - name: browser-rocky-9
     image: docker.io/geerlingguy/docker-rockylinux9-ansible:latest
     pre_build_image: true
     command: /usr/lib/systemd/systemd
@@ -32,7 +32,7 @@ platforms:
     tmpfs:
       /run: rw,nosuid,nodev,size=65536k
       /tmp: rw,nosuid,nodev
-  - name: browser-rocky10
+  - name: browser-rocky-10
     image: docker.io/geerlingguy/docker-rockylinux10-ansible:latest
     pre_build_image: true
     command: /usr/lib/systemd/systemd
@@ -56,9 +56,9 @@ provisioner:
         ansible_python_interpreter: /usr/bin/python
       browser-debian-trixie:
         ansible_python_interpreter: /usr/bin/python3
-      browser-rocky9:
+      browser-rocky-9:
         ansible_python_interpreter: /usr/bin/python3
-      browser-rocky10:
+      browser-rocky-10:
         ansible_python_interpreter: /usr/bin/python3
 verifier:
   name: ansible
