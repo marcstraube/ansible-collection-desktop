@@ -67,3 +67,13 @@
   tags:
     - shell
     - shell:starship
+
+- name: Main | Import Starship shell init tasks
+  ansible.builtin.import_tasks: starship_init.yml
+  when:
+    - shell_enabled | bool
+    - shell_starship_enabled | bool
+    - shell_starship_shells | length > 0
+  tags:
+    - shell
+    - shell:starship

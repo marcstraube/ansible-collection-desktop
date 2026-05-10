@@ -103,6 +103,27 @@ Valid preset names (source: `starship preset --list`):
 `pure-preset`, `tokyo-night`. An invalid preset value fails the
 role at start with a clear assertion message.
 
+`shell_starship_shells` controls which shell rcfiles get a
+starship init line appended via `blockinfile` (with marker
+`# ANSIBLE MANAGED — starship init`). Independent from
+`shell_starship_config_enabled` — a user can opt into starship
+init using starship defaults without deploying a custom config.
+
+| Shell  | Target file              | Init line                          |
+|--------|--------------------------|------------------------------------|
+| `bash` | `~/.bashrc`              | `eval "$(starship init bash)"`     |
+| `zsh`  | `~/.zshrc`               | `eval "$(starship init zsh)"`      |
+| `fish` | `~/.config/fish/config.fish` | `starship init fish \| source` |
+
+The zsh init line is skipped when `shell_zsh_framework: 'ohmyzsh'` —
+the Oh My Zsh `.zshrc` template already includes starship init when
+both are enabled, so adding it again would duplicate.
+
+Init lines honour `shell_user_config_mode`: `'managed'` reconciles
+the marker block on every run; `'initial'` deploys the block on
+first run and leaves the file alone if the marker is already present
+(preserving any user modifications inside it); `'disabled'` skips.
+
 ### Additional Tools
 
 | Variable                 | Default | Description                               |
