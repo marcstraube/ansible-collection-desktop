@@ -1,0 +1,9 @@
+---
+#
+# RedHat 10 Packages (Rocky 10 / EPEL 10)
+#
+
+# None of these are in EPEL 10
+__graphics_apps_gimp_package: ''
+__graphics_apps_krita_package: ''
+__graphics_apps_inkscape_package: ''
