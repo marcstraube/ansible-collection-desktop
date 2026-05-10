@@ -53,6 +53,43 @@
         allowerasing: true
       when: ansible_facts['os_family'] == 'RedHat'
 
+    #
+    # Sudo PAM workaround for containerised Rocky under GitHub-hosted
+    # runners. sudo's PAM auth+account stack fails to read /etc/shadow
+    # (0000 perms; setuid root + DAC_READ_SEARCH cap may be restricted
+    # by the runner's container security profile), reporting:
+    #   "PAM account management error: Authentication service cannot
+    #    retrieve authentication info" + "a password is required"
+    #
+    # Bypass: replace sudo's PAM stack with pam_permit (skip both auth
+    # and account checks) and add `Defaults !authenticate` to sudoers.
+    # Test container only — production sudo PAM stack is unaffected.
+    #
+
+    - name: Prepare | Bypass sudo PAM stack (RedHat container)
+      ansible.builtin.copy:
+        content: |
+          #%PAM-1.0
+          auth       sufficient   pam_permit.so
+          account    sufficient   pam_permit.so
+          password   sufficient   pam_permit.so
+          session    sufficient   pam_permit.so
+        dest: /etc/pam.d/sudo
+        owner: root
+        group: root
+        mode: '0644'
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Prepare | Disable sudoers authentication (RedHat container)
+      ansible.builtin.copy:
+        content: 'Defaults !authenticate'
+        dest: /etc/sudoers.d/molecule-no-auth
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      when: ansible_facts['os_family'] == 'RedHat'
+
     - name: Prepare | Install container dependencies
       ansible.builtin.package:
         name: '{{ __prepare_packages[ansible_facts["os_family"]] }}'
