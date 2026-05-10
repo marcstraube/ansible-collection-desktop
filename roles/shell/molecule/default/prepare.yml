@@ -107,3 +107,8 @@
         name: testuser
         create_home: true
         shell: /bin/bash
+        # Active-but-no-login. Required so PAM account management
+        # accepts root → testuser become in containerised Rocky
+        # (locked accounts fail with "Authentication service cannot
+        # retrieve authentication info" on pam_unix account check).
+        password: '*'
