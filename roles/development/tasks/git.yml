@@ -10,6 +10,14 @@
   retries: 3
   delay: 5
 
+- name: Git | Manage git-lfs
+  ansible.builtin.package:
+    name: '{{ __development_git_lfs_package }}'
+    state: "{{ 'present' if development_git_lfs_enabled | bool else 'absent' }}"
+  when: __development_git_lfs_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
 - name: Git | Manage GitHub CLI
   ansible.builtin.package:
     name: '{{ __development_github_cli_package }}'

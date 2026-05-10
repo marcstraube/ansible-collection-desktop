@@ -57,7 +57,6 @@ overrides if needed.
 | `development_rust_components` | `[]`    | Rust components via rustup (non-Arch) |
 | `development_go_enabled`      | `false` | Enable Go installation                |
 | `development_java_enabled`    | `false` | Enable Java installation              |
-| `development_java_version`    | `'21'`  | Java version to install               |
 
 ### Build Tools
 

@@ -6,9 +6,9 @@
 # Version control
 __development_git_packages:
   - 'git'
-  - 'git-lfs'
   - 'git-delta'
 
+__development_git_lfs_package: 'git-lfs'
 __development_github_cli_package: 'github-cli'
 __development_gitlab_cli_package: 'glab'
 
@@ -33,9 +33,10 @@ __development_java_package: 'jdk-openjdk'
 __development_build_packages:
   - 'base-devel'
   - 'make'
-  - 'cmake'
-  - 'meson'
-  - 'ninja'
+
+__development_cmake_package: 'cmake'
+__development_meson_package: 'meson'
+__development_ninja_package: 'ninja'
 
 # Database tools
 __development_dbeaver_package: 'dbeaver'
@@ -45,12 +46,11 @@ __development_pgadmin_package: 'pgadmin4'
 __development_httpie_package: 'httpie'
 
 # Misc tools
-__development_misc_packages:
-  - 'jq'
-  - 'yq'
-  - 'direnv'
-  - 'pre-commit'
-  - 'shellcheck'
+__development_jq_package: 'jq'
+__development_yq_package: 'yq'
+__development_direnv_package: 'direnv'
+__development_pre_commit_package: 'pre-commit'
+__development_shellcheck_package: 'shellcheck'
 
 # AUR packages
 __development_aur_packages:

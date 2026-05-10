@@ -70,11 +70,9 @@ development_go_enabled: false
 
 # Java (OpenJDK)
 
-# Enable Java installation
+# Enable Java installation (version pinning is per-OS — see vars/{distro}.yml;
+# for per-project version control use mise/sdkman/asdf instead)
 development_java_enabled: false
-
-# Java version to install
-development_java_version: '21'
 
 #
 # Build Tools

@@ -6,8 +6,8 @@
 # Version control
 __development_git_packages:
   - 'git'
-  - 'git-lfs'
 
+__development_git_lfs_package: 'git-lfs'
 __development_github_cli_package: 'gh'
 __development_gitlab_cli_package: ''
 
@@ -32,9 +32,10 @@ __development_java_package: 'openjdk-17-jdk'
 __development_build_packages:
   - 'build-essential'
   - 'make'
-  - 'cmake'
-  - 'meson'
-  - 'ninja-build'
+
+__development_cmake_package: 'cmake'
+__development_meson_package: 'meson'
+__development_ninja_package: 'ninja-build'
 
 # IDEs (need external repos or Flatpak)
 __development_vscodium_package: ''
@@ -53,8 +54,8 @@ __development_postman_package: ''
 __development_bruno_package: ''
 
 # Misc tools
-__development_misc_packages:
-  - 'jq'
-  - 'direnv'
-  - 'pre-commit'
-  - 'shellcheck'
+__development_jq_package: 'jq'
+__development_yq_package: ''
+__development_direnv_package: 'direnv'
+__development_pre_commit_package: 'pre-commit'
+__development_shellcheck_package: 'shellcheck'

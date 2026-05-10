@@ -8,33 +8,11 @@
 
 # Python
 
-- name: Languages | Install Python (Arch)
-  community.general.pacman:
+- name: Languages | Install Python
+  ansible.builtin.package:
     name: '{{ __development_python_packages }}'
     state: present
-  when:
-    - ansible_facts['os_family'] == 'Archlinux'
-    - development_python_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Languages | Install Python (Debian)
-  ansible.builtin.apt:
-    name: '{{ __development_python_packages }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'Debian'
-    - development_python_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Languages | Install Python (RedHat)
-  ansible.builtin.dnf:
-    name: '{{ __development_python_packages }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'RedHat'
-    - development_python_enabled | bool
+  when: development_python_enabled | bool
   retries: 3
   delay: 5
 
@@ -82,64 +60,20 @@
 
 # Go
 
-- name: Languages | Install Go (Arch)
-  community.general.pacman:
+- name: Languages | Install Go
+  ansible.builtin.package:
     name: '{{ __development_go_packages }}'
     state: present
-  when:
-    - ansible_facts['os_family'] == 'Archlinux'
-    - development_go_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Languages | Install Go (Debian)
-  ansible.builtin.apt:
-    name: '{{ __development_go_packages }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'Debian'
-    - development_go_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Languages | Install Go (RedHat)
-  ansible.builtin.dnf:
-    name: '{{ __development_go_packages }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'RedHat'
-    - development_go_enabled | bool
+  when: development_go_enabled | bool
   retries: 3
   delay: 5
 
 # Java
 
-- name: Languages | Install Java (Arch)
-  community.general.pacman:
+- name: Languages | Install Java
+  ansible.builtin.package:
     name: '{{ __development_java_package }}'
     state: present
-  when:
-    - ansible_facts['os_family'] == 'Archlinux'
-    - development_java_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Languages | Install Java (Debian)
-  ansible.builtin.apt:
-    name: '{{ __development_java_package }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'Debian'
-    - development_java_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Languages | Install Java (RedHat)
-  ansible.builtin.dnf:
-    name: '{{ __development_java_package }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'RedHat'
-    - development_java_enabled | bool
+  when: development_java_enabled | bool
   retries: 3
   delay: 5
