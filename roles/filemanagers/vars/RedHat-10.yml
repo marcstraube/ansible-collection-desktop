@@ -1,0 +1,11 @@
+---
+#
+# RedHat 10 Overrides
+#
+# EPEL 10 packages a smaller subset of GUI file managers than EPEL 9.
+# Only dolphin and nautilus are available — Thunar, pcmanfm, nemo
+# are not packaged.
+#
+
+__filemanagers_thunar_package: ''
+__filemanagers_nemo_package: ''

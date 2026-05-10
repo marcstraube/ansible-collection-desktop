@@ -16,29 +16,14 @@
             - '../../vars'
 
     #
-    # Thunar
+    # Nautilus (default test target — universally available)
     #
 
-    - name: Verify | Check Thunar installed (Arch)
-      ansible.builtin.command:
-        cmd: pacman -Q {{ __filemanagers_thunar_package }}
-      register: __verify_thunar_arch
-      changed_when: false
-      failed_when: __verify_thunar_arch.rc != 0
-      when: ansible_facts['os_family'] == 'Archlinux'
-
-    - name: Verify | Check Thunar installed (Debian)
-      ansible.builtin.command:
-        cmd: dpkg -l {{ __filemanagers_thunar_package }}
-      register: __verify_thunar_debian
-      changed_when: false
-      failed_when: __verify_thunar_debian.rc != 0
-      when: ansible_facts['os_family'] == 'Debian'
-
-    - name: Verify | Check Thunar installed (RedHat)  # noqa: command-instead-of-module
-      ansible.builtin.command:
-        cmd: rpm -q {{ __filemanagers_thunar_package }}
-      register: __verify_thunar_redhat
-      changed_when: false
-      failed_when: __verify_thunar_redhat.rc != 0
-      when: ansible_facts['os_family'] == 'RedHat'
+    - name: Verify | nautilus enabled — package installed
+      ansible.builtin.package:
+        name: '{{ __filemanagers_nautilus_package }}'
+        state: present
+      check_mode: true
+      register: __verify_nautilus
+      failed_when: __verify_nautilus.changed
+      when: __filemanagers_nautilus_package | default('') | length > 0

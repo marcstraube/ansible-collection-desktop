@@ -5,9 +5,12 @@
 
   vars:
     filemanagers_enabled: true
-    filemanagers_thunar_enabled: true
+    # Test with nautilus — universally available across Arch, Debian,
+    # EPEL 9, EPEL 10. Thunar is missing from EPEL 10, dolphin pulls
+    # the full KDE stack (heavy in CI).
+    filemanagers_thunar_enabled: false
     filemanagers_dolphin_enabled: false
-    filemanagers_nautilus_enabled: false
+    filemanagers_nautilus_enabled: true
     filemanagers_pcmanfm_enabled: false
     filemanagers_nemo_enabled: false
     filemanagers_doublecmd_enabled: false

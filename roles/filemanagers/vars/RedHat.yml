@@ -3,9 +3,9 @@
 # RedHat Packages
 #
 
-__filemanagers_thunar_package: 'thunar'
+__filemanagers_thunar_package: 'Thunar'  # EPEL packages with capital T; rpm -q is case-sensitive
 __filemanagers_dolphin_package: 'dolphin'
 __filemanagers_nautilus_package: 'nautilus'
-__filemanagers_pcmanfm_package: 'pcmanfm'
+__filemanagers_pcmanfm_package: ''  # not in EPEL on any EL
 __filemanagers_nemo_package: 'nemo'
 __filemanagers_doublecmd_package: ''
