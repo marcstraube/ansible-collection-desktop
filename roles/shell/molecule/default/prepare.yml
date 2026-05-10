@@ -53,18 +53,9 @@
         allowerasing: true
       when: ansible_facts['os_family'] == 'RedHat'
 
-    #
-    # Sudo PAM workaround for containerised Rocky under GitHub-hosted
-    # runners. sudo's PAM auth+account stack fails to read /etc/shadow
-    # (0000 perms; setuid root + DAC_READ_SEARCH cap may be restricted
-    # by the runner's container security profile), reporting:
-    #   "PAM account management error: Authentication service cannot
-    #    retrieve authentication info" + "a password is required"
-    #
-    # Bypass: replace sudo's PAM stack with pam_permit (skip both auth
-    # and account checks) and add `Defaults !authenticate` to sudoers.
-    # Test container only — production sudo PAM stack is unaffected.
-    #
+    # Sudo PAM bypass — required for tasks using `become_user` on
+    # geerlingguy Rocky containers under GitHub-hosted runners
+    # (test container only).
 
     - name: Prepare | Bypass sudo PAM stack (RedHat container)
       ansible.builtin.copy:
