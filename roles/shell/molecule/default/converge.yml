@@ -63,6 +63,8 @@
     shell_starship_enabled: true
     shell_starship_config_enabled: true
     shell_starship_preset: 'plain-text-symbols'
+    shell_starship_shells:
+      - 'bash'
     shell_user_config_mode: 'managed'
     shell_users:
       - 'testuser'
