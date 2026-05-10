@@ -167,6 +167,23 @@ cd collections/ansible_collections/marcstraube/desktop
 molecule test -s default -- --limit shell-archlinux
 ```
 
+## References
+
+- [Bash](https://www.gnu.org/software/bash/) — GNU Bourne Again SHell
+- [Zsh](https://www.zsh.org/) — Z Shell — extended Bourne shell with many improvements
+- [Fish](https://fishshell.com/) — Smart and user-friendly command line shell
+- [Oh My Zsh](https://ohmyz.sh/) — Community-driven framework for managing Zsh configuration
+- [Starship](https://starship.rs/) — Minimal, fast, customizable cross-shell prompt
+- [Starship Presets](https://starship.rs/presets/) — Curated configuration presets (`starship preset --list`)
+- [grml-zsh-config](https://grml.org/zsh/) — Feature-rich Zsh setup from the GRML project
+- [fzf](https://github.com/junegunn/fzf) — Command-line fuzzy finder
+- [zoxide](https://github.com/ajeetdsouza/zoxide) — Smarter `cd` command
+- [eza](https://github.com/eza-community/eza) — Modern replacement for `ls`
+- [bat](https://github.com/sharkdp/bat) — `cat` clone with syntax highlighting and Git integration
+- [fd](https://github.com/sharkdp/fd) — Simple, fast, user-friendly alternative to `find`
+- [ripgrep](https://github.com/BurntSushi/ripgrep) — Recursive `grep` alternative respecting gitignore
+- [tldr](https://tldr.sh/) — Simplified, community-driven man pages
+
 ## License
 
 MIT

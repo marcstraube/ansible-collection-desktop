@@ -128,6 +128,16 @@ molecule test
 
 Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 
+## References
+
+- [SDDM](https://github.com/sddm/sddm) — Simple Desktop Display Manager (Qt-based)
+- [GDM](https://gitlab.gnome.org/GNOME/gdm) — GNOME Display Manager
+- [LightDM](https://github.com/canonical/lightdm) — Lightweight cross-desktop display manager
+- [greetd](https://sr.ht/~kennylevinsen/greetd/) — Minimal and flexible login daemon
+- [tuigreet](https://github.com/apognu/tuigreet) — Console-based greeter for greetd
+- [gtkgreet](https://git.sr.ht/~kennylevinsen/gtkgreet) — GTK-based greeter for greetd
+- [regreet](https://github.com/rharish101/ReGreet) — Clean and customizable GTK4 greeter for greetd
+
 ## License
 
 MIT

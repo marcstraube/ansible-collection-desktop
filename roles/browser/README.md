@@ -153,6 +153,18 @@ molecule test
 - **Driver:** Podman
 - **Platforms:** Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 
+## References
+
+- [Firefox](https://www.mozilla.org/firefox/) — Open-source web browser
+- [Mozilla Policy Templates](https://mozilla.github.io/policy-templates/) — Reference for `policies.json` keys deployed by this role
+- [arkenfox/user.js](https://github.com/arkenfox/user.js) — Hardened Firefox `user.js` template the role's defaults derive from
+- [Chromium](https://www.chromium.org/) — Open-source browser project
+- [Chromium Enterprise Policy List](https://chromeenterprise.google/policies/) — Reference for Chromium/Brave policy keys
+- [LibreWolf](https://librewolf.net/) — Privacy-focused Firefox fork
+- [Brave](https://brave.com/) — Privacy-focused Chromium fork
+- [Tor Browser](https://www.torproject.org/) — Anonymity-focused Firefox fork
+- [Zen Browser](https://zen-browser.app/) — Productivity-focused Firefox fork
+
 ## License
 
 MIT

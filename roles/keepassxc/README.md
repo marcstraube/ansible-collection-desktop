@@ -136,6 +136,13 @@ cd collections/ansible_collections/marcstraube/desktop
 molecule test -s default -- --tags keepassxc
 ```
 
+## References
+
+- [KeePassXC](https://keepassxc.org/) — Cross-platform community-driven password manager
+- [KeePassXC Documentation](https://keepassxc.org/docs/) — User guide and configuration reference
+- [KeePassXC-Browser](https://github.com/keepassxreboot/keepassxc-browser) — Browser extension for autofill
+- [Freedesktop Secret Service API](https://specifications.freedesktop.org/secret-service-spec/latest/) — D-Bus API KeePassXC implements
+
 ## License
 
 MIT
