@@ -3,7 +3,7 @@
 # Scanning Packages
 #
 
-__imaging_sane_package: sane
+__imaging_sane_package: sane-utils
 __imaging_xsane_package: xsane
 __imaging_simple_scan_package: simple-scan
 __imaging_skanlite_package: skanlite
