@@ -78,8 +78,8 @@ __wayland_utils_portal_packages:
 __wayland_utils_portal_base: 'xdg-desktop-portal'
 
 # Media and brightness
-__wayland_utils_brightnessctl_package: 'brightnessctl'
-__wayland_utils_playerctl_package: 'playerctl'
+__wayland_utils_brightnessctl_package: ''
+__wayland_utils_playerctl_package: ''
 
 # Misc — not in EPEL
 __wayland_utils_wev_package: ''
