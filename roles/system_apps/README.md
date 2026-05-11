@@ -12,23 +12,28 @@ Deja Dup), and GNOME utilities (Seahorse, dconf Editor).
 Each application is individually toggled via boolean variables, defaulting to a sensible
 baseline (GParted, Filelight, Solaar on by default; optional tools off by default).
 
-On Rocky Linux, EPEL must be enabled before running this role — several packages
-(gparted, filelight, solaar, timeshift, deja-dup) are not available in the base repos.
+On Rocky Linux, EPEL and CRB must be enabled before running this role
+(typically via `marcstraube.common.package_management`) — several packages
+(gparted, filelight, solaar, timeshift, deja-dup) are not in the base
+repos, and filelight + plasma-systemmonitor pull KF5 libraries from CRB.
+
+On Rocky 10 specifically, gparted, solaar, timeshift, and deja-dup are not
+packaged in EPEL 10 and are skipped automatically.
 
 ## Requirements
 
 - ansible-core >= 2.17
 - `community.general` collection (pacman module on Arch Linux)
-- **Rocky Linux:** EPEL repository enabled (via `marcstraube.common.package_management`)
+- **Rocky Linux:** EPEL + CRB repositories enabled
 
 ## Supported Platforms
 
-| Platform                   | Notes                                  |
-|----------------------------|----------------------------------------|
-| Arch Linux                 | Native packages from extra/community   |
-| Debian Trixie              | Native packages from main              |
-| EL 9 (Rocky, Alma, RHEL)   | EPEL required for most packages        |
-| EL 10 (Rocky, Alma, RHEL)  | EPEL required for most packages        |
+| Platform                   | Notes                                                                    |
+|----------------------------|--------------------------------------------------------------------------|
+| Arch Linux                 | Native packages from extra/community                                     |
+| Debian Trixie              | Native packages from main                                                |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB required                                                      |
+| EL 10 (Rocky, Alma, RHEL)  | EPEL + CRB required — gparted, solaar, timeshift, deja-dup not available |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

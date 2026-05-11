@@ -9,6 +9,10 @@ processing tools across Arch Linux, Debian, and EL-based systems. Each
 application is individually toggleable via boolean variables. VueScan is
 available on Arch Linux only (AUR package).
 
+On Rocky Linux, EPEL must be enabled before running this role (typically
+via `marcstraube.common.package_management`) — simple-scan, skanlite,
+ImageMagick, and GraphicsMagick are not in the base repos.
+
 ## Requirements
 
 - ansible-core >= 2.17
@@ -16,12 +20,12 @@ available on Arch Linux only (AUR package).
 
 ## Supported Platforms
 
-| Platform                   | Notes |
-| -------------------------- | ----- |
-| Arch Linux                 |       |
-| Debian Trixie              |       |
-| EL 9 (Rocky, Alma, RHEL)   |       |
-| EL 10 (Rocky, Alma, RHEL)  |       |
+| Platform                   | Notes                                 |
+| -------------------------- | ------------------------------------- |
+| Arch Linux                 | Native packages + AUR                 |
+| Debian Trixie              | Official repo packages                |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL packages                         |
+| EL 10 (Rocky, Alma, RHEL)  | EPEL packages — xsane not available   |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

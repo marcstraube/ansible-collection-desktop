@@ -5,12 +5,11 @@ Install remote desktop and access applications.
 ## Description
 
 Installs remote desktop clients, VNC viewers, RDP clients, and other remote
-access tools. Application availability varies by platform:
+access tools.
 
-- **Remmina**, **TigerVNC**, **FreeRDP**: Available on all platforms via official repositories.
-- **RustDesk**, **Asbru Connection Manager**, **RealVNC Viewer**, **AnyDesk**, **TeamViewer**:
-  Arch Linux only, installed via AUR. Requires the `aur_builder` user and the
-  `kewlfft.aur` collection.
+RustDesk, Asbru Connection Manager, RealVNC Viewer, AnyDesk, and TeamViewer
+are Arch-only (AUR). They require the `aur_builder` user and the
+`kewlfft.aur` collection.
 
 ## Requirements
 
@@ -21,12 +20,12 @@ access tools. Application availability varies by platform:
 
 ## Supported Platforms
 
-| Platform                   | Notes                                    |
-| -------------------------- | ---------------------------------------- |
-| Arch Linux                 | Full support — native packages + AUR     |
-| Debian Trixie              | Official repo packages only              |
-| EL 9 (Rocky, Alma, RHEL)   | Official repo packages only              |
-| EL 10 (Rocky, Alma, RHEL)  | Official repo packages only              |
+| Platform                   | Notes                                      |
+| -------------------------- | ------------------------------------------ |
+| Arch Linux                 | Native packages + AUR                      |
+| Debian Trixie              | Official repo packages                     |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL packages                              |
+| EL 10 (Rocky, Alma, RHEL)  | EPEL packages — TigerVNC + Remmina dropped |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
