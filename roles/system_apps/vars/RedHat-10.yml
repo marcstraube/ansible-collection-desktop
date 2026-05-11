@@ -1,0 +1,7 @@
+---
+#
+# RedHat 10 Overrides
+#
+
+# GParted is not packaged in EPEL 10.
+__system_apps_gparted_package: ''
