@@ -15,20 +15,44 @@
   retries: 3
   delay: 5
 
-- name: Install | Detect running kernel package
+# Detect kernels from the pacman DB (not the running-kernel modules dir) so
+# this stays correct when an earlier playbook step upgraded the kernel and
+# the old /usr/lib/modules/<running>/ tree no longer exists. Also covers
+# multi-kernel setups (e.g. linux-lts + linux) where DKMS needs headers
+# for every bootable kernel.
+
+- name: Install | Detect installed kernel packages
   ansible.builtin.command:
-    cmd: pacman -Qqo /usr/lib/modules/{{ ansible_facts['kernel'] }}/vmlinuz
-  register: __tuxedo_kernel_package
+    cmd: pacman -Qq
+  register: __tuxedo_installed_packages
   changed_when: false
   when: tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
 
-- name: Install | Kernel headers for running kernel
+- name: Install | Build kernel headers list
+  ansible.builtin.set_fact:
+    __tuxedo_kernel_headers: >-
+      {{
+        __tuxedo_installed_packages.stdout_lines
+        | select('match', '^linux(|-lts|-zen|-hardened|-rt|-rt-lts)$')
+        | map('regex_replace', '$', '-headers')
+        | list
+      }}
+  when: tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
+
+- name: Install | Validate at least one kernel detected
+  ansible.builtin.assert:
+    that:
+      - __tuxedo_kernel_headers | length > 0
+    fail_msg: >-
+      No standard Arch kernel package detected (linux, linux-lts,
+      linux-zen, linux-hardened, linux-rt, linux-rt-lts).
+  when: tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
+
+- name: Install | Kernel headers
   ansible.builtin.package:
-    name: '{{ __tuxedo_kernel_package.stdout }}-headers'
+    name: '{{ __tuxedo_kernel_headers }}'
     state: present
-  when:
-    - tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
-    - __tuxedo_kernel_package is not skipped
+  when: tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
   retries: 3
   delay: 5
 
