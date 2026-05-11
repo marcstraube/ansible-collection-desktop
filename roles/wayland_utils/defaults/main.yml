@@ -82,9 +82,14 @@ wayland_utils_locker: 'none'
 # Wallpaper
 #
 
-# Wallpaper tool: swww, swaybg, hyprpaper, wpaperd, none
+# Wallpaper tool: awww, swaybg, hyprpaper, wpaperd, none
+# (awww is the upstream-renamed successor of swww; same CLI, same features)
 # Usually set by DE role
 wayland_utils_wallpaper: 'none'
+
+# Install matugen (Material You color generation tool, useful with
+# awww/Hyprland for dynamic theming)
+wayland_utils_matugen_enabled: false
 
 #
 # Display Management

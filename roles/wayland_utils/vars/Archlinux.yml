@@ -60,11 +60,14 @@ __wayland_utils_locker_packages:
 
 # Wallpaper
 __wayland_utils_wallpaper_packages:
-  swww: 'swww'
+  awww: 'awww'
   swaybg: 'swaybg'
   hyprpaper: 'hyprpaper'
   wpaperd: 'wpaperd'
   none: ''
+
+# Matugen (Material You color generation)
+__wayland_utils_matugen_package: 'matugen'
 
 # Display management
 __wayland_utils_wlr_randr_package: 'wlr-randr'

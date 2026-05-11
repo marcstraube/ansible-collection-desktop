@@ -56,11 +56,14 @@ __wayland_utils_locker_packages:
 
 # Wallpaper — not in EPEL
 __wayland_utils_wallpaper_packages:
-  swww: ''
+  awww: ''
   swaybg: ''
   hyprpaper: ''
   wpaperd: ''
   none: ''
+
+# Matugen — not in EPEL
+__wayland_utils_matugen_package: ''
 
 # Display management — not in EPEL
 __wayland_utils_wlr_randr_package: ''
