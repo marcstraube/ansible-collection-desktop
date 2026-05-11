@@ -6,4 +6,4 @@
 # Official repository packages
 __remote_access_remmina_package: remmina
 __remote_access_tigervnc_package: tigervnc-viewer
-__remote_access_freerdp_package: freerdp2-x11
+__remote_access_freerdp_package: freerdp3-x11
