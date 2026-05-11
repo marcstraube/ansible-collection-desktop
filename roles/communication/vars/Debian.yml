@@ -3,8 +3,9 @@
 # Debian-Specific Variables
 #
 
-# Telegram package
-__communication_telegram_package: 'telegram-desktop'
+# Telegram is not packaged in Debian Trixie main repos.
+# Users wanting Telegram on Debian should use flatpak.
+__communication_telegram_package: ''
 
 # Sieve email filtering (KDE PIM suite includes sieve editor)
 __communication_sieve_package: 'kmail'

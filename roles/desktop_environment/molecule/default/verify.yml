@@ -7,6 +7,15 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    # XFCE is not packaged in EPEL 10 — skip XFCE-specific verification
+    # on Rocky 10. Tracked in upstream EPEL.
+    _de_xfce_unsupported: >-
+      {{
+        ansible_facts['os_family'] == 'RedHat'
+        and ansible_facts['distribution_major_version'] == '10'
+      }}
+
   tasks:
     #
     # XFCE Package Verification
@@ -34,7 +43,9 @@
       register: _de_xfce_rpm
       changed_when: false
       failed_when: _de_xfce_rpm.rc != 0
-      when: ansible_facts['os_family'] == 'RedHat'
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - not (_de_xfce_unsupported | bool)
 
     #
     # Configuration Directories
@@ -44,12 +55,14 @@
       ansible.builtin.stat:
         path: /usr/share/xfce4
       register: _de_xfce_share_dir
+      when: not (_de_xfce_unsupported | bool)
 
     - name: Verify | Assert xfce4 share directory exists
       ansible.builtin.assert:
         that:
           - _de_xfce_share_dir.stat.exists
         fail_msg: 'xfce4 share directory not found'
+      when: not (_de_xfce_unsupported | bool)
 
     #
     # Session File
@@ -59,9 +72,11 @@
       ansible.builtin.stat:
         path: /usr/share/xsessions/xfce.desktop
       register: _de_xfce_session_file
+      when: not (_de_xfce_unsupported | bool)
 
     - name: Verify | Assert xfce.desktop exists
       ansible.builtin.assert:
         that:
           - _de_xfce_session_file.stat.exists
         fail_msg: 'xfce.desktop session file not found'
+      when: not (_de_xfce_unsupported | bool)

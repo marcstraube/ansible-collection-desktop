@@ -1,0 +1,9 @@
+---
+#
+# RedHat 10 Overrides
+#
+
+__system_apps_gparted_package: ''
+__system_apps_solaar_package: ''
+__system_apps_timeshift_package: ''
+__system_apps_deja_dup_package: ''

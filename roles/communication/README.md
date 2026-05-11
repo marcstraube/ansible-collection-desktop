@@ -10,6 +10,10 @@ is individually toggleable via boolean variables. AUR packages are used on
 Arch Linux for applications not available in official repositories (Slack,
 Threema, Zoom, Teams, Jitsi Meet).
 
+On Rocky Linux, EPEL and CRB must be enabled before running this role
+(typically via `marcstraube.common.package_management`) — kmail / KDE PIM
+pulls KF5 libraries that live in CRB.
+
 ## Requirements
 
 - ansible-core >= 2.17
@@ -17,12 +21,12 @@ Threema, Zoom, Teams, Jitsi Meet).
 
 ## Supported Platforms
 
-| Platform                  | Notes |
-|---------------------------|-------|
-| Arch Linux                |       |
-| Debian Trixie             |       |
-| EL 9 (Rocky, Alma, RHEL)  |       |
-| EL 10 (Rocky, Alma, RHEL) |       |
+| Platform                  | Notes                                                  |
+|---------------------------|--------------------------------------------------------|
+| Arch Linux                | Native packages + AUR                                  |
+| Debian Trixie             | Official repo packages — telegram-desktop not available |
+| EL 9 (Rocky, Alma, RHEL)  | EPEL + CRB required (kmail / KDE PIM)                  |
+| EL 10 (Rocky, Alma, RHEL) | EPEL + CRB required (kmail / KDE PIM)                  |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

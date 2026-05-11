@@ -8,12 +8,12 @@ Install office applications and document tools.
 
 ## Supported Platforms
 
-| Platform                    | Notes                                                                           |
-|-----------------------------|---------------------------------------------------------------------------------|
-| Arch Linux                  |                                                                                 |
-| Debian Trixie               |                                                                                 |
-| EL 9 (Rocky, Alma, RHEL)    | Some packages unavailable (gnome-contacts, foliate, gscan2pdf)                  |
-| EL 10 (Rocky, Alma, RHEL)   | Some packages unavailable (gnome-calendar, gnome-contacts, foliate, gscan2pdf)  |
+| Platform                    | Notes                                                                                                            |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------|
+| Arch Linux                  | Native packages + AUR                                                                                            |
+| Debian Trixie               | Official repo packages                                                                                           |
+| EL 9 (Rocky, Alma, RHEL)    | EPEL packages — gnome-contacts, foliate, gscan2pdf not available                                                 |
+| EL 10 (Rocky, Alma, RHEL)   | EPEL packages — calibre, foliate, texstudio, gnome-calendar, gnome-contacts not available; evince → GNOME Papers |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

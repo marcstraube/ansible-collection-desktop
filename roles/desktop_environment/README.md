@@ -17,12 +17,12 @@ Wayland utilities integration, theme installation, and common desktop applicatio
 
 ## Supported Platforms
 
-| Platform                  | Notes                      |
-|---------------------------|----------------------------|
-| Arch Linux                | Full support including AUR |
-| Debian Trixie             | Limited Hyprland extras    |
-| EL 9 (Rocky, Alma, RHEL)  | Limited Hyprland extras    |
-| EL 10 (Rocky, Alma, RHEL) | Limited Hyprland extras    |
+| Platform                  | Notes                                             |
+|---------------------------|---------------------------------------------------|
+| Arch Linux                | Full support including AUR                        |
+| Debian Trixie             | Limited Hyprland extras                           |
+| EL 9 (Rocky, Alma, RHEL)  | EPEL — limited Hyprland extras                    |
+| EL 10 (Rocky, Alma, RHEL) | EPEL — limited Hyprland extras; XFCE not packaged |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
