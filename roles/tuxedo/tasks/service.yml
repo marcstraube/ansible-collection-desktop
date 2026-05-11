@@ -11,9 +11,11 @@
     daemon_reload: true
   when: tuxedo_tccd_enabled | bool
 
+# tccd-sleep is a sleep.target-driven oneshot owned by
+# tuxedo-control-center-bin. It must not be started manually — doing
+# so triggers ExecStart (`systemctl stop tccd`) outside a sleep cycle
+# and bounces tccd on every Ansible run. Only manage `enabled`.
 - name: Service | Manage tccd-sleep service
   ansible.builtin.systemd_service:
     name: '{{ __tuxedo_tccd_sleep_service }}'
     enabled: "{{ tuxedo_tccd_sleep_enabled | bool }}"
-    state: "{{ tuxedo_tccd_sleep_enabled | bool | ternary('started', 'stopped') }}"
-  when: tuxedo_tccd_sleep_enabled | bool
