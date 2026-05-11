@@ -39,6 +39,19 @@
         update_cache: true
       when: ansible_facts['os_family'] == 'Debian'
 
+    - name: Prepare | Install EPEL repository (RedHat)
+      ansible.builtin.dnf:
+        name: epel-release
+        state: present
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    # kmail (KDE PIM) pulls libaspell.so.15 / KF5 libs from CRB.
+    - name: Prepare | Enable CRB repository (RedHat)
+      ansible.builtin.command:
+        cmd: dnf config-manager --set-enabled crb
+      changed_when: true
+      when: ansible_facts['os_family'] == 'RedHat'
+
     - name: Prepare | Update package cache (RedHat)
       ansible.builtin.dnf:
         update_cache: true
