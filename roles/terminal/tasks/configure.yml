@@ -1,6 +1,12 @@
 ---
 #
-# Default Terminal — $TERMINAL via /etc/environment.d
+# Default Terminal — $TERMINAL
+#
+# Deployed in two places so the variable is visible to both user-service
+# (graphical session, dbus-spawned apps) and shell-login contexts:
+#   /etc/environment.d/terminal.conf  — systemd user manager
+#   /etc/profile.d/terminal.sh        — bash/sh login shells (and zsh via
+#                                       /etc/zsh/zprofile)
 #
 
 - name: Configure | Ensure /etc/environment.d exists
@@ -21,8 +27,23 @@
     mode: '0644'
   when: terminal_default | default('') | length > 0
 
+- name: Configure | Deploy default terminal profile script
+  ansible.builtin.template:
+    src: terminal.sh.j2
+    dest: /etc/profile.d/terminal.sh
+    owner: root
+    group: root
+    mode: '0644'
+  when: terminal_default | default('') | length > 0
+
 - name: Configure | Remove default terminal env file when unset
   ansible.builtin.file:
     path: /etc/environment.d/terminal.conf
+    state: absent
+  when: terminal_default | default('') | length == 0
+
+- name: Configure | Remove default terminal profile script when unset
+  ansible.builtin.file:
+    path: /etc/profile.d/terminal.sh
     state: absent
   when: terminal_default | default('') | length == 0
