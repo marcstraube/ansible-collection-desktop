@@ -82,13 +82,13 @@ development_java_enabled: false
 development_make_enabled: true
 
 # Enable cmake
-development_cmake_enabled: false
+development_cmake_enabled: true
 
 # Enable meson
-development_meson_enabled: false
+development_meson_enabled: true
 
 # Enable ninja
-development_ninja_enabled: false
+development_ninja_enabled: true
 
 #
 # IDEs and Editors
