@@ -247,6 +247,18 @@
     - gaming
   when: gaming_enabled | default(false) | bool
 
+- name: Desktop | Include wine role
+  ansible.builtin.include_role:
+    name: marcstraube.desktop.wine
+    apply:
+      tags:
+        - desktop
+        - wine
+  tags:
+    - desktop
+    - wine
+  when: wine_enabled | default(false) | bool
+
 - name: Desktop | Include communication role
   ansible.builtin.include_role:
     name: marcstraube.desktop.communication
