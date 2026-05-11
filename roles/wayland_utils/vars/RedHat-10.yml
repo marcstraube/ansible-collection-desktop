@@ -1,6 +1,6 @@
 ---
 #
-# RedHat Variables
+# RedHat 10 Variables
 #
 
 # Clipboard
@@ -13,11 +13,10 @@ __wayland_utils_grim_package: ''
 __wayland_utils_slurp_package: ''
 __wayland_utils_swappy_package: ''
 
-# Screen recording — wf-recorder not in EPEL
+# Screen recording — not in EPEL 10
 __wayland_utils_recorder_package: ''
 __wayland_utils_screenrec_package: ''
-__wayland_utils_obs_packages:
-  - 'obs-studio'
+__wayland_utils_obs_packages: []
 
 # Notifications — not in EPEL
 __wayland_utils_notification_packages:
