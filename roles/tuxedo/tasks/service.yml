@@ -14,8 +14,16 @@
 # tccd-sleep is a sleep.target-driven oneshot owned by
 # tuxedo-control-center-bin. It must not be started manually — doing
 # so triggers ExecStart (`systemctl stop tccd`) outside a sleep cycle
-# and bounces tccd on every Ansible run. Only manage `enabled`.
+# and bounces tccd on every Ansible run. Only manage `enabled`, and
+# only when the unit is actually installed on the host (the package is
+# AUR-only and absent in some environments, e.g. molecule containers).
+- name: Service | Check if tccd-sleep service is installed
+  ansible.builtin.stat:
+    path: '/usr/lib/systemd/system/{{ __tuxedo_tccd_sleep_service }}'
+  register: __tuxedo_tccd_sleep_unit
+
 - name: Service | Manage tccd-sleep service
   ansible.builtin.systemd_service:
     name: '{{ __tuxedo_tccd_sleep_service }}'
     enabled: "{{ tuxedo_tccd_sleep_enabled | bool }}"
+  when: __tuxedo_tccd_sleep_unit.stat.exists
