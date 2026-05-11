@@ -85,9 +85,10 @@ overrides if needed.
 
 ### Wallpaper
 
-| Variable                  | Default  | Description                                                   |
-|---------------------------|----------|---------------------------------------------------------------|
-| `wayland_utils_wallpaper` | `'none'` | Wallpaper tool: swww, swaybg, hyprpaper, wpaperd, none        |
+| Variable                         | Default  | Description                                                                 |
+|----------------------------------|----------|-----------------------------------------------------------------------------|
+| `wayland_utils_wallpaper`        | `'none'` | Wallpaper tool: awww, swaybg, hyprpaper, wpaperd, none                      |
+| `wayland_utils_matugen_enabled`  | `false`  | Install matugen (Material You color generation, pairs well with awww)       |
 
 ### Display Management
 

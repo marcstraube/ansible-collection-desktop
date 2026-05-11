@@ -38,7 +38,7 @@ desktop_environment_wayland_utils_config: {}
 desktop_environment_wayland_utils_hyprland_config:
   wayland_utils_idle: 'hypridle'
   wayland_utils_locker: 'hyprlock'
-  wayland_utils_wallpaper: 'swww'
+  wayland_utils_wallpaper: 'awww'
 
 #
 # Hyprland Options

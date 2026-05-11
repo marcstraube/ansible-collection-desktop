@@ -21,6 +21,7 @@
         ([__wayland_utils_idle_packages[wayland_utils_idle] | default('')]) +
         ([__wayland_utils_locker_packages[wayland_utils_locker] | default('')]) +
         ([__wayland_utils_wallpaper_packages[wayland_utils_wallpaper] | default('')]) +
+        (wayland_utils_matugen_enabled | bool | ternary([__wayland_utils_matugen_package], [])) +
         (wayland_utils_wlr_randr_enabled | bool | ternary([__wayland_utils_wlr_randr_package], [])) +
         (wayland_utils_kanshi_enabled | bool | ternary([__wayland_utils_kanshi_package], [])) +
         (wayland_utils_nwg_displays_enabled | bool | ternary([__wayland_utils_nwg_displays_package], [])) +

@@ -57,11 +57,14 @@ __wayland_utils_locker_packages:
 
 # Wallpaper
 __wayland_utils_wallpaper_packages:
-  swww: ''  # Not in repos
+  awww: ''  # Not in repos
   swaybg: 'swaybg'
   hyprpaper: ''  # Not in repos
   wpaperd: ''
   none: ''
+
+# Matugen — not in repos
+__wayland_utils_matugen_package: ''
 
 # Display management
 __wayland_utils_wlr_randr_package: 'wlr-randr'
