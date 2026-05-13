@@ -48,6 +48,10 @@ office_thunderbird_enabled: false
 # Thunderbird language pack
 office_thunderbird_i18n: 'de'
 
+# Enable Betterbird installation (AUR only)
+# Thunderbird fork with quality-of-life patches. Ships all locales.
+office_betterbird_enabled: false
+
 # Enable Evolution installation
 office_evolution_enabled: false
 

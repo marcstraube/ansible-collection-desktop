@@ -89,6 +89,18 @@
   retries: 3
   delay: 5
 
+- name: Install | Betterbird from AUR (Arch)
+  become: true
+  become_user: aur_builder
+  kewlfft.aur.aur:
+    name: '{{ __office_betterbird_package }}'
+    state: present
+  when:
+    - office_betterbird_enabled | bool
+    - __office_betterbird_package | length > 0
+  retries: 3
+  delay: 5
+
 - name: Install | Evolution
   ansible.builtin.package:
     name: '{{ __office_evolution_package }}'

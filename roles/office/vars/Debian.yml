@@ -28,6 +28,7 @@ __office_pdf_tools_packages:
 
 __office_thunderbird_package: 'thunderbird'
 __office_thunderbird_i18n_package: 'thunderbird-l10n-{{ office_thunderbird_i18n }}'
+__office_betterbird_package: ''
 __office_evolution_package: 'evolution'
 
 #
