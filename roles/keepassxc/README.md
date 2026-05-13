@@ -51,6 +51,22 @@ overrides if needed.
 | `keepassxc_secret_service_enabled`   | `false` | Enable Secret Service (freedesktop.org) integration |
 | `keepassxc_secret_service_scope`     | `'user'`| Secret Service scope: `'user'` or `'global'`        |
 
+> **Manual setup required after first run.** Enabling
+> `keepassxc_secret_service_enabled` only registers KeePassXC as the
+> freedesktop Secret-Service DBus provider. The database group that
+> KeePassXC actually exposes to Secret-Service clients must be assigned
+> manually **per database** in the KeePassXC GUI — the assignment is
+> stored inside the KDBX file and cannot be set by Ansible.
+>
+> Path in the GUI: `Application Settings → Secret Service Integration →
+> Expose entries under this group`. Pick (or create) a group, then save
+> the database.
+>
+> Without this step, every Secret-Service client (Slack, Claude Desktop,
+> browsers, …) that contacts KeePassXC triggers a one-time setup wizard
+> on first connection that looks like a "create new database" prompt and
+> can be confusing.
+
 ### SSH Agent Integration
 
 | Variable                      | Default | Description                |
@@ -141,7 +157,7 @@ molecule test -s default -- --tags keepassxc
 - [KeePassXC](https://keepassxc.org/) — Cross-platform community-driven password manager
 - [KeePassXC Documentation](https://keepassxc.org/docs/) — User guide and configuration reference
 - [KeePassXC-Browser](https://github.com/keepassxreboot/keepassxc-browser) — Browser extension for autofill
-- [Freedesktop Secret Service API](https://specifications.freedesktop.org/secret-service-spec/latest/) — D-Bus API KeePassXC implements
+- [Secret Service API](https://specifications.freedesktop.org/secret-service-spec/latest/) — D-Bus API KeePassXC uses
 
 ## License
 
