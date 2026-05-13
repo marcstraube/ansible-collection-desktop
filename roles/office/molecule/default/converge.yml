@@ -11,6 +11,7 @@
     office_pdf_viewer: 'evince'
     office_pdf_tools_enabled: false
     office_thunderbird_enabled: false
+    office_betterbird_enabled: false
     office_evolution_enabled: false
     office_gnome_calendar_enabled: false
     office_gnome_contacts_enabled: false

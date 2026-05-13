@@ -8,12 +8,17 @@ Install office applications and document tools.
 
 ## Supported Platforms
 
-| Platform                    | Notes                                                                                                            |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------|
-| Arch Linux                  | Native packages + AUR                                                                                            |
-| Debian Trixie               | Official repo packages                                                                                           |
-| EL 9 (Rocky, Alma, RHEL)    | EPEL packages — gnome-contacts, foliate, gscan2pdf not available                                                 |
-| EL 10 (Rocky, Alma, RHEL)   | EPEL packages — calibre, foliate, texstudio, gnome-calendar, gnome-contacts not available; evince → GNOME Papers |
+| Platform                  | Notes                  |
+|---------------------------|------------------------|
+| Arch Linux                | Native packages + AUR  |
+| Debian Trixie             | Official repo packages |
+| EL 9 (Rocky, Alma, RHEL)  | EPEL packages          |
+| EL 10 (Rocky, Alma, RHEL) | EPEL packages          |
+
+Packages not available on EL 9: `gnome-contacts`, `foliate`, `gscan2pdf`.
+
+Packages not available on EL 10: `calibre`, `foliate`, `texstudio`,
+`gnome-calendar`, `gnome-contacts`. `evince` is replaced by GNOME Papers.
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
@@ -46,11 +51,12 @@ overrides if needed.
 
 ### Email Clients
 
-| Variable                     | Default | Description               |
-|------------------------------|---------|---------------------------|
-| `office_thunderbird_enabled` | `false` | Enable Thunderbird        |
-| `office_thunderbird_i18n`    | `'de'`  | Thunderbird language pack |
-| `office_evolution_enabled`   | `false` | Enable Evolution          |
+| Variable                     | Default | Description                  |
+|------------------------------|---------|------------------------------|
+| `office_thunderbird_enabled` | `false` | Enable Thunderbird           |
+| `office_thunderbird_i18n`    | `'de'`  | Thunderbird language pack    |
+| `office_betterbird_enabled`  | `false` | Enable Betterbird (AUR only) |
+| `office_evolution_enabled`   | `false` | Enable Evolution             |
 
 ### Calendar / PIM
 
