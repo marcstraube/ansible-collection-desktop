@@ -15,8 +15,15 @@
     browser_firefox_policies_enabled: true
     browser_chromium_policies_enabled: true
 
-    # Skip user configuration in container test
-    browser_users: []
+    # Skip Firefox per-user user.js in container test (no graphical
+    # session for profile creation); keep browser_users populated so
+    # the mimeapps.list handler path is exercised.
+    browser_firefox_user_js_enabled: false
+
+    browser_default: 'firefox'
+    browser_user_config_mode: 'managed'
+    browser_users:
+      - username: 'browser_test_user'
 
     # Minimal extensions for testing
     browser_firefox_extensions:

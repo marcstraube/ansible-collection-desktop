@@ -1,0 +1,40 @@
+---
+- name: Users Default Handler | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ browser_user.username }}'
+
+- name: Users Default Handler | Set user home fact
+  ansible.builtin.set_fact:
+    __browser_user_home: '{{ getent_passwd[browser_user.username][4] }}'
+
+- name: Users Default Handler | Stat ~/.config
+  ansible.builtin.stat:
+    path: '{{ __browser_user_home }}/.config'
+  register: __browser_user_config_dir
+
+# Create only when missing — never alter mode of existing dir.
+# XDG private default (0700) when the role has to create it.
+- name: Users Default Handler | Create ~/.config if missing
+  ansible.builtin.file:
+    path: '{{ __browser_user_home }}/.config'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+  when: not __browser_user_config_dir.stat.exists
+
+- name: Users Default Handler | Set http/https handler in mimeapps.list
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/.config/mimeapps.list'
+    section: 'Default Applications'
+    option: '{{ item }}'
+    value: '{{ browser_default }}.desktop'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0644'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - 'x-scheme-handler/http'
+    - 'x-scheme-handler/https'

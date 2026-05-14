@@ -28,7 +28,11 @@ browser_tor_enabled: false
 # Install Zen Browser (Firefox fork)
 browser_zen_enabled: false
 
-# Default browser for xdg-settings
+# Default browser for the http/https URL handler.
+# Sets x-scheme-handler/http and x-scheme-handler/https in each
+# browser_users home's ~/.config/mimeapps.list. Use the .desktop
+# basename without the suffix (e.g. 'firefox', 'librewolf',
+# 'chromium', 'brave-browser'). Empty string disables.
 browser_default: 'firefox'
 
 #

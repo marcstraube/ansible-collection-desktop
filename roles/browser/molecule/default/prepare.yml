@@ -89,3 +89,13 @@
         mode: '0440'
         validate: 'visudo -cf %s'
       when: ansible_facts['os_family'] == 'Archlinux'
+
+    #
+    # Test User (for mimeapps.list handler verification)
+    #
+
+    - name: Prepare | Create test user
+      ansible.builtin.user:
+        name: browser_test_user
+        create_home: true
+        shell: /bin/bash

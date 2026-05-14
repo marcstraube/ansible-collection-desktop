@@ -51,7 +51,7 @@ Chromium on Rocky Linux requires EPEL.
 | `browser_brave_enabled`      | `false`     | Install Brave (Arch only)     |
 | `browser_tor_enabled`        | `false`     | Install Tor Browser           |
 | `browser_zen_enabled`        | `false`     | Install Zen Browser (Arch)    |
-| `browser_default`            | `'firefox'` | Default browser (xdg)         |
+| `browser_default`            | `'firefox'` | Default http/https handler    |
 
 ### Firefox Options
 
@@ -116,6 +116,18 @@ Chromium on Rocky Linux requires EPEL.
 | -------------------------- | ----------- | -------------------------------------- |
 | `browser_users`            | `[]`        | Users for per-user profile settings    |
 | `browser_user_config_mode` | `'initial'` | Default mode: managed/initial/disabled |
+
+`browser_default` is applied per-user via `~/.config/mimeapps.list`
+(sections `[Default Applications]`, keys `x-scheme-handler/http`
+and `x-scheme-handler/https`). Previously this used `xdg-settings`,
+which silently failed without a graphical session. The value must
+match the `.desktop` basename of an installed browser, without the
+suffix (e.g. `firefox`, `librewolf`, `chromium`, `brave-browser`).
+Set to an empty string to skip handler management. Other entries
+in `mimeapps.list` are preserved on each run. The same
+`managed`/`initial`/`disabled` mode that governs per-user profile
+config applies here too — `initial` deploys only on newly created
+users, leaving subsequent manual changes intact.
 
 ## Tags
 
