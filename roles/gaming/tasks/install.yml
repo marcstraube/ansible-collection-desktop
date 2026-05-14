@@ -13,6 +13,19 @@
   retries: 3
   delay: 5
 
+- name: Install | Assert multilib repo is enabled for Steam (Arch)
+  ansible.builtin.assert:
+    that:
+      - pacman_multilib_enabled | default(false) | bool
+    fail_msg: >-
+      Steam on Arch lives in the multilib repository and pulls lib32
+      dependencies. Set `pacman_multilib_enabled: true` in inventory
+      and run the `marcstraube.common.package_management` role first
+      (or use the `base-system` tag).
+  when:
+    - gaming_steam_enabled | bool
+    - ansible_facts['os_family'] == 'Archlinux'
+
 - name: Install | Steam
   ansible.builtin.package:
     name: '{{ __gaming_steam_package }}'

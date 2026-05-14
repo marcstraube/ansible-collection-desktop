@@ -12,6 +12,12 @@ environment configuration, and per-user Wine prefix initialization.
 ## Requirements
 
 - ansible-core >= 2.17
+- Arch Linux: `multilib` repository enabled — set
+  `pacman_multilib_enabled: true` in inventory and run the
+  `marcstraube.common.package_management` role first (or use the
+  `base-system` tag). Required for the `lib32-*` packages and the
+  32-bit Vulkan driver. The role asserts this precondition before
+  installation.
 - EPEL repository enabled (for Wine on Rocky Linux 9, managed by
   `marcstraube.common.package_management`)
 - Wine is **not available** for EL 10 (no EPEL package exists)

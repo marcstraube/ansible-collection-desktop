@@ -22,6 +22,16 @@ to exist on managed hosts.
 - `kewlfft.aur` collection (AUR packages on Arch Linux)
 - EPEL repository enabled (for Lutris on EL 9/10)
 - `aur_builder` system user with passwordless sudo (Arch Linux only)
+- Arch Linux + `gaming_steam_enabled: true`: `multilib` repository
+  enabled — set `pacman_multilib_enabled: true` in inventory and run
+  the `marcstraube.common.package_management` role first (or use the
+  `base-system` tag). Steam lives in `multilib` and pulls `lib32-*`
+  dependencies. The role asserts this precondition before installing
+  Steam.
+- Arch Linux + Lutris: although Lutris itself installs without
+  multilib, running 32-bit Windows games via Wine/Proton needs the
+  `lib32-*` optional dependencies. Enabling `multilib` is strongly
+  recommended.
 
 ## Supported Platforms
 
