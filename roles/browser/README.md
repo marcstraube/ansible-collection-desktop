@@ -67,10 +67,11 @@ Chromium on Rocky Linux requires EPEL.
 
 ### LibreWolf Options
 
-| Variable                                      | Default     | Description                      |
-| --------------------------------------------- | ----------- | -------------------------------- |
-| `browser_librewolf_policies_enabled`          | `true`      | Deploy policies.json             |
-| `browser_librewolf_extensions`                | `{...}`     | Extensions (defaults to Firefox) |
+| Variable                                      | Default     | Description                       |
+| --------------------------------------------- | ----------- | --------------------------------- |
+| `browser_librewolf_policies_enabled`          | `true`      | Deploy policies.json              |
+| `browser_librewolf_user_js_enabled`           | `true`      | Deploy per-user user.js           |
+| `browser_librewolf_extensions`                | `{...}`     | Extensions (defaults to Firefox)  |
 | `browser_librewolf_preferences`               | `{}`        | Additional preferences           |
 | `browser_librewolf_disable_telemetry`         | `true`      | Disable telemetry                |
 | `browser_librewolf_disable_pocket`            | `true`      | Disable Pocket                   |
@@ -128,6 +129,34 @@ in `mimeapps.list` are preserved on each run. The same
 `managed`/`initial`/`disabled` mode that governs per-user profile
 config applies here too — `initial` deploys only on newly created
 users, leaving subsequent manual changes intact.
+
+### Firefox / LibreWolf profile bootstrap
+
+For Firefox and LibreWolf, the role writes the profile directory,
+`profiles.ini`, and `user.js` directly (Mozilla's `-CreateProfile`
+CLI is a silent no-op in non-interactive contexts). To make the
+bootstrapped profile actually take effect on first launch, the role
+also writes a per-install `[Install<hash>]` section in
+`profiles.ini` — without it, modern Firefox (>= 67) ignores
+`[Profile0].Default=1` and auto-creates its own random-prefix
+profile, locking the install to that one.
+
+The install hash is `CityHash64` of the UTF-16-LE encoded install
+directory path (see Mozilla source `commonupdatedir.cpp::GetInstallHash`).
+Pre-computed hashes for the standard distro install paths are
+hardcoded in `vars/{Archlinux,Debian,RedHat}.yml`
+(`__browser_firefox_install_hash`, `__browser_librewolf_install_hash`).
+
+To compute the hash for a custom install path:
+
+```bash
+go run github.com/bradenhilton/mozillainstallhash/cmd/mozhash@latest <path>
+# e.g. mozhash /opt/firefox  → custom 16-char uppercase hex
+```
+
+If the install hash is left empty, the profile is still written but
+the browser will not pick it up as default — fall back to detecting
+the random-prefix profile the browser creates on first launch.
 
 ## Tags
 

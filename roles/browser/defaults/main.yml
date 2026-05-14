@@ -55,6 +55,9 @@ browser_firefox_user_js_enabled: true
 # LibreWolf already has good defaults, fewer customizations needed
 browser_librewolf_policies_enabled: true
 
+# Deploy per-user user-overrides.js (LibreWolf's user.js equivalent)
+browser_librewolf_user_js_enabled: true
+
 #
 # Chromium Options
 #
@@ -164,9 +167,6 @@ browser_firefox_preferences:
   # Disable Pocket
   'extensions.pocket.enabled': false
 
-  # Disable Firefox accounts
-  'identity.fxaccounts.enabled': false
-
   # HTTPS-only mode
   'dom.security.https_only_mode': true
   'dom.security.https_only_mode_ever_enabled': true
@@ -246,6 +246,7 @@ browser_extension_default_mode: 'blocked'
 
 browser_librewolf_preferences: {}
 browser_librewolf_extensions: '{{ browser_firefox_extensions }}'
+browser_librewolf_extensions_optional: '{{ browser_firefox_extensions_optional | default({}) }}'
 browser_librewolf_disable_telemetry: true
 browser_librewolf_disable_pocket: true
 browser_librewolf_disable_firefox_studies: true

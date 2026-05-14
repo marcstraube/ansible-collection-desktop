@@ -6,49 +6,115 @@
 
 - name: Users LibreWolf | Set user home fact
   ansible.builtin.set_fact:
-    __browser_user_home: '{{ getent_passwd[browser_user.username][4] }}'
+    __browser_user_home: "{{ ansible_facts['getent_passwd'][browser_user.username][4] }}"
 
-- name: Users LibreWolf | Check for existing profile
+# Ensure parent directory exists before find — avoids a 'not a directory'
+# warning on hosts where the user has never opened LibreWolf.
+- name: Users LibreWolf | Ensure ~/.librewolf directory exists
+  ansible.builtin.file:
+    path: '{{ __browser_user_home }}/.librewolf'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+
+# Detect any existing profile (random-prefixed by LibreWolf on first
+# interactive launch, e.g. xyz123.default-default) — if one is
+# already there, use it instead of bootstrapping a new one.
+- name: Users LibreWolf | Discover existing profile
   ansible.builtin.find:
     paths: '{{ __browser_user_home }}/.librewolf'
     patterns: '{{ __browser_librewolf_profile_pattern }}'
     file_type: directory
   register: __browser_librewolf_existing_profiles
-  # Profile directory may not exist yet on first run
-  failed_when: false
 
-- name: Users LibreWolf | Create profile if none exists
-  ansible.builtin.command:
-    cmd: 'librewolf --headless -CreateProfile "default"'
-  become: true
-  become_user: '{{ browser_user.username }}'
-  register: __browser_create_librewolf_profile
-  changed_when: __browser_create_librewolf_profile.rc == 0
-  when: >-
-    __browser_librewolf_existing_profiles.files is not defined or
-    __browser_librewolf_existing_profiles.files | length == 0
-
-- name: Users LibreWolf | Find profile after creation
-  ansible.builtin.find:
-    paths: '{{ __browser_user_home }}/.librewolf'
-    patterns: '{{ __browser_librewolf_profile_pattern }}'
-    file_type: directory
-  register: __browser_librewolf_profiles
-  when: >-
-    __browser_librewolf_existing_profiles.files is not defined or
-    __browser_librewolf_existing_profiles.files | length == 0
-
-- name: Users LibreWolf | Set profile path fact
+- name: Users LibreWolf | Set profile path from existing
   ansible.builtin.set_fact:
     __browser_librewolf_profile_path: >-
-      {{ ((__browser_librewolf_profiles | default(__browser_librewolf_existing_profiles)).files
-         | sort(attribute='path') | first).path }}
+      {{ (__browser_librewolf_existing_profiles.files
+          | sort(attribute='path') | first).path }}
+  when:
+    - __browser_librewolf_existing_profiles.files | length > 0
 
-- name: Users LibreWolf | Deploy user-overrides.js
+# Bootstrap profile when no existing one is found. -CreateProfile is
+# unreliable in non-interactive contexts, so the role writes the
+# profile dir and profiles.ini directly.
+- name: Users LibreWolf | Set profile path from bootstrap
+  ansible.builtin.set_fact:
+    __browser_librewolf_profile_path: '{{ __browser_user_home }}/.librewolf/{{ __browser_librewolf_profile_dirname }}'
+  when:
+    - __browser_librewolf_existing_profiles.files | length == 0
+
+- name: Users LibreWolf | Ensure profile directory exists
+  ansible.builtin.file:
+    path: '{{ __browser_librewolf_profile_path }}'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+
+- name: Users LibreWolf | Register profile in profiles.ini
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/.librewolf/profiles.ini'
+    section: 'Profile0'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0600'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - { option: 'Name', value: 'default' }
+    - { option: 'IsRelative', value: '1' }
+    - { option: 'Path', value: '{{ __browser_librewolf_profile_path | basename }}' }
+    - { option: 'Default', value: '1' }
+  loop_control:
+    label: '{{ item.option }}'
+
+- name: Users LibreWolf | Set General section in profiles.ini
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/.librewolf/profiles.ini'
+    section: 'General'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0600'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - { option: 'StartWithLastProfile', value: '1' }
+    - { option: 'Version', value: '2' }
+  loop_control:
+    label: '{{ item.option }}'
+
+# See users_firefox.yml for the why — same mechanism for LibreWolf.
+- name: Users LibreWolf | Set Install section in profiles.ini
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/.librewolf/profiles.ini'
+    section: 'Install{{ __browser_librewolf_install_hash }}'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0600'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - { option: 'Default', value: '{{ __browser_librewolf_profile_path | basename }}' }
+    - { option: 'Locked', value: '1' }
+  loop_control:
+    label: '{{ item.option }}'
+  when: __browser_librewolf_install_hash | length > 0
+
+- name: Users LibreWolf | Deploy user.js
   ansible.builtin.template:
     src: user.js.j2
-    dest: '{{ __browser_librewolf_profile_path }}/user-overrides.js'
+    dest: '{{ __browser_librewolf_profile_path }}/user.js'
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
     mode: '0644'
+  vars:
+    __browser_template_prefs: '{{ browser_librewolf_preferences }}'
   when: browser_librewolf_preferences | length > 0

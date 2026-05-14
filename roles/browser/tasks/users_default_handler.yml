@@ -6,7 +6,7 @@
 
 - name: Users Default Handler | Set user home fact
   ansible.builtin.set_fact:
-    __browser_user_home: '{{ getent_passwd[browser_user.username][4] }}'
+    __browser_user_home: "{{ ansible_facts['getent_passwd'][browser_user.username][4] }}"
 
 - name: Users Default Handler | Stat ~/.config
   ansible.builtin.stat:

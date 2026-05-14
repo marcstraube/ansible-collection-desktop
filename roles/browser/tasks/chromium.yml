@@ -1,5 +1,5 @@
 ---
-- name: Chromium | Ensure Chromium policies directories exist
+- name: Chromium | Ensure policies directories exist
   ansible.builtin.file:
     path: '{{ item }}'
     state: directory
@@ -10,7 +10,7 @@
     - '{{ __browser_chromium_policies_path }}/managed'
     - '{{ __browser_chromium_policies_path }}/recommended'
 
-- name: Chromium | Deploy Chromium managed policies
+- name: Chromium | Deploy managed policies
   ansible.builtin.template:
     src: chromium-policies.json.j2
     dest: '{{ __browser_chromium_policies_path }}/managed/policies.json'
@@ -29,7 +29,7 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - browser_chromium_wayland_gestures_enabled | bool
 
-- name: Chromium | Deploy Chromium Wayland gestures hook (Arch)
+- name: Chromium | Deploy Wayland gestures hook (Arch)
   ansible.builtin.template:
     src: chromium-wayland-gestures.hook.j2
     dest: '/etc/pacman.d/hooks/chromium-wayland-gestures.hook'

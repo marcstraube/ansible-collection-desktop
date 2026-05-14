@@ -3,6 +3,18 @@
   hosts: all
   gather_facts: true
   tasks:
+    - name: Verify | Load OS-specific role vars
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '{{ playbook_dir }}/../../vars'
+          skip: true
+
     #
     # Firefox Verification
     #
@@ -55,6 +67,12 @@
           - __browser_verify_ublock.stdout | int > 0
         fail_msg: 'uBlock Origin not found in Firefox policies.json'
 
+    - name: Verify | Validate Firefox policies.json is valid JSON
+      ansible.builtin.command:
+        cmd: 'python3 -c "import json; json.load(open(''{{ __browser_verify_policies_path | trim }}/policies.json''))"'
+      register: __browser_verify_firefox_policies_json
+      changed_when: false
+
     #
     # Chromium Verification
     #
@@ -82,6 +100,12 @@
         that:
           - __browser_verify_chromium_policies.stat.exists
         fail_msg: 'Chromium policies.json not found'
+
+    - name: Verify | Validate Chromium policies.json is valid JSON
+      ansible.builtin.command:
+        cmd: 'python3 -c "import json; json.load(open(''/etc/chromium/policies/managed/policies.json''))"'
+      register: __browser_verify_chromium_policies_json
+      changed_when: false
 
     #
     # Firefox Autoconfig Verification
@@ -149,3 +173,58 @@
           - (__browser_verify_mimeapps_content.content | b64decode)
             is search('x-scheme-handler/https\s*=\s*firefox\.desktop')
         fail_msg: 'x-scheme-handler/https not set to firefox.desktop'
+
+    #
+    # Firefox Profile Bootstrap (filesystem-based)
+    #
+
+    - name: Verify | Check Firefox profile directory exists
+      ansible.builtin.stat:
+        path: /home/browser_test_user/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
+      register: __browser_verify_firefox_profile
+
+    - name: Verify | Assert Firefox profile directory exists
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_firefox_profile.stat.exists
+          - __browser_verify_firefox_profile.stat.isdir
+        fail_msg: 'Firefox bootstrap profile directory not created'
+
+    - name: Verify | Check Firefox profiles.ini exists
+      ansible.builtin.stat:
+        path: /home/browser_test_user/.mozilla/firefox/profiles.ini
+      register: __browser_verify_firefox_profiles_ini
+
+    - name: Verify | Assert Firefox profiles.ini exists
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_firefox_profiles_ini.stat.exists
+        fail_msg: 'Firefox profiles.ini not created'
+
+    - name: Verify | Read Firefox profiles.ini content
+      ansible.builtin.slurp:
+        src: /home/browser_test_user/.mozilla/firefox/profiles.ini
+      register: __browser_verify_firefox_profiles_ini_content
+
+    - name: Verify | Assert profiles.ini registers the profile correctly
+      ansible.builtin.assert:
+        that:
+          - "'Path=' + __browser_firefox_profile_dirname in __profiles_ini_text"
+          - "'Default=1' in __profiles_ini_text"
+          - "'Version=2' in __profiles_ini_text"
+          - "'[Install' + __browser_firefox_install_hash + ']' in __profiles_ini_text"
+          - "'Default=' + __browser_firefox_profile_dirname in __profiles_ini_text"
+        fail_msg: 'profiles.ini does not register the bootstrap profile correctly'
+      vars:
+        __profiles_ini_text: '{{ __browser_verify_firefox_profiles_ini_content.content | b64decode }}'
+
+    - name: Verify | Check Firefox user.js exists in profile
+      ansible.builtin.stat:
+        path: /home/browser_test_user/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}/user.js
+      register: __browser_verify_firefox_user_js
+
+    - name: Verify | Assert Firefox user.js deployed
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_firefox_user_js.stat.exists
+        fail_msg: 'Firefox user.js not deployed into profile'
