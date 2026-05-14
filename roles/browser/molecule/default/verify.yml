@@ -3,6 +3,18 @@
   hosts: all
   gather_facts: true
   tasks:
+    - name: Verify | Load OS-specific role vars
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '{{ playbook_dir }}/../../vars'
+          skip: true
+
     #
     # Firefox Verification
     #
@@ -168,7 +180,7 @@
 
     - name: Verify | Check Firefox profile directory exists
       ansible.builtin.stat:
-        path: /home/browser_test_user/.mozilla/firefox/profile.default-release
+        path: /home/browser_test_user/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
       register: __browser_verify_firefox_profile
 
     - name: Verify | Assert Firefox profile directory exists
@@ -176,7 +188,7 @@
         that:
           - __browser_verify_firefox_profile.stat.exists
           - __browser_verify_firefox_profile.stat.isdir
-        fail_msg: 'Firefox profile.default-release directory not created'
+        fail_msg: 'Firefox bootstrap profile directory not created'
 
     - name: Verify | Check Firefox profiles.ini exists
       ansible.builtin.stat:
@@ -197,21 +209,18 @@
     - name: Verify | Assert profiles.ini registers the profile correctly
       ansible.builtin.assert:
         that:
-          - (__browser_verify_firefox_profiles_ini_content.content | b64decode)
-            is search('Path\s*=\s*profile\.default-release')
-          - (__browser_verify_firefox_profiles_ini_content.content | b64decode)
-            is search('Default\s*=\s*1')
-          - (__browser_verify_firefox_profiles_ini_content.content | b64decode)
-            is search('Version\s*=\s*2')
-          - (__browser_verify_firefox_profiles_ini_content.content | b64decode)
-            is search('\[Install4F96D1932A9F858E\]')
-          - (__browser_verify_firefox_profiles_ini_content.content | b64decode)
-            is search('Default\s*=\s*profile\.default-release')
-        fail_msg: 'profiles.ini does not register profile.default-release correctly'
+          - "'Path=' + __browser_firefox_profile_dirname in __profiles_ini_text"
+          - "'Default=1' in __profiles_ini_text"
+          - "'Version=2' in __profiles_ini_text"
+          - "'[Install' + __browser_firefox_install_hash + ']' in __profiles_ini_text"
+          - "'Default=' + __browser_firefox_profile_dirname in __profiles_ini_text"
+        fail_msg: 'profiles.ini does not register the bootstrap profile correctly'
+      vars:
+        __profiles_ini_text: '{{ __browser_verify_firefox_profiles_ini_content.content | b64decode }}'
 
     - name: Verify | Check Firefox user.js exists in profile
       ansible.builtin.stat:
-        path: /home/browser_test_user/.mozilla/firefox/profile.default-release/user.js
+        path: /home/browser_test_user/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}/user.js
       register: __browser_verify_firefox_user_js
 
     - name: Verify | Assert Firefox user.js deployed
