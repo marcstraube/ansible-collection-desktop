@@ -158,10 +158,44 @@ development_shellcheck_enabled: true
 # User Configuration
 #
 
-# Users to configure with git settings
+# Users to configure with development settings (git + IDEs).
+# Per-user mode (managed/initial/disabled) can be set per entry; the
+# top-level default below applies when an entry omits it.
 development_users: []
 # Example:
 #   - username: 'johndoe'
+#     mode: 'managed'                        # optional, overrides global
 #     git_name: 'John Doe'
 #     git_email: 'john@example.com'
 #     git_signing_key: '0x1234567890ABCDEF'
+
+# Default mode when a user entry does not set its own `mode`:
+#   managed  — overwrite the file on every run
+#   initial  — deploy only when the user was created in this run
+#   disabled — skip user-config deploy entirely
+development_user_config_mode: 'initial'
+
+#
+# VSCode / VSCodium settings (per-user)
+#
+# Deployed under <user-home>/.config/Code/User/settings.json (VSCode)
+# and/or <user-home>/.config/VSCodium/User/settings.json. Both editors
+# read the same key syntax. Defaults below opt out of telemetry from
+# the editor core and from common Microsoft/Red Hat extensions; user
+# inventory can override or extend.
+
+development_vscode_settings:
+  telemetry.telemetryLevel: 'off'                          # editor core
+  workbench.enableExperiments: false                       # A/B experiments
+  workbench.settings.enableNaturalLanguageSearch: false    # cloud search lookup
+  update.mode: 'none'                                      # OS package manager handles updates
+  extensions.autoCheckUpdates: false
+  redhat.telemetry.enabled: false                          # all Red Hat-published extensions
+  workbench.welcomePage.walkthroughs.openOnInstall: false  # UX, but unwanted phone-home
+
+# argv.json deployed under <user-home>/.vscode/argv.json (VSCode) and
+# <user-home>/.vscode-oss/argv.json (VSCodium). Electron-runtime level;
+# distinct from the editor settings above.
+development_vscode_argv:
+  enable-crash-reporter: false
+  enable-telemetry: false

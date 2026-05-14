@@ -1,0 +1,105 @@
+---
+- name: Users VSCode | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ dev_user.username }}'
+
+- name: Users VSCode | Set user home fact
+  ansible.builtin.set_fact:
+    __development_user_home: "{{ ansible_facts['getent_passwd'][dev_user.username][4] }}"
+
+#
+# VSCode (proprietary)
+#
+
+- name: Users VSCode | Ensure VSCode User config directory exists
+  ansible.builtin.file:
+    path: '{{ __development_user_home }}/.config/Code/User'
+    state: directory
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0700'
+  when:
+    - development_vscode_enabled | bool
+    - development_vscode_settings | length > 0
+
+- name: Users VSCode | Deploy VSCode settings.json
+  ansible.builtin.copy:
+    content: '{{ development_vscode_settings | to_nice_json(indent=2) }}'
+    dest: '{{ __development_user_home }}/.config/Code/User/settings.json'
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0600'
+  when:
+    - development_vscode_enabled | bool
+    - development_vscode_settings | length > 0
+
+- name: Users VSCode | Ensure VSCode runtime directory exists
+  ansible.builtin.file:
+    path: '{{ __development_user_home }}/.vscode'
+    state: directory
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0700'
+  when:
+    - development_vscode_enabled | bool
+    - development_vscode_argv | length > 0
+
+- name: Users VSCode | Deploy VSCode argv.json
+  ansible.builtin.copy:
+    content: '{{ development_vscode_argv | to_nice_json(indent=2) }}'
+    dest: '{{ __development_user_home }}/.vscode/argv.json'
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0600'
+  when:
+    - development_vscode_enabled | bool
+    - development_vscode_argv | length > 0
+
+#
+# VSCodium (FOSS build, no MS telemetry code)
+#
+
+- name: Users VSCode | Ensure VSCodium User config directory exists
+  ansible.builtin.file:
+    path: '{{ __development_user_home }}/.config/VSCodium/User'
+    state: directory
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0700'
+  when:
+    - development_vscodium_enabled | bool
+    - development_vscode_settings | length > 0
+
+- name: Users VSCode | Deploy VSCodium settings.json
+  ansible.builtin.copy:
+    content: '{{ development_vscode_settings | to_nice_json(indent=2) }}'
+    dest: '{{ __development_user_home }}/.config/VSCodium/User/settings.json'
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0600'
+  when:
+    - development_vscodium_enabled | bool
+    - development_vscode_settings | length > 0
+
+- name: Users VSCode | Ensure VSCodium runtime directory exists
+  ansible.builtin.file:
+    path: '{{ __development_user_home }}/.vscode-oss'
+    state: directory
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0700'
+  when:
+    - development_vscodium_enabled | bool
+    - development_vscode_argv | length > 0
+
+- name: Users VSCode | Deploy VSCodium argv.json
+  ansible.builtin.copy:
+    content: '{{ development_vscode_argv | to_nice_json(indent=2) }}'
+    dest: '{{ __development_user_home }}/.vscode-oss/argv.json'
+    owner: '{{ dev_user.username }}'
+    group: '{{ dev_user.username }}'
+    mode: '0600'
+  when:
+    - development_vscodium_enabled | bool
+    - development_vscode_argv | length > 0
