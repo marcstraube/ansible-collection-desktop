@@ -14,21 +14,3 @@
     owner: root
     group: root
     mode: '0644'
-
-- name: Firefox | Deploy autoconfig.js
-  ansible.builtin.template:
-    src: autoconfig.js.j2
-    dest: '{{ __browser_firefox_autoconfig_path }}/autoconfig.js'
-    owner: root
-    group: root
-    mode: '0644'
-  when: browser_firefox_preferences | length > 0
-
-- name: Firefox | Deploy firefox.cfg
-  ansible.builtin.template:
-    src: firefox.cfg.j2
-    dest: '{{ __browser_firefox_config_path }}/firefox.cfg'
-    owner: root
-    group: root
-    mode: '0644'
-  when: browser_firefox_preferences | length > 0

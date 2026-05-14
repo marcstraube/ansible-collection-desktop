@@ -9,8 +9,10 @@ extension management, privacy hardening, and telemetry control. Supports
 Firefox, LibreWolf, Chromium, Brave, Tor Browser, and Zen Browser.
 
 Browser extensions are managed via policies (force-installed, user-installable,
-or blocked). Firefox/LibreWolf also support per-user hardening preferences
-via `user.js` and system-wide locked preferences via `firefox.cfg`.
+or blocked). Firefox/LibreWolf system-wide locked preferences go through the
+Mozilla `Preferences` policy inside `policies.json` (whitelist-bound, see
+upstream `Policies.sys.mjs`). Per-user, user-overridable hardening lives in
+`<profile>/user.js`.
 
 LibreWolf, Brave, Tor Browser, and Zen Browser are installed from AUR on
 Arch Linux. Tor Browser is available via `torbrowser-launcher` on Debian.
@@ -62,8 +64,8 @@ Chromium on Rocky Linux requires EPEL.
 | `browser_firefox_i18n`                | `''`    | Language pack code (empty = none)     |
 | `browser_firefox_extensions`          | `{...}` | Extensions with install modes         |
 | `browser_firefox_extensions_optional` | `{}`    | Optional extensions (user-selectable) |
-| `browser_firefox_preferences`         | `{...}` | Firefox preferences for user.js/cfg   |
-| `browser_firefox_policy_settings`     | `{...}` | Additional policies.json settings     |
+| `browser_firefox_preferences`         | `{}`    | User-overridable prefs → `user.js`    |
+| `browser_firefox_policy_settings`     | `{...}` | policies.json settings (incl. locked) |
 
 ### LibreWolf Options
 
@@ -129,6 +131,24 @@ in `mimeapps.list` are preserved on each run. The same
 `managed`/`initial`/`disabled` mode that governs per-user profile
 config applies here too — `initial` deploys only on newly created
 users, leaving subsequent manual changes intact.
+
+### Firefox / LibreWolf preferences — locked vs. user-overridable
+
+Two mechanisms, two variables, distinct semantics:
+
+- **`browser_firefox_policy_settings.Preferences`** (and `_librewolf_…`) deploy via `policies.json` as **system-wide locked** prefs. Only the [Mozilla whitelist of allowed prefixes](https://github.com/mozilla/gecko-dev/blob/master/browser/components/enterprisepolicies/Policies.sys.mjs) is honored — non-whitelisted entries are silently ignored by Mozilla. Format:
+
+  ```yaml
+  browser_firefox_policy_settings:
+    Preferences:
+      network.prefetch-next:
+        Value: false
+        Status: locked
+  ```
+
+- **`browser_firefox_preferences`** (and `_librewolf_…`) deploy as `user_pref()` in `<profile>/user.js` — **per-user, overridable in `about:config`** until the next managed-mode run reconciles. Use this for prefs that aren't on the policy whitelist, or for defaults the user should be able to change.
+
+The role's defaults intentionally leave `browser_firefox_preferences` empty: every soft-hardening pref worth defaulting is either already covered by another policy (e.g. `DisableTelemetry` covers all telemetry prefs) or by recent Firefox built-in defaults. The two non-trivial leftovers (`network.prefetch-next`, `network.dns.disablePrefetch`) live in `Preferences` policy.
 
 ### Firefox / LibreWolf profile bootstrap
 

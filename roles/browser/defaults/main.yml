@@ -148,40 +148,24 @@ browser_chromium_extensions:
     mode: 'normal_installed'
 
 #
-# Firefox Preferences (user.js)
+# Firefox Preferences (user.js — per-user, overridable in about:config)
 #
-# Only applied if browser_firefox_user_js_enabled: true
-# These are merged with arkenfox/user.js recommendations
+# Only applied if browser_firefox_user_js_enabled: true.
+# These deploy as `user_pref()` in <profile>/user.js — the user can
+# change them in about:config (until the next managed run reconciles).
+# For system-wide locked prefs, use `browser_firefox_policy_settings`
+# below with the `Preferences` policy (whitelist-bound by Mozilla).
 
-browser_firefox_preferences:
-  # Privacy
-  'privacy.trackingprotection.enabled': true
-  'privacy.trackingprotection.socialtracking.enabled': true
-  'network.cookie.cookieBehavior': 5      # Reject cross-site and social media trackers
-
-  # Disable telemetry
-  'toolkit.telemetry.enabled': false
-  'datareporting.healthreport.uploadEnabled': false
-  'datareporting.policy.dataSubmissionEnabled': false
-
-  # Disable Pocket
-  'extensions.pocket.enabled': false
-
-  # HTTPS-only mode
-  'dom.security.https_only_mode': true
-  'dom.security.https_only_mode_ever_enabled': true
-
-  # Disable prefetching
-  'network.prefetch-next': false
-  'network.dns.disablePrefetch': true
-
-  # Resist fingerprinting (can break some sites)
-  # 'privacy.resistFingerprinting': true
+browser_firefox_preferences: {}
+  # Example:
+  #   'privacy.resistFingerprinting': true
 
 #
 # Firefox Policies (additional)
 #
-# These are merged into policies.json alongside extensions
+# These are merged into policies.json alongside extensions.
+# Use the `Preferences` policy for system-wide locked prefs — whitelist
+# is enforced by Mozilla, see toolkit/.../Policies.sys.mjs.
 
 browser_firefox_policy_settings:
   DisableTelemetry: true
@@ -207,6 +191,13 @@ browser_firefox_policy_settings:
     Snippets: false
   HttpsOnlyMode: 'force_enabled'
   PasswordManagerEnabled: false           # Using KeePassXC instead
+  Preferences:
+    network.prefetch-next:
+      Value: false
+      Status: locked
+    network.dns.disablePrefetch:
+      Value: true
+      Status: locked
   SanitizeOnShutdown:
     Cache: true
     Cookies: false                        # Keep cookies, use containers instead

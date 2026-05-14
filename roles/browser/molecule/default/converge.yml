@@ -19,6 +19,11 @@
     # no DISPLAY/D-Bus needed — keep enabled in container tests.
     browser_firefox_user_js_enabled: true
 
+    # Exercise the user.js path explicitly — defaults are now empty so
+    # the role would skip the deploy. One sample pref is enough.
+    browser_firefox_preferences:
+      privacy.resistFingerprinting: true
+
     browser_default: 'firefox'
     browser_user_config_mode: 'managed'
     browser_users:

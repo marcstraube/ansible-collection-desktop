@@ -7,8 +7,6 @@ __browser_tor_package: 'torbrowser-launcher'
 
 # Policy paths
 __browser_firefox_policies_path: '/etc/firefox-esr/policies'
-__browser_firefox_autoconfig_path: '/usr/lib/firefox-esr/defaults/pref'
-__browser_firefox_config_path: '/usr/lib/firefox-esr'
 __browser_librewolf_policies_path: ''
 __browser_chromium_policies_path: '/etc/chromium/policies'
 __browser_brave_policies_path: ''
