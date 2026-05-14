@@ -115,3 +115,37 @@
         that:
           - __browser_verify_firefoxcfg.stat.exists
         fail_msg: 'Firefox firefox.cfg not found'
+
+    #
+    # Default Browser Handler (mimeapps.list)
+    #
+
+    - name: Verify | Check mimeapps.list exists for test user
+      ansible.builtin.stat:
+        path: /home/browser_test_user/.config/mimeapps.list
+      register: __browser_verify_mimeapps
+
+    - name: Verify | Assert mimeapps.list exists
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_mimeapps.stat.exists
+        fail_msg: 'mimeapps.list not created for browser_test_user'
+
+    - name: Verify | Read mimeapps.list content
+      ansible.builtin.slurp:
+        src: /home/browser_test_user/.config/mimeapps.list
+      register: __browser_verify_mimeapps_content
+
+    - name: Verify | Assert http handler is firefox.desktop
+      ansible.builtin.assert:
+        that:
+          - (__browser_verify_mimeapps_content.content | b64decode)
+            is search('x-scheme-handler/http\s*=\s*firefox\.desktop')
+        fail_msg: 'x-scheme-handler/http not set to firefox.desktop'
+
+    - name: Verify | Assert https handler is firefox.desktop
+      ansible.builtin.assert:
+        that:
+          - (__browser_verify_mimeapps_content.content | b64decode)
+            is search('x-scheme-handler/https\s*=\s*firefox\.desktop')
+        fail_msg: 'x-scheme-handler/https not set to firefox.desktop'

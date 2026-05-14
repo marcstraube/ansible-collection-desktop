@@ -46,3 +46,27 @@
       (browser_user.mode | default(browser_user_config_mode)) == 'managed'
       or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
           and browser_user.username in (__users_newly_created | default([])))
+
+- name: Users | Include default browser handler config
+  ansible.builtin.include_tasks:
+    file: users_default_handler.yml
+    apply:
+      tags:
+        - browser
+        - browser:configure
+        - browser:default
+  tags:
+    - browser
+    - browser:configure
+    - browser:default
+  loop: '{{ browser_users }}'
+  loop_control:
+    loop_var: browser_user
+    label: '{{ browser_user.username }}'
+  when:
+    - browser_default | length > 0
+    - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
+    - >-
+      (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
+          and browser_user.username in (__users_newly_created | default([])))

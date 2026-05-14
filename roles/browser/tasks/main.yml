@@ -94,16 +94,3 @@
   when:
     - browser_enabled | bool
     - browser_users | length > 0
-
-- name: Main | Set default browser
-  ansible.builtin.command:
-    cmd: 'xdg-settings set default-web-browser {{ browser_default }}.desktop'
-  changed_when: false
-  # xdg-settings requires a display server, fails in containers/headless
-  failed_when: false
-  when:
-    - browser_enabled | bool
-    - browser_default | length > 0
-  tags:
-    - browser
-    - browser:default
