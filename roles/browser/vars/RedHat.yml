@@ -13,6 +13,17 @@ __browser_librewolf_policies_path: ''
 __browser_chromium_policies_path: '/etc/chromium/policies'
 __browser_brave_policies_path: ''
 
-# Firefox profile directory pattern (for find)
+# Profile detection: pattern to discover any existing profile
+# (random-prefixed by Firefox itself).
 __browser_firefox_profile_pattern: '*.default-release'
 __browser_librewolf_profile_pattern: '*.default-default'
+
+# Profile bootstrap: deterministic dirname used when no profile exists.
+__browser_firefox_profile_dirname: 'profile.default-release'
+__browser_librewolf_profile_dirname: 'profile.default-default'
+
+# Mozilla install hash — see Archlinux.yml for explanation.
+# Regenerate via: github.com/bradenhilton/mozillainstallhash
+__browser_firefox_install_hash: '11457493C5A56847'        # /usr/lib64/firefox
+# LibreWolf is not packaged for RHEL/Rocky — leave empty.
+__browser_librewolf_install_hash: ''

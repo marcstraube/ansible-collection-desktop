@@ -1,5 +1,5 @@
-{{ ansible_managed | comment('cblock') }}
 {
+  "_comment": "{{ ansible_managed }}",
   "policies": {
 {% if browser_firefox_extensions | length > 0 or browser_firefox_extensions_optional | default({}) | length > 0 %}
     "ExtensionSettings": {

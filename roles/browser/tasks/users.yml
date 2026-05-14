@@ -40,6 +40,7 @@
     label: '{{ browser_user.username }}'
   when:
     - browser_librewolf_enabled | bool
+    - browser_librewolf_user_js_enabled | bool
     - ansible_facts['os_family'] == 'Archlinux'
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
     - >-

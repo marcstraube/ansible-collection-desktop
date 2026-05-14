@@ -19,6 +19,21 @@ __browser_librewolf_policies_path: '/usr/lib/librewolf/distribution'
 __browser_chromium_policies_path: '/etc/chromium/policies'
 __browser_brave_policies_path: '/etc/brave/policies'
 
-# Firefox profile directory pattern (for find)
+# Profile detection: pattern to discover any existing profile
+# (random-prefixed by Firefox itself, e.g. xyz123.default-release).
 __browser_firefox_profile_pattern: '*.default-release'
 __browser_librewolf_profile_pattern: '*.default-default'
+
+# Profile bootstrap: deterministic dirname used when no profile exists.
+# Firefox -CreateProfile is unreliable in non-interactive contexts,
+# so the role writes profiles.ini and the profile dir directly.
+__browser_firefox_profile_dirname: 'profile.default-release'
+__browser_librewolf_profile_dirname: 'profile.default-default'
+
+# Mozilla install hash — CityHash64 of UTF-16-LE encoded install dir path.
+# Identifies which profile is the default for THIS install in profiles.ini
+# (via the [Install<hash>] section). Without it, the browser ignores
+# [Profile0].Default=1 and auto-creates its own random-prefix profile.
+# Regenerate via: github.com/bradenhilton/mozillainstallhash
+__browser_firefox_install_hash: '4F96D1932A9F858E'        # /usr/lib/firefox
+__browser_librewolf_install_hash: '6C1CE26D3274EA5B'      # /usr/lib/librewolf

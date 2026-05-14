@@ -1,5 +1,5 @@
 ---
-- name: Firefox | Ensure Firefox policies directory exists
+- name: Firefox | Ensure policies directory exists
   ansible.builtin.file:
     path: '{{ __browser_firefox_policies_path }}'
     state: directory
@@ -7,7 +7,7 @@
     group: root
     mode: '0755'
 
-- name: Firefox | Deploy Firefox policies.json
+- name: Firefox | Deploy policies.json
   ansible.builtin.template:
     src: firefox-policies.json.j2
     dest: '{{ __browser_firefox_policies_path }}/policies.json'
@@ -15,7 +15,7 @@
     group: root
     mode: '0644'
 
-- name: Firefox | Deploy Firefox autoconfig.js
+- name: Firefox | Deploy autoconfig.js
   ansible.builtin.template:
     src: autoconfig.js.j2
     dest: '{{ __browser_firefox_autoconfig_path }}/autoconfig.js'
@@ -24,7 +24,7 @@
     mode: '0644'
   when: browser_firefox_preferences | length > 0
 
-- name: Firefox | Deploy Firefox firefox.cfg
+- name: Firefox | Deploy firefox.cfg
   ansible.builtin.template:
     src: firefox.cfg.j2
     dest: '{{ __browser_firefox_config_path }}/firefox.cfg'

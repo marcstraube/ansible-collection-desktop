@@ -1,5 +1,5 @@
-{{ ansible_managed | comment('cblock') }}
 {
+  "_comment": "{{ ansible_managed }}",
   "policies": {
 {% if browser_librewolf_disable_telemetry | bool %}
     "DisableTelemetry": true,
@@ -17,14 +17,13 @@
       "Locked": {{ browser_librewolf_dns_over_https.locked | default(false) | lower }}
     },
 {% endif %}
-{% if browser_librewolf_extensions | length > 0 %}
+{% if browser_librewolf_extensions | length > 0 or browser_librewolf_extensions_optional | default({}) | length > 0 %}
     "ExtensionSettings": {
       "*": {
         "blocked_install_message": "Extension installation is managed by system policy.",
         "installation_mode": "{{ browser_extension_default_mode }}"
-      }{% if browser_librewolf_extensions | length > 0 %},{% endif %}
-
-{% for ext_id, ext_config in browser_librewolf_extensions | dictsort %}
+      },
+{% for ext_id, ext_config in (browser_librewolf_extensions | combine(browser_librewolf_extensions_optional | default({}))) | dictsort %}
       "{{ ext_id }}": {
         "installation_mode": "{{ ext_config.mode | default('normal_installed') }}"{% if ext_config.url is defined %},
         "install_url": "{{ ext_config.url }}"{% endif %}

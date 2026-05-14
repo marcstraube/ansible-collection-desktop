@@ -1,5 +1,5 @@
 ---
-- name: Brave | Ensure Brave policies directories exist (Arch)
+- name: Brave | Ensure policies directories exist (Arch)
   ansible.builtin.file:
     path: '{{ item }}'
     state: directory
@@ -13,7 +13,7 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - __browser_brave_policies_path | length > 0
 
-- name: Brave | Deploy Brave managed policies (Arch)
+- name: Brave | Deploy managed policies (Arch)
   ansible.builtin.template:
     src: brave-policies.json.j2
     dest: '{{ __browser_brave_policies_path }}/managed/policies.json'
@@ -24,7 +24,7 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - __browser_brave_policies_path | length > 0
 
-- name: Brave | Brave configuration not available notice
+- name: Brave | Configuration not available notice
   ansible.builtin.debug:
     msg: >-
       Brave policy configuration requires the Brave repository.
