@@ -67,6 +67,19 @@
 # 32-bit Support (Arch Linux)
 #
 
+- name: Install | Assert multilib repo is enabled (Arch)
+  ansible.builtin.assert:
+    that:
+      - pacman_multilib_enabled | default(false) | bool
+    fail_msg: >-
+      The wine role requires the Arch multilib repository for lib32
+      packages. Set `pacman_multilib_enabled: true` in inventory and
+      run the `marcstraube.common.package_management` role first
+      (or use the `base-system` tag).
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - wine_lib32_packages | default([]) | length > 0
+
 - name: Install | lib32 packages (Arch)
   ansible.builtin.package:
     name: '{{ wine_lib32_packages }}'
