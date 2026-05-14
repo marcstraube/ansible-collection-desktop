@@ -2,17 +2,51 @@
 #
 # Development User Configuration
 #
+# Respects mode: managed | initial | disabled
+#   managed  — overwrite on every run
+#   initial  — deploy only when user is newly created in this run
+#   disabled — skip entirely
+# Per-user `mode:` overrides `development_user_config_mode`.
 
-- name: Users | Configure Git for users
+- name: Users | Include Git user config
   ansible.builtin.include_tasks:
     file: users_git.yml
     apply:
       tags:
         - development
         - development:users
-  loop: '{{ development_users }}'
-  loop_control:
-    loop_var: dev_user
   tags:
     - development
     - development:users
+  loop: '{{ development_users }}'
+  loop_control:
+    loop_var: dev_user
+    label: '{{ dev_user.username }}'
+  when:
+    - (dev_user.mode | default(development_user_config_mode)) != 'disabled'
+    - >-
+      (dev_user.mode | default(development_user_config_mode)) == 'managed'
+      or ((dev_user.mode | default(development_user_config_mode)) == 'initial'
+          and dev_user.username in (__users_newly_created | default([])))
+
+- name: Users | Include VSCode user config
+  ansible.builtin.include_tasks:
+    file: users_vscode.yml
+    apply:
+      tags:
+        - development
+        - development:users
+  tags:
+    - development
+    - development:users
+  loop: '{{ development_users }}'
+  loop_control:
+    loop_var: dev_user
+    label: '{{ dev_user.username }}'
+  when:
+    - development_vscode_enabled | bool or development_vscodium_enabled | bool
+    - (dev_user.mode | default(development_user_config_mode)) != 'disabled'
+    - >-
+      (dev_user.mode | default(development_user_config_mode)) == 'managed'
+      or ((dev_user.mode | default(development_user_config_mode)) == 'initial'
+          and dev_user.username in (__users_newly_created | default([])))

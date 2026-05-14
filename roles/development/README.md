@@ -77,6 +77,25 @@ overrides if needed.
 | `development_phpstorm_enabled`          | `false` | Enable PHPStorm          |
 | `development_zed_enabled`               | `false` | Enable Zed Editor        |
 
+#### VSCode / VSCodium settings
+
+| Variable                      | Default | Description                                    |
+|-------------------------------|---------|------------------------------------------------|
+| `development_vscode_settings` | `{...}` | Per-user `settings.json` content (dict)        |
+| `development_vscode_argv`     | `{...}` | Per-user `argv.json` (Electron-runtime flags) |
+
+Defaults opt out of editor-core, common Microsoft, and Red Hat extension
+telemetry. **Caveat:** extensions (Pylance, C/C++, GitLens, …) have
+their own telemetry channels that are not centrally controllable; this
+role only covers the editor core, the Electron runtime, and a few
+well-known extension switches.
+
+Files are deployed under `~/.config/Code/User/settings.json` and
+`~/.vscode/argv.json` (VSCode), and the corresponding `VSCodium` /
+`.vscode-oss` paths. The role overwrites these files in `managed` mode —
+inventory should populate `development_vscode_settings` with everything
+intended, not just deltas.
+
 ### Database Tools
 
 | Variable                      | Default | Description    |
@@ -105,18 +124,28 @@ overrides if needed.
 
 ### User Configuration
 
-| Variable            | Default | Description                          |
-|---------------------|---------|--------------------------------------|
-| `development_users` | `[]`    | Users to configure with git settings |
+| Variable                       | Default     | Description                                      |
+|--------------------------------|-------------|--------------------------------------------------|
+| `development_users`            | `[]`        | Users to configure with git + IDE settings       |
+| `development_user_config_mode` | `'initial'` | Default mode: `managed` / `initial` / `disabled` |
 
 Each user entry supports:
 
-| Key               | Required | Description        |
-|-------------------|----------|--------------------|
-| `username`        | yes      | System username    |
-| `git_name`        | no       | Git user.name      |
-| `git_email`       | no       | Git user.email     |
-| `git_signing_key` | no       | GPG signing key ID |
+| Key               | Required | Description                                  |
+|-------------------|----------|----------------------------------------------|
+| `username`        | yes      | System username                              |
+| `mode`            | no       | Per-user override of the global config mode  |
+| `git_name`        | no       | Git user.name                                |
+| `git_email`       | no       | Git user.email                               |
+| `git_signing_key` | no       | GPG signing key ID                           |
+
+Mode semantics — analog to `marcstraube.desktop.browser`:
+
+| Mode       | First run                  | Subsequent runs                        |
+|------------|----------------------------|----------------------------------------|
+| `managed`  | deploy                     | overwrite (always reconcile)           |
+| `initial`  | deploy if user is newly created | leave existing user customisations alone |
+| `disabled` | skip                       | skip                                   |
 
 ## Tags
 
