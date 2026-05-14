@@ -107,38 +107,21 @@
       register: __browser_verify_chromium_policies_json
       changed_when: false
 
-    #
-    # Firefox Autoconfig Verification
-    #
+    - name: Verify | Read Firefox policies.json for Preferences check
+      ansible.builtin.slurp:
+        src: '{{ __browser_verify_policies_path | trim }}/policies.json'
+      register: __browser_verify_ff_policies_content
 
-    - name: Verify | Set Firefox config path fact
-      ansible.builtin.set_fact:
-        __browser_verify_config_path: >-
-          {% if ansible_facts['os_family'] == 'Archlinux' %}/usr/lib/firefox{%
-          elif ansible_facts['os_family'] == 'Debian' %}/usr/lib/firefox-esr{%
-          else %}/usr/lib64/firefox{% endif %}
-
-    - name: Verify | Check autoconfig.js exists
-      ansible.builtin.stat:
-        path: '{{ __browser_verify_config_path | trim }}/defaults/pref/autoconfig.js'
-      register: __browser_verify_autoconfig
-
-    - name: Verify | Assert autoconfig.js exists
+    - name: Verify | Assert Preferences policy locks expected prefs
       ansible.builtin.assert:
         that:
-          - __browser_verify_autoconfig.stat.exists
-        fail_msg: 'Firefox autoconfig.js not found'
-
-    - name: Verify | Check firefox.cfg exists
-      ansible.builtin.stat:
-        path: '{{ __browser_verify_config_path | trim }}/firefox.cfg'
-      register: __browser_verify_firefoxcfg
-
-    - name: Verify | Assert firefox.cfg exists
-      ansible.builtin.assert:
-        that:
-          - __browser_verify_firefoxcfg.stat.exists
-        fail_msg: 'Firefox firefox.cfg not found'
+          - __ff_prefs['network.prefetch-next'].Value is sameas false
+          - __ff_prefs['network.prefetch-next'].Status == 'locked'
+          - __ff_prefs['network.dns.disablePrefetch'].Value is sameas true
+          - __ff_prefs['network.dns.disablePrefetch'].Status == 'locked'
+        fail_msg: 'Preferences policy missing or wrong for required locked prefs'
+      vars:
+        __ff_prefs: "{{ (__browser_verify_ff_policies_content.content | b64decode | from_json).policies.Preferences }}"
 
     #
     # Default Browser Handler (mimeapps.list)
