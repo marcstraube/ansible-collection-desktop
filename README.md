@@ -1,14 +1,17 @@
 # Ansible Collection: marcstraube.desktop
 
 [![CI](https://github.com/marcstraube/ansible-collection-desktop/workflows/CI/badge.svg)](https://github.com/marcstraube/ansible-collection-desktop/actions)
+[![Release](https://img.shields.io/github/v/release/marcstraube/ansible-collection-desktop?display_name=tag&sort=semver)](https://github.com/marcstraube/ansible-collection-desktop/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/sponsor-PayPal-blue.svg)](https://paypal.me/marcstraube)
 
 ## Description
 
 Desktop workstation roles for Arch Linux, Debian Trixie, and EL 9/10.
-27 roles covering desktop environments, display managers, browsers,
+28 roles covering desktop environments, display managers, browsers,
 development tools, multimedia, office, and productivity applications.
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Supported Platforms
 
@@ -52,6 +55,12 @@ development tools, multimedia, office, and productivity applications.
 | **elgato**    | Elgato hardware support                       |
 | **tuxedo**    | TUXEDO hardware support                       |
 
+### User Environment
+
+| Role              | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| **xdg_user_dirs** | XDG user dirs with locale, skip and custom entries  |
+
 ### Development & AI
 
 | Role            | Description                               |
@@ -80,11 +89,11 @@ development tools, multimedia, office, and productivity applications.
 
 ### Gaming & Hobby
 
-| Role       | Description                              |
-|------------|------------------------------------------|
-| **gaming** | Gaming platforms, emulators, launchers   |
-| **wine**   | Wine Windows compatibility layer         |
-| **cad**    | CAD applications                         |
+| Role       | Description                            |
+| ---------- | -------------------------------------- |
+| **gaming** | Gaming platforms, emulators, launchers |
+| **wine**   | Wine Windows compatibility layer       |
+| **cad**    | CAD applications                       |
 
 ## Installation
 

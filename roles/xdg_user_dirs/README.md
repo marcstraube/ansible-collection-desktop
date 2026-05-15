@@ -23,34 +23,34 @@ all three package repositories.
 
 ## Supported Platforms
 
-| Platform                  | Notes                                    |
-| ------------------------- | ---------------------------------------- |
-| Arch Linux                | `xdg-user-dirs` package, native locale   |
-| Debian Trixie             | same package                             |
-| EL 9 / EL 10              | same package                             |
+| Platform      | Notes                                  |
+| ------------- | -------------------------------------- |
+| Arch Linux    | `xdg-user-dirs` package, native locale |
+| Debian Trixie | same package                           |
+| EL 9 / EL 10  | same package                           |
 
 ## Role Variables
 
 ### Role Control
 
-| Variable               | Default | Description         |
-| ---------------------- | ------- | ------------------- |
+| Variable                | Default | Description         |
+| ----------------------- | ------- | ------------------- |
 | `xdg_user_dirs_enabled` | `true`  | Enable/disable role |
 
 ### Localization
 
-| Variable                | Default          | Description                              |
-| ----------------------- | ---------------- | ---------------------------------------- |
-| `xdg_user_dirs_locale`  | `'en_US.UTF-8'`  | Locale used when generating directory names |
+| Variable               | Default         | Description                                 |
+| ---------------------- | --------------- | ------------------------------------------- |
+| `xdg_user_dirs_locale` | `'en_US.UTF-8'` | Locale used when generating directory names |
 
 The locale's `.po` data ships inside the `xdg-user-dirs` package, so
 the role does not need to install separate translation packs.
 
 ### Extra (custom) directories
 
-| Variable                | Default | Description                                     |
-| ----------------------- | ------- | ----------------------------------------------- |
-| `xdg_user_dirs_extra`   | `{}`    | Additional XDG entries beyond the package defaults |
+| Variable              | Default | Description                                        |
+| --------------------- | ------- | -------------------------------------------------- |
+| `xdg_user_dirs_extra` | `{}`    | Additional XDG entries beyond the package defaults |
 
 Format: dict with the XDG key (without the `XDG_` prefix and `_DIR`
 suffix) as key, relative path under `$HOME` as value:
@@ -67,9 +67,9 @@ key as a default, the line is replaced in place rather than duplicated.
 
 ### Skipping standard entries
 
-| Variable               | Default | Description                                            |
-| ---------------------- | ------- | ------------------------------------------------------ |
-| `xdg_user_dirs_skip`   | `[]`    | XDG keys to remove from `user-dirs.dirs` (no dir created) |
+| Variable             | Default | Description                                               |
+| -------------------- | ------- | --------------------------------------------------------- |
+| `xdg_user_dirs_skip` | `[]`    | XDG keys to remove from `user-dirs.dirs` (no dir created) |
 
 ```yaml
 xdg_user_dirs_skip:
@@ -85,11 +85,11 @@ including future additions like `PROJECTS` (added in 0.20).
 
 ### User configuration
 
-| Variable                          | Default     | Description                                  |
-| --------------------------------- | ----------- | -------------------------------------------- |
-| `xdg_user_dirs_users`             | `[]`        | Users to configure                           |
-| `xdg_user_dirs_user_config_mode`  | `'initial'` | Default mode: `managed` / `initial` / `disabled` |
-| `xdg_user_dirs_mode`              | `'0755'`    | Filesystem mode for created XDG directories. Set to `'0700'` to match a private `$HOME`. |
+| Variable                         | Default     | Description                                       |
+| -------------------------------- | ----------- | ------------------------------------------------- |
+| `xdg_user_dirs_users`            | `[]`        | Users to configure                                |
+| `xdg_user_dirs_user_config_mode` | `'initial'` | Default mode: `managed` / `initial` / `disabled`  |
+| `xdg_user_dirs_mode`             | `'0755'`    | Mode of created dirs (`'0700'` for private homes) |
 
 Per-user entry:
 
@@ -102,11 +102,11 @@ xdg_user_dirs_users:
 Mode semantics — identical to `marcstraube.desktop.browser` and
 `marcstraube.desktop.development`:
 
-| Mode       | First run                         | Subsequent runs                                       |
-| ---------- | --------------------------------- | ----------------------------------------------------- |
-| `managed`  | deploy                            | re-run `xdg-user-dirs-update --force`, re-apply extras |
-| `initial`  | deploy if user is newly created   | leave existing user-dirs.dirs alone                   |
-| `disabled` | skip                              | skip                                                  |
+| Mode       | First run                       | Subsequent runs                                        |
+| ---------- | ------------------------------- | ------------------------------------------------------ |
+| `managed`  | deploy                          | re-run `xdg-user-dirs-update --force`, re-apply extras |
+| `initial`  | deploy if user is newly created | leave existing user-dirs.dirs alone                    |
+| `disabled` | skip                            | skip                                                   |
 
 ## What the freeze actually does
 
@@ -130,11 +130,11 @@ clobbering their changes on every login.
 
 ## Tags
 
-| Tag                       | Scope                  |
-| ------------------------- | ---------------------- |
-| `xdg_user_dirs`           | All role tasks         |
-| `xdg_user_dirs:install`   | Package installation   |
-| `xdg_user_dirs:users`     | Per-user configuration |
+| Tag                     | Scope                  |
+| ----------------------- | ---------------------- |
+| `xdg_user_dirs`         | All role tasks         |
+| `xdg_user_dirs:install` | Package installation   |
+| `xdg_user_dirs:users`   | Per-user configuration |
 
 ## Example Playbook
 
@@ -170,8 +170,12 @@ Driver: Podman. Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10.
 
 ## References
 
-- [freedesktop.org xdg-user-dirs](https://www.freedesktop.org/wiki/Software/xdg-user-dirs/) — upstream spec and tool
-- [xdg-user-dirs 0.20 release notes — Projects directory](https://blog.tenstral.net/2026/04/hello-projects-directory.html) — background on the new `PROJECTS` default
+- [freedesktop.org xdg-user-dirs][upstream] — upstream spec and tool
+- [xdg-user-dirs 0.20 release notes][projects-blog] — background on the
+  new `PROJECTS` default
+
+[upstream]: https://www.freedesktop.org/wiki/Software/xdg-user-dirs/
+[projects-blog]: https://blog.tenstral.net/2026/04/hello-projects-directory.html
 
 ## License
 
