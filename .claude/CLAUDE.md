@@ -75,16 +75,6 @@ All `include_tasks` in roles use `apply: tags:` for proper `--tags` filtering:
     - mytag
 ```
 
-## Untested Roles
-
-The following roles are integrated in `playbooks/desktop.yml` with `default(false)` toggles
-but have NOT been verified on a live system yet:
-cad, communication, downloads, filemanagers, gaming, graphics_apps,
-imaging, multimedia, remote_access, security_apps, system_apps, tabletop.
-
-They can be enabled per host via inventory (e.g., `gaming_enabled: true`) but may need
-fixes before production use.
-
 ## Security
 
 - Vault files (`vault.yml`) are never accessed — only `vault.yml.example` templates
