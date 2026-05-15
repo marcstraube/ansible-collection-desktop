@@ -1,0 +1,25 @@
+---
+- name: Main | Install xdg-user-dirs package
+  ansible.builtin.package:
+    name: xdg-user-dirs
+    state: present
+  retries: 3
+  delay: 5
+  when: xdg_user_dirs_enabled | bool
+  tags:
+    - xdg_user_dirs
+    - xdg_user_dirs:install
+
+- name: Main | Include user-config tasks
+  ansible.builtin.include_tasks:
+    file: users.yml
+    apply:
+      tags:
+        - xdg_user_dirs
+        - xdg_user_dirs:users
+  tags:
+    - xdg_user_dirs
+    - xdg_user_dirs:users
+  when:
+    - xdg_user_dirs_enabled | bool
+    - xdg_user_dirs_users | length > 0

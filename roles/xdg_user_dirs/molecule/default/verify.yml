@@ -1,0 +1,104 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Verify | Check xdg-user-dirs package installed
+      ansible.builtin.package:
+        name: xdg-user-dirs
+        state: present
+      check_mode: true
+      register: __xdg_verify_pkg
+
+    - name: Verify | Assert xdg-user-dirs installed
+      ansible.builtin.assert:
+        that:
+          - not __xdg_verify_pkg.changed
+        fail_msg: 'xdg-user-dirs is not installed'
+
+    - name: Verify | Read user-dirs.dirs content
+      ansible.builtin.slurp:
+        src: /home/xdg_test_user/.config/user-dirs.dirs
+      register: __xdg_dirs_content
+
+    - name: Verify | Assert user-dirs.dirs has localized names
+      ansible.builtin.assert:
+        that:
+          - "'Desktop' in __dirs_text"
+          - "'Documents' in __dirs_text"
+          - "'Pictures' in __dirs_text"
+        fail_msg: 'user-dirs.dirs does not contain expected standard directory names'
+      vars:
+        __dirs_text: '{{ __xdg_dirs_content.content | b64decode }}'
+
+    - name: Verify | Assert custom MEDIA entry present
+      ansible.builtin.assert:
+        that:
+          - "'XDG_MEDIA_DIR=\"$HOME/Media\"' in __dirs_text"
+        fail_msg: 'Custom XDG_MEDIA_DIR entry missing from user-dirs.dirs'
+      vars:
+        __dirs_text: '{{ __xdg_dirs_content.content | b64decode }}'
+
+    - name: Verify | Read user-dirs.conf (freeze)
+      ansible.builtin.slurp:
+        src: /home/xdg_test_user/.config/user-dirs.conf
+      register: __xdg_conf_content
+
+    - name: Verify | Assert freeze is enabled
+      ansible.builtin.assert:
+        that:
+          - "'enabled=False' in (__xdg_conf_content.content | b64decode)"
+        fail_msg: 'user-dirs.conf does not contain enabled=False'
+
+    - name: Verify | Check Documents directory exists
+      ansible.builtin.stat:
+        path: /home/xdg_test_user/Documents
+      register: __xdg_dokumente
+
+    - name: Verify | Assert Documents directory exists
+      ansible.builtin.assert:
+        that:
+          - __xdg_dokumente.stat.exists
+          - __xdg_dokumente.stat.isdir
+          - __xdg_dokumente.stat.pw_name == 'xdg_test_user'
+        fail_msg: 'Documents directory missing or wrong owner'
+
+    - name: Verify | Check Media custom directory exists
+      ansible.builtin.stat:
+        path: /home/xdg_test_user/Media
+      register: __xdg_medien
+
+    - name: Verify | Assert Media custom directory exists
+      ansible.builtin.assert:
+        that:
+          - __xdg_medien.stat.exists
+          - __xdg_medien.stat.isdir
+          - __xdg_medien.stat.pw_name == 'xdg_test_user'
+        fail_msg: 'Custom Media directory missing or wrong owner'
+
+    - name: Verify | Assert configured mode applied to created dirs
+      ansible.builtin.assert:
+        that:
+          - __xdg_dokumente.stat.mode == '0700'
+          - __xdg_medien.stat.mode == '0700'
+        fail_msg: 'XDG directories do not have configured mode 0700'
+
+    - name: Verify | Assert skipped entries removed from user-dirs.dirs
+      ansible.builtin.assert:
+        that:
+          - "'XDG_TEMPLATES_DIR=' not in __dirs_text"
+          - "'XDG_PUBLICSHARE_DIR=' not in __dirs_text"
+        fail_msg: 'Skipped XDG entries still present in user-dirs.dirs'
+      vars:
+        __dirs_text: '{{ __xdg_dirs_content.content | b64decode }}'
+
+    - name: Verify | Check Templates directory NOT created
+      ansible.builtin.stat:
+        path: /home/xdg_test_user/Templates
+      register: __xdg_templates
+
+    - name: Verify | Assert Templates directory absent
+      ansible.builtin.assert:
+        that:
+          - not __xdg_templates.stat.exists
+        fail_msg: 'Templates directory created despite being in skip list'
