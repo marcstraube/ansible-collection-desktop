@@ -1,0 +1,78 @@
+---
+#
+# Role Control
+#
+
+# Enable the xdg_user_dirs role
+xdg_user_dirs_enabled: true
+
+#
+# Localization
+#
+
+# Locale used when generating ~/.config/user-dirs.dirs. The package's
+# translated names (Schreibtisch, Bilder, …) come from the .po files
+# shipped with xdg-user-dirs, so the locale's UTF-8 codeset must be
+# generated on the host (handled by your base role, not here).
+xdg_user_dirs_locale: 'en_US.UTF-8'
+
+#
+# Extra (custom) XDG entries
+#
+# Merged into ~/.config/user-dirs.dirs via lineinfile after the
+# standard set from /etc/xdg/user-dirs.defaults has been written.
+# Format: key (without XDG_ prefix and _DIR suffix) → relative path
+# under $HOME.
+#
+# Example:
+#   xdg_user_dirs_extra:
+#     MEDIA: 'Medien'
+#     BACKUP: 'Sicherungen'
+xdg_user_dirs_extra: {}
+
+#
+# Standard entries to skip
+#
+# Removes the listed XDG_<KEY>_DIR lines from ~/.config/user-dirs.dirs
+# after xdg-user-dirs-update wrote them, and skips directory creation
+# for those keys. Locale translation of the kept entries is unaffected.
+# Use the upstream key name without the XDG_ prefix and _DIR suffix.
+#
+# Common keys: DESKTOP, DOWNLOAD, DOCUMENTS, MUSIC, PICTURES, VIDEOS,
+#              TEMPLATES, PUBLICSHARE, PROJECTS
+#
+# Example:
+#   xdg_user_dirs_skip:
+#     - TEMPLATES
+#     - PUBLICSHARE
+xdg_user_dirs_skip: []
+
+#
+# User Configuration
+#
+# Users for whom XDG user directories should be deployed.
+# Each entry needs at least `username`; an optional `mode` overrides
+# the global default below.
+#
+# Modes:
+#   managed  — overwrite the file on every run (re-runs xdg-user-dirs-update)
+#   initial  — deploy only when the user was created in this run
+#   disabled — skip this user entirely
+xdg_user_dirs_users: []
+# Example:
+#   xdg_user_dirs_users:
+#     - username: 'johndoe'
+#       mode: 'managed'
+
+# Default mode when a user entry omits its own `mode`.
+xdg_user_dirs_user_config_mode: 'initial'
+
+#
+# Directory Permissions
+#
+# Filesystem mode applied to every XDG user directory the role creates
+# or touches. '0755' matches the XDG default (what most file managers
+# create) and keeps the dirs traversable for tools that walk $HOME.
+# Set to '0700' if you keep $HOME at 0700 and want consistent perms;
+# in that case nothing outside $HOME can reach the subdirs anyway.
+xdg_user_dirs_mode: '0755'

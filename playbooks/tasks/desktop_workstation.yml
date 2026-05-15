@@ -91,6 +91,18 @@
     - bluetooth
   when: bluetooth_enabled | default(true) | bool
 
+- name: Desktop | Include xdg_user_dirs role
+  ansible.builtin.include_role:
+    name: marcstraube.desktop.xdg_user_dirs
+    apply:
+      tags:
+        - desktop
+        - xdg_user_dirs
+  tags:
+    - desktop
+    - xdg_user_dirs
+  when: xdg_user_dirs_enabled | default(true) | bool
+
 - name: Desktop | Include filemanagers role
   ansible.builtin.include_role:
     name: marcstraube.desktop.filemanagers

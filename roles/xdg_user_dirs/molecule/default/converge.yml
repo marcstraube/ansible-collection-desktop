@@ -1,0 +1,27 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    # Localized output (e.g. de_DE.UTF-8 → 'Schreibtisch') is not tested
+    # here because stock molecule container images strip non-English .mo
+    # files via NoExtract (Arch) / _install_langs (RHEL family). The
+    # translation mechanism is exercised live on real hosts; molecule
+    # tests the deploy/freeze/dir-creation mechanism with C/en_US.
+    xdg_user_dirs_enabled: true
+    xdg_user_dirs_locale: 'en_US.UTF-8'
+    xdg_user_dirs_extra:
+      MEDIA: 'Media'
+    xdg_user_dirs_skip:
+      - TEMPLATES
+      - PUBLICSHARE
+    xdg_user_dirs_mode: '0700'
+    xdg_user_dirs_user_config_mode: 'managed'
+    xdg_user_dirs_users:
+      - username: 'xdg_test_user'
+
+  tasks:
+    - name: Converge | Include xdg_user_dirs role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

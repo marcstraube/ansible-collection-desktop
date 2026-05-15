@@ -1,0 +1,24 @@
+---
+# Respects mode: managed | initial | disabled.
+# Per-user `mode:` overrides xdg_user_dirs_user_config_mode.
+
+- name: Users | Configure XDG user dirs
+  ansible.builtin.include_tasks:
+    file: users_setup.yml
+    apply:
+      tags:
+        - xdg_user_dirs
+        - xdg_user_dirs:users
+  tags:
+    - xdg_user_dirs
+    - xdg_user_dirs:users
+  loop: '{{ xdg_user_dirs_users }}'
+  loop_control:
+    loop_var: xdg_user
+    label: '{{ xdg_user.username }}'
+  when:
+    - (xdg_user.mode | default(xdg_user_dirs_user_config_mode)) != 'disabled'
+    - >-
+      (xdg_user.mode | default(xdg_user_dirs_user_config_mode)) == 'managed'
+      or ((xdg_user.mode | default(xdg_user_dirs_user_config_mode)) == 'initial'
+          and xdg_user.username in (__users_newly_created | default([])))

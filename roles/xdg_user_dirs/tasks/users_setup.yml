@@ -1,0 +1,104 @@
+---
+- name: Users Setup | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ xdg_user.username }}'
+
+- name: Users Setup | Set user home fact
+  ansible.builtin.set_fact:
+    __xdg_user_home: "{{ ansible_facts['getent_passwd'][xdg_user.username][4] }}"
+
+- name: Users Setup | Ensure ~/.config directory exists
+  ansible.builtin.file:
+    path: '{{ __xdg_user_home }}/.config'
+    state: directory
+    owner: '{{ xdg_user.username }}'
+    group: '{{ xdg_user.username }}'
+    mode: '0700'
+
+# --dummy-output writes user-dirs.dirs but does NOT create the target
+# directories on its own (which would defeat xdg_user_dirs_skip). The
+# real dir creation is handled by the file task at the end of this
+# file, so we keep full control over which dirs exist. --force still
+# bypasses any enabled=False freeze. Output is deterministic for a
+# given locale, hence changed_when: false; drift is detected by the
+# ownership/mode task that follows.
+- name: Users Setup | Generate user-dirs.dirs with configured locale
+  ansible.builtin.command:
+    cmd: xdg-user-dirs-update --force --dummy-output {{ __xdg_user_home }}/.config/user-dirs.dirs
+  environment:
+    LANG: '{{ xdg_user_dirs_locale }}'
+    LC_ALL: '{{ xdg_user_dirs_locale }}'
+  become: true
+  become_user: '{{ xdg_user.username }}'
+  changed_when: false
+
+- name: Users Setup | Enforce ownership and mode on user-dirs.dirs
+  ansible.builtin.file:
+    path: '{{ __xdg_user_home }}/.config/user-dirs.dirs'
+    owner: '{{ xdg_user.username }}'
+    group: '{{ xdg_user.username }}'
+    mode: '0600'
+
+# Drop standard entries the operator does not want. The line is
+# removed first so the subsequent parse step sees only the kept set
+# and no directory is created for the dropped keys.
+- name: Users Setup | Drop skipped XDG entries
+  ansible.builtin.lineinfile:
+    path: '{{ __xdg_user_home }}/.config/user-dirs.dirs'
+    regexp: '^XDG_{{ item }}_DIR='
+    state: absent
+    owner: '{{ xdg_user.username }}'
+    group: '{{ xdg_user.username }}'
+    mode: '0600'
+  loop: '{{ xdg_user_dirs_skip }}'
+  loop_control:
+    label: '{{ item }}'
+  when: xdg_user_dirs_skip | length > 0
+
+# Custom XDG entries are appended/merged into user-dirs.dirs.
+# lineinfile matches on the XDG_<KEY>_DIR= prefix, so a future
+# xdg-user-dirs upgrade that ships the same key as a default does
+# not produce a duplicate line.
+- name: Users Setup | Apply extra XDG entries
+  ansible.builtin.lineinfile:
+    path: '{{ __xdg_user_home }}/.config/user-dirs.dirs'
+    regexp: '^XDG_{{ item.key }}_DIR='
+    line: 'XDG_{{ item.key }}_DIR="$HOME/{{ item.value }}"'
+    owner: '{{ xdg_user.username }}'
+    group: '{{ xdg_user.username }}'
+    mode: '0600'
+  loop: '{{ xdg_user_dirs_extra | dict2items }}'
+  loop_control:
+    label: '{{ item.key }}'
+  when: xdg_user_dirs_extra | length > 0
+
+- name: Users Setup | Freeze user-dirs.dirs against auto-triggered updates
+  ansible.builtin.copy:
+    content: "enabled=False\n"
+    dest: '{{ __xdg_user_home }}/.config/user-dirs.conf'
+    owner: '{{ xdg_user.username }}'
+    group: '{{ xdg_user.username }}'
+    mode: '0644'
+
+- name: Users Setup | Read user-dirs.dirs to learn target paths
+  ansible.builtin.slurp:
+    src: '{{ __xdg_user_home }}/.config/user-dirs.dirs'
+  register: __xdg_dirs_file
+
+- name: Users Setup | Parse XDG_*_DIR entries
+  ansible.builtin.set_fact:
+    __xdg_target_dirs: >-
+      {{ __xdg_dirs_file.content | b64decode
+         | regex_findall('XDG_[A-Z_]+_DIR="[$]HOME/([^"]+)"') }}
+
+- name: Users Setup | Ensure all referenced directories exist
+  ansible.builtin.file:
+    path: '{{ __xdg_user_home }}/{{ item }}'
+    state: directory
+    owner: '{{ xdg_user.username }}'
+    group: '{{ xdg_user.username }}'
+    mode: '{{ xdg_user_dirs_mode }}'
+  loop: '{{ __xdg_target_dirs }}'
+  loop_control:
+    label: '{{ item }}'
