@@ -7,7 +7,7 @@
     keepassxc_enabled: true
     keepassxc_secret_service_enabled: true
     keepassxc_secret_service_scope: 'global'  # pragma: allowlist secret
-    keepassxc_autostart_enabled: false
+    keepassxc_autostart_enabled: true
     keepassxc_users:
       - name: 'testuser'
         mode: 'managed'

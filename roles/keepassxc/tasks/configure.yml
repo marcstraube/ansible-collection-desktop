@@ -49,22 +49,30 @@
 # General
 - name: Configure | General settings
   community.general.ini_file:
-    path: '/home/{{ item.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
+    path: '/home/{{ item.0.name }}/{{ keepassxc_config_dir }}/keepassxc.ini'
     section: 'General'
-    option: 'ConfigVersion'
-    value: '{{ keepassxc_config.General.ConfigVersion | default(2) }}'
+    option: '{{ item.1.option }}'
+    value: '{{ item.0.config[item.1.option] | default(item.1.value) | string | lower }}'
     no_extra_spaces: true
-    owner: '{{ item.name }}'
-    group: '{{ item.group | default(item.name) }}'
+    owner: '{{ item.0.name }}'
+    group: '{{ item.0.group | default(item.0.name) }}'
     mode: '0600'
-  loop: '{{ keepassxc_users }}'
+  loop: >-
+    {{ keepassxc_users | product([
+         {'option': 'ConfigVersion',
+          'value': keepassxc_config.General.ConfigVersion | default(2)},
+         {'option': 'BackupBeforeSave',
+          'value': keepassxc_config.General.BackupBeforeSave | default(true)},
+         {'option': 'UseAtomicSaves',
+          'value': keepassxc_config.General.UseAtomicSaves | default(true)}
+       ]) | list }}
   loop_control:
-    label: '{{ item.name }}'
+    label: '{{ item.0.name }}: General.{{ item.1.option }}'
   when:
     - keepassxc_users | length > 0
-    - (item.mode | default(keepassxc_user_config_mode)) != 'disabled'
-    - (item.mode | default(keepassxc_user_config_mode)) == 'managed'
-      or __keepassxc_should_deploy[item.name] | default(true)
+    - (item.0.mode | default(keepassxc_user_config_mode)) != 'disabled'
+    - (item.0.mode | default(keepassxc_user_config_mode)) == 'managed'
+      or __keepassxc_should_deploy[item.0.name] | default(true)
 
 # Browser
 - name: Configure | Browser integration
@@ -122,8 +130,12 @@
          {'option': 'DarkTrayIcon', 'value': keepassxc_config.GUI.DarkTrayIcon | default(false)},
          {'option': 'HidePasswords', 'value': keepassxc_config.GUI.HidePasswords | default(true)},
          {'option': 'HideUsernames', 'value': keepassxc_config.GUI.HideUsernames | default(false)},
+         {'option': 'MinimizeOnClose', 'value': keepassxc_config.GUI.MinimizeOnClose | default(false)},
+         {'option': 'MinimizeOnStartup', 'value': keepassxc_config.GUI.MinimizeOnStartup | default(true)},
          {'option': 'MinimizeToTray', 'value': keepassxc_config.GUI.MinimizeToTray | default(true)},
-         {'option': 'ShowTrayIcon', 'value': keepassxc_config.GUI.ShowTrayIcon | default(true)}
+         {'option': 'ShowTrayIcon', 'value': keepassxc_config.GUI.ShowTrayIcon | default(true)},
+         {'option': 'TrayIconAppearance',
+          'value': keepassxc_config.GUI.TrayIconAppearance | default('monochrome-light')}
        ]) | list }}
   loop_control:
     label: '{{ item.0.name }}: GUI.{{ item.1.option }}'

@@ -2,42 +2,46 @@
 #
 # KeePassXC Autostart Tasks
 #
+# Manages the XDG autostart entry that KeePassXC's own GUI checkbox
+# ("Automatically launch KeePassXC at system startup") writes to
+# ~/.config/autostart/. Existence of the file is the autostart state;
+# KeePassXC checks file presence in Linux::isLaunchAtStartupEnabled().
 
-- name: Autostart | Create systemd user service directories
+- name: Autostart | Read system KeePassXC desktop file for GenericName translations
+  ansible.builtin.slurp:
+    src: /usr/share/applications/org.keepassxc.KeePassXC.desktop
+  register: __keepassxc_system_desktop
+  when: keepassxc_users | length > 0
+
+- name: Autostart | Create autostart directory
   ansible.builtin.file:
-    path: '/home/{{ item.name }}/.config/systemd/user/'
+    path: '/home/{{ item.name }}/.config/autostart'
     state: directory
     owner: '{{ item.name }}'
     group: '{{ item.group | default(item.name) }}'
-    mode: '0755'
-  when: item.autostart | default(true)
+    mode: '0700'
   loop: '{{ keepassxc_users }}'
   loop_control:
     label: '{{ item.name }}'
+  when: item.autostart | default(true) | bool
 
-- name: Autostart | Deploy systemd user service
+- name: Autostart | Deploy XDG autostart entry
   ansible.builtin.template:
-    src: 'keepassxc.service.j2'
-    dest: '/home/{{ item.name }}/.config/systemd/user/keepassxc.service'
+    src: 'org.keepassxc.KeePassXC.desktop.j2'
+    dest: '/home/{{ item.name }}/.config/autostart/org.keepassxc.KeePassXC.desktop'
     owner: '{{ item.name }}'
     group: '{{ item.group | default(item.name) }}'
-    mode: '0644'
-  when: item.autostart | default(true)
+    mode: '0600'
   loop: '{{ keepassxc_users }}'
   loop_control:
     label: '{{ item.name }}'
+  when: item.autostart | default(true) | bool
 
-- name: Autostart | Manage KeePassXC autostart service
-  ansible.builtin.systemd_service:
-    name: keepassxc.service
-    enabled: "{{ item.autostart | default(true) | bool }}"
-    state: "{{ item.autostart | default(true) | bool | ternary('started', 'stopped') }}"
-    scope: user
-    daemon_reload: true
-  become: true
-  become_user: '{{ item.name }}'
+- name: Autostart | Remove XDG autostart entry when disabled
+  ansible.builtin.file:
+    path: '/home/{{ item.name }}/.config/autostart/org.keepassxc.KeePassXC.desktop'
+    state: absent
   loop: '{{ keepassxc_users }}'
   loop_control:
     label: '{{ item.name }}'
-  # Systemd user scope not available in containers (molecule)
-  failed_when: false
+  when: not (item.autostart | default(true) | bool)
