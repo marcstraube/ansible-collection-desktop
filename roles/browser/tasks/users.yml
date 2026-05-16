@@ -1,13 +1,20 @@
 ---
 # Respects mode: managed | initial | disabled
 
-- name: Users | Include Firefox user config
+- name: Users | Bootstrap Firefox profile
   ansible.builtin.include_tasks:
-    file: users_firefox.yml
+    file: users_firefox_family.yml
     apply:
       tags:
         - browser
         - browser:configure
+  vars:
+    __ff_config_dir: '.mozilla/firefox'
+    __ff_profile_pattern: '{{ __browser_firefox_profile_pattern }}'
+    __ff_profile_dirname: '{{ __browser_firefox_profile_dirname }}'
+    __ff_install_hash: '{{ __browser_firefox_install_hash }}'
+    __ff_profile_name: 'default-release'
+    __ff_preferences: '{{ browser_firefox_preferences }}'
   tags:
     - browser
     - browser:configure
@@ -24,13 +31,20 @@
       or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
           and browser_user.username in (__users_newly_created | default([])))
 
-- name: Users | Include LibreWolf user config
+- name: Users | Bootstrap LibreWolf profile
   ansible.builtin.include_tasks:
-    file: users_librewolf.yml
+    file: users_firefox_family.yml
     apply:
       tags:
         - browser
         - browser:configure
+  vars:
+    __ff_config_dir: '.librewolf'
+    __ff_profile_pattern: '{{ __browser_librewolf_profile_pattern }}'
+    __ff_profile_dirname: '{{ __browser_librewolf_profile_dirname }}'
+    __ff_install_hash: '{{ __browser_librewolf_install_hash }}'
+    __ff_profile_name: 'default'
+    __ff_preferences: '{{ browser_librewolf_preferences }}'
   tags:
     - browser
     - browser:configure

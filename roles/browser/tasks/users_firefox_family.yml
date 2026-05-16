@@ -1,0 +1,137 @@
+---
+# Per-user profile bootstrap and user.js deploy for Firefox-family
+# browsers (Firefox, LibreWolf, Zen, Mullvad, ...). The interactive
+# -CreateProfile path is unreliable in non-interactive contexts
+# (silent no-op without DISPLAY/D-Bus/UI init), so the role writes
+# the profile dir and profiles.ini directly.
+#
+# Required vars from the caller:
+#   __ff_config_dir       relative dir under $HOME (e.g. '.mozilla/firefox')
+#   __ff_profile_pattern  find pattern for existing profile dirs
+#   __ff_profile_dirname  bootstrap profile dir name (when none found)
+#   __ff_install_hash     CityHash64 of the install path (per-install
+#                         section key in profiles.ini)
+#   __ff_profile_name     Profile0.Name value ('default-release' for
+#                         Firefox, 'default' for LibreWolf, ...)
+#   __ff_preferences      preferences dict for user.js (skip deploy if empty)
+
+- name: Users Profile | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ browser_user.username }}'
+
+- name: Users Profile | Set user home fact
+  ansible.builtin.set_fact:
+    __browser_user_home: "{{ ansible_facts['getent_passwd'][browser_user.username][4] }}"
+
+# Ensure parent directory exists before find — avoids a 'not a directory'
+# warning on hosts where the user has never opened the browser.
+- name: Users Profile | Ensure browser config directory exists
+  ansible.builtin.file:
+    path: '{{ __browser_user_home }}/{{ __ff_config_dir }}'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+
+# Detect any existing profile (random-prefixed on first interactive
+# launch, e.g. xyz123.default-release) — if one is already there,
+# use it instead of bootstrapping a new one.
+- name: Users Profile | Discover existing profile
+  ansible.builtin.find:
+    paths: '{{ __browser_user_home }}/{{ __ff_config_dir }}'
+    patterns: '{{ __ff_profile_pattern }}'
+    file_type: directory
+  register: __ff_existing_profiles
+
+- name: Users Profile | Set profile path from existing
+  ansible.builtin.set_fact:
+    __ff_profile_path: >-
+      {{ (__ff_existing_profiles.files
+          | sort(attribute='path') | first).path }}
+  when:
+    - __ff_existing_profiles.files | length > 0
+
+- name: Users Profile | Set profile path from bootstrap
+  ansible.builtin.set_fact:
+    __ff_profile_path: '{{ __browser_user_home }}/{{ __ff_config_dir }}/{{ __ff_profile_dirname }}'
+  when:
+    - __ff_existing_profiles.files | length == 0
+
+- name: Users Profile | Ensure profile directory exists
+  ansible.builtin.file:
+    path: '{{ __ff_profile_path }}'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+
+- name: Users Profile | Register profile in profiles.ini
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/{{ __ff_config_dir }}/profiles.ini'
+    section: 'Profile0'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0600'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - { option: 'Name', value: '{{ __ff_profile_name }}' }
+    - { option: 'IsRelative', value: '1' }
+    - { option: 'Path', value: '{{ __ff_profile_path | basename }}' }
+    - { option: 'Default', value: '1' }
+  loop_control:
+    label: 'Profile0.{{ item.option }}'
+
+- name: Users Profile | Set General section in profiles.ini
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/{{ __ff_config_dir }}/profiles.ini'
+    section: 'General'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0600'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - { option: 'StartWithLastProfile', value: '1' }
+    - { option: 'Version', value: '2' }
+  loop_control:
+    label: 'General.{{ item.option }}'
+
+# Modern Firefox-family browsers (>= 67) route the default-profile
+# decision through the per-install section, which overrides
+# [Profile0].Default=1. Writing it here makes the browser actually
+# use our bootstrapped profile on first launch (otherwise it creates
+# a random-prefix profile and locks the install to that one).
+- name: Users Profile | Set Install section in profiles.ini
+  community.general.ini_file:
+    path: '{{ __browser_user_home }}/{{ __ff_config_dir }}/profiles.ini'
+    section: 'Install{{ __ff_install_hash }}'
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0600'
+    no_extra_spaces: true
+    create: true
+  loop:
+    - { option: 'Default', value: '{{ __ff_profile_path | basename }}' }
+    - { option: 'Locked', value: '1' }
+  loop_control:
+    label: 'Install.{{ item.option }}'
+  when: __ff_install_hash | length > 0
+
+- name: Users Profile | Deploy user.js
+  ansible.builtin.template:
+    src: user.js.j2
+    dest: '{{ __ff_profile_path }}/user.js'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0644'
+  vars:
+    __browser_template_prefs: '{{ __ff_preferences }}'
+  when: __ff_preferences | length > 0
