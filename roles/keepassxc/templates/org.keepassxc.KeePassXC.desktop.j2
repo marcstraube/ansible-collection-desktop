@@ -1,0 +1,29 @@
+{{ ansible_managed | comment }}
+{% set _ns = namespace(localized_full='', localized_short='', fallback='Password Manager') -%}
+{% set _lang_full = (item.lang | default(keepassxc_locale)) | regex_replace('[.@].*$', '') -%}
+{% set _lang_short = _lang_full.split('_')[0] -%}
+{% set _prefix_full = 'GenericName[' ~ _lang_full ~ ']=' -%}
+{% set _prefix_short = 'GenericName[' ~ _lang_short ~ ']=' -%}
+{% for _line in (__keepassxc_system_desktop.content | b64decode).split('\n') -%}
+{%-   if _line.startswith(_prefix_full) %}{% set _ns.localized_full = _line[(_prefix_full | length):] %}
+{%-   elif _line.startswith(_prefix_short) %}{% set _ns.localized_short = _line[(_prefix_short | length):] %}
+{%-   elif _line.startswith('GenericName=') %}{% set _ns.fallback = _line[12:] %}
+{%-   endif %}
+{%- endfor -%}
+[Desktop Entry]
+Name=KeePassXC
+GenericName={{ _ns.localized_full if _ns.localized_full else (_ns.localized_short if _ns.localized_short else _ns.fallback) }}
+Exec=keepassxc
+TryExec=keepassxc
+Icon=keepassxc
+StartupWMClass=keepassxc
+StartupNotify=false
+Terminal=false
+Type=Application
+Version=1.0
+Categories=Utility;Security;Qt;
+MimeType=application/x-keepass2;
+X-GNOME-Autostart-enabled=true
+X-GNOME-Autostart-Delay={{ item.delay | default(2) }}
+X-KDE-autostart-after=panel
+X-LXQt-Need-Tray=true

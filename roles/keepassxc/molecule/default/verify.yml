@@ -91,7 +91,50 @@
     - name: Verify | Assert managed-mode template values present
       ansible.builtin.assert:
         that:
-          - "'[FdoSecrets]' in (_keepassxc_user_ini_content.content | b64decode)"
-          - "'[Security]' in (_keepassxc_user_ini_content.content | b64decode)"
-          - "'ConfigVersion=2' in (_keepassxc_user_ini_content.content | b64decode)"
+          - "'[FdoSecrets]' in __ini_text"
+          - "'[Security]' in __ini_text"
+          - "'ConfigVersion=2' in __ini_text"
+          - "'BackupBeforeSave=true' in __ini_text"
+          - "'UseAtomicSaves=true' in __ini_text"
+          - "'MinimizeOnClose=false' in __ini_text"
+          - "'MinimizeOnStartup=true' in __ini_text"
+          - "'TrayIconAppearance=monochrome-light' in __ini_text"
         fail_msg: 'testuser keepassxc.ini missing expected sections/values'
+      vars:
+        __ini_text: '{{ _keepassxc_user_ini_content.content | b64decode }}'
+
+    #
+    # XDG Autostart Verification (autostart_enabled: true)
+    #
+
+    - name: Verify | Check testuser XDG autostart entry
+      ansible.builtin.stat:
+        path: '/home/testuser/.config/autostart/org.keepassxc.KeePassXC.desktop'
+      register: _keepassxc_user_autostart
+
+    - name: Verify | Assert XDG autostart entry deployed
+      ansible.builtin.assert:
+        that:
+          - _keepassxc_user_autostart.stat.exists
+          - _keepassxc_user_autostart.stat.isreg
+          - _keepassxc_user_autostart.stat.pw_name == 'testuser'
+          - _keepassxc_user_autostart.stat.mode == '0600'
+        fail_msg: 'testuser XDG autostart entry missing or wrong ownership/permissions'
+
+    - name: Verify | Read XDG autostart entry content
+      ansible.builtin.slurp:
+        src: '/home/testuser/.config/autostart/org.keepassxc.KeePassXC.desktop'
+      register: _keepassxc_autostart_content
+
+    - name: Verify | Assert XDG autostart entry has required hints
+      ansible.builtin.assert:
+        that:
+          - "'[Desktop Entry]' in __autostart_text"
+          - "'Exec=keepassxc' in __autostart_text"
+          - "'X-GNOME-Autostart-enabled=true' in __autostart_text"
+          - "'X-GNOME-Autostart-Delay=2' in __autostart_text"
+          - "'X-KDE-autostart-after=panel' in __autostart_text"
+          - "'X-LXQt-Need-Tray=true' in __autostart_text"
+        fail_msg: 'XDG autostart entry missing required Desktop Entry keys or tray-readiness hints'
+      vars:
+        __autostart_text: '{{ _keepassxc_autostart_content.content | b64decode }}'

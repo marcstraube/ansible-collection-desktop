@@ -46,11 +46,15 @@ keepassxc_secret_service_scope: 'user'  # pragma: allowlist secret
 keepassxc_ssh_agent_enabled: false
 
 #
-# Systemd Autostart
+# Autostart
 #
 
-# Enable KeePassXC autostart via systemd user service
+# Enable KeePassXC autostart via XDG autostart entry
 keepassxc_autostart_enabled: false
+
+# Default locale for GenericName translation in autostart entry.
+# Per-user override via 'lang' attribute on users_list / keepassxc_users.
+keepassxc_locale: 'en_US.UTF-8'
 
 #
 # Configuration
@@ -92,6 +96,10 @@ keepassxc_config_dir: '.config/keepassxc'
 keepassxc_config:
   General:
     ConfigVersion: 2
+    # Write keepassxc.ini.old before each save (safety, upstream default)
+    BackupBeforeSave: true
+    # Atomic save can break cloud-sync (Nextcloud, Dropbox); upstream default true
+    UseAtomicSaves: true
   Browser:
     CustomProxyLocation: ''
   GUI:
@@ -100,6 +108,12 @@ keepassxc_config:
     DarkTrayIcon: false
     HidePasswords: true
     HideUsernames: false
+    # Close button minimises to tray instead of quitting
+    MinimizeOnClose: false
+    # Start minimised
+    MinimizeOnStartup: true
+    # Tray icon style: 'monochrome-light', 'monochrome-dark', or 'colorful'
+    TrayIconAppearance: 'monochrome-light'
   Security:
     # Lock triggers
     LockDatabaseScreenLock: true      # Primary: lock with screen

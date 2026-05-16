@@ -73,11 +73,30 @@ overrides if needed.
 | ----------------------------- | ------- | -------------------------- |
 | `keepassxc_ssh_agent_enabled` | `false` | Enable KeePassXC SSH agent |
 
-### Systemd Autostart
+### Autostart
 
-| Variable                      | Default | Description                                         |
-| ----------------------------- | ------- | --------------------------------------------------- |
-| `keepassxc_autostart_enabled` | `false` | Enable KeePassXC autostart via systemd user service |
+KeePassXC autostart is managed via the XDG autostart entry
+`~/.config/autostart/org.keepassxc.KeePassXC.desktop` — the same file
+KeePassXC writes from its GUI checkbox "Automatically launch KeePassXC
+at system startup". The role deploys/removes this file based on the
+toggle below; KeePassXC and the role share a single source of truth.
+
+| Variable                      | Default         | Description                                        |
+| ----------------------------- | --------------- | -------------------------------------------------- |
+| `keepassxc_autostart_enabled` | `false`         | Enable KeePassXC autostart via XDG autostart entry |
+| `keepassxc_locale`            | `en_US.UTF-8`   | Host-level locale for `GenericName` translation    |
+
+The `GenericName` field in the deployed autostart entry is translated
+from the system `.desktop` file (`/usr/share/applications/org.keepassxc.KeePassXC.desktop`)
+using the requested locale. Resolution order:
+
+1. Per-user `lang` attribute on the user entry (`keepassxc_users[*].lang`
+   or `users_list[*].lang` — both flow through)
+2. `keepassxc_locale` (host-level default)
+3. English fallback (`GenericName=Password Manager`)
+
+Wire `keepassxc_locale: "{{ base_locale }}"` in inventory to follow a
+project-wide locale.
 
 ### Configuration
 
@@ -114,6 +133,8 @@ keepassxc_users:
     group: 'johndoe'              # Optional, defaults to name
     mode: 'managed'               # managed/initial/disabled
     autostart: true               # Opt-out with false
+    delay: 5                      # Optional, X-GNOME-Autostart-Delay (seconds, default 2)
+    lang: 'de_DE.UTF-8'           # Optional, overrides keepassxc_locale for this user
     secret_service: true          # Opt-out with false
     browser_integration: true     # Override global setting
     config:                       # Override specific config values
@@ -123,8 +144,8 @@ keepassxc_users:
 
 The `mode` key controls per-user config deployment:
 
-- `managed` -- always deploy/overwrite config (default)
-- `initial` -- deploy only when user is newly created
+- `managed` -- always deploy/overwrite config
+- `initial` -- deploy only when `keepassxc.ini` does not yet exist for the user (default)
 - `disabled` -- skip config deployment for this user
 
 ## Tags
