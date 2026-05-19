@@ -37,7 +37,6 @@ directory structure, variable naming, task patterns, and template rules.
 | `pipewire` | Audio stack | Replaces PulseAudio |
 | `bluetooth` | BlueZ configuration | Security timeouts, MAC privacy |
 | `terminal` | Ghostty, Alacritty, Kitty, Foot | Per-user config |
-| `shell` | Zsh, Fish, Bash | Oh-My-Zsh, plugins |
 | `office` | LibreOffice, Thunderbird, Obsidian | Language packs |
 
 ## Display Manager — Greeter Architecture

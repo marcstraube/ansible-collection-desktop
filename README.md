@@ -8,7 +8,7 @@
 ## Description
 
 Desktop workstation roles for Arch Linux, Debian Trixie, and EL 9/10.
-28 roles covering desktop environments, display managers, browsers,
+27 roles covering desktop environments, display managers, browsers,
 development tools, multimedia, office, and productivity applications.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
@@ -40,7 +40,6 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 | Role          | Description                                        |
 | ------------- | -------------------------------------------------- |
-| **shell**     | Zsh, Fish, Bash with Oh-My-Zsh, plugins, themes    |
 | **terminal**  | Ghostty, Alacritty, Kitty, Foot                    |
 | **browser**   | Firefox, LibreWolf, Chromium, Brave with policies  |
 | **office**    | LibreOffice, Thunderbird, Obsidian, language packs |
