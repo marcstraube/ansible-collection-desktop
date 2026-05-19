@@ -88,7 +88,7 @@ jobs:
         include:
           - { role: browser, platform: browser-archlinux }
           - { role: pipewire, platform: pipewire-archlinux }
-          - { role: shell, platform: shell-archlinux }
+          - { role: terminal, platform: terminal-archlinux }
           - { role: keepassxc, platform: keepassxc-archlinux }
 
     steps:
