@@ -54,12 +54,6 @@
       vars:
         desktop_base_enabled: true
 
-    - role: marcstraube.desktop.shell
-      vars:
-        shell_zsh_enabled: true
-        # starship not available in Debian 12 repos (only Debian 13+)
-        shell_starship: "{{ ansible_facts['os_family'] == 'Archlinux' }}"
-
     - role: marcstraube.desktop.terminal
       vars:
         terminal_alacritty_enabled: true

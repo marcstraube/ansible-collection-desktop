@@ -55,18 +55,6 @@
     - terminal
   when: terminal_enabled | default(true) | bool
 
-- name: Desktop | Include shell role
-  ansible.builtin.include_role:
-    name: marcstraube.desktop.shell
-    apply:
-      tags:
-        - desktop
-        - shell
-  tags:
-    - desktop
-    - shell
-  when: shell_enabled | default(true) | bool
-
 - name: Desktop | Include pipewire role
   ansible.builtin.include_role:
     name: marcstraube.desktop.pipewire
