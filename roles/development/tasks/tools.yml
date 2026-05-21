@@ -35,14 +35,6 @@
   retries: 3
   delay: 5
 
-- name: Tools | Manage shellcheck
-  ansible.builtin.package:
-    name: '{{ __development_shellcheck_package }}'
-    state: "{{ 'present' if development_shellcheck_enabled | bool else 'absent' }}"
-  when: __development_shellcheck_package | default('') | length > 0
-  retries: 3
-  delay: 5
-
 - name: Tools | Manage DBeaver
   ansible.builtin.package:
     name: '{{ __development_dbeaver_package }}'

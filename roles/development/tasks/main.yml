@@ -75,6 +75,34 @@
     - development
     - development:tools
 
+- name: Main | Import shell tooling tasks
+  ansible.builtin.import_tasks: shell.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:shell
+
+- name: Main | Import Python tooling tasks
+  ansible.builtin.import_tasks: python_tooling.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:python-tooling
+
+- name: Main | Import Lua tooling tasks
+  ansible.builtin.import_tasks: lua.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:lua
+
+- name: Main | Import QML tooling tasks
+  ansible.builtin.import_tasks: qml.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:qml
+
 - name: Main | Import user configuration tasks
   ansible.builtin.import_tasks: users.yml
   when:

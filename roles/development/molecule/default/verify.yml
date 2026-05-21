@@ -8,6 +8,8 @@
       ansible.builtin.include_vars: '{{ item }}'
       with_first_found:
         - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
             - '{{ ansible_facts["distribution"] }}.yml'
             - '{{ ansible_facts["os_family"] }}.yml'
           paths:
@@ -146,33 +148,81 @@
       failed_when: _dev_jq_rpm.rc != 0
       when: ansible_facts['os_family'] == 'RedHat'
 
-    - name: Verify | Check shellcheck installed (Arch)
-      ansible.builtin.command:
-        cmd: 'pacman -Q shellcheck'
-      register: _dev_sc_arch
-      changed_when: false
-      failed_when: _dev_sc_arch.rc != 0
-      when: ansible_facts['os_family'] == 'Archlinux'
+    #
+    # Language Tooling (per-platform availability — skipped when package is '')
+    #
 
-    - name: >-
-        Verify | Check shellcheck installed
-        (Debian)
-      ansible.builtin.command:
-        cmd: 'dpkg -l shellcheck'
-      register: _dev_sc_deb
-      changed_when: false
-      failed_when: _dev_sc_deb.rc != 0
-      when: ansible_facts['os_family'] == 'Debian'
+    - name: Verify | shfmt — package installed
+      ansible.builtin.package:
+        name: '{{ __development_shell_shfmt_package }}'
+        state: present
+      check_mode: true
+      register: _dev_shfmt_check
+      failed_when: _dev_shfmt_check.changed
+      when: __development_shell_shfmt_package | default('') | length > 0
 
-    - name: >-
-        Verify | Check ShellCheck installed
-        (RedHat)
-      ansible.builtin.command:  # noqa: command-instead-of-module
-        cmd: 'rpm -q ShellCheck'
-      register: _dev_sc_rpm
-      changed_when: false
-      failed_when: _dev_sc_rpm.rc != 0
-      when: ansible_facts['os_family'] == 'RedHat'
+    - name: Verify | shellcheck — package installed
+      ansible.builtin.package:
+        name: '{{ __development_shell_shellcheck_package }}'
+        state: present
+      check_mode: true
+      register: _dev_shellcheck_check
+      failed_when: _dev_shellcheck_check.changed
+      when: __development_shell_shellcheck_package | default('') | length > 0
+
+    - name: Verify | bats — package installed
+      ansible.builtin.package:
+        name: '{{ __development_shell_bats_package }}'
+        state: present
+      check_mode: true
+      register: _dev_bats_check
+      failed_when: _dev_bats_check.changed
+      when: __development_shell_bats_package | default('') | length > 0
+
+    - name: Verify | ruff — package installed
+      ansible.builtin.package:
+        name: '{{ __development_python_ruff_package }}'
+        state: present
+      check_mode: true
+      register: _dev_ruff_check
+      failed_when: _dev_ruff_check.changed
+      when: __development_python_ruff_package | default('') | length > 0
+
+    - name: Verify | stylua — package installed
+      ansible.builtin.package:
+        name: '{{ __development_lua_stylua_package }}'
+        state: present
+      check_mode: true
+      register: _dev_stylua_check
+      failed_when: _dev_stylua_check.changed
+      when: __development_lua_stylua_package | default('') | length > 0
+
+    - name: Verify | luacheck — package installed
+      ansible.builtin.package:
+        name: '{{ __development_lua_luacheck_package }}'
+        state: present
+      check_mode: true
+      register: _dev_luacheck_check
+      failed_when: _dev_luacheck_check.changed
+      when: __development_lua_luacheck_package | default('') | length > 0
+
+    - name: Verify | busted — package installed
+      ansible.builtin.package:
+        name: '{{ __development_lua_busted_package }}'
+        state: present
+      check_mode: true
+      register: _dev_busted_check
+      failed_when: _dev_busted_check.changed
+      when: __development_lua_busted_package | default('') | length > 0
+
+    - name: Verify | qml-tools — package installed
+      ansible.builtin.package:
+        name: '{{ __development_qml_tools_package }}'
+        state: present
+      check_mode: true
+      register: _dev_qml_tools_check
+      failed_when: _dev_qml_tools_check.changed
+      when: __development_qml_tools_package | default('') | length > 0
 
     #
     # Toggle verification: cmake enabled, meson disabled

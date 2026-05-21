@@ -19,12 +19,23 @@
     development_cmake_enabled: true
     development_meson_enabled: false
     development_ninja_enabled: false
-    # Misc toggles: enable jq + shellcheck (existing verify), disable rest
+    # Misc toggles: enable jq, disable rest
     development_jq_enabled: true
     development_yq_enabled: false
     development_direnv_enabled: false
     development_pre_commit_enabled: false
-    development_shellcheck_enabled: true
+    # Shell tooling: enable all (verify checks present/absent per platform)
+    development_shell_shfmt_enabled: true
+    development_shell_shellcheck_enabled: true
+    development_shell_bats_enabled: true
+    # Python tooling
+    development_python_ruff_enabled: true
+    # Lua tooling
+    development_lua_stylua_enabled: true
+    development_lua_luacheck_enabled: true
+    development_lua_busted_enabled: true
+    # QML tooling
+    development_qml_tools_enabled: true
     # Database tools off
     development_dbeaver_enabled: false
     development_pgadmin_enabled: false

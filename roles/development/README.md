@@ -79,9 +79,9 @@ overrides if needed.
 
 #### VSCode / VSCodium settings
 
-| Variable                      | Default | Description                                    |
-|-------------------------------|---------|------------------------------------------------|
-| `development_vscode_settings` | `{...}` | Per-user `settings.json` content (dict)        |
+| Variable                      | Default | Description                                   |
+|-------------------------------|---------|-----------------------------------------------|
+| `development_vscode_settings` | `{...}` | Per-user `settings.json` content (dict)       |
 | `development_vscode_argv`     | `{...}` | Per-user `argv.json` (Electron-runtime flags) |
 
 Defaults opt out of editor-core, common Microsoft, and Red Hat extension
@@ -120,7 +120,61 @@ intended, not just deltas.
 | `development_yq_enabled`         | `true`  | Enable yq YAML processor           |
 | `development_direnv_enabled`     | `true`  | Enable direnv directory-based envs |
 | `development_pre_commit_enabled` | `true`  | Enable pre-commit git hooks        |
-| `development_shellcheck_enabled` | `true`  | Enable shellcheck linter           |
+
+### Language Tooling
+
+Per-tool toggles for distro-packaged linters, formatters, and test frameworks.
+Each toggle resolves to a `__development_<tool>_package` variable in
+`vars/{distro}.yml`. Distros without an upstream package map to `''`, in which
+case the install task is a no-op — see "Platform support" below.
+
+For tools installed via a language package manager (`pipx`, `rustup`) the
+role uses the free-form lists `development_python_tools` and
+`development_rust_components` under "Programming Languages" above.
+
+#### Shell
+
+`shfmt` and `shellcheck` cover multiple shell dialects (POSIX sh, bash,
+dash, ksh, mksh); `bats-core` is bash-specific.
+
+| Variable                                 | Default | Description                          |
+|------------------------------------------|---------|--------------------------------------|
+| `development_shell_shfmt_enabled`        | `false` | Enable shfmt shell formatter         |
+| `development_shell_shellcheck_enabled`   | `true`  | Enable shellcheck shell linter       |
+| `development_shell_bats_enabled`         | `false` | Enable bats-core Bash test framework |
+
+#### Python Tooling
+
+| Variable                          | Default | Description                              |
+|-----------------------------------|---------|------------------------------------------|
+| `development_python_ruff_enabled` | `false` | Enable ruff Python linter and formatter  |
+
+#### Lua
+
+| Variable                           | Default | Description                          |
+|------------------------------------|---------|--------------------------------------|
+| `development_lua_stylua_enabled`   | `false` | Enable stylua Lua formatter          |
+| `development_lua_luacheck_enabled` | `false` | Enable luacheck Lua linter           |
+| `development_lua_busted_enabled`   | `false` | Enable busted Lua test framework     |
+
+#### QML
+
+| Variable                        | Default | Description                                          |
+|---------------------------------|---------|------------------------------------------------------|
+| `development_qml_tools_enabled` | `false` | Enable Qt6 QML tools (qmllint + qmlformat, same pkg) |
+
+##### Platform support
+
+| Tool         | Arch | Debian Trixie | EL 9 | EL 10 |
+|--------------|------|---------------|------|-------|
+| shfmt        | yes  | yes           | no   | no    |
+| shellcheck   | yes  | yes           | yes  | yes   |
+| bats         | yes  | yes           | yes  | yes   |
+| ruff         | yes  | no            | no   | yes   |
+| stylua       | yes  | no            | no   | no    |
+| luacheck     | yes  | yes           | no   | no    |
+| busted       | yes  | yes           | no   | no    |
+| qml-tools    | yes  | yes           | yes  | yes   |
 
 ### User Configuration
 
@@ -141,23 +195,27 @@ Each user entry supports:
 
 Mode semantics — analog to `marcstraube.desktop.browser`:
 
-| Mode       | First run                  | Subsequent runs                        |
-|------------|----------------------------|----------------------------------------|
-| `managed`  | deploy                     | overwrite (always reconcile)           |
+| Mode       | First run                       | Subsequent runs                          |
+|------------|---------------------------------|------------------------------------------|
+| `managed`  | deploy                          | overwrite (always reconcile)             |
 | `initial`  | deploy if user is newly created | leave existing user customisations alone |
-| `disabled` | skip                       | skip                                   |
+| `disabled` | skip                            | skip                                     |
 
 ## Tags
 
-| Tag                     | Scope                      |
-|-------------------------|----------------------------|
-| `development`           | All role tasks             |
-| `development:git`       | Version control tasks      |
-| `development:languages` | Programming language tasks |
-| `development:build`     | Build tools tasks          |
-| `development:ides`      | IDE installation tasks     |
-| `development:tools`     | Misc tools tasks           |
-| `development:users`     | User configuration tasks   |
+| Tag                            | Scope                      |
+|--------------------------------|----------------------------|
+| `development`                  | All role tasks             |
+| `development:git`              | Version control tasks      |
+| `development:languages`        | Programming language tasks |
+| `development:build`            | Build tools tasks          |
+| `development:ides`             | IDE installation tasks     |
+| `development:tools`            | Misc tools tasks           |
+| `development:shell`            | Shell tooling tasks        |
+| `development:python-tooling`   | Python tooling tasks       |
+| `development:lua`              | Lua tooling tasks          |
+| `development:qml`              | QML tooling tasks          |
+| `development:users`            | User configuration tasks   |
 
 ## Example Playbook
 
@@ -207,6 +265,15 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [VSCodium](https://vscodium.com/) — Free/libre Code-OSS binaries (telemetry-free VS Code build)
 - [JetBrains Toolbox](https://www.jetbrains.com/toolbox-app/) — Manager for JetBrains IDEs
 - [Zed](https://zed.dev/) — High-performance multiplayer code editor
+- [shfmt](https://github.com/mvdan/sh) — Shell formatter
+- [shellcheck](https://github.com/koalaman/shellcheck) — Shell script static analysis
+- [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system
+- [ruff](https://github.com/astral-sh/ruff) — Python linter and formatter
+- [stylua](https://github.com/JohnnyMorganz/StyLua) — Lua formatter
+- [luacheck](https://github.com/mpeterv/luacheck) — Lua linter
+- [busted](https://github.com/lunarmodules/busted) — Lua test framework
+- [Qt qmllint](https://doc.qt.io/qt-6/qtquick-tool-qmllint.html) — QML linter
+- [Qt qmlformat](https://doc.qt.io/qt-6/qtquick-tool-qmlformat.html) — QML formatter
 - [HTTPie](https://httpie.io/) — Modern HTTP CLI client
 - [pre-commit](https://pre-commit.com/) — Multi-language git hook framework
 - [direnv](https://direnv.net/) — Per-directory environment variable loader

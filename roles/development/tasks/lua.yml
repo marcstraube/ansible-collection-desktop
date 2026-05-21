@@ -1,0 +1,28 @@
+---
+#
+# Lua Tooling Installation
+#
+
+- name: Lua | Manage stylua
+  ansible.builtin.package:
+    name: '{{ __development_lua_stylua_package }}'
+    state: "{{ 'present' if development_lua_stylua_enabled | bool else 'absent' }}"
+  when: __development_lua_stylua_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Lua | Manage luacheck
+  ansible.builtin.package:
+    name: '{{ __development_lua_luacheck_package }}'
+    state: "{{ 'present' if development_lua_luacheck_enabled | bool else 'absent' }}"
+  when: __development_lua_luacheck_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Lua | Manage busted
+  ansible.builtin.package:
+    name: '{{ __development_lua_busted_package }}'
+    state: "{{ 'present' if development_lua_busted_enabled | bool else 'absent' }}"
+  when: __development_lua_busted_package | default('') | length > 0
+  retries: 3
+  delay: 5
