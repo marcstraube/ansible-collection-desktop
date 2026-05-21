@@ -81,6 +81,9 @@ ai_comfyui_port: 8188
 ai_comfyui_user: 'comfyui'
 # Service group
 ai_comfyui_group: 'comfyui'
+# Service user home (FHS state directory — kept distinct from install_dir
+# so `become_user`'s ~/.ansible/tmp does not land in the git-clone target)
+ai_comfyui_home: '/var/lib/comfyui'
 # Enable ComfyUI-Manager
 ai_comfyui_manager_enabled: true
 # Enable and start the ComfyUI service
