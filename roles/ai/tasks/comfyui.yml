@@ -12,6 +12,13 @@
   retries: 3
   delay: 5
 
+- name: ComfyUI | Create service group
+  become: true
+  ansible.builtin.group:
+    name: '{{ ai_comfyui_group }}'
+    system: true
+    state: present
+
 - name: ComfyUI | Create ComfyUI service user
   become: true
   ansible.builtin.user:
