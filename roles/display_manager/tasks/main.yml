@@ -18,21 +18,27 @@
 
 - name: Main | Import install tasks
   ansible.builtin.import_tasks: install.yml
-  when: display_manager_enabled | bool
+  when:
+    - display_manager_enabled | bool
+    - __display_manager_packages[display_manager_name] | default('') | length > 0
   tags:
     - display-manager
     - display-manager:install
 
 - name: Main | Import configure tasks
   ansible.builtin.import_tasks: configure.yml
-  when: display_manager_enabled | bool
+  when:
+    - display_manager_enabled | bool
+    - __display_manager_packages[display_manager_name] | default('') | length > 0
   tags:
     - display-manager
     - display-manager:configure
 
 - name: Main | Import service tasks
   ansible.builtin.import_tasks: service.yml
-  when: display_manager_enabled | bool
+  when:
+    - display_manager_enabled | bool
+    - __display_manager_packages[display_manager_name] | default('') | length > 0
   tags:
     - display-manager
     - display-manager:service
