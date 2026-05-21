@@ -3,6 +3,10 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    # Mirror converge.yml so vars-driven assertions resolve identically.
+    display_manager_name: 'sddm'
+
   tasks:
     - name: Verify | Load OS-specific variables
       ansible.builtin.include_vars: '{{ item }}'
