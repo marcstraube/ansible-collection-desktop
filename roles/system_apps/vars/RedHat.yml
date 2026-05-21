@@ -1,0 +1,18 @@
+---
+#
+# RedHat Variables (targets newest supported RHEL major: EL10)
+#
+# The following packages are not available on EL10 + EPEL:
+# - gparted / solaar / timeshift / deja-dup: not packaged in EPEL 10.
+# - filelight / plasma-systemmonitor: EPEL builds depend on Qt 6.10
+#   while Rocky 10 base ships Qt 6.8/6.9, so dnf depsolve fails.
+# Older RHEL majors restore working values in vars/RedHat-<N>.yml.
+# See README "Platform support" section.
+#
+
+__system_apps_gparted_package: ''
+__system_apps_filelight_package: ''
+__system_apps_solaar_package: ''
+__system_apps_plasma_system_monitor_package: ''
+__system_apps_timeshift_package: ''
+__system_apps_deja_dup_package: ''

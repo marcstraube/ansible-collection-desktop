@@ -1,0 +1,10 @@
+---
+#
+# RedHat 9 Overrides
+#
+# Restores packages that work on EL9 but are broken on EL10 (the
+# vars/RedHat.yml file targets the newest supported RHEL major).
+#
+
+# Sieve email filtering (KDE PIM suite includes sieve editor)
+__communication_sieve_package: 'kmail'

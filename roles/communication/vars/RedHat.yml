@@ -4,7 +4,10 @@
 #
 
 # Sieve email filtering (KDE PIM suite includes sieve editor)
-__communication_sieve_package: 'kmail'
+# Empty on EL10: EPEL currently ships kmail-25.12.3 with unsatisfied
+# Qt 6.10 dependencies (Rocky 10 base ships Qt 6.8/6.9). Restored for
+# EL9 in vars/RedHat-9.yml. See README "Platform support" section.
+__communication_sieve_package: ''
 
 # Packages not available without external repos
 __communication_slack_package: ''

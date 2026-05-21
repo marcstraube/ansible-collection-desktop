@@ -3,9 +3,28 @@
   hosts: all
   gather_facts: true
 
+  vars:
+    # Mirror converge.yml so vars-driven assertions resolve identically.
+    display_manager_name: 'sddm'
+
   tasks:
+    - name: Verify | Load OS-specific variables
+      ansible.builtin.include_vars: '{{ item }}'
+      with_first_found:
+        - files:
+            - '{{ ansible_facts["distribution"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}-{{ ansible_facts["distribution_major_version"] }}.yml'
+            - '{{ ansible_facts["distribution"] }}.yml'
+            - '{{ ansible_facts["os_family"] }}.yml'
+          paths:
+            - '../../vars'
+
+    - name: Verify | Compute picked-DM package
+      ansible.builtin.set_fact:
+        _dm_picked_package: '{{ __display_manager_packages[display_manager_name] | default("") }}'
+
     #
-    # Package Verification
+    # Package Verification (skipped when the picked DM is no-op on this platform)
     #
 
     - name: Verify | Check SDDM installed (Arch)
@@ -14,7 +33,9 @@
       register: _dm_sddm_arch
       changed_when: false
       failed_when: _dm_sddm_arch.rc != 0
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - _dm_picked_package | length > 0
 
     - name: Verify | Check SDDM installed (Debian)
       ansible.builtin.command:
@@ -22,7 +43,9 @@
       register: _dm_sddm_deb
       changed_when: false
       failed_when: _dm_sddm_deb.rc != 0
-      when: ansible_facts['os_family'] == 'Debian'
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - _dm_picked_package | length > 0
 
     - name: Verify | Check SDDM installed (RedHat)
       ansible.builtin.command:  # noqa: command-instead-of-module
@@ -30,10 +53,12 @@
       register: _dm_sddm_rpm
       changed_when: false
       failed_when: _dm_sddm_rpm.rc != 0
-      when: ansible_facts['os_family'] == 'RedHat'
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - _dm_picked_package | length > 0
 
     #
-    # Configuration
+    # Configuration (skipped when the picked DM is no-op on this platform)
     #
 
     - name: Verify | Check SDDM config directory exists
@@ -41,9 +66,11 @@
         path: /etc/sddm.conf.d
       register: _dm_sddm_config_dir
       failed_when: not _dm_sddm_config_dir.stat.exists
+      when: _dm_picked_package | length > 0
 
     - name: Verify | Check SDDM service file exists
       ansible.builtin.stat:
         path: /usr/lib/systemd/system/sddm.service
       register: _dm_sddm_service_file
       failed_when: not _dm_sddm_service_file.stat.exists
+      when: _dm_picked_package | length > 0

@@ -1,0 +1,14 @@
+---
+#
+# RedHat 9 Overrides
+#
+# Restores packages that work on EL9 but are broken or unpackaged on
+# EL10 (vars/RedHat.yml targets the newest supported RHEL major).
+#
+
+__system_apps_gparted_package: 'gparted'
+__system_apps_filelight_package: 'filelight'
+__system_apps_solaar_package: 'solaar'
+__system_apps_plasma_system_monitor_package: 'plasma-systemmonitor'
+__system_apps_timeshift_package: 'timeshift'
+__system_apps_deja_dup_package: 'deja-dup'

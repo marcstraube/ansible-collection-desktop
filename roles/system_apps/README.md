@@ -17,8 +17,8 @@ On Rocky Linux, EPEL and CRB must be enabled before running this role
 (gparted, filelight, solaar, timeshift, deja-dup) are not in the base
 repos, and filelight + plasma-systemmonitor pull KF5 libraries from CRB.
 
-On Rocky 10 specifically, gparted, solaar, timeshift, and deja-dup are not
-packaged in EPEL 10 and are skipped automatically.
+On Rocky 10 specifically, several packages are skipped automatically —
+see "Known limitations on EL10" below.
 
 ## Requirements
 
@@ -28,16 +28,29 @@ packaged in EPEL 10 and are skipped automatically.
 
 ## Supported Platforms
 
-| Platform                   | Notes                                                                    |
-|----------------------------|--------------------------------------------------------------------------|
-| Arch Linux                 | Native packages from extra/community                                     |
-| Debian Trixie              | Native packages from main                                                |
-| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB required                                                      |
-| EL 10 (Rocky, Alma, RHEL)  | EPEL + CRB required — gparted, solaar, timeshift, deja-dup not available |
+| Platform                   | Notes                                                |
+|----------------------------|------------------------------------------------------|
+| Arch Linux                 | Native packages from extra/community                 |
+| Debian Trixie              | Native packages from main                            |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB required                                  |
+| EL 10 (Rocky, Alma, RHEL)  | EPEL + CRB required — see EL10 limitations below     |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
 overrides if needed.
+
+### Known limitations on EL10
+
+The following packages are not installable on Rocky 10 / Alma 10 / RHEL 10
+and are skipped automatically. The role install tasks already guard with
+`length > 0`, so the empty package names produce a no-op:
+
+- `gparted` — not packaged in EPEL 10
+- `filelight` — EPEL build depends on Qt 6.10, Rocky 10 ships Qt 6.8/6.9
+- `solaar` — not packaged in EPEL 10
+- `plasma-systemmonitor` — EPEL build depends on Qt 6.10
+- `timeshift` — not packaged in EPEL 10
+- `deja-dup` — not packaged in EPEL 10
 
 ## Role Variables
 
