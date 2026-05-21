@@ -28,12 +28,12 @@ packaged in EPEL 10 and are skipped automatically.
 
 ## Supported Platforms
 
-| Platform                   | Notes                                                                    |
-|----------------------------|--------------------------------------------------------------------------|
-| Arch Linux                 | Native packages from extra/community                                     |
-| Debian Trixie              | Native packages from main                                                |
-| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB required                                                      |
-| EL 10 (Rocky, Alma, RHEL)  | EPEL + CRB required — gparted, solaar, timeshift, deja-dup not available |
+| Platform                   | Notes                                                                               |
+|----------------------------|-------------------------------------------------------------------------------------|
+| Arch Linux                 | Native packages from extra/community                                                |
+| Debian Trixie              | Native packages from main                                                           |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB required                                                                 |
+| EL 10 (Rocky, Alma, RHEL)  | EPEL + CRB required — gparted, filelight, solaar, timeshift, deja-dup not available |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
