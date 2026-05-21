@@ -33,7 +33,23 @@ __ai_ollama_package: 'ollama'
 # Service names
 __ai_ollama_service: 'ollama.service'
 
-# ComfyUI
+# ComfyUI — AUR package (handles user, install dir, venv, PyTorch, systemd unit)
+# See roles/ai/tasks/comfyui-archlinux.yml for the install flow.
+# These are AUR PKGBUILD facts, not inventory-tunable.
+__ai_comfyui_aur_package: 'comfyui'
+# GPU backend (ai_comfyui_gpu) → COMFYUI_GPU env var consumed by PKGBUILD
+# post_install hook to choose the PyTorch wheel index (ROCm / CUDA / CPU).
+__ai_comfyui_aur_gpu_map:
+  nvidia: 'cuda'
+  amd: 'rocm'
+  cpu: 'cpu'
+# AUR-fixed paths and identity (set by comfyui.sysusers / PKGBUILD _prefix).
+__ai_comfyui_aur_user: 'comfy'
+__ai_comfyui_aur_group: 'comfy'
+__ai_comfyui_aur_user_home: '/var/lib/comfyui'
+__ai_comfyui_aur_install_dir: '/opt/comfyui'
+
+# ComfyUI — manual install fallback (kept for parity but not used on Arch)
 __ai_comfyui_python: 'python'
 __ai_comfyui_venv_packages:
   - 'python'

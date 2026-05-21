@@ -1,0 +1,64 @@
+---
+#
+# ComfyUI install — Arch Linux (AUR)
+#
+# The AUR `comfyui` package owns: system user `comfy`, install dir
+# `/opt/comfyui`, Python venv, PyTorch wheel selection (driven by the
+# `COMFYUI_GPU` env var consumed by the PKGBUILD's post_install hook),
+# and the systemd unit at `/usr/lib/systemd/system/comfyui.service`.
+#
+# Inventory variables `ai_comfyui_user`, `ai_comfyui_group`,
+# `ai_comfyui_install_dir`, `ai_comfyui_home` are *not* honored on the
+# Arch path — the AUR package determines those.
+#
+# ComfyUI-Manager has no AUR package yet, so it is installed via a
+# manual git-clone as `comfy`. This is the documented exception to the
+# project rule that Arch installs go through official repos or AUR.
+# An AUR submission for `comfyui-manager` is tracked separately and
+# would let this block collapse into a kewlfft.aur.aur install.
+
+- name: ComfyUI | Install AUR package
+  become: true
+  become_user: aur_builder
+  environment:
+    COMFYUI_GPU: "{{ __ai_comfyui_aur_gpu_map[ai_comfyui_gpu] | default('cpu') }}"
+  kewlfft.aur.aur:
+    name: '{{ __ai_comfyui_aur_package }}'
+    state: present
+  retries: 3
+  delay: 5
+
+# Pre-create the Ansible remote_tmp under comfy's home so the next
+# `become_user: comfy` task does not emit the generic 0700 warning.
+# Running git as `comfy` (rather than as root + chown) keeps git's
+# safe.directory check happy on repeated runs — root would refuse to
+# touch a comfy-owned repo and abort with `dubious ownership`.
+- name: ComfyUI | Pre-create Ansible remote_tmp under comfy home
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_comfyui_aur_user_home }}/.ansible/tmp'
+    state: directory
+    owner: '{{ __ai_comfyui_aur_user }}'
+    group: '{{ __ai_comfyui_aur_group }}'
+    mode: '0700'
+  when: ai_comfyui_manager_enabled | bool
+
+- name: ComfyUI | Clone ComfyUI-Manager
+  become: true
+  become_user: '{{ __ai_comfyui_aur_user }}'
+  ansible.builtin.git:
+    repo: '{{ __ai_comfyui_manager_repo_url }}'
+    dest: "{{ __ai_comfyui_aur_install_dir }}/custom_nodes/ComfyUI-Manager"
+    version: 'main'
+    update: true
+  when: ai_comfyui_manager_enabled | bool
+  retries: 5
+  delay: 10
+
+- name: ComfyUI | Manage service
+  become: true
+  ansible.builtin.systemd_service:
+    name: comfyui.service
+    enabled: "{{ ai_comfyui_service_enabled | bool }}"
+    state: "{{ ai_comfyui_service_enabled | bool | ternary('started', 'stopped') }}"
+    daemon_reload: true

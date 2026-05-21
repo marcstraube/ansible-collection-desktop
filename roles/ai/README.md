@@ -69,18 +69,39 @@ API keys are managed by the user via environment variables (not by this role).
 
 ### ComfyUI (Stable Diffusion)
 
-| Variable                      | Default          | Description                 |
-| ----------------------------- | ---------------- | --------------------------- |
-| `ai_comfyui_enabled`          | `false`          | Install ComfyUI             |
-| `ai_comfyui_gpu`              | `'nvidia'`       | GPU type: `nvidia` or `amd` |
-| `ai_comfyui_version`          | `'master'`       | Git branch/tag              |
-| `ai_comfyui_install_dir`      | `'/opt/comfyui'` | Installation directory      |
-| `ai_comfyui_listen`           | `'127.0.0.1'`    | Listen address              |
-| `ai_comfyui_port`             | `8188`           | Web UI port                 |
-| `ai_comfyui_user`             | `'comfyui'`      | Service user                |
-| `ai_comfyui_group`            | `'comfyui'`      | Service group               |
-| `ai_comfyui_manager_enabled`  | `true`           | Install ComfyUI-Manager     |
-| `ai_comfyui_service_enabled`  | `true`           | Enable systemd service      |
+| Variable                      | Default                 | Description                                                |
+| ----------------------------- | ----------------------- | ---------------------------------------------------------- |
+| `ai_comfyui_enabled`          | `false`                 | Install ComfyUI                                            |
+| `ai_comfyui_gpu`              | `'nvidia'`              | GPU backend: `nvidia`, `amd`, or `cpu`                     |
+| `ai_comfyui_version`          | `'master'`              | Git branch/tag (manual path only)                          |
+| `ai_comfyui_install_dir`      | `'/opt/comfyui'`        | Installation directory (manual path only)                  |
+| `ai_comfyui_home`             | `'/var/lib/comfyui'`    | Service user home (manual path only; FHS state directory)  |
+| `ai_comfyui_listen`           | `'127.0.0.1'`           | Listen address                                             |
+| `ai_comfyui_port`             | `8188`                  | Web UI port                                                |
+| `ai_comfyui_user`             | `'comfyui'`             | Service user (manual path only)                            |
+| `ai_comfyui_group`            | `'comfyui'`             | Service group (manual path only)                           |
+| `ai_comfyui_manager_enabled`  | `true`                  | Install ComfyUI-Manager                                    |
+| `ai_comfyui_service_enabled`  | `true`                  | Enable systemd service                                     |
+
+**Install path differs by OS family:**
+
+- **Arch Linux**: installs the AUR `comfyui` package via `kewlfft.aur.aur`.
+  The PKGBUILD owns the install dir (`/opt/comfyui`), the service user
+  (`comfy`), the Python venv, the PyTorch wheel selection (driven by
+  `COMFYUI_GPU={cuda,rocm,cpu}` mapped from `ai_comfyui_gpu`), and the
+  systemd unit. Inventory variables marked *(manual path only)* in the
+  table above are **not honored** on Arch — they are fixed by the AUR
+  PKGBUILD.
+- **Debian / Rocky Linux**: from-source install. The role creates the
+  service user/group, clones the upstream ComfyUI repo to
+  `ai_comfyui_install_dir`, builds a Python virtual environment, and
+  installs PyTorch wheels selected by `ai_comfyui_gpu`. All variables
+  above apply.
+
+**ComfyUI-Manager** is installed via manual git-clone on both paths
+because no upstream package exists yet (see `tasks/comfyui-archlinux.yml`
+for the documented exception to the project's "Arch installs go through
+repos or AUR" rule).
 
 ## Tags
 
