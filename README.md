@@ -23,7 +23,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 ## Requirements
 
 - ansible-core >= 2.19
-- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) >= 1.0.0
+- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) >= 2.0.0
 
 ## Included Roles
 
