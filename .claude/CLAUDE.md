@@ -5,7 +5,7 @@
 Desktop workstation roles for Arch Linux and Debian Trixie — desktop environments,
 display managers, browsers, development tools, multimedia, and productivity software.
 
-## Coding Standards (ansible-core 2.17+)
+## Coding Standards (ansible-core 2.19+)
 
 - **Facts:** `ansible_facts['os_family']` — never `ansible_os_family` (deprecated)
 - **Modules:** Always FQCN (`ansible.builtin.*`, `community.general.*`, `kewlfft.aur.*`)
