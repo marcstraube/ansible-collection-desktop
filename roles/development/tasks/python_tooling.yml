@@ -1,0 +1,12 @@
+---
+#
+# Python Tooling Installation
+#
+
+- name: Python Tooling | Manage ruff
+  ansible.builtin.package:
+    name: '{{ __development_python_ruff_package }}'
+    state: "{{ 'present' if development_python_ruff_enabled | bool else 'absent' }}"
+  when: __development_python_ruff_package | default('') | length > 0
+  retries: 3
+  delay: 5

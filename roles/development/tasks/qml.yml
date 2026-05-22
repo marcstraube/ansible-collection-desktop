@@ -1,0 +1,15 @@
+---
+#
+# QML Tooling Installation
+#
+# qmllint and qmlformat ship in the same upstream package across all
+# supported distros. A single toggle covers both binaries.
+#
+
+- name: QML | Manage qml-tools
+  ansible.builtin.package:
+    name: '{{ __development_qml_tools_package }}'
+    state: "{{ 'present' if development_qml_tools_enabled | bool else 'absent' }}"
+  when: __development_qml_tools_package | default('') | length > 0
+  retries: 3
+  delay: 5

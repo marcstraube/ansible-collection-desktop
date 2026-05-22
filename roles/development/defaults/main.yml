@@ -75,6 +75,46 @@ development_go_enabled: false
 development_java_enabled: false
 
 #
+# Language Tooling
+#
+# Linters, formatters, and test frameworks for shell, Python, Lua, and
+# QML. Each toggle resolves to a `__development_<tool>_package` variable
+# in vars/{distro}.yml — empty on distros without an upstream package,
+# in which case the install task is a no-op.
+
+# Shell
+
+# Enable shfmt shell formatter (POSIX sh, bash, mksh)
+development_shell_shfmt_enabled: false
+
+# Enable shellcheck shell linter (sh, bash, dash, ksh)
+development_shell_shellcheck_enabled: true
+
+# Enable bats-core Bash test framework (bash-only)
+development_shell_bats_enabled: false
+
+# Python Tooling
+
+# Enable ruff Python linter and formatter
+development_python_ruff_enabled: false
+
+# Lua
+
+# Enable stylua Lua formatter
+development_lua_stylua_enabled: false
+
+# Enable luacheck Lua linter
+development_lua_luacheck_enabled: false
+
+# Enable busted Lua test framework
+development_lua_busted_enabled: false
+
+# QML
+
+# Enable Qt6 QML tools (qmllint + qmlformat — single package)
+development_qml_tools_enabled: false
+
+#
 # Build Tools
 #
 
@@ -150,9 +190,6 @@ development_direnv_enabled: true
 
 # Enable pre-commit git hooks
 development_pre_commit_enabled: true
-
-# Enable shellcheck shell script linter
-development_shellcheck_enabled: true
 
 #
 # User Configuration

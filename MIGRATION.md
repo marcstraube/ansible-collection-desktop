@@ -7,6 +7,28 @@ snippets. For the full list of changes per release, see
 
 ## v2.0.0 (unreleased)
 
+### `development_shellcheck_enabled` renamed (#116)
+
+shellcheck moves from "Misc Tools" into the new `# Language Tooling`
+section under `# Shell`, alongside `shfmt` and `bats`. The toggle is
+renamed accordingly. Hard rename, no fallback.
+
+| Old name                          | New name                                |
+|-----------------------------------|-----------------------------------------|
+| `development_shellcheck_enabled`  | `development_shell_shellcheck_enabled`  |
+
+#### Before
+
+```yaml
+development_shellcheck_enabled: true
+```
+
+#### After
+
+```yaml
+development_shell_shellcheck_enabled: true
+```
+
 ### Boolean toggles renamed to follow `_enabled` convention (#43)
 
 Three logic-gate booleans were renamed to match the project's

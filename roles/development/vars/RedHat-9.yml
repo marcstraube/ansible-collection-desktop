@@ -1,6 +1,11 @@
 ---
 #
-# Debian Variables
+# RedHat 9 Variables
+#
+# vars/RedHat.yml targets the newest supported RHEL major (EL10). EL9
+# mirrors RedHat.yml because include_vars uses with_first_found and
+# loads only one file per host. EL9-specific overrides are:
+# - ruff: not packaged on EL9 (EPEL 10 ships it, EPEL 9 does not).
 #
 
 # Version control
@@ -9,35 +14,36 @@ __development_git_packages:
 
 __development_git_lfs_package: 'git-lfs'
 __development_github_cli_package: 'gh'
-__development_gitlab_cli_package: ''
+__development_gitlab_cli_package: ''  # not in EPEL 9/10
 
 # Python
 __development_python_packages:
   - 'python3'
   - 'python3-pip'
-  - 'python3-venv'
   - 'pipx'
 
 # Rust
-__development_rust_packages: []
+__development_rust_packages:
+  - 'rust'
+  - 'cargo'
 
 # Go
 __development_go_packages:
   - 'golang'
 
 # Java
-__development_java_package: 'openjdk-17-jdk'
+__development_java_package: 'java-21-openjdk-devel'
 
 # Build tools
 __development_build_packages:
-  - 'build-essential'
+  - '@Development Tools'
   - 'make'
 
 __development_cmake_package: 'cmake'
 __development_meson_package: 'meson'
 __development_ninja_package: 'ninja-build'
 
-# IDEs (need external repos or Flatpak)
+# IDEs
 __development_vscodium_package: ''
 __development_vscode_package: ''
 __development_jetbrains_toolbox_package: ''
@@ -46,7 +52,7 @@ __development_zed_package: ''
 
 # Database tools
 __development_dbeaver_package: ''
-__development_pgadmin_package: ''
+__development_pgadmin_package: 'pgadmin4'
 
 # API tools
 __development_httpie_package: 'httpie'
@@ -59,18 +65,18 @@ __development_yq_package: ''
 __development_direnv_package: 'direnv'
 __development_pre_commit_package: 'pre-commit'
 
-# Shell tooling
-__development_shell_shfmt_package: 'shfmt'
-__development_shell_shellcheck_package: 'shellcheck'
+# Shell tooling (shfmt not in EPEL)
+__development_shell_shfmt_package: ''
+__development_shell_shellcheck_package: 'ShellCheck'
 __development_shell_bats_package: 'bats'
 
-# Python tooling (ruff not yet in Debian Trixie main)
+# Python tooling (ruff not packaged on EL9)
 __development_python_ruff_package: ''
 
-# Lua tooling (stylua not packaged in Debian)
+# Lua tooling (none packaged on EL)
 __development_lua_stylua_package: ''
-__development_lua_luacheck_package: 'lua-check'
-__development_lua_busted_package: 'lua-busted'
+__development_lua_luacheck_package: ''
+__development_lua_busted_package: ''
 
-# QML tooling (qmllint + qmlformat ship in the same package)
-__development_qml_tools_package: 'qt6-declarative-dev-tools'
+# QML tooling (qmllint + qmlformat in qt6-qtdeclarative-devel — EPEL on EL9)
+__development_qml_tools_package: 'qt6-qtdeclarative-devel'

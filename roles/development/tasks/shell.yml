@@ -1,0 +1,28 @@
+---
+#
+# Shell Tooling Installation
+#
+
+- name: Shell | Manage shfmt
+  ansible.builtin.package:
+    name: '{{ __development_shell_shfmt_package }}'
+    state: "{{ 'present' if development_shell_shfmt_enabled | bool else 'absent' }}"
+  when: __development_shell_shfmt_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Shell | Manage shellcheck
+  ansible.builtin.package:
+    name: '{{ __development_shell_shellcheck_package }}'
+    state: "{{ 'present' if development_shell_shellcheck_enabled | bool else 'absent' }}"
+  when: __development_shell_shellcheck_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Shell | Manage bats
+  ansible.builtin.package:
+    name: '{{ __development_shell_bats_package }}'
+    state: "{{ 'present' if development_shell_bats_enabled | bool else 'absent' }}"
+  when: __development_shell_bats_package | default('') | length > 0
+  retries: 3
+  delay: 5
