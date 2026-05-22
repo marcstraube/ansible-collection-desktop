@@ -6,9 +6,9 @@ readme: README.md
 authors:
   - Marc Straube <email@marcstraube.de>
 description: >-
-  27 desktop workstation roles for Arch Linux and Debian Trixie.
-  Desktop environments, display managers, browsers, development tools,
-  multimedia, office, and productivity applications.
+  27 desktop workstation roles for Arch Linux, Debian Trixie, and
+  Rocky Linux 9/10. Desktop environments, display managers, browsers,
+  development tools, multimedia, office, and productivity applications.
   Built for ansible-core 2.19+.
 license_file: LICENSE
 tags:
