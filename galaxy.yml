@@ -9,6 +9,7 @@ description: >-
   27 desktop workstation roles for Arch Linux and Debian Trixie.
   Desktop environments, display managers, browsers, development tools,
   multimedia, office, and productivity applications.
+  Built for ansible-core 2.19+.
 license_file: LICENSE
 tags:
   - linux
@@ -38,7 +39,7 @@ build_ignore:
   - '__pycache__'
   - 'roles/*/molecule'
 dependencies:
-  marcstraube.common: '>=1.0.0'
+  marcstraube.common: '>=2.0.0'
   community.general: '>=8.0.0'
   ansible.posix: '>=1.5.0'
-  kewlfft.aur: '>=0.10.0'
+  kewlfft.aur: '>=0.11.0'
