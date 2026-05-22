@@ -1,0 +1,61 @@
+---
+# Drift-detection targets — packages currently marked as Layer-1 no-ops
+# (empty `__<role>_<pkg>_package` in vars/{distro}.yml). The
+# drift-detection workflow periodically probes each entry and opens an
+# issue when the package becomes installable again, so the
+# corresponding vars file entry can be restored.
+#
+# Schema (per entry):
+#   role:       role directory under roles/
+#   platform:   one of archlinux | debian-trixie | rocky-9 | rocky-10
+#   package:    upstream package name to probe with the platform's PM
+#   source:     'repo' (default) or 'aur' — aur targets attempt a
+#               makepkg build instead of a pacman download
+#   vars_file:  path (relative to the role) to the vars file that
+#               currently holds the no-op; included in the drift issue
+#               so the fix location is obvious
+#
+# Add an entry here when introducing a new Layer-1 no-op; remove the
+# entry when restoring the package.
+
+targets:
+  # EL10 EPEL drift — Qt 6.10 / unpackaged set landed via #129/#131.
+  - role: communication
+    platform: rocky-10
+    package: kmail
+    vars_file: vars/RedHat.yml
+
+  - role: system_apps
+    platform: rocky-10
+    package: gparted
+    vars_file: vars/RedHat.yml
+
+  - role: system_apps
+    platform: rocky-10
+    package: filelight
+    vars_file: vars/RedHat.yml
+
+  - role: system_apps
+    platform: rocky-10
+    package: solaar
+    vars_file: vars/RedHat.yml
+
+  - role: system_apps
+    platform: rocky-10
+    package: plasma-systemmonitor
+    vars_file: vars/RedHat.yml
+
+  - role: system_apps
+    platform: rocky-10
+    package: timeshift
+    vars_file: vars/RedHat.yml
+
+  - role: system_apps
+    platform: rocky-10
+    package: deja-dup
+    vars_file: vars/RedHat.yml
+
+  - role: display_manager
+    platform: rocky-10
+    package: sddm
+    vars_file: vars/RedHat.yml
