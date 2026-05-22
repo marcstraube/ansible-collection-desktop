@@ -50,6 +50,7 @@
 * **tuxedo:** detect kernels from pacman DB, support multi-kernel ([#85](https://github.com/marcstraube/ansible-collection-desktop/issues/85)) ([f818f82](https://github.com/marcstraube/ansible-collection-desktop/commit/f818f82a2bf46a9ce1d8a0ef119222edf54ce317))
 * **tuxedo:** drop state management for sleep.target-driven tccd-sleep ([#89](https://github.com/marcstraube/ansible-collection-desktop/issues/89)) ([a5ed0e1](https://github.com/marcstraube/ansible-collection-desktop/commit/a5ed0e18eb8611a693a331fabbc2615fc749647f))
 * unblock v2.0.0 CI matrix across desktop roles ([#70](https://github.com/marcstraube/ansible-collection-desktop/issues/70)) ([731e737](https://github.com/marcstraube/ansible-collection-desktop/commit/731e737be80567cf8e0dedeb8ce6d5a5a31ed4ed)), closes [#72](https://github.com/marcstraube/ansible-collection-desktop/issues/72) [#73](https://github.com/marcstraube/ansible-collection-desktop/issues/73) [#75](https://github.com/marcstraube/ansible-collection-desktop/issues/75) [#76](https://github.com/marcstraube/ansible-collection-desktop/issues/76) [#77](https://github.com/marcstraube/ansible-collection-desktop/issues/77) [#78](https://github.com/marcstraube/ansible-collection-desktop/issues/78) [#79](https://github.com/marcstraube/ansible-collection-desktop/issues/79)
+* **galaxy:** bump marcstraube.common floor to >=2.0.0, kewlfft.aur to >=0.11.0, and align description metadata ([#139](https://github.com/marcstraube/ansible-collection-desktop/issues/139)) ([cc911d2](https://github.com/marcstraube/ansible-collection-desktop/commit/cc911d28dc8aad90312d4dd28967d4a6a0d2d2a8)), closes [#138](https://github.com/marcstraube/ansible-collection-desktop/issues/138)
 
 
 ### Code Refactoring
@@ -76,6 +77,8 @@
 * backfill MIGRATION.md with v2.0.0 breaking-change sections ([#124](https://github.com/marcstraube/ansible-collection-desktop/issues/124)) ([f069a54](https://github.com/marcstraube/ansible-collection-desktop/commit/f069a5492dc62c64460fae7b88b376a8cb4cda19)), closes [#123](https://github.com/marcstraube/ansible-collection-desktop/issues/123)
 * **keepassxc:** document FdoSecrets group assignment as manual setup ([#97](https://github.com/marcstraube/ansible-collection-desktop/issues/97)) ([e892191](https://github.com/marcstraube/ansible-collection-desktop/commit/e8921915c86a7b2e390f43045f867879a335a31c)), closes [#96](https://github.com/marcstraube/ansible-collection-desktop/issues/96)
 * **readme:** list xdg_user_dirs role and fix markdown lint ([#108](https://github.com/marcstraube/ansible-collection-desktop/issues/108)) ([61438b6](https://github.com/marcstraube/ansible-collection-desktop/commit/61438b608f921694ea86aa0447b4240031aef024))
+* **galaxy:** list Rocky Linux 9/10 in description for parity with platform support ([#139](https://github.com/marcstraube/ansible-collection-desktop/issues/139)) ([cc911d2](https://github.com/marcstraube/ansible-collection-desktop/commit/cc911d28dc8aad90312d4dd28967d4a6a0d2d2a8))
+* **readme:** bump marcstraube.common floor reference to >=2.0.0 ([#139](https://github.com/marcstraube/ansible-collection-desktop/issues/139)) ([cc911d2](https://github.com/marcstraube/ansible-collection-desktop/commit/cc911d28dc8aad90312d4dd28967d4a6a0d2d2a8))
 
 
 ### Miscellaneous
