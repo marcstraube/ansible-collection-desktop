@@ -43,13 +43,14 @@ API keys are managed by the user via environment variables (not by this role).
 
 | Variable                          | Default | Description                           |
 | --------------------------------- | ------- | ------------------------------------- |
-| `ai_claude_code_enabled`          | `true`  | Install Claude Code                   |
-| `ai_gemini_cli_enabled`           | `false` | Install Gemini CLI                    |
-| `ai_codex_enabled`                | `false` | Install OpenAI Codex CLI              |
-| `ai_opencode_enabled`             | `false` | Install OpenCode CLI                  |
-| `ai_opencode_claude_auth_enabled` | `false` | OpenCode auth plugin for Claude creds |
-| `ai_opencode_gemini_auth_enabled` | `false` | OpenCode auth plugin for Gemini creds |
-| `ai_aider_enabled`                | `false` | Install Aider (pair programming)      |
+| `ai_claude_code_enabled`            | `true`  | Install Claude Code                                 |
+| `ai_gemini_cli_enabled`             | `false` | Install Gemini CLI                                  |
+| `ai_codex_enabled`                  | `false` | Install OpenAI Codex CLI                            |
+| `ai_opencode_enabled`               | `false` | Install OpenCode CLI                                |
+| `ai_opencode_claude_auth_enabled`   | `false` | OpenCode auth plugin for Claude creds               |
+| `ai_opencode_gemini_auth_enabled`   | `false` | OpenCode auth plugin for Gemini creds               |
+| `ai_aider_enabled`                  | `false` | Install Aider (pair programming)                    |
+| `ai_claude_cowork_service_enabled`  | `false` | Install Claude Cowork Service (Arch only, AUR)      |
 
 ### Desktop Applications
 

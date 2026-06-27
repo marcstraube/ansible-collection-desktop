@@ -32,6 +32,10 @@ ai_opencode_gemini_auth_enabled: false
 # Enable Aider (AI pair programming)
 ai_aider_enabled: false
 
+# Enable Claude Cowork Service (native backend for Claude Desktop Cowork —
+# Arch only; AUR-packaged)
+ai_claude_cowork_service_enabled: false
+
 #
 # Desktop Applications
 #
