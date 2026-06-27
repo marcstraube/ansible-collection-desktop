@@ -17,6 +17,8 @@ __ai_aur_packages:
     - opencode-gemini-auth
   aider:
     - aider
+  claude_cowork_service:
+    - claude-cowork-service
   claude_desktop:
     - claude-desktop-bin
   opencode_desktop:

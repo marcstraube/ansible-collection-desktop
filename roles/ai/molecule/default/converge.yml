@@ -12,6 +12,7 @@
     ai_codex_enabled: false
     ai_opencode_enabled: false
     ai_aider_enabled: false
+    ai_claude_cowork_service_enabled: false
     ai_claude_desktop_enabled: false
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: false

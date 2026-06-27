@@ -183,3 +183,27 @@
     - ai_aider_enabled | bool
   retries: 3
   delay: 5
+
+# Claude Cowork Service
+
+- name: CLI | Install Claude Cowork Service from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.claude_cowork_service }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_claude_cowork_service_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: CLI | Claude Cowork Service not available (non-Arch)
+  ansible.builtin.debug:
+    msg: >
+      Claude Cowork Service is only packaged for Arch
+      ({{ ansible_facts['os_family'] }} has no upstream package).
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_claude_cowork_service_enabled | bool
+    - __ai_claude_cowork_service_package | default('') | length == 0
