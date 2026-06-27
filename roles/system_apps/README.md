@@ -15,7 +15,7 @@ baseline (GParted, Filelight, Solaar on by default; optional tools off by defaul
 On Rocky Linux, EPEL and CRB must be enabled before running this role
 (typically via `marcstraube.common.package_management`) — several packages
 (gparted, filelight, solaar, timeshift, deja-dup) are not in the base
-repos, and filelight + plasma-systemmonitor pull KF5 libraries from CRB.
+repos, and filelight + plasma-systemmonitor pull KF5/Qt6 libraries from CRB.
 
 On Rocky 10 specifically, several packages are skipped automatically —
 see "Known limitations on EL10" below.
@@ -46,9 +46,7 @@ and are skipped automatically. The role install tasks already guard with
 `length > 0`, so the empty package names produce a no-op:
 
 - `gparted` — not packaged in EPEL 10
-- `filelight` — EPEL build depends on Qt 6.10, Rocky 10 ships Qt 6.8/6.9
 - `solaar` — not packaged in EPEL 10
-- `plasma-systemmonitor` — EPEL build depends on Qt 6.10
 - `timeshift` — not packaged in EPEL 10
 - `deja-dup` — not packaged in EPEL 10
 
