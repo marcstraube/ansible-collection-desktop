@@ -2,25 +2,19 @@
 #
 # RedHat Variables (targets newest supported RHEL major: EL10)
 #
-# SDDM is unavailable on EL10: EPEL ships sddm-wayland-*, neatvnc, and
-# plasma-keyboard packages that require Qt 6.10 (Rocky 10 base ships
-# Qt 6.8/6.9). The base `sddm` package transitively pulls these in.
-# An empty package name combined with the role's package-list filter
-# turns SDDM installation into a no-op on EL10.
-# EL9 restores working values in vars/RedHat-9.yml.
-# See README "Platform support" section.
+# Older RHEL majors override these in vars/RedHat-<N>.yml when the
+# package names or selections differ. See README "Platform support".
 #
 
 # Display manager packages
 __display_manager_packages:
-  sddm: ''
+  sddm: 'sddm'
   gdm: 'gdm'
   lightdm: 'lightdm'
   greetd: 'greetd'
 
 # SDDM virtual keyboard package
-# Empty on EL10: nothing to add when SDDM itself is a no-op.
-__display_manager_sddm_virtual_keyboard_package: ''
+__display_manager_sddm_virtual_keyboard_package: 'qt6-qtvirtualkeyboard'
 
 # LightDM greeter packages
 __display_manager_lightdm_greeter_packages:

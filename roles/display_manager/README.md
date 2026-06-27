@@ -19,7 +19,7 @@ greeters (gtkgreet, regreet) running under Hyprland, Sway, or Cage.
 | Arch Linux                | Native packages, all DMs supported                     |
 | Debian Trixie             | Native packages (gdm packaged as `gdm3`)               |
 | EL 9 (Rocky, Alma, RHEL)  | EPEL + CRB required, all DMs supported                 |
-| EL 10 (Rocky, Alma, RHEL) | EPEL + CRB required — SDDM unavailable (Qt 6.10 drift) |
+| EL 10 (Rocky, Alma, RHEL) | EPEL + CRB required, all DMs supported                 |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

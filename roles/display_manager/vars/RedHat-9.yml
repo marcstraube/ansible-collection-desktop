@@ -2,10 +2,10 @@
 #
 # RedHat 9 Variables
 #
-# vars/RedHat.yml targets the newest supported RHEL major (EL10) and
-# turns SDDM into a no-op there. EL9 restores the working values.
-# The remaining keys mirror vars/RedHat.yml because include_vars uses
-# with_first_found and loads only one file per host.
+# Mirrors vars/RedHat.yml because include_vars uses with_first_found
+# and loads only one file per host. Diverges where EL9 needs older
+# package names — currently only the Qt5 virtual keyboard for SDDM
+# (EL10 ships qt6-qtvirtualkeyboard).
 #
 
 # Display manager packages
