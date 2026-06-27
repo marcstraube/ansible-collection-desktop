@@ -41,6 +41,9 @@
     development_pgadmin_enabled: false
     # httpie disabled — EPEL 9 package has a broken pygments dep
     development_httpie_enabled: false
+    # Socket CLI: AUR on Arch, npm-global on non-Arch (npm/nodejs
+    # provided by prepare.yml)
+    development_socket_cli_enabled: true
     development_users: []
 
   tasks:

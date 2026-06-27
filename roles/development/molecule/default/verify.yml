@@ -258,3 +258,23 @@
       register: _dev_git_lfs_check
       failed_when: _dev_git_lfs_check.changed
       when: __development_git_lfs_package | default('') | length > 0
+
+    #
+    # Socket CLI (enabled) — AUR on Arch, npm-global on non-Arch
+    #
+
+    - name: Verify | Socket CLI installed from AUR (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q socket-cli'
+      register: _dev_socket_cli_arch
+      changed_when: false
+      failed_when: _dev_socket_cli_arch.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Socket CLI installed via npm (non-Arch)
+      ansible.builtin.command:
+        cmd: 'npm ls -g --depth=0 socket'
+      register: _dev_socket_cli_npm
+      changed_when: false
+      failed_when: _dev_socket_cli_npm.rc != 0
+      when: ansible_facts['os_family'] != 'Archlinux'

@@ -86,3 +86,5 @@ __development_aur_packages:
     - 'insomnia-bin'
   api_tools_bruno:
     - 'bruno-bin'
+  security_socket_cli:
+    - 'socket-cli'

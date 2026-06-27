@@ -12,8 +12,12 @@ Git configuration with signing key setup.
 ## Requirements
 
 - ansible-core >= 2.17
-- `community.general` collection (for git_config, pipx, pacman modules)
+- `community.general` collection (for git_config, pipx, pacman, npm modules)
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
+- `marcstraube.common.nodejs` role on non-Arch when enabling tools that
+  install via npm (e.g. Socket CLI). The development role itself does
+  not install Node.js; `development_nodejs_enabled` is a marker the
+  inventory uses to gate the common role.
 
 ## Supported Platforms
 
@@ -120,6 +124,18 @@ intended, not just deltas.
 | `development_yq_enabled`         | `true`  | Enable yq YAML processor           |
 | `development_direnv_enabled`     | `true`  | Enable direnv directory-based envs |
 | `development_pre_commit_enabled` | `true`  | Enable pre-commit git hooks        |
+
+### Security Tooling
+
+| Variable                         | Default | Description                                          |
+|----------------------------------|---------|------------------------------------------------------|
+| `development_socket_cli_enabled` | `false` | Enable Socket CLI (npm supply-chain scanner)         |
+
+Socket CLI is an npm-native tool. Arch installs the AUR package
+`socket-cli` (which wraps the upstream npm package); Debian and EL
+install the `socket` npm package globally via `community.general.npm`.
+On non-Arch, `marcstraube.common.nodejs` must be applied before this
+role to provide `npm`.
 
 ### Language Tooling
 
@@ -278,6 +294,7 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [pre-commit](https://pre-commit.com/) — Multi-language git hook framework
 - [direnv](https://direnv.net/) — Per-directory environment variable loader
 - [ShellCheck](https://www.shellcheck.net/) — Shell script static analyser
+- [Socket CLI](https://socket.dev/cli) — npm dependency supply-chain scanner ([source](https://github.com/SocketDev/socket-cli))
 
 ## License
 
