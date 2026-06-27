@@ -58,3 +58,30 @@
   when: __development_httpie_package | default('') | length > 0
   retries: 3
   delay: 5
+
+# Socket CLI — npm-native supply-chain scanner. AUR wraps the upstream
+# npm package; non-Arch installs it via npm directly.
+
+- name: Tools | Install Socket CLI from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.security_socket_cli }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_socket_cli_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Tools | Install Socket CLI via npm (non-Arch)
+  become: true
+  community.general.npm:
+    name: 'socket'
+    global: true
+    state: present
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_socket_cli_enabled | bool
+  retries: 3
+  delay: 5

@@ -111,3 +111,29 @@
         mode: '0440'
         validate: 'visudo -cf %s'
       when: ansible_facts['os_family'] == 'Archlinux'
+
+    #
+    # Node.js / npm — required by Socket CLI on non-Arch
+    # (the development role itself does not install nodejs; the
+    # inventory normally enables marcstraube.common.nodejs separately).
+    #
+
+    - name: Prepare | Install nodejs and npm (Debian)
+      ansible.builtin.apt:
+        name:
+          - nodejs
+          - npm
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+      retries: 3
+      delay: 5
+
+    - name: Prepare | Install nodejs (RedHat)
+      ansible.builtin.dnf:
+        name:
+          - nodejs
+          - npm
+        state: present
+      when: ansible_facts['os_family'] == 'RedHat'
+      retries: 3
+      delay: 5

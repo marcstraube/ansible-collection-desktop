@@ -192,6 +192,17 @@ development_direnv_enabled: true
 development_pre_commit_enabled: true
 
 #
+# Security Tooling
+#
+# Supply-chain / dependency scanners. PM-native tools are installed
+# from their canonical source: AUR on Arch (which wraps the upstream
+# package manager), and the upstream package manager directly on
+# Debian/RedHat.
+
+# Enable Socket CLI (npm dependency supply-chain scanner)
+development_socket_cli_enabled: false
+
+#
 # User Configuration
 #
 
