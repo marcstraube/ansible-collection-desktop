@@ -12,8 +12,12 @@ Git configuration with signing key setup.
 ## Requirements
 
 - ansible-core >= 2.17
-- `community.general` collection (for git_config, pipx, pacman modules)
+- `community.general` collection (for git_config, pipx, pacman, npm modules)
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
+- `marcstraube.common.nodejs` role on non-Arch when enabling tools that
+  install via npm (e.g. Socket CLI). The development role itself does
+  not install Node.js; `development_nodejs_enabled` is a marker the
+  inventory uses to gate the common role.
 
 ## Supported Platforms
 
@@ -130,6 +134,8 @@ intended, not just deltas.
 Socket CLI is an npm-native tool. Arch installs the AUR package
 `socket-cli` (which wraps the upstream npm package); Debian and EL
 install the `socket` npm package globally via `community.general.npm`.
+On non-Arch, `marcstraube.common.nodejs` must be applied before this
+role to provide `npm`.
 
 ### Language Tooling
 
