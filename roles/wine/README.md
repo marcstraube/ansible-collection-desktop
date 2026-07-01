@@ -18,8 +18,13 @@ environment configuration, and per-user Wine prefix initialization.
   `base-system` tag). Required for the `lib32-*` packages and the
   32-bit Vulkan driver. The role asserts this precondition before
   installation.
-- EPEL repository enabled (for Wine on Rocky Linux 9, managed by
-  `marcstraube.common.package_management`)
+- Wine is **currently unavailable** on Rocky Linux 9 / EL 9: EPEL's
+  `wine-8.0-1.el9` requires `mesa-libOSMesa(x86-64)` which is no
+  longer provided on EL 9. The role is a Layer-1 no-op on this
+  platform until the dependency is restored upstream — see
+  [#163](https://github.com/marcstraube/ansible-collection-desktop/issues/163).
+  The drift-detection workflow will open a re-enable issue once the
+  package becomes installable again.
 - Wine is **not available** for EL 10 (no EPEL package exists)
 
 ## Supported Platforms
@@ -28,7 +33,7 @@ environment configuration, and per-user Wine prefix initialization.
 |---------------------------|-----------------------------------------------|
 | Arch Linux                | Stable or staging variant, full lib32 support |
 | Debian Trixie             | Automatic i386 multiarch enablement           |
-| EL 9 (Rocky, Alma, RHEL)  | Via EPEL, 64-bit only (WoW64)                 |
+| EL 9 (Rocky, Alma, RHEL)  | Currently unavailable — EPEL drift (#163)     |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint)
 should work but are not actively tested. Use distro-specific vars overrides if needed.
@@ -64,7 +69,8 @@ Wine is not available for EL 10 — the role warns and skips on unsupported vers
 | `wine_lib32_packages` | `[lib32-mesa, ...]` | lib32 packages for 32-bit support |
 | `wine_vulkan_driver` | `'auto'` | GPU Vulkan driver (`auto`, `amd`, `intel`, `nvidia`, `none`) |
 
-Debian handles 32-bit automatically via multiarch. EL 9 uses WoW64 mode.
+Debian handles 32-bit automatically via multiarch. EL 9 would use
+WoW64 mode when wine is installable again (see #163).
 
 ### Environment
 

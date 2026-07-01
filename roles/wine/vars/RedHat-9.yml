@@ -1,6 +1,10 @@
 ---
+# Layer-1 no-op: EPEL 9 wine-8.0-1.el9 pulls wine-core-8.0-1.el9 which
+# requires mesa-libOSMesa(x86-64), no longer provided on Rocky 9 / EL 9.
+# See desktop#163. The drift-detection workflow will open a re-enable
+# issue once the dependency is provided again.
 __wine_package_variants:
-  stable: wine
+  stable: ''
 
 __wine_winetricks_package: ''
 __wine_mono_package: ''

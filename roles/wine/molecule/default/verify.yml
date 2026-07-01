@@ -12,16 +12,19 @@
       ansible.builtin.stat:
         path: /usr/bin/wine
       register: __wine_binary
+      when: ansible_facts['os_family'] != 'RedHat'
 
     - name: Verify | Check Wine64 binary exists
       ansible.builtin.stat:
         path: /usr/bin/wine64
       register: __wine64_binary
+      when: ansible_facts['os_family'] != 'RedHat'
 
     - name: Verify | Assert Wine is installed
       ansible.builtin.assert:
         that: __wine_binary.stat.exists or __wine64_binary.stat.exists
         fail_msg: 'Wine binary not found at /usr/bin/wine or /usr/bin/wine64'
+      when: ansible_facts['os_family'] != 'RedHat'
 
     - name: Verify | Check winetricks binary exists
       ansible.builtin.stat:
