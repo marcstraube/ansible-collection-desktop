@@ -30,6 +30,10 @@
   ansible.builtin.package:
     name: '{{ __wine_package_variants[wine_variant] | default(__wine_package_variants["stable"]) }}'
     state: present
+  when: >-
+    (__wine_package_variants[wine_variant]
+      | default(__wine_package_variants["stable"]))
+      | length > 0
   retries: 3
   delay: 5
 

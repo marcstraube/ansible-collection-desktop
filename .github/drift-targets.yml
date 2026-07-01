@@ -59,3 +59,10 @@ targets:
     platform: rocky-10
     package: sddm
     vars_file: vars/RedHat.yml
+
+  # EL9 EPEL drift — wine-core depends on mesa-libOSMesa, dropped from
+  # EL9 (#163).
+  - role: wine
+    platform: rocky-9
+    package: wine
+    vars_file: vars/RedHat-9.yml
