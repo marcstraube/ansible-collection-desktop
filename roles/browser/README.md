@@ -69,19 +69,19 @@ Chromium on Rocky Linux requires EPEL.
 
 ### LibreWolf Options
 
-| Variable                                      | Default     | Description                       |
-| --------------------------------------------- | ----------- | --------------------------------- |
-| `browser_librewolf_policies_enabled`          | `true`      | Deploy policies.json              |
-| `browser_librewolf_user_js_enabled`           | `true`      | Deploy per-user user.js           |
-| `browser_librewolf_extensions`                | `{...}`     | Extensions (defaults to Firefox)  |
-| `browser_librewolf_preferences`               | `{}`        | Additional preferences           |
-| `browser_librewolf_disable_telemetry`         | `true`      | Disable telemetry                |
-| `browser_librewolf_disable_pocket`            | `true`      | Disable Pocket                   |
-| `browser_librewolf_disable_firefox_studies`   | `true`      | Disable Firefox studies          |
-| `browser_librewolf_homepage`                  | `''`        | Homepage URL (empty = default)   |
-| `browser_librewolf_no_default_bookmarks`      | `true`      | Remove default bookmarks         |
-| `browser_librewolf_offer_to_save_logins`      | `false`     | Offer to save logins             |
-| `browser_librewolf_password_manager`          | `false`     | Built-in password manager        |
+| Variable                                    | Default | Description                      |
+| ------------------------------------------- | ------- | -------------------------------- |
+| `browser_librewolf_policies_enabled`        | `true`  | Deploy policies.json             |
+| `browser_librewolf_user_js_enabled`         | `true`  | Deploy per-user user.js          |
+| `browser_librewolf_extensions`              | `{...}` | Extensions (defaults to Firefox) |
+| `browser_librewolf_preferences`             | `{}`    | Additional preferences           |
+| `browser_librewolf_disable_telemetry`       | `true`  | Disable telemetry                |
+| `browser_librewolf_disable_pocket`          | `true`  | Disable Pocket                   |
+| `browser_librewolf_disable_firefox_studies` | `true`  | Disable Firefox studies          |
+| `browser_librewolf_homepage`                | `''`    | Homepage URL (empty = default)   |
+| `browser_librewolf_no_default_bookmarks`    | `true`  | Remove default bookmarks         |
+| `browser_librewolf_offer_to_save_logins`    | `false` | Offer to save logins             |
+| `browser_librewolf_password_manager`        | `false` | Built-in password manager        |
 
 ### Chromium Options
 
@@ -136,7 +136,10 @@ users, leaving subsequent manual changes intact.
 
 Two mechanisms, two variables, distinct semantics:
 
-- **`browser_firefox_policy_settings.Preferences`** (and `_librewolf_…`) deploy via `policies.json` as **system-wide locked** prefs. Only the [Mozilla whitelist of allowed prefixes](https://github.com/mozilla/gecko-dev/blob/master/browser/components/enterprisepolicies/Policies.sys.mjs) is honored — non-whitelisted entries are silently ignored by Mozilla. Format:
+- **`browser_firefox_policy_settings.Preferences`** (and `_librewolf_…`) deploy via `policies.json` as
+  **system-wide locked** prefs. Only the
+  [Mozilla whitelist of allowed prefixes](https://github.com/mozilla/gecko-dev/blob/master/browser/components/enterprisepolicies/Policies.sys.mjs)
+  is honored — non-whitelisted entries are silently ignored by Mozilla. Format:
 
   ```yaml
   browser_firefox_policy_settings:
@@ -146,9 +149,14 @@ Two mechanisms, two variables, distinct semantics:
         Status: locked
   ```
 
-- **`browser_firefox_preferences`** (and `_librewolf_…`) deploy as `user_pref()` in `<profile>/user.js` — **per-user, overridable in `about:config`** until the next managed-mode run reconciles. Use this for prefs that aren't on the policy whitelist, or for defaults the user should be able to change.
+- **`browser_firefox_preferences`** (and `_librewolf_…`) deploy as `user_pref()` in `<profile>/user.js` —
+  **per-user, overridable in `about:config`** until the next managed-mode run reconciles. Use this for
+  prefs that aren't on the policy whitelist, or for defaults the user should be able to change.
 
-The role's defaults intentionally leave `browser_firefox_preferences` empty: every soft-hardening pref worth defaulting is either already covered by another policy (e.g. `DisableTelemetry` covers all telemetry prefs) or by recent Firefox built-in defaults. The two non-trivial leftovers (`network.prefetch-next`, `network.dns.disablePrefetch`) live in `Preferences` policy.
+The role's defaults intentionally leave `browser_firefox_preferences` empty: every soft-hardening pref
+worth defaulting is either already covered by another policy (e.g. `DisableTelemetry` covers all
+telemetry prefs) or by recent Firefox built-in defaults. The two non-trivial leftovers
+(`network.prefetch-next`, `network.dns.disablePrefetch`) live in `Preferences` policy.
 
 ### Firefox / LibreWolf profile bootstrap
 
@@ -217,10 +225,13 @@ molecule test
 ## References
 
 - [Firefox](https://www.mozilla.org/firefox/) — Open-source web browser
-- [Mozilla Policy Templates](https://mozilla.github.io/policy-templates/) — Reference for `policies.json` keys deployed by this role
-- [arkenfox/user.js](https://github.com/arkenfox/user.js) — Hardened Firefox `user.js` template the role's defaults derive from
+- [Mozilla Policy Templates](https://mozilla.github.io/policy-templates/) —
+  Reference for `policies.json` keys deployed by this role
+- [arkenfox/user.js](https://github.com/arkenfox/user.js) —
+  Hardened Firefox `user.js` template the role's defaults derive from
 - [Chromium](https://www.chromium.org/) — Open-source browser project
-- [Chromium Enterprise Policy List](https://chromeenterprise.google/policies/) — Reference for Chromium/Brave policy keys
+- [Chromium Enterprise Policy List](https://chromeenterprise.google/policies/) —
+  Reference for Chromium/Brave policy keys
 - [LibreWolf](https://librewolf.net/) — Privacy-focused Firefox fork
 - [Brave](https://brave.com/) — Privacy-focused Chromium fork
 - [Tor Browser](https://www.torproject.org/) — Anonymity-focused Firefox fork
