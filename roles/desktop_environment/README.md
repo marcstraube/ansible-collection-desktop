@@ -201,7 +201,9 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [LXDE](https://lxde.org/) — Lightweight X11 desktop environment
 - [LXQt](https://lxqt-project.org/) — Lightweight Qt desktop environment
 - [UWSM](https://github.com/Vladimir-csp/uwsm) — Universal Wayland Session Manager
-- [hyprland-qt-support](https://github.com/hyprwm/hyprland-qt-support) and the Hypr* ecosystem (hypridle, hyprlock, hyprpaper, hyprpicker, hyprshot, hyprsunset, hyprlauncher) — Companion utilities to Hyprland
+- [hyprland-qt-support](https://github.com/hyprwm/hyprland-qt-support) and the Hypr* ecosystem
+  (hypridle, hyprlock, hyprpaper, hyprpicker, hyprshot, hyprsunset, hyprlauncher) —
+  Companion utilities to Hyprland
 
 ## License
 

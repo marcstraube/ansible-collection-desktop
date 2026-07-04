@@ -37,10 +37,10 @@ overrides if needed.
 
 ### Terminal Emulators
 
-| Variable             | Default                               | Description                                              |
-|----------------------|---------------------------------------|----------------------------------------------------------|
-| `terminal_emulators` | `['ghostty']`                         | List of terminal emulators to install                    |
-| `terminal_default`   | `'{{ terminal_emulators \| first }}'` | Default `$TERMINAL` (empty disables env file deployment) |
+| Variable             | Default                               | Description                                   |
+|----------------------|---------------------------------------|-----------------------------------------------|
+| `terminal_emulators` | `['ghostty']`                         | List of terminal emulators to install         |
+| `terminal_default`   | `'{{ terminal_emulators \| first }}'` | Default `$TERMINAL` (empty disables env file) |
 
 When `terminal_default` is non-empty, the role writes
 `/etc/environment.d/terminal.conf` containing `TERMINAL=<value>`,
@@ -91,7 +91,8 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [Kitty](https://sw.kovidgoyal.net/kitty/) — Fast, feature-rich, GPU-based terminal with image support
 - [Foot](https://codeberg.org/dnkl/foot) — Fast, lightweight, minimalist Wayland terminal emulator
 - [WezTerm](https://wezterm.org/) — GPU-accelerated cross-platform terminal emulator and multiplexer
-- [systemd.environment-generators(7)](https://www.freedesktop.org/software/systemd/man/latest/environment.d.html) — `/etc/environment.d/` reference
+- [systemd.environment-generators(7)](https://www.freedesktop.org/software/systemd/man/latest/environment.d.html) —
+  `/etc/environment.d/` reference
 
 ## License
 
