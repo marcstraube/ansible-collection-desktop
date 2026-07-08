@@ -1,5 +1,5 @@
 ---
-- name: Converge
+- name: Converge | Managed mode
   hosts: all
   gather_facts: true
 
@@ -8,9 +8,75 @@
     keepassxc_secret_service_enabled: true
     keepassxc_secret_service_scope: 'global'  # pragma: allowlist secret
     keepassxc_autostart_enabled: true
+    keepassxc_user_config_mode: 'managed'
     keepassxc_users:
       - name: 'testuser'
         mode: 'managed'
+      - name: 'kp_disabled_user'
+        mode: 'disabled'
+
+  tasks:
+    - name: Converge | Include keepassxc role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+# initial mode is gated on keepassxc.ini existence (not __users_newly_created):
+# deploy only when the file is absent, leaving an existing config untouched.
+# autostart / secret_service are independent per-user opt-outs and are
+# disabled here so the play exercises the config-mode path in isolation.
+- name: Converge | Initial mode (existing-file gating)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    keepassxc_enabled: true
+    keepassxc_secret_service_enabled: false
+    keepassxc_autostart_enabled: false
+    keepassxc_user_config_mode: 'initial'
+    keepassxc_users:
+      - name: 'kp_initial_fresh'
+      - name: 'kp_initial_exist'
+
+  pre_tasks:
+    - name: Converge | Ensure existing-user config dir exists
+      ansible.builtin.file:
+        path: /home/kp_initial_exist/.config/keepassxc
+        state: directory
+        owner: kp_initial_exist
+        group: kp_initial_exist
+        mode: '0700'
+
+    - name: Converge | Pre-seed existing keepassxc.ini to prove it is left untouched
+      ansible.builtin.copy:
+        content: |
+          [General]
+          ConfigVersion=99
+
+          [MoleculeFixture]
+          preexisting=true
+        dest: /home/kp_initial_exist/.config/keepassxc/keepassxc.ini
+        owner: kp_initial_exist
+        group: kp_initial_exist
+        mode: '0600'
+
+  tasks:
+    - name: Converge | Include keepassxc role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+- name: Converge | Disabled mode (global)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    keepassxc_enabled: true
+    keepassxc_secret_service_enabled: false
+    keepassxc_autostart_enabled: false
+    keepassxc_user_config_mode: 'disabled'
+    keepassxc_users:
+      - name: 'kp_global_disabled'
 
   tasks:
     - name: Converge | Include keepassxc role  # noqa: role-name[path]
