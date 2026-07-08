@@ -1,5 +1,5 @@
 ---
-- name: Converge
+- name: Converge | Managed mode
   hosts: all
   gather_facts: true
 
@@ -28,6 +28,8 @@
     browser_user_config_mode: 'managed'
     browser_users:
       - username: 'browser_test_user'
+      - username: 'browser_disabled_user'
+        mode: 'disabled'
 
     # Minimal extensions for testing
     browser_firefox_extensions:
@@ -38,6 +40,81 @@
     browser_chromium_extensions:
       'cjpalhdlnbpafiamejdnhcphjbkeiagm':
         mode: 'force_installed'
+
+  tasks:
+    - name: Converge | Include browser role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+# initial mode acts only on users present in __users_newly_created (the
+# canonical fact set by marcstraube.common.users). Chromium/policies are
+# system-level (not user_config_mode gated) and are disabled here so the
+# play exercises the per-user Firefox profile path in isolation.
+- name: Converge | Initial mode (per-user gating)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    browser_enabled: true
+    browser_firefox_enabled: true
+    browser_chromium_enabled: false
+    browser_firefox_policies_enabled: false
+    browser_firefox_user_js_enabled: true
+    browser_firefox_preferences:
+      privacy.resistFingerprinting: true
+    browser_default: 'firefox'
+    browser_user_config_mode: 'initial'
+    browser_users:
+      - username: 'browser_initial_new'
+      - username: 'browser_initial_exist'
+
+  pre_tasks:
+    - name: Converge | Ensure existing-user config dir exists
+      ansible.builtin.file:
+        path: /home/browser_initial_exist/.config
+        state: directory
+        owner: browser_initial_exist
+        group: browser_initial_exist
+        mode: '0700'
+
+    - name: Converge | Pre-seed existing mimeapps.list to prove it is left untouched
+      ansible.builtin.copy:
+        content: |
+          [Default Applications]
+          x-scheme-handler/molecule-fixture=preexisting.desktop
+        dest: /home/browser_initial_exist/.config/mimeapps.list
+        owner: browser_initial_exist
+        group: browser_initial_exist
+        mode: '0644'
+
+    - name: Converge | Mark only browser_initial_new as newly created
+      ansible.builtin.set_fact:
+        __users_newly_created:
+          - 'browser_initial_new'
+
+  tasks:
+    - name: Converge | Include browser role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+- name: Converge | Disabled mode (global)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    browser_enabled: true
+    browser_firefox_enabled: true
+    browser_chromium_enabled: false
+    browser_firefox_policies_enabled: false
+    browser_firefox_user_js_enabled: true
+    browser_firefox_preferences:
+      privacy.resistFingerprinting: true
+    browser_default: 'firefox'
+    browser_user_config_mode: 'disabled'
+    browser_users:
+      - username: 'browser_global_disabled'
 
   tasks:
     - name: Converge | Include browser role  # noqa: role-name[path]

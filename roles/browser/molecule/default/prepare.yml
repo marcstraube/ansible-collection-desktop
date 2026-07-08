@@ -94,8 +94,19 @@
     # Test User (for mimeapps.list handler verification)
     #
 
-    - name: Prepare | Create test user
+    - name: Prepare | Create test users
       ansible.builtin.user:
-        name: browser_test_user
+        name: '{{ item }}'
         create_home: true
         shell: /bin/bash
+      loop:
+        # Play 1 (managed): reconciled user + per-user disabled override
+        - browser_test_user
+        - browser_disabled_user
+        # Play 2 (initial): newly-created (deployed) + existing (untouched)
+        - browser_initial_new
+        - browser_initial_exist
+        # Play 3 (disabled, global): never deployed
+        - browser_global_disabled
+      loop_control:
+        label: '{{ item }}'
