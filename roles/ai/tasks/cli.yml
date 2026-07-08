@@ -31,6 +31,13 @@
 
 # Gemini CLI
 
+- name: CLI | Warn about Gemini CLI deprecation
+  ansible.builtin.debug:
+    msg: >
+      ai_gemini_cli_enabled is DEPRECATED and will be removed in v3.0.0.
+      Migrate to Antigravity (ai_antigravity_cli_enabled). See #146.
+  when: ai_gemini_cli_enabled | bool
+
 - name: CLI | Install Gemini CLI from AUR (Arch)
   become: true
   become_user: 'aur_builder'
@@ -54,6 +61,31 @@
     - ai_gemini_cli_enabled | bool
   retries: 3
   delay: 5
+
+# Antigravity CLI
+
+- name: CLI | Install Antigravity CLI from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.antigravity_cli }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_antigravity_cli_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: CLI | Antigravity CLI not available (non-Arch)
+  ansible.builtin.debug:
+    msg: >
+      Antigravity CLI is only packaged for Arch. Google distributes it as a
+      tarball for {{ ansible_facts['os_family'] }} — download from
+      https://antigravity.google/download/linux
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_antigravity_cli_enabled | bool
+    - __ai_antigravity_cli_package | default('') | length == 0
 
 # OpenAI Codex
 

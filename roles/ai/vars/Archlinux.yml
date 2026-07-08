@@ -9,6 +9,8 @@ __ai_aur_packages:
     - claude-code
   gemini_cli:
     - gemini-cli
+  antigravity_cli:
+    - antigravity-cli
   opencode:
     - opencode-bin
   opencode_claude_auth:
@@ -21,6 +23,8 @@ __ai_aur_packages:
     - claude-cowork-service
   claude_desktop:
     - claude-desktop-bin
+  antigravity:
+    - antigravity
   opencode_desktop:
     - opencode-desktop-bin
   lmstudio:
