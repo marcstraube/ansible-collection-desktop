@@ -138,3 +138,91 @@
         fail_msg: 'XDG autostart entry missing required Desktop Entry keys or tray-readiness hints'
       vars:
         __autostart_text: '{{ _keepassxc_autostart_content.content | b64decode }}'
+
+    #
+    # Managed Mode — Per-User Disabled Override (kp_disabled_user)
+    #
+    # Entry-level mode=disabled overrides the managed global mode
+    # → role MUST NOT deploy keepassxc.ini for this user.
+    #
+
+    - name: Verify | Check per-user-disabled user has no keepassxc.ini
+      ansible.builtin.stat:
+        path: '/home/kp_disabled_user/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_disabled_ini
+
+    - name: Verify | Assert per-user-disabled user has no config
+      ansible.builtin.assert:
+        that:
+          - not _keepassxc_disabled_ini.stat.exists
+        fail_msg: 'keepassxc.ini deployed for a per-user-disabled entry'
+
+    #
+    # Initial Mode — No Existing Config (kp_initial_fresh)
+    #
+    # keepassxc_user_config_mode=initial + keepassxc.ini absent
+    # → role MUST deploy the config.
+    #
+
+    - name: Verify | Check initial-fresh user keepassxc.ini exists
+      ansible.builtin.stat:
+        path: '/home/kp_initial_fresh/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_initialfresh_ini
+
+    - name: Verify | Assert initial-fresh user config is deployed
+      ansible.builtin.assert:
+        that:
+          - _keepassxc_initialfresh_ini.stat.exists
+          - _keepassxc_initialfresh_ini.stat.pw_name == 'kp_initial_fresh'
+          - _keepassxc_initialfresh_ini.stat.mode == '0600'
+        fail_msg: 'keepassxc.ini not deployed for initial-mode user without existing config'
+
+    - name: Verify | Read initial-fresh user keepassxc.ini
+      ansible.builtin.slurp:
+        src: '/home/kp_initial_fresh/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_initialfresh_content
+
+    - name: Verify | Assert initial-fresh user config has template values
+      ansible.builtin.assert:
+        that:
+          - "'ConfigVersion=2' in (_keepassxc_initialfresh_content.content | b64decode)"
+          - "'[Security]' in (_keepassxc_initialfresh_content.content | b64decode)"
+        fail_msg: 'initial-fresh keepassxc.ini missing expected template values'
+
+    #
+    # Initial Mode — Existing Config (kp_initial_exist)
+    #
+    # keepassxc_user_config_mode=initial + keepassxc.ini already present
+    # → role MUST leave the existing config untouched (no overwrite).
+    #
+
+    - name: Verify | Read initial-exist user keepassxc.ini
+      ansible.builtin.slurp:
+        src: '/home/kp_initial_exist/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_initialexist_content
+
+    - name: Verify | Assert initial-exist user config is unchanged
+      ansible.builtin.assert:
+        that:
+          - "'ConfigVersion=99' in (_keepassxc_initialexist_content.content | b64decode)"
+          - "'[MoleculeFixture]' in (_keepassxc_initialexist_content.content | b64decode)"
+          - "'preexisting=true' in (_keepassxc_initialexist_content.content | b64decode)"
+        fail_msg: 'pre-existing keepassxc.ini was overwritten for existing initial-mode user'
+
+    #
+    # Disabled Mode — Global (kp_global_disabled)
+    #
+    # keepassxc_user_config_mode=disabled
+    # → role MUST NOT deploy keepassxc.ini for any user.
+    #
+
+    - name: Verify | Check global-disabled user has no keepassxc.ini
+      ansible.builtin.stat:
+        path: '/home/kp_global_disabled/.config/keepassxc/keepassxc.ini'
+      register: _keepassxc_globaldisabled_ini
+
+    - name: Verify | Assert global-disabled user has no config
+      ansible.builtin.assert:
+        that:
+          - not _keepassxc_globaldisabled_ini.stat.exists
+        fail_msg: 'keepassxc.ini deployed despite global disabled mode'
