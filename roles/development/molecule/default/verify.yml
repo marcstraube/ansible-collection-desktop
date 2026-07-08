@@ -278,3 +278,85 @@
       changed_when: false
       failed_when: _dev_socket_cli_npm.rc != 0
       when: ansible_facts['os_family'] != 'Archlinux'
+
+    #
+    # user_config_mode coverage — per-user git config (~/.gitconfig)
+    #
+
+    #
+    # Managed Mode — Config Applied (dev_managed_user)
+    #
+    - name: Verify | Read managed user .gitconfig
+      ansible.builtin.slurp:
+        src: /home/dev_managed_user/.gitconfig
+      register: _dev_managed_gitconfig
+
+    - name: Verify | Assert managed user git config is applied
+      ansible.builtin.assert:
+        that:
+          - "'Dev Managed' in (_dev_managed_gitconfig.content | b64decode)"
+          - "'defaultBranch = main' in (_dev_managed_gitconfig.content | b64decode)"
+        fail_msg: 'git config not applied for managed-mode user'
+
+    #
+    # Managed Mode — Per-User Disabled Override (dev_disabled_user)
+    #
+    - name: Verify | Check per-user-disabled user has no .gitconfig
+      ansible.builtin.stat:
+        path: /home/dev_disabled_user/.gitconfig
+      register: _dev_disabled_gitconfig
+
+    - name: Verify | Assert per-user-disabled user has no git config
+      ansible.builtin.assert:
+        that:
+          - not _dev_disabled_gitconfig.stat.exists
+        fail_msg: 'git config applied for a per-user-disabled entry'
+
+    #
+    # Initial Mode — Newly Created User (dev_initial_new)
+    #
+    - name: Verify | Read initial-new user .gitconfig
+      ansible.builtin.slurp:
+        src: /home/dev_initial_new/.gitconfig
+      register: _dev_initialnew_gitconfig
+
+    - name: Verify | Assert initial-new user git config is applied
+      ansible.builtin.assert:
+        that:
+          - "'Dev Initial New' in (_dev_initialnew_gitconfig.content | b64decode)"
+          - "'defaultBranch = main' in (_dev_initialnew_gitconfig.content | b64decode)"
+        fail_msg: 'git config not applied for newly-created initial-mode user'
+
+    #
+    # Initial Mode — Existing User (dev_initial_exist)
+    #
+    # user NOT IN __users_newly_created → role MUST leave the pre-existing
+    # .gitconfig untouched (fixture preserved, no role-managed keys added).
+    #
+    - name: Verify | Read initial-exist user .gitconfig
+      ansible.builtin.slurp:
+        src: /home/dev_initial_exist/.gitconfig
+      register: _dev_initialexist_gitconfig
+
+    - name: Verify | Assert initial-exist user git config is unchanged
+      ansible.builtin.assert:
+        that:
+          - "'Preexisting Fixture' in (_dev_initialexist_gitconfig.content | b64decode)"
+          - "'fixture = preexisting' in (_dev_initialexist_gitconfig.content | b64decode)"
+          - "'Dev Initial Exist' not in (_dev_initialexist_gitconfig.content | b64decode)"
+          - "'defaultBranch = main' not in (_dev_initialexist_gitconfig.content | b64decode)"
+        fail_msg: 'pre-existing .gitconfig was modified for existing initial-mode user'
+
+    #
+    # Disabled Mode — Global (dev_global_disabled)
+    #
+    - name: Verify | Check global-disabled user has no .gitconfig
+      ansible.builtin.stat:
+        path: /home/dev_global_disabled/.gitconfig
+      register: _dev_globaldisabled_gitconfig
+
+    - name: Verify | Assert global-disabled user has no git config
+      ansible.builtin.assert:
+        that:
+          - not _dev_globaldisabled_gitconfig.stat.exists
+        fail_msg: 'git config applied despite global disabled mode'
