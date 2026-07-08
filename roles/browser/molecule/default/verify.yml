@@ -211,3 +211,103 @@
         that:
           - __browser_verify_firefox_user_js.stat.exists
         fail_msg: 'Firefox user.js not deployed into profile'
+
+    #
+    # Managed Mode — Per-User Disabled Override (browser_disabled_user)
+    #
+    # Entry-level mode=disabled overrides the managed global mode → role
+    # MUST NOT bootstrap a Firefox profile or write mimeapps.list.
+    #
+
+    - name: Verify | Check per-user-disabled user has no Firefox profile
+      ansible.builtin.stat:
+        path: /home/browser_disabled_user/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
+      register: __browser_verify_disabled_profile
+
+    - name: Verify | Check per-user-disabled user has no mimeapps.list
+      ansible.builtin.stat:
+        path: /home/browser_disabled_user/.config/mimeapps.list
+      register: __browser_verify_disabled_mimeapps
+
+    - name: Verify | Assert per-user-disabled user has no config
+      ansible.builtin.assert:
+        that:
+          - not __browser_verify_disabled_profile.stat.exists
+          - not __browser_verify_disabled_mimeapps.stat.exists
+        fail_msg: 'browser config deployed for a per-user-disabled entry'
+
+    #
+    # Initial Mode — Newly Created User (browser_initial_new)
+    #
+    # browser_user_config_mode=initial + user IN __users_newly_created
+    # → role MUST bootstrap the profile, user.js and mimeapps.list.
+    #
+
+    - name: Verify | Check initial-new user Firefox user.js exists
+      ansible.builtin.stat:
+        path: /home/browser_initial_new/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}/user.js
+      register: __browser_verify_initialnew_userjs
+
+    - name: Verify | Check initial-new user mimeapps.list exists
+      ansible.builtin.stat:
+        path: /home/browser_initial_new/.config/mimeapps.list
+      register: __browser_verify_initialnew_mimeapps
+
+    - name: Verify | Assert initial-new user config is deployed
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_initialnew_userjs.stat.exists
+          - __browser_verify_initialnew_userjs.stat.pw_name == 'browser_initial_new'
+          - __browser_verify_initialnew_mimeapps.stat.exists
+        fail_msg: 'browser config not deployed for newly-created initial-mode user'
+
+    #
+    # Initial Mode — Existing User (browser_initial_exist)
+    #
+    # browser_user_config_mode=initial + user NOT IN __users_newly_created
+    # → role MUST leave the pre-existing mimeapps.list untouched and MUST
+    #   NOT bootstrap a Firefox profile.
+    #
+
+    - name: Verify | Read initial-exist user mimeapps.list
+      ansible.builtin.slurp:
+        src: /home/browser_initial_exist/.config/mimeapps.list
+      register: __browser_verify_initialexist_mimeapps
+
+    - name: Verify | Check initial-exist user has no Firefox profile
+      ansible.builtin.stat:
+        path: /home/browser_initial_exist/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
+      register: __browser_verify_initialexist_profile
+
+    - name: Verify | Assert initial-exist user config is unchanged
+      ansible.builtin.assert:
+        that:
+          - "'x-scheme-handler/molecule-fixture=preexisting.desktop'
+            in (__browser_verify_initialexist_mimeapps.content | b64decode)"
+          - "'firefox.desktop' not in (__browser_verify_initialexist_mimeapps.content | b64decode)"
+          - not __browser_verify_initialexist_profile.stat.exists
+        fail_msg: 'pre-existing config was modified for existing initial-mode user'
+
+    #
+    # Disabled Mode — Global (browser_global_disabled)
+    #
+    # browser_user_config_mode=disabled → role MUST NOT deploy any
+    # per-user config.
+    #
+
+    - name: Verify | Check global-disabled user has no Firefox profile
+      ansible.builtin.stat:
+        path: /home/browser_global_disabled/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
+      register: __browser_verify_globaldisabled_profile
+
+    - name: Verify | Check global-disabled user has no mimeapps.list
+      ansible.builtin.stat:
+        path: /home/browser_global_disabled/.config/mimeapps.list
+      register: __browser_verify_globaldisabled_mimeapps
+
+    - name: Verify | Assert global-disabled user has no config
+      ansible.builtin.assert:
+        that:
+          - not __browser_verify_globaldisabled_profile.stat.exists
+          - not __browser_verify_globaldisabled_mimeapps.stat.exists
+        fail_msg: 'browser config deployed despite global disabled mode'
