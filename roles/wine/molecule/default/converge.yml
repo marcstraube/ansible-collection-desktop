@@ -1,5 +1,9 @@
 ---
-- name: Converge
+# Wine is a documented no-op on Rocky 9 / EL 9 (EPEL wine dependency drift,
+# see desktop#163), so wineboot is unavailable there. The per-user mode test
+# therefore clears wine_users on RedHat: the role still runs (env file), but
+# no prefix initialization is attempted. Mode coverage runs on Arch + Debian.
+- name: Converge | Managed mode
   hosts: all
   gather_facts: true
 
@@ -9,8 +13,89 @@
     wine_vulkan_driver: 'none'
     # Multilib may not be available in containers
     wine_lib32_packages: []
-    # No user prefix initialization in containers
-    wine_users: []
+    wine_user_config_mode: 'managed'
+    wine_users:
+      - username: 'wine_managed_user'
+      - username: 'wine_disabled_user'
+        mode: 'disabled'
+
+  pre_tasks:
+    - name: Converge | Clear test users where wine is unavailable (RedHat)
+      ansible.builtin.set_fact:
+        wine_users: []
+      when: ansible_facts['os_family'] == 'RedHat'
+
+  tasks:
+    - name: Converge | Include wine role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+# initial mode is gated on wine-prefix existence (system.reg) rather than
+# the __users_newly_created fact: wineboot runs only when the prefix is
+# absent, leaving an already-initialized prefix untouched.
+- name: Converge | Initial mode (existing-prefix gating)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    wine_enabled: true
+    wine_vulkan_driver: 'none'
+    wine_lib32_packages: []
+    wine_user_config_mode: 'initial'
+    wine_users:
+      - username: 'wine_initial_fresh'
+      - username: 'wine_initial_exist'
+
+  pre_tasks:
+    - name: Converge | Clear test users where wine is unavailable (RedHat)
+      ansible.builtin.set_fact:
+        wine_users: []
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Converge | Ensure existing-user wine prefix dir exists
+      ansible.builtin.file:
+        path: /home/wine_initial_exist/.wine
+        state: directory
+        owner: wine_initial_exist
+        group: wine_initial_exist
+        mode: '0755'
+      when: ansible_facts['os_family'] != 'RedHat'
+
+    - name: Converge | Pre-seed existing wine prefix to prove it is left untouched
+      ansible.builtin.copy:
+        content: |
+          WINE REGISTRY Version 2
+          ;; molecule-fixture: pre-existing wine prefix
+        dest: /home/wine_initial_exist/.wine/system.reg
+        owner: wine_initial_exist
+        group: wine_initial_exist
+        mode: '0600'
+      when: ansible_facts['os_family'] != 'RedHat'
+
+  tasks:
+    - name: Converge | Include wine role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+- name: Converge | Disabled mode (global)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    wine_enabled: true
+    wine_vulkan_driver: 'none'
+    wine_lib32_packages: []
+    wine_user_config_mode: 'disabled'
+    wine_users:
+      - username: 'wine_global_disabled'
+
+  pre_tasks:
+    - name: Converge | Clear test users where wine is unavailable (RedHat)
+      ansible.builtin.set_fact:
+        wine_users: []
+      when: ansible_facts['os_family'] == 'RedHat'
 
   tasks:
     - name: Converge | Include wine role  # noqa: role-name[path]

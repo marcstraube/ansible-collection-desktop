@@ -64,3 +64,87 @@
       ansible.builtin.command:
         cmd: grep -q 'WINEDEBUG' /etc/profile.d/wine.sh
       changed_when: false
+
+    #
+    # user_config_mode coverage (Arch + Debian only)
+    #
+    # Wine is a no-op on Rocky 9 / EL 9 (see desktop#163), so wineboot is
+    # unavailable and wine_users is cleared there — these prefix assertions
+    # only run where wine is actually installed.
+    #
+    - name: Verify | user_config_mode prefix assertions
+      when: ansible_facts['os_family'] != 'RedHat'
+      block:
+        #
+        # Managed Mode — Prefix Initialized (wine_managed_user)
+        #
+        - name: Verify | Check managed user wine prefix exists
+          ansible.builtin.stat:
+            path: /home/wine_managed_user/.wine/system.reg
+          register: __wine_managed_prefix
+
+        - name: Verify | Assert managed user prefix is initialized
+          ansible.builtin.assert:
+            that:
+              - __wine_managed_prefix.stat.exists
+              - __wine_managed_prefix.stat.pw_name == 'wine_managed_user'
+            fail_msg: 'wine prefix not initialized for managed-mode user'
+
+        #
+        # Managed Mode — Per-User Disabled Override (wine_disabled_user)
+        #
+        - name: Verify | Check per-user-disabled user has no wine prefix
+          ansible.builtin.stat:
+            path: /home/wine_disabled_user/.wine/system.reg
+          register: __wine_disabled_prefix
+
+        - name: Verify | Assert per-user-disabled user has no prefix
+          ansible.builtin.assert:
+            that:
+              - not __wine_disabled_prefix.stat.exists
+            fail_msg: 'wine prefix initialized for a per-user-disabled entry'
+
+        #
+        # Initial Mode — No Existing Prefix (wine_initial_fresh)
+        #
+        - name: Verify | Check initial-fresh user wine prefix exists
+          ansible.builtin.stat:
+            path: /home/wine_initial_fresh/.wine/system.reg
+          register: __wine_initialfresh_prefix
+
+        - name: Verify | Assert initial-fresh user prefix is initialized
+          ansible.builtin.assert:
+            that:
+              - __wine_initialfresh_prefix.stat.exists
+              - __wine_initialfresh_prefix.stat.pw_name == 'wine_initial_fresh'
+            fail_msg: 'wine prefix not initialized for initial-mode user without existing prefix'
+
+        #
+        # Initial Mode — Existing Prefix (wine_initial_exist)
+        #
+        - name: Verify | Read initial-exist user system.reg
+          ansible.builtin.slurp:
+            src: /home/wine_initial_exist/.wine/system.reg
+          register: __wine_initialexist_reg
+
+        - name: Verify | Assert initial-exist user prefix is unchanged
+          ansible.builtin.assert:
+            that:
+              - >-
+                'molecule-fixture: pre-existing wine prefix'
+                in (__wine_initialexist_reg.content | b64decode)
+            fail_msg: 'pre-existing wine prefix was re-initialized for existing initial-mode user'
+
+        #
+        # Disabled Mode — Global (wine_global_disabled)
+        #
+        - name: Verify | Check global-disabled user has no wine prefix
+          ansible.builtin.stat:
+            path: /home/wine_global_disabled/.wine/system.reg
+          register: __wine_globaldisabled_prefix
+
+        - name: Verify | Assert global-disabled user has no prefix
+          ansible.builtin.assert:
+            that:
+              - not __wine_globaldisabled_prefix.stat.exists
+            fail_msg: 'wine prefix initialized despite global disabled mode'
