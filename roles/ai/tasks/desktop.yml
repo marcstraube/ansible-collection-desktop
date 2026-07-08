@@ -27,6 +27,31 @@
     - ai_claude_desktop_enabled | bool
     - __ai_claude_desktop_package | length == 0
 
+# Antigravity
+
+- name: Desktop | Install Antigravity from AUR (Arch)
+  become: true
+  become_user: 'aur_builder'
+  kewlfft.aur.aur:
+    name: '{{ __ai_aur_packages.antigravity }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_antigravity_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Desktop | Antigravity not available (non-Arch)
+  ansible.builtin.debug:
+    msg: >
+      Antigravity is only packaged for Arch. Google distributes it as a tarball
+      for {{ ansible_facts['os_family'] }} — download from
+      https://antigravity.google/download/linux
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - ai_antigravity_enabled | bool
+    - __ai_antigravity_package | length == 0
+
 # OpenCode Desktop
 
 - name: Desktop | Install OpenCode Desktop from AUR (Arch)
