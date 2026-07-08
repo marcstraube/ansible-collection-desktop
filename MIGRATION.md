@@ -14,6 +14,8 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+## v2.1.0 - 2026-07-08
+
 ## v2.0.0 - 2026-05-22
 
 ### Minimum ansible-core bumped from 2.17 to 2.19 (#135)

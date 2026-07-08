@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.0.0...v2.1.0) (2026-07-08)
+
+
+### Features
+
+* **ai:** add Antigravity toggles and deprecate Gemini CLI ([#168](https://github.com/marcstraube/ansible-collection-desktop/issues/168)) ([980418b](https://github.com/marcstraube/ansible-collection-desktop/commit/980418b8c061741d4940442abb4a247fa0d5a2be)), closes [#145](https://github.com/marcstraube/ansible-collection-desktop/issues/145)
+* **ai:** add Claude Cowork Service toggle (AUR-only) ([#157](https://github.com/marcstraube/ansible-collection-desktop/issues/157)) ([58980fb](https://github.com/marcstraube/ansible-collection-desktop/commit/58980fbdea7c780cc2e05210bf32a4063759c03e)), closes [#149](https://github.com/marcstraube/ansible-collection-desktop/issues/149)
+* **development:** add Socket CLI npm supply-chain scanner toggle ([#156](https://github.com/marcstraube/ansible-collection-desktop/issues/156)) ([ff9a53a](https://github.com/marcstraube/ansible-collection-desktop/commit/ff9a53a21926f61c03cc4bc9df272d598e67936d))
+* **roles:** add minor-version level to with_first_found vars lookup ([#173](https://github.com/marcstraube/ansible-collection-desktop/issues/173)) ([5076b46](https://github.com/marcstraube/ansible-collection-desktop/commit/5076b460aff4b30f1158cded102d6ab99a56a67b)), closes [#117](https://github.com/marcstraube/ansible-collection-desktop/issues/117)
+
+
+### Bug Fixes
+
+* **ai:** use native PyTorch for ComfyUI, fail fast on unsupported OS ([#170](https://github.com/marcstraube/ansible-collection-desktop/issues/170)) ([de6b583](https://github.com/marcstraube/ansible-collection-desktop/commit/de6b583837fa454adb1a23b5a2ef20860372e5f5)), closes [#122](https://github.com/marcstraube/ansible-collection-desktop/issues/122)
+* **display_manager:** re-enable sddm on EL10 ([#155](https://github.com/marcstraube/ansible-collection-desktop/issues/155)) ([a81064f](https://github.com/marcstraube/ansible-collection-desktop/commit/a81064f2109c13d8da97f605323dcf4f4e0c31f1)), closes [#141](https://github.com/marcstraube/ansible-collection-desktop/issues/141)
+* **system_apps:** re-enable filelight and plasma-systemmonitor on EL10 ([#152](https://github.com/marcstraube/ansible-collection-desktop/issues/152)) ([cb78d77](https://github.com/marcstraube/ansible-collection-desktop/commit/cb78d77a802e09c528249f24e123dadb514bd14b)), closes [#140](https://github.com/marcstraube/ansible-collection-desktop/issues/140) [#142](https://github.com/marcstraube/ansible-collection-desktop/issues/142)
+* **wine:** Rocky 9 Layer-1 no-op for EPEL mesa-libOSMesa drift ([#164](https://github.com/marcstraube/ansible-collection-desktop/issues/164)) ([8f2e66e](https://github.com/marcstraube/ansible-collection-desktop/commit/8f2e66eec0653899e02620e7852f6cf98bde8193)), closes [#163](https://github.com/marcstraube/ansible-collection-desktop/issues/163)
+
 ## [2.0.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v1.2.1...v2.0.0) (2026-05-22)
 
 
