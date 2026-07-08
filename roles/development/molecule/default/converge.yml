@@ -1,5 +1,10 @@
 ---
-- name: Converge
+# All three plays share an identical feature-toggle set so the per-play
+# manage tasks stay idempotent across the sequence (the tool roles remove
+# packages when their toggle flips to false, which would otherwise make
+# play 1 reinstall on every converge). Only development_user_config_mode and
+# development_users differ between the plays.
+- name: Converge | Managed mode
   hosts: all
   gather_facts: true
 
@@ -15,36 +20,151 @@
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
-    # Build-tool toggles: enable cmake, disable meson and ninja
     development_cmake_enabled: true
     development_meson_enabled: false
     development_ninja_enabled: false
-    # Misc toggles: enable jq, disable rest
     development_jq_enabled: true
     development_yq_enabled: false
     development_direnv_enabled: false
     development_pre_commit_enabled: false
-    # Shell tooling: enable all (verify checks present/absent per platform)
     development_shell_shfmt_enabled: true
     development_shell_shellcheck_enabled: true
     development_shell_bats_enabled: true
-    # Python tooling
     development_python_ruff_enabled: true
-    # Lua tooling
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true
-    # QML tooling
     development_qml_tools_enabled: true
-    # Database tools off
     development_dbeaver_enabled: false
     development_pgadmin_enabled: false
-    # httpie disabled — EPEL 9 package has a broken pygments dep
     development_httpie_enabled: false
-    # Socket CLI: AUR on Arch, npm-global on non-Arch (npm/nodejs
-    # provided by prepare.yml)
     development_socket_cli_enabled: true
-    development_users: []
+    development_user_config_mode: 'managed'
+    development_users:
+      - username: 'dev_managed_user'
+        git_name: 'Dev Managed'
+        git_email: 'managed@example.com'
+      - username: 'dev_disabled_user'
+        mode: 'disabled'
+        git_name: 'Dev Disabled'
+        git_email: 'disabled@example.com'
+
+  tasks:
+    - name: Converge | Include development role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+# initial mode acts only on users present in __users_newly_created (the
+# canonical fact set by marcstraube.common.users).
+- name: Converge | Initial mode (per-user gating)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    development_enabled: true
+    development_git_enabled: true
+    development_git_lfs_enabled: true
+    development_python_enabled: true
+    development_nodejs_enabled: false
+    development_rust_enabled: false
+    development_go_enabled: false
+    development_java_enabled: false
+    development_vscodium_enabled: false
+    development_vscode_enabled: false
+    development_zed_enabled: false
+    development_cmake_enabled: true
+    development_meson_enabled: false
+    development_ninja_enabled: false
+    development_jq_enabled: true
+    development_yq_enabled: false
+    development_direnv_enabled: false
+    development_pre_commit_enabled: false
+    development_shell_shfmt_enabled: true
+    development_shell_shellcheck_enabled: true
+    development_shell_bats_enabled: true
+    development_python_ruff_enabled: true
+    development_lua_stylua_enabled: true
+    development_lua_luacheck_enabled: true
+    development_lua_busted_enabled: true
+    development_qml_tools_enabled: true
+    development_dbeaver_enabled: false
+    development_pgadmin_enabled: false
+    development_httpie_enabled: false
+    development_socket_cli_enabled: true
+    development_user_config_mode: 'initial'
+    development_users:
+      - username: 'dev_initial_new'
+        git_name: 'Dev Initial New'
+        git_email: 'new@example.com'
+      - username: 'dev_initial_exist'
+        git_name: 'Dev Initial Exist'
+        git_email: 'exist@example.com'
+
+  pre_tasks:
+    - name: Converge | Pre-seed existing user .gitconfig to prove it is left untouched
+      ansible.builtin.copy:
+        content: |
+          [user]
+          name = Preexisting Fixture
+          [molecule]
+          fixture = preexisting
+        dest: /home/dev_initial_exist/.gitconfig
+        owner: dev_initial_exist
+        group: dev_initial_exist
+        mode: '0644'
+
+    - name: Converge | Mark only dev_initial_new as newly created
+      ansible.builtin.set_fact:
+        __users_newly_created:
+          - 'dev_initial_new'
+
+  tasks:
+    - name: Converge | Include development role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+- name: Converge | Disabled mode (global)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    development_enabled: true
+    development_git_enabled: true
+    development_git_lfs_enabled: true
+    development_python_enabled: true
+    development_nodejs_enabled: false
+    development_rust_enabled: false
+    development_go_enabled: false
+    development_java_enabled: false
+    development_vscodium_enabled: false
+    development_vscode_enabled: false
+    development_zed_enabled: false
+    development_cmake_enabled: true
+    development_meson_enabled: false
+    development_ninja_enabled: false
+    development_jq_enabled: true
+    development_yq_enabled: false
+    development_direnv_enabled: false
+    development_pre_commit_enabled: false
+    development_shell_shfmt_enabled: true
+    development_shell_shellcheck_enabled: true
+    development_shell_bats_enabled: true
+    development_python_ruff_enabled: true
+    development_lua_stylua_enabled: true
+    development_lua_luacheck_enabled: true
+    development_lua_busted_enabled: true
+    development_qml_tools_enabled: true
+    development_dbeaver_enabled: false
+    development_pgadmin_enabled: false
+    development_httpie_enabled: false
+    development_socket_cli_enabled: true
+    development_user_config_mode: 'disabled'
+    development_users:
+      - username: 'dev_global_disabled'
+        git_name: 'Dev Global Disabled'
+        git_email: 'gd@example.com'
 
   tasks:
     - name: Converge | Include development role  # noqa: role-name[path]

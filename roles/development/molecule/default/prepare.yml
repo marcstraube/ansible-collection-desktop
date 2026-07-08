@@ -137,3 +137,31 @@
       when: ansible_facts['os_family'] == 'RedHat'
       retries: 3
       delay: 5
+
+    #
+    # Test users for user_config_mode coverage (git config uses become_user)
+    #
+
+    - name: Prepare | Create test users
+      ansible.builtin.user:
+        name: '{{ item }}'
+        create_home: true
+        shell: /bin/bash
+        # Real sha512 password hash. Required so PAM account management
+        # accepts root → user become in containerised Rocky under
+        # GitHub-hosted runners (locked accounts and `*` placeholder both
+        # fail pam_unix account check with "Authentication service cannot
+        # retrieve authentication info").
+        password: "{{ 'molecule-dev-test-noop' | password_hash('sha512') }}"
+        update_password: 'on_create'
+      loop:
+        # Play 1 (managed): reconciled user + per-user disabled override
+        - dev_managed_user
+        - dev_disabled_user
+        # Play 2 (initial): newly-created (deployed) + existing (untouched)
+        - dev_initial_new
+        - dev_initial_exist
+        # Play 3 (disabled, global): never deployed
+        - dev_global_disabled
+      loop_control:
+        label: '{{ item }}'
