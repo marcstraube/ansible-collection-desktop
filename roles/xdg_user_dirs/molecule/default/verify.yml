@@ -102,3 +102,103 @@
         that:
           - not __xdg_templates.stat.exists
         fail_msg: 'Templates directory created despite being in skip list'
+
+    #
+    # Managed Mode — Per-User Disabled Override (xdg_disabled_user)
+    #
+    # Entry-level mode=disabled overrides the managed global mode
+    # → role MUST NOT deploy any config for this user.
+    #
+
+    - name: Verify | Check per-user-disabled user has no user-dirs.dirs
+      ansible.builtin.stat:
+        path: /home/xdg_disabled_user/.config/user-dirs.dirs
+      register: __xdg_disabled_dirs
+
+    - name: Verify | Assert per-user-disabled user has no config
+      ansible.builtin.assert:
+        that:
+          - not __xdg_disabled_dirs.stat.exists
+        fail_msg: 'user-dirs.dirs deployed for a per-user-disabled entry'
+
+    #
+    # Initial Mode — Newly Created User (xdg_initial_new)
+    #
+    # xdg_user_dirs_user_config_mode=initial + user IN __users_newly_created
+    # → role MUST deploy the config (dirs file + freeze file).
+    #
+
+    - name: Verify | Check initial-new user user-dirs.dirs exists
+      ansible.builtin.stat:
+        path: /home/xdg_initial_new/.config/user-dirs.dirs
+      register: __xdg_initialnew_dirs
+
+    - name: Verify | Assert initial-new user config is deployed
+      ansible.builtin.assert:
+        that:
+          - __xdg_initialnew_dirs.stat.exists
+          - __xdg_initialnew_dirs.stat.pw_name == 'xdg_initial_new'
+        fail_msg: 'user-dirs.dirs not deployed for newly-created initial-mode user'
+
+    - name: Verify | Check initial-new user freeze file exists
+      ansible.builtin.stat:
+        path: /home/xdg_initial_new/.config/user-dirs.conf
+      register: __xdg_initialnew_conf
+
+    - name: Verify | Assert initial-new user freeze file is deployed
+      ansible.builtin.assert:
+        that:
+          - __xdg_initialnew_conf.stat.exists
+        fail_msg: 'user-dirs.conf freeze not deployed for newly-created initial-mode user'
+
+    #
+    # Initial Mode — Existing User (xdg_initial_exist)
+    #
+    # xdg_user_dirs_user_config_mode=initial + user NOT IN __users_newly_created
+    # → role MUST leave the pre-existing user-dirs.dirs untouched and MUST
+    #   NOT create the freeze file.
+    #
+
+    - name: Verify | Read initial-exist user user-dirs.dirs
+      ansible.builtin.slurp:
+        src: /home/xdg_initial_exist/.config/user-dirs.dirs
+      register: __xdg_initialexist_dirs
+
+    - name: Verify | Assert initial-exist user config is unchanged
+      ansible.builtin.assert:
+        that:
+          - >-
+            'molecule-fixture: pre-existing user content'
+            in (__xdg_initialexist_dirs.content | b64decode)
+          - "'PreexistingDesktop' in (__xdg_initialexist_dirs.content | b64decode)"
+          - "'XDG_MEDIA_DIR=' not in (__xdg_initialexist_dirs.content | b64decode)"
+        fail_msg: 'pre-existing user-dirs.dirs was modified for existing initial-mode user'
+
+    - name: Verify | Check initial-exist user freeze file absent
+      ansible.builtin.stat:
+        path: /home/xdg_initial_exist/.config/user-dirs.conf
+      register: __xdg_initialexist_conf
+
+    - name: Verify | Assert initial-exist user freeze file absent
+      ansible.builtin.assert:
+        that:
+          - not __xdg_initialexist_conf.stat.exists
+        fail_msg: 'freeze file created for existing initial-mode user (should be untouched)'
+
+    #
+    # Disabled Mode — Global (xdg_global_disabled)
+    #
+    # xdg_user_dirs_user_config_mode=disabled
+    # → role MUST NOT deploy any config for any user.
+    #
+
+    - name: Verify | Check global-disabled user has no user-dirs.dirs
+      ansible.builtin.stat:
+        path: /home/xdg_global_disabled/.config/user-dirs.dirs
+      register: __xdg_globaldisabled_dirs
+
+    - name: Verify | Assert global-disabled user has no config
+      ansible.builtin.assert:
+        that:
+          - not __xdg_globaldisabled_dirs.stat.exists
+        fail_msg: 'user-dirs.dirs deployed despite global disabled mode'

@@ -1,5 +1,5 @@
 ---
-- name: Converge
+- name: Converge | Managed mode
   hosts: all
   gather_facts: true
 
@@ -20,6 +20,67 @@
     xdg_user_dirs_user_config_mode: 'managed'
     xdg_user_dirs_users:
       - username: 'xdg_test_user'
+      - username: 'xdg_disabled_user'
+        mode: 'disabled'
+
+  tasks:
+    - name: Converge | Include xdg_user_dirs role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+- name: Converge | Initial mode (per-user gating)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    xdg_user_dirs_enabled: true
+    xdg_user_dirs_locale: 'en_US.UTF-8'
+    xdg_user_dirs_user_config_mode: 'initial'
+    xdg_user_dirs_users:
+      - username: 'xdg_initial_new'
+      - username: 'xdg_initial_exist'
+
+  pre_tasks:
+    - name: Converge | Ensure existing-user config dir exists
+      ansible.builtin.file:
+        path: /home/xdg_initial_exist/.config
+        state: directory
+        owner: xdg_initial_exist
+        group: xdg_initial_exist
+        mode: '0700'
+
+    - name: Converge | Pre-seed existing user-dirs.dirs to prove it is left untouched
+      ansible.builtin.copy:
+        content: |
+          # molecule-fixture: pre-existing user content
+          XDG_DESKTOP_DIR="$HOME/PreexistingDesktop"
+        dest: /home/xdg_initial_exist/.config/user-dirs.dirs
+        owner: xdg_initial_exist
+        group: xdg_initial_exist
+        mode: '0600'
+
+    - name: Converge | Mark only xdg_initial_new as newly created
+      ansible.builtin.set_fact:
+        __users_newly_created:
+          - 'xdg_initial_new'
+
+  tasks:
+    - name: Converge | Include xdg_user_dirs role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+
+- name: Converge | Disabled mode (global)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    xdg_user_dirs_enabled: true
+    xdg_user_dirs_locale: 'en_US.UTF-8'
+    xdg_user_dirs_user_config_mode: 'disabled'
+    xdg_user_dirs_users:
+      - username: 'xdg_global_disabled'
 
   tasks:
     - name: Converge | Include xdg_user_dirs role  # noqa: role-name[path]
