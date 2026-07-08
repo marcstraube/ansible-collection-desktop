@@ -1,0 +1,34 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+
+  vars:
+    comfyui_install_dir: /opt/comfyui
+
+  tasks:
+    - name: Verify | Stat venv interpreter and systemd unit
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - '{{ comfyui_install_dir }}/venv/bin/python'
+        - /etc/systemd/system/comfyui.service
+      register: __verify_paths
+
+    - name: Verify | Import the torch stack from the venv
+      ansible.builtin.command:
+        cmd: >-
+          {{ comfyui_install_dir }}/venv/bin/python
+          -c "import torch, torchvision, torchaudio"
+      changed_when: false
+      register: __verify_import
+
+    - name: Verify | Assert install succeeded
+      ansible.builtin.assert:
+        that:
+          - __verify_paths.results | selectattr('stat.exists') | list | length == 2
+          - __verify_import.rc == 0
+        fail_msg: 'ComfyUI venv, systemd unit, or native torch stack missing'
+        success_msg: >-
+          ComfyUI installed; native torch/torchvision/torchaudio importable
+          from the --system-site-packages venv

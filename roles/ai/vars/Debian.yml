@@ -30,3 +30,16 @@ __ai_comfyui_venv_packages:
   - 'python3-venv'
   - 'python3-pip'
   - 'git'
+
+# ComfyUI — native PyTorch packages (manual install flow). torchvision and
+# torchaudio are GPU-agnostic; only the base torch package differs by backend.
+# AMD/ROCm has no Debian package, so it is rejected in comfyui-other.yml.
+__ai_comfyui_torch_packages:
+  nvidia:
+    - 'python3-torch-cuda'
+    - 'python3-torchvision'
+    - 'python3-torchaudio'
+  cpu:
+    - 'python3-torch'
+    - 'python3-torchvision'
+    - 'python3-torchaudio'
