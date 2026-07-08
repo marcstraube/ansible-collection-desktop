@@ -99,11 +99,18 @@ API keys are managed by the user via environment variables (not by this role).
   systemd unit. Inventory variables marked *(manual path only)* in the
   table above are **not honored** on Arch — they are fixed by the AUR
   PKGBUILD.
-- **Debian / Rocky Linux**: from-source install. The role creates the
-  service user/group, clones the upstream ComfyUI repo to
-  `ai_comfyui_install_dir`, builds a Python virtual environment, and
-  installs PyTorch wheels selected by `ai_comfyui_gpu`. All variables
-  above apply.
+- **Debian** (`ai_comfyui_gpu: nvidia` or `cpu`): from-source install with
+  native PyTorch. The role installs `python3-torch-cuda` (nvidia) or
+  `python3-torch` (cpu) plus `python3-torchvision` and `python3-torchaudio`
+  from Debian's repositories, then builds a `--system-site-packages` venv so
+  ComfyUI sees them. ComfyUI's own requirements are installed into the venv;
+  torch is already satisfied by the native packages. All *(manual path only)*
+  variables above apply.
+- **Debian with `ai_comfyui_gpu: amd`, and all Rocky Linux / EL hosts**:
+  **unsupported**. No complete native PyTorch stack
+  (torch/torchvision/torchaudio) is packaged there, and the upstream pip wheel
+  index is fragile against Python version drift. The role fails fast with a
+  clear message (see issue #122). Use Arch Linux for AMD/ROCm.
 
 **ComfyUI-Manager** is installed via manual git-clone on both paths
 because no upstream package exists yet (see `tasks/comfyui-archlinux.yml`

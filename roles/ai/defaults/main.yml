@@ -80,7 +80,8 @@ ai_lmstudio_enabled: false
 
 # Enable ComfyUI (Stable Diffusion node-based UI)
 ai_comfyui_enabled: false
-# GPU backend (nvidia or amd)
+# GPU backend: 'nvidia', 'amd', or 'cpu' (amd is Arch-only — Debian has no
+# native ROCm PyTorch package; see README)
 ai_comfyui_gpu: 'nvidia'
 # Git branch/tag
 ai_comfyui_version: 'master'

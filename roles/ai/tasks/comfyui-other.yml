@@ -1,17 +1,50 @@
 ---
 #
-# ComfyUI install — manual flow (Debian, Rocky Linux)
+# ComfyUI install — manual flow (Debian)
 #
 # On Arch, the AUR `comfyui` package is used instead — see
-# `comfyui-archlinux.yml`. This file performs a from-source install:
-# create service user/group, clone repo, build a Python venv, install
-# PyTorch wheels matching `ai_comfyui_gpu`, then deploy a project-owned
+# `comfyui-archlinux.yml`. This manual flow is supported only on Debian with
+# `ai_comfyui_gpu` set to `nvidia` or `cpu`, where PyTorch ships as native
+# `python3-torch{,-cuda}` packages. It creates the service user/group, clones
+# the repo, builds a `--system-site-packages` venv (so the native PyTorch is
+# visible), installs the remaining requirements, and deploys a project-owned
 # systemd unit.
+#
+# Unsupported combinations fail fast: AMD/ROCm on Debian (no ROCm package) and
+# all RedHat-family hosts (no complete native torch/torchvision/torchaudio
+# stack in EPEL). The upstream pip wheel index is intentionally avoided — it is
+# fragile against Python version drift. See issue #122.
+
+- name: ComfyUI | Assert manual install is supported on this platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+      - ai_comfyui_gpu in ['nvidia', 'cpu']
+    fail_msg: >-
+      Manual ComfyUI install is only supported on Debian with ai_comfyui_gpu
+      'nvidia' or 'cpu' (native python3-torch packages).
+      {{ ansible_facts['distribution'] }} with ai_comfyui_gpu
+      '{{ ai_comfyui_gpu }}' has no complete native PyTorch stack
+      (torch/torchvision/torchaudio), and the upstream pip wheel index is
+      unreliable against Python version drift. See
+      https://github.com/marcstraube/ansible-collection-desktop/issues/122.
+      Arch Linux installs ComfyUI via the AUR comfyui package instead.
+    success_msg: >-
+      Debian / ai_comfyui_gpu '{{ ai_comfyui_gpu }}' — installing PyTorch from
+      native python3-torch packages.
 
 - name: ComfyUI | Install ComfyUI system dependencies
   become: true
   ansible.builtin.package:
     name: '{{ __ai_comfyui_venv_packages }}'
+    state: present
+  retries: 3
+  delay: 5
+
+- name: ComfyUI | Install native PyTorch packages
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_comfyui_torch_packages[ai_comfyui_gpu] }}'
     state: present
   retries: 3
   delay: 5
@@ -53,42 +86,19 @@
   retries: 5
   delay: 10
 
+# The venv is built with --system-site-packages so the native PyTorch packages
+# installed above are visible inside it.
 - name: ComfyUI | Create ComfyUI Python virtual environment
   become: true
   become_user: '{{ ai_comfyui_user }}'
   ansible.builtin.command:
-    cmd: '{{ __ai_comfyui_python }} -m venv venv'
+    cmd: '{{ __ai_comfyui_python }} -m venv --system-site-packages venv'
     chdir: '{{ ai_comfyui_install_dir }}'
     creates: '{{ ai_comfyui_install_dir }}/venv/bin/activate'
 
-- name: ComfyUI | Install PyTorch (NVIDIA CUDA)
-  become: true
-  become_user: '{{ ai_comfyui_user }}'
-  ansible.builtin.pip:
-    name:
-      - torch
-      - torchvision
-      - torchaudio
-    extra_args: '--index-url https://download.pytorch.org/whl/cu126'
-    virtualenv: '{{ ai_comfyui_install_dir }}/venv'
-  when: ai_comfyui_gpu == 'nvidia'
-  retries: 3
-  delay: 5
-
-- name: ComfyUI | Install PyTorch (AMD ROCm)
-  become: true
-  become_user: '{{ ai_comfyui_user }}'
-  ansible.builtin.pip:
-    name:
-      - torch
-      - torchvision
-      - torchaudio
-    extra_args: '--index-url https://download.pytorch.org/whl/rocm6.2.4'
-    virtualenv: '{{ ai_comfyui_install_dir }}/venv'
-  when: ai_comfyui_gpu == 'amd'
-  retries: 3
-  delay: 5
-
+# ComfyUI's requirements.txt lists torch/torchvision/torchaudio unpinned. With
+# the native packages visible via --system-site-packages, pip treats them as
+# already satisfied and does not pull wheels from PyPI.
 - name: ComfyUI | Install ComfyUI requirements
   become: true
   become_user: '{{ ai_comfyui_user }}'
