@@ -5,8 +5,9 @@ Install AI development tools.
 ## Description
 
 Installs AI CLI tools, desktop applications, and local inference engines.
-Supports Claude Code, Gemini CLI, OpenAI Codex, OpenCode, Aider, Ollama,
-LM Studio, Claude Desktop, OpenCode Desktop, and ComfyUI (Stable Diffusion).
+Supports Claude Code, Gemini CLI, Antigravity, OpenAI Codex, OpenCode, Aider,
+Ollama, LM Studio, Claude Desktop, OpenCode Desktop, and ComfyUI (Stable
+Diffusion).
 
 On Arch Linux, tools are installed via native packages (AUR/community/extra).
 On Debian and Rocky Linux, tools are installed via npm, pipx, install scripts,
@@ -44,7 +45,8 @@ API keys are managed by the user via environment variables (not by this role).
 | Variable                           | Default | Description                                    |
 | ---------------------------------- | ------- | ---------------------------------------------- |
 | `ai_claude_code_enabled`           | `true`  | Install Claude Code                            |
-| `ai_gemini_cli_enabled`            | `false` | Install Gemini CLI                             |
+| `ai_gemini_cli_enabled`            | `false` | Install Gemini CLI (deprecated)                |
+| `ai_antigravity_cli_enabled`       | `false` | Install Antigravity CLI (Arch only, AUR)       |
 | `ai_codex_enabled`                 | `false` | Install OpenAI Codex CLI                       |
 | `ai_opencode_enabled`              | `false` | Install OpenCode CLI                           |
 | `ai_opencode_claude_auth_enabled`  | `false` | OpenCode auth plugin for Claude creds          |
@@ -52,11 +54,15 @@ API keys are managed by the user via environment variables (not by this role).
 | `ai_aider_enabled`                 | `false` | Install Aider (pair programming)               |
 | `ai_claude_cowork_service_enabled` | `false` | Install Claude Cowork Service (Arch only, AUR) |
 
+> **Deprecation:** `ai_gemini_cli_enabled` is deprecated and will be removed in
+> v3.0.0. Migrate to Antigravity (`ai_antigravity_cli_enabled`). See #146.
+
 ### Desktop Applications
 
 | Variable                      | Default | Description                                  |
 | ----------------------------- | ------- | -------------------------------------------- |
 | `ai_claude_desktop_enabled`   | `false` | Install Claude Desktop (Arch only)           |
+| `ai_antigravity_enabled`      | `false` | Install Antigravity (Arch only)              |
 | `ai_opencode_desktop_enabled` | `false` | Install OpenCode Desktop (AUR / .deb / .rpm) |
 
 ### Local AI / Inference

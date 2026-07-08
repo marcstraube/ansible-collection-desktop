@@ -8,9 +8,11 @@ __ai_codex_package: ''
 
 # CLI Tools — AUR-only on Arch, no-op elsewhere
 __ai_claude_cowork_service_package: ''
+__ai_antigravity_cli_package: ''
 
 # Desktop Apps
 __ai_claude_desktop_package: ''
+__ai_antigravity_package: ''
 __ai_opencode_desktop_url: >-
   https://github.com/anomalyco/opencode/releases/latest/download/opencode-desktop-linux-amd64.deb
 
