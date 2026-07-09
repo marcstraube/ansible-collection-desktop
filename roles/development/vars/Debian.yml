@@ -64,8 +64,9 @@ __development_shell_shfmt_package: 'shfmt'
 __development_shell_shellcheck_package: 'shellcheck'
 __development_shell_bats_package: 'bats'
 
-# Python tooling (ruff not yet in Debian Trixie main)
+# Python tooling (ruff and uv not packaged in Debian Trixie)
 __development_python_ruff_package: ''
+__development_python_uv_package: ''
 
 # Lua tooling (stylua not packaged in Debian)
 __development_lua_stylua_package: ''

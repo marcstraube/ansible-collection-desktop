@@ -10,3 +10,21 @@
   when: __development_python_ruff_package | default('') | length > 0
   retries: 3
   delay: 5
+
+- name: Python Tooling | Manage uv
+  ansible.builtin.package:
+    name: '{{ __development_python_uv_package }}'
+    state: "{{ 'present' if development_python_uv_enabled | bool else 'absent' }}"
+  when: __development_python_uv_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Python Tooling | uv not available (unpackaged platform)
+  ansible.builtin.debug:
+    msg: >
+      uv is not packaged for {{ ansible_facts['os_family'] }} on this release
+      (Debian Trixie, EL9). Install manually from
+      https://github.com/astral-sh/uv
+  when:
+    - development_python_uv_enabled | bool
+    - __development_python_uv_package | default('') | length == 0
