@@ -98,6 +98,9 @@ development_shell_bats_enabled: false
 # Enable ruff Python linter and formatter
 development_python_ruff_enabled: false
 
+# Enable uv Python package installer and resolver
+development_python_uv_enabled: false
+
 # Lua
 
 # Enable stylua Lua formatter

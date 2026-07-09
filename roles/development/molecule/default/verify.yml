@@ -188,6 +188,15 @@
       failed_when: _dev_ruff_check.changed
       when: __development_python_ruff_package | default('') | length > 0
 
+    - name: Verify | uv — package installed
+      ansible.builtin.package:
+        name: '{{ __development_python_uv_package }}'
+        state: present
+      check_mode: true
+      register: _dev_uv_check
+      failed_when: _dev_uv_check.changed
+      when: __development_python_uv_package | default('') | length > 0
+
     - name: Verify | stylua — package installed
       ansible.builtin.package:
         name: '{{ __development_lua_stylua_package }}'
