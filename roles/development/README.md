@@ -161,9 +161,9 @@ dash, ksh, mksh); `bats-core` is bash-specific.
 
 #### Python Tooling
 
-| Variable                          | Default | Description                              |
-|-----------------------------------|---------|------------------------------------------|
-| `development_python_ruff_enabled` | `false` | Enable ruff Python linter and formatter  |
+| Variable                          | Default | Description                                     |
+|-----------------------------------|---------|-------------------------------------------------|
+| `development_python_ruff_enabled` | `false` | Enable ruff Python linter and formatter         |
 | `development_python_uv_enabled`   | `false` | Enable uv Python package installer and resolver |
 
 #### Lua
