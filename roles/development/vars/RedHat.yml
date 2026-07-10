@@ -45,6 +45,14 @@ __development_jetbrains_toolbox_package: ''
 __development_phpstorm_packages: []
 __development_zed_package: ''
 
+# Arduino: IDE 2.x is Flatpak/AppImage only; the classic 1.x EPEL
+# package is orphaned (last build EPEL 7) — both no-op
+__development_arduino_classic_package: ''
+
+# Serial device access for Arduino
+__development_serial_groups:
+  - 'dialout'
+
 # Database tools
 __development_dbeaver_package: ''
 __development_pgadmin_package: 'pgadmin4'

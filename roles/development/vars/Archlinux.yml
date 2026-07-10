@@ -68,6 +68,11 @@ __development_lua_busted_package: 'busted'
 # QML tooling (qmllint + qmlformat ship in the same package)
 __development_qml_tools_package: 'qt6-declarative'
 
+# Serial device access for Arduino (uucp required for CH340 USB-serial
+# chips — uaccess from systemd-logind alone is not sufficient)
+__development_serial_groups:
+  - 'uucp'
+
 # AUR packages
 __development_aur_packages:
   ides_vscodium:
@@ -81,6 +86,10 @@ __development_aur_packages:
     - 'phpstorm-jre'
   ides_zed:
     - 'zed-editor'
+  ides_arduino_ide:
+    - 'arduino-ide-bin'
+  ides_arduino_classic:
+    - 'arduino'
   api_tools_postman:
     - 'postman-bin'
   api_tools_insomnia:

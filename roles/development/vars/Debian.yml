@@ -44,6 +44,14 @@ __development_jetbrains_toolbox_package: ''
 __development_phpstorm_packages: []
 __development_zed_package: ''
 
+# Arduino: IDE 2.x is Flatpak/AppImage only (no-op via ides.yml notice);
+# the classic 1.x IDE is packaged officially
+__development_arduino_classic_package: 'arduino'
+
+# Serial device access for Arduino
+__development_serial_groups:
+  - 'dialout'
+
 # Database tools
 __development_dbeaver_package: ''
 __development_pgadmin_package: ''

@@ -73,13 +73,15 @@ overrides if needed.
 
 ### IDEs and Editors
 
-| Variable                                | Default | Description              |
-|-----------------------------------------|---------|--------------------------|
-| `development_vscode_enabled`            | `false` | Enable VS Code           |
-| `development_vscodium_enabled`          | `true`  | Enable VSCodium          |
-| `development_jetbrains_toolbox_enabled` | `false` | Enable JetBrains Toolbox |
-| `development_phpstorm_enabled`          | `false` | Enable PHPStorm          |
-| `development_zed_enabled`               | `false` | Enable Zed Editor        |
+| Variable                                | Default | Description                     |
+|-----------------------------------------|---------|---------------------------------|
+| `development_vscode_enabled`            | `false` | Enable VS Code                  |
+| `development_vscodium_enabled`          | `true`  | Enable VSCodium                 |
+| `development_jetbrains_toolbox_enabled` | `false` | Enable JetBrains Toolbox        |
+| `development_phpstorm_enabled`          | `false` | Enable PHPStorm                 |
+| `development_zed_enabled`               | `false` | Enable Zed Editor               |
+| `development_arduino_ide_enabled`       | `false` | Enable Arduino IDE 2.x          |
+| `development_arduino_classic_enabled`   | `false` | Enable classic Arduino IDE 1.x  |
 
 #### VSCode / VSCodium settings
 
@@ -99,6 +101,45 @@ Files are deployed under `~/.config/Code/User/settings.json` and
 `.vscode-oss` paths. The role overwrites these files in `managed` mode —
 inventory should populate `development_vscode_settings` with everything
 intended, not just deltas.
+
+#### Arduino
+
+Two independent toggles cover the two IDE generations, since their
+packaging differs per platform:
+
+| IDE                   | Arch                    | Debian Trixie      | EL 9/10 |
+|-----------------------|-------------------------|--------------------|---------|
+| Arduino IDE 2.x       | AUR (`arduino-ide-bin`) | no (Flatpak only)  | no      |
+| Classic Arduino IDE   | AUR (`arduino`)         | yes (`arduino`)    | no      |
+
+Arduino IDE 2.x on Debian/EL is only distributed as Flatpak
+(`cc.arduino.IDE2`) or AppImage; the classic 1.x EPEL package is
+orphaned. Enabling an unavailable combination logs a notice and skips.
+
+When either toggle is enabled, the role adds all `development_users`
+to the OS-specific serial device groups so boards can be flashed over
+USB-serial (`/dev/ttyACM*` / `/dev/ttyUSB*`):
+
+| Platform | Group     | Notes                                                          |
+|----------|-----------|----------------------------------------------------------------|
+| Arch     | `uucp`    | Required for CH340 chips — `uaccess` alone is not sufficient   |
+| Debian   | `dialout` |                                                                |
+| EL 9/10  | `dialout` |                                                                |
+
+Membership is append-only: the groups may be required by other tooling,
+so disabling the Arduino toggles does not remove users from them. Group
+changes take effect at next login.
+
+On Arch the role also deploys a `.desktop` override for Arduino IDE 2.x
+under `/usr/local/share/applications/` that redirects stdout/stderr to
+`/dev/null`. The IDE main process logs to stdout; launched from a
+`.desktop` entry that is a closed pipe, and every write raises an
+uncaught EPIPE exception dialog (upstream:
+[arduino-ide#2340](https://github.com/arduino/arduino-ide/issues/2340)).
+A pacman hook regenerates the override whenever `arduino-ide-bin`
+changes the packaged desktop file, so upstream `.desktop` updates are
+picked up automatically. Disabling the toggle removes the override,
+hook, and generator script.
 
 ### Database Tools
 
@@ -283,6 +324,8 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [VSCodium](https://vscodium.com/) — Free/libre Code-OSS binaries (telemetry-free VS Code build)
 - [JetBrains Toolbox](https://www.jetbrains.com/toolbox-app/) — Manager for JetBrains IDEs
 - [Zed](https://zed.dev/) — High-performance multiplayer code editor
+- [Arduino IDE 2.x](https://github.com/arduino/arduino-ide) — Arduino IDE, Theia/Electron based
+- [Arduino IDE 1.x](https://github.com/arduino/Arduino) — Classic Arduino IDE, Java/Swing based
 - [shfmt](https://github.com/mvdan/sh) — Shell formatter
 - [shellcheck](https://github.com/koalaman/shellcheck) — Shell script static analysis
 - [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system

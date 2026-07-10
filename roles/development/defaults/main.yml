@@ -152,6 +152,12 @@ development_phpstorm_enabled: false
 # Enable Zed Editor
 development_zed_enabled: false
 
+# Enable Arduino IDE 2.x (Theia/Electron based)
+development_arduino_ide_enabled: false
+
+# Enable classic Arduino IDE 1.x (Java/Swing based)
+development_arduino_classic_enabled: false
+
 #
 # Database Tools
 #
