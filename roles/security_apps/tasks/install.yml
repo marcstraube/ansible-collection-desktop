@@ -31,7 +31,7 @@
 
 - name: Install | Cypherock CySync from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __security_apps_aur_packages.cypherock }}'
     state: present
@@ -43,7 +43,7 @@
 
 - name: Install | Ledger Live from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __security_apps_aur_packages.ledger }}'
     state: present
@@ -55,7 +55,7 @@
 
 - name: Install | Trezor Suite from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __security_apps_aur_packages.trezor }}'
     state: present

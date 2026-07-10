@@ -19,7 +19,7 @@
 
 - name: ComfyUI | Install AUR package
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   environment:
     COMFYUI_GPU: "{{ __ai_comfyui_aur_gpu_map[ai_comfyui_gpu] | default('cpu') }}"
   kewlfft.aur.aur:

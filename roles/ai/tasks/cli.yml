@@ -7,7 +7,7 @@
 
 - name: CLI | Install Claude Code from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.claude_code }}'
     state: present
@@ -40,7 +40,7 @@
 
 - name: CLI | Install Gemini CLI from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.gemini_cli }}'
     state: present
@@ -66,7 +66,7 @@
 
 - name: CLI | Install Antigravity CLI from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.antigravity_cli }}'
     state: present
@@ -117,7 +117,7 @@
 
 - name: CLI | Install OpenCode from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.opencode }}'
     state: present
@@ -141,7 +141,7 @@
 
 - name: CLI | Install OpenCode Claude auth from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.opencode_claude_auth }}'
     state: present
@@ -167,7 +167,7 @@
 
 - name: CLI | Install OpenCode Gemini auth from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.opencode_gemini_auth }}'
     state: present
@@ -195,7 +195,7 @@
 
 - name: CLI | Install Aider from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.aider }}'
     state: present
@@ -220,7 +220,7 @@
 
 - name: CLI | Install Claude Cowork Service from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.claude_cowork_service }}'
     state: present

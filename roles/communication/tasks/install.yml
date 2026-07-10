@@ -69,7 +69,7 @@
 
 - name: Install | Slack from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __communication_aur_packages.slack }}'
     state: present
@@ -82,7 +82,7 @@
 
 - name: Install | Slack Wayland from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __communication_aur_packages.slack_wayland }}'
     state: present
@@ -95,7 +95,7 @@
 
 - name: Install | Threema from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __communication_aur_packages.threema }}'
     state: present
@@ -107,7 +107,7 @@
 
 - name: Install | Zoom from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __communication_aur_packages.zoom }}'
     state: present
@@ -119,7 +119,7 @@
 
 - name: Install | Teams from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __communication_aur_packages.teams }}'
     state: present
@@ -131,7 +131,7 @@
 
 - name: Install | Jitsi Meet from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __communication_aur_packages.jitsi }}'
     state: present

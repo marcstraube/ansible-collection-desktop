@@ -26,7 +26,7 @@
 
 - name: Install | Install AUR audio packages
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __bluetooth_aur_packages.alsa }}'
     state: present

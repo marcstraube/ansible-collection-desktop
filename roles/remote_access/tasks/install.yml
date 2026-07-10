@@ -39,7 +39,7 @@
 
 - name: Install | RustDesk from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __remote_access_aur_packages.rustdesk }}'
     state: present
@@ -51,7 +51,7 @@
 
 - name: Install | Asbru from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __remote_access_aur_packages.asbru }}'
     state: present
@@ -63,7 +63,7 @@
 
 - name: Install | RealVNC Viewer from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __remote_access_aur_packages.realvnc }}'
     state: present
@@ -75,7 +75,7 @@
 
 - name: Install | AnyDesk from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __remote_access_aur_packages.anydesk }}'
     state: present
@@ -87,7 +87,7 @@
 
 - name: Install | TeamViewer from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __remote_access_aur_packages.teamviewer }}'
     state: present

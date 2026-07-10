@@ -45,7 +45,7 @@
 
 - name: Themes | Install AUR packages (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __desktop_environment_themes_aur_packages }}'
     state: present

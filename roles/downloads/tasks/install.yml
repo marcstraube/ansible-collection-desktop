@@ -77,7 +77,7 @@
 
 - name: Install | JDownloader from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __downloads_aur_packages.jdownloader }}'
     state: present

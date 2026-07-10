@@ -60,7 +60,7 @@
 
 - name: Install | Tuxedo drivers from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __tuxedo_aur_packages.drivers }}'
     state: present
@@ -74,7 +74,7 @@
 
 - name: Install | Tuxedo Control Center from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __tuxedo_aur_packages.control_center }}'
     state: present
@@ -88,7 +88,7 @@
 
 - name: Install | YT6801 Ethernet driver from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __tuxedo_aur_packages.yt6801 }}'
     state: present
