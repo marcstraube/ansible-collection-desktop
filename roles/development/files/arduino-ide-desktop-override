@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# Regenerate the Arduino IDE .desktop override that redirects stdout and
+# stderr to /dev/null. The IDE main process logs via console.log; when
+# launched from a .desktop entry stdout is a closed pipe and every write
+# raises an uncaught EPIPE exception dialog on launch and quit.
+# Upstream: https://github.com/arduino/arduino-ide/issues/2340
+#
+# Managed by marcstraube.desktop.development. Also run from a pacman hook
+# on arduino-ide-bin install/upgrade/remove so the override tracks the
+# packaged desktop file.
+
+set -eu
+
+src='/usr/share/applications/arduino-ide-v2.desktop'
+dst='/usr/local/share/applications/arduino-ide-v2.desktop'
+
+if [ ! -f "$src" ]; then
+    if [ -f "$dst" ]; then
+        rm -f "$dst"
+        echo 'changed: override removed (packaged desktop file gone)'
+    else
+        echo 'unchanged'
+    fi
+    exit 0
+fi
+
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+sed 's|^Exec=.*|Exec=/bin/sh -c '\''exec arduino-ide "$@" >/dev/null 2>&1'\'' arduino-ide %U|' "$src" > "$tmp"
+
+if [ -f "$dst" ] && cmp -s "$tmp" "$dst"; then
+    echo 'unchanged'
+else
+    install -D -m 0644 "$tmp" "$dst"
+    echo 'changed: override regenerated'
+fi

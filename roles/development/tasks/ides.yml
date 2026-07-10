@@ -80,6 +80,124 @@
   retries: 3
   delay: 5
 
+# Arduino IDE 2.x (Arch AUR)
+#
+# .desktop override: workaround for
+# https://github.com/arduino/arduino-ide/issues/2340 — the IDE main
+# process logs to stdout, which is a closed pipe when launched from a
+# .desktop entry, and every write raises an uncaught EPIPE exception
+# dialog. The override redirects stdout/stderr to /dev/null. Script and
+# pacman hook deploy BEFORE the AUR install so the hook fires during the
+# install transaction and creates the override automatically; the
+# generate task below only covers hosts where the IDE was installed
+# before the hook existed, and re-runs as a no-op otherwise.
+
+- name: IDEs | Deploy Arduino IDE desktop override script (Arch)
+  ansible.builtin.copy:
+    src: 'arduino-ide-desktop-override'
+    dest: '/usr/local/bin/arduino-ide-desktop-override'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_arduino_ide_enabled | bool
+
+- name: IDEs | Deploy pacman hook for Arduino IDE desktop override (Arch)
+  ansible.builtin.copy:
+    src: 'arduino-ide-desktop-override.hook'
+    dest: '/etc/pacman.d/hooks/arduino-ide-desktop-override.hook'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_arduino_ide_enabled | bool
+
+- name: IDEs | Manage Arduino IDE from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_arduino_ide }}'
+    state: "{{ 'present' if development_arduino_ide_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_arduino_ide | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+- name: IDEs | Arduino IDE not available notice (non-Arch)
+  ansible.builtin.debug:
+    msg: 'Arduino IDE 2.x requires Flatpak (cc.arduino.IDE2) or AppImage on {{ ansible_facts["os_family"] }}.'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_arduino_ide_enabled | bool
+
+- name: IDEs | Generate Arduino IDE desktop override (Arch)
+  ansible.builtin.command: '/usr/local/bin/arduino-ide-desktop-override'
+  register: __development_arduino_override
+  changed_when: "'changed' in __development_arduino_override.stdout"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_arduino_ide_enabled | bool
+
+- name: IDEs | Remove Arduino IDE desktop override artefacts (Arch)
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - '/etc/pacman.d/hooks/arduino-ide-desktop-override.hook'
+    - '/usr/local/bin/arduino-ide-desktop-override'
+    - '/usr/local/share/applications/arduino-ide-v2.desktop'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - not development_arduino_ide_enabled | bool
+
+# Classic Arduino IDE 1.x (Arch AUR, Debian apt)
+
+- name: IDEs | Manage classic Arduino IDE from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.ides_arduino_classic }}'
+    state: "{{ 'present' if development_arduino_classic_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.ides_arduino_classic | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+- name: IDEs | Manage classic Arduino IDE
+  ansible.builtin.package:
+    name: '{{ __development_arduino_classic_package }}'
+    state: "{{ 'present' if development_arduino_classic_enabled | bool else 'absent' }}"
+  when: __development_arduino_classic_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: IDEs | Classic Arduino IDE not available notice (RedHat)
+  ansible.builtin.debug:
+    msg: 'Classic Arduino IDE is not packaged for {{ ansible_facts["os_family"] }} (EPEL package is orphaned).'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_arduino_classic_enabled | bool
+    - __development_arduino_classic_package | default('') | length == 0
+
+# Arduino serial device access
+#
+# Membership is append-only: uucp/dialout may be required by other
+# tooling, so disabling the Arduino toggles does not remove users.
+
+- name: IDEs | Add development users to serial device groups (Arduino)
+  ansible.builtin.user:
+    name: '{{ item.0.username }}'
+    groups: '{{ item.1 }}'
+    append: true
+  loop: '{{ development_users | product(__development_serial_groups | default([])) | list }}'
+  loop_control:
+    label: '{{ item.0.username }}:{{ item.1 }}'
+  when: development_arduino_ide_enabled | bool or development_arduino_classic_enabled | bool
+
 # Postman (Arch AUR)
 
 - name: IDEs | Manage Postman from AUR (Arch)

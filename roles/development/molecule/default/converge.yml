@@ -20,6 +20,8 @@
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
+    development_arduino_ide_enabled: false
+    development_arduino_classic_enabled: false
     development_cmake_enabled: true
     development_meson_enabled: false
     development_ninja_enabled: false
@@ -74,6 +76,8 @@
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
+    development_arduino_ide_enabled: false
+    development_arduino_classic_enabled: false
     development_cmake_enabled: true
     development_meson_enabled: false
     development_ninja_enabled: false
@@ -143,6 +147,8 @@
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
+    development_arduino_ide_enabled: false
+    development_arduino_classic_enabled: false
     development_cmake_enabled: true
     development_meson_enabled: false
     development_ninja_enabled: false
