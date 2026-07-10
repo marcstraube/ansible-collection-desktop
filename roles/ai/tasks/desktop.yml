@@ -7,7 +7,7 @@
 
 - name: Desktop | Install Claude Desktop from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.claude_desktop }}'
     state: present
@@ -31,7 +31,7 @@
 
 - name: Desktop | Install Antigravity from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.antigravity }}'
     state: present
@@ -56,7 +56,7 @@
 
 - name: Desktop | Install OpenCode Desktop from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __ai_aur_packages.opencode_desktop }}'
     state: present

@@ -7,7 +7,7 @@
 
 - name: IDEs | Manage VSCodium from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.ides_vscodium }}'
     state: "{{ 'present' if development_vscodium_enabled | bool else 'absent' }}"
@@ -28,7 +28,7 @@
 
 - name: IDEs | Manage VS Code from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.ides_vscode }}'
     state: "{{ 'present' if development_vscode_enabled | bool else 'absent' }}"
@@ -42,7 +42,7 @@
 
 - name: IDEs | Manage PHPStorm from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.ides_phpstorm }}'
     state: "{{ 'present' if development_phpstorm_enabled | bool else 'absent' }}"
@@ -56,7 +56,7 @@
 
 - name: IDEs | Manage Zed from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.ides_zed }}'
     state: "{{ 'present' if development_zed_enabled | bool else 'absent' }}"
@@ -70,7 +70,7 @@
 
 - name: IDEs | Manage JetBrains Toolbox from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.ides_jetbrains }}'
     state: "{{ 'present' if development_jetbrains_toolbox_enabled | bool else 'absent' }}"
@@ -202,7 +202,7 @@
 
 - name: IDEs | Manage Postman from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.api_tools_postman }}'
     state: "{{ 'present' if development_postman_enabled | bool else 'absent' }}"
@@ -216,7 +216,7 @@
 
 - name: IDEs | Manage Insomnia from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.api_tools_insomnia }}'
     state: "{{ 'present' if development_insomnia_enabled | bool else 'absent' }}"
@@ -230,7 +230,7 @@
 
 - name: IDEs | Manage Bruno from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __development_aur_packages.api_tools_bruno }}'
     state: "{{ 'present' if development_bruno_enabled | bool else 'absent' }}"

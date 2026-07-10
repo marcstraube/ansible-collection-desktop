@@ -51,7 +51,7 @@
 
 - name: Install | FFMultiConverter from AUR (Arch)
   become: true
-  become_user: aur_builder
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __multimedia_aur_packages.ffmulticonverter }}'
     state: present

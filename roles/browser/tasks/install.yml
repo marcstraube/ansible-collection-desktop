@@ -27,7 +27,7 @@
 
 - name: Install | LibreWolf from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __browser_aur_packages.librewolf }}'
     state: present
@@ -64,7 +64,7 @@
 
 - name: Install | Brave from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __browser_aur_packages.brave }}'
     state: present
@@ -89,7 +89,7 @@
 
 - name: Install | Import Tor Browser GPG key (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   ansible.builtin.shell:
     executable: /bin/bash
     cmd: |
@@ -105,7 +105,7 @@
 
 - name: Install | Tor Browser from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __browser_aur_packages.tor }}'
     state: present
@@ -132,7 +132,7 @@
 
 - name: Install | Zen Browser from AUR (Arch)
   become: true
-  become_user: 'aur_builder'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
     name: '{{ __browser_aur_packages.zen }}'
     state: present
