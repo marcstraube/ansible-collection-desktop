@@ -29,6 +29,17 @@ __development_go_packages:
 # Java
 __development_java_package: 'jdk-openjdk'
 
+# C/C++ (clang bundles clang-format, clang-tidy and clangd)
+__development_c_packages:
+  - 'clang'
+  - 'gdb'
+  - 'pkgconf'
+
+__development_c_ccache_package: 'ccache'
+__development_c_valgrind_package: 'valgrind'
+__development_c_cppcheck_package: 'cppcheck'
+__development_c_bear_package: 'bear'
+
 # Build tools
 __development_build_packages:
   - 'base-devel'
@@ -98,3 +109,5 @@ __development_aur_packages:
     - 'bruno-bin'
   security_socket_cli:
     - 'socket-cli'
+  c_codelldb:
+    - 'codelldb-bin'

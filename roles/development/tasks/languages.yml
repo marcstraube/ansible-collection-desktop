@@ -77,3 +77,69 @@
   when: development_java_enabled | bool
   retries: 3
   delay: 5
+
+# C/C++
+#
+# The core block (clang, gdb, pkgconf) uses 'when' skip like the other
+# languages above. The fine-grained helper tools below are leaf packages
+# without reverse dependencies and are managed present/absent like the
+# language tooling toggles.
+
+- name: Languages | Install C/C++ toolchain
+  ansible.builtin.package:
+    name: '{{ __development_c_packages }}'
+    state: present
+  when: development_c_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Languages | Manage codelldb from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __development_aur_packages.c_codelldb }}'
+    state: "{{ 'present' if development_c_codelldb_enabled | bool else 'absent' }}"
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - __development_aur_packages.c_codelldb | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+- name: Languages | codelldb not available notice (non-Arch)
+  ansible.builtin.debug:
+    msg: 'codelldb is not packaged for {{ ansible_facts["os_family"] }} (upstream ships a VSIX archive only).'
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_c_codelldb_enabled | bool
+
+- name: Languages | Manage ccache
+  ansible.builtin.package:
+    name: '{{ __development_c_ccache_package }}'
+    state: "{{ 'present' if development_c_ccache_enabled | bool else 'absent' }}"
+  when: __development_c_ccache_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Languages | Manage valgrind
+  ansible.builtin.package:
+    name: '{{ __development_c_valgrind_package }}'
+    state: "{{ 'present' if development_c_valgrind_enabled | bool else 'absent' }}"
+  when: __development_c_valgrind_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Languages | Manage cppcheck
+  ansible.builtin.package:
+    name: '{{ __development_c_cppcheck_package }}'
+    state: "{{ 'present' if development_c_cppcheck_enabled | bool else 'absent' }}"
+  when: __development_c_cppcheck_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Languages | Manage bear
+  ansible.builtin.package:
+    name: '{{ __development_c_bear_package }}'
+    state: "{{ 'present' if development_c_bear_enabled | bool else 'absent' }}"
+  when: __development_c_bear_package | default('') | length > 0
+  retries: 3
+  delay: 5

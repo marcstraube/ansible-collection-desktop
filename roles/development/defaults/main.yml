@@ -74,6 +74,27 @@ development_go_enabled: false
 # for per-project version control use mise/sdkman/asdf instead)
 development_java_enabled: false
 
+# C/C++
+
+# Enable the core C/C++ tooling block (clang incl. clang-format,
+# clang-tidy and clangd, gdb, pkgconf)
+development_c_enabled: false
+
+# Enable codelldb LLDB debug adapter (AUR only — no-op on Debian/RedHat)
+development_c_codelldb_enabled: false
+
+# Enable ccache compiler cache
+development_c_ccache_enabled: false
+
+# Enable valgrind memory and leak debugger
+development_c_valgrind_enabled: false
+
+# Enable cppcheck static analysis
+development_c_cppcheck_enabled: false
+
+# Enable bear (generates compile_commands.json for non-CMake projects)
+development_c_bear_enabled: false
+
 #
 # Language Tooling
 #

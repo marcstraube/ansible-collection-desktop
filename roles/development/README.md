@@ -61,6 +61,39 @@ overrides if needed.
 | `development_rust_components` | `[]`    | Rust components via rustup (non-Arch) |
 | `development_go_enabled`      | `false` | Enable Go installation                |
 | `development_java_enabled`    | `false` | Enable Java installation              |
+| `development_c_enabled`       | `false` | Enable C/C++ toolchain installation   |
+
+#### C/C++
+
+`development_c_enabled` installs the core C/C++ tooling block: `clang`
+(with `clang-format`, `clang-tidy` and the `clangd` LSP server), `gdb`
+and `pkgconf`. Fine-grained toggles add optional helpers:
+
+| Variable                          | Default | Description                                            |
+|-----------------------------------|---------|--------------------------------------------------------|
+| `development_c_codelldb_enabled`  | `false` | Enable codelldb LLDB debug adapter (Arch AUR only)     |
+| `development_c_ccache_enabled`    | `false` | Enable ccache compiler cache                           |
+| `development_c_valgrind_enabled`  | `false` | Enable valgrind memory and leak debugger               |
+| `development_c_cppcheck_enabled`  | `false` | Enable cppcheck static analysis                        |
+| `development_c_bear_enabled`      | `false` | Enable bear (`compile_commands.json` for non-CMake)    |
+
+Platform support:
+
+| Tool       | Arch      | Debian Trixie | EL 9       | EL 10      |
+|------------|-----------|---------------|------------|------------|
+| core block | yes       | yes           | yes        | yes        |
+| codelldb   | yes (AUR) | no            | no         | no         |
+| ccache     | yes       | yes           | yes (EPEL) | yes (EPEL) |
+| valgrind   | yes       | yes           | yes        | yes        |
+| cppcheck   | yes       | yes           | yes (EPEL) | yes (EPEL) |
+| bear       | yes       | yes           | yes (EPEL) | no         |
+
+On Debian the core block additionally installs the separate `clangd`,
+`clang-format` and `clang-tidy` packages; on EL they ship in
+`clang-tools-extra`. `codelldb` is the LLDB debug adapter used by
+VS Code/VSCodium/Zed for native debugging; upstream distributes only a
+VSIX archive, so it is AUR-only. `bear` is not packaged in EPEL 10.
+Enabling an unavailable combination is a no-op (codelldb logs a notice).
 
 ### Build Tools
 
@@ -326,6 +359,14 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [Zed](https://zed.dev/) — High-performance multiplayer code editor
 - [Arduino IDE 2.x](https://github.com/arduino/arduino-ide) — Arduino IDE, Theia/Electron based
 - [Arduino IDE 1.x](https://github.com/arduino/Arduino) — Classic Arduino IDE, Java/Swing based
+- [clang](https://clang.llvm.org/) — C/C++ compiler with clang-format, clang-tidy and clangd
+- [gdb](https://www.sourceware.org/gdb/) — GNU debugger
+- [pkgconf](https://github.com/pkgconf/pkgconf) — Library discovery for build systems
+- [codelldb](https://github.com/vadimcn/codelldb) — LLDB debug adapter for VS Code/VSCodium/Zed
+- [ccache](https://ccache.dev/) — Compiler cache
+- [valgrind](https://valgrind.org/) — Memory and leak debugger
+- [cppcheck](https://cppcheck.sourceforge.io/) — C/C++ static analysis
+- [bear](https://github.com/rizsotto/Bear) — compile_commands.json generator for non-CMake builds
 - [shfmt](https://github.com/mvdan/sh) — Shell formatter
 - [shellcheck](https://github.com/koalaman/shellcheck) — Shell script static analysis
 - [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system

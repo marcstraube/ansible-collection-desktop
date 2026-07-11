@@ -28,6 +28,20 @@ __development_go_packages:
 # Java
 __development_java_package: 'openjdk-17-jdk'
 
+# C/C++ (clangd, clang-format and clang-tidy are separate packages on Debian)
+__development_c_packages:
+  - 'clang'
+  - 'clangd'
+  - 'clang-format'
+  - 'clang-tidy'
+  - 'gdb'
+  - 'pkgconf'
+
+__development_c_ccache_package: 'ccache'
+__development_c_valgrind_package: 'valgrind'
+__development_c_cppcheck_package: 'cppcheck'
+__development_c_bear_package: 'bear'
+
 # Build tools
 __development_build_packages:
   - 'build-essential'
