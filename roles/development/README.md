@@ -84,7 +84,7 @@ Platform support:
 | core block | yes       | yes           | yes        | yes        |
 | codelldb   | yes (AUR) | no            | no         | no         |
 | ccache     | yes       | yes           | yes (EPEL) | yes (EPEL) |
-| valgrind   | yes       | yes           | yes        | yes        |
+| valgrind   | yes       | yes           | yes\*      | yes\*      |
 | cppcheck   | yes       | yes           | yes (EPEL) | yes (EPEL) |
 | bear       | yes       | yes           | yes (EPEL) | no         |
 
@@ -94,6 +94,10 @@ On Debian the core block additionally installs the separate `clangd`,
 VS Code/VSCodium/Zed for native debugging; upstream distributes only a
 VSIX archive, so it is AUR-only. `bear` is not packaged in EPEL 10.
 Enabling an unavailable combination is a no-op (codelldb logs a notice).
+
+\* On EL, `valgrind` ships with the `@Development Tools` group pulled in by
+the build-tools section, so its own toggle is a no-op there — it is present
+whenever the build tools are installed.
 
 ### Build Tools
 

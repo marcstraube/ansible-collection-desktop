@@ -43,9 +43,12 @@ __development_c_packages:
   - 'gdb'
   - 'pkgconf'
 
-# ccache, cppcheck and bear via EPEL (bear ships in EPEL 9 but not EPEL 10)
+# ccache, cppcheck and bear via EPEL (bear ships in EPEL 9 but not EPEL 10).
+# valgrind ships with @Development Tools (build tools) on EL — managing it
+# separately fights that group install and breaks idempotence, so it is a
+# no-op here and comes in with the build tools.
 __development_c_ccache_package: 'ccache'
-__development_c_valgrind_package: 'valgrind'
+__development_c_valgrind_package: ''
 __development_c_cppcheck_package: 'cppcheck'
 __development_c_bear_package: 'bear'
 
