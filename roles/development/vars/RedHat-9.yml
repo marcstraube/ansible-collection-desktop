@@ -7,6 +7,7 @@
 # loads only one file per host. EL9-specific overrides are:
 # - ruff: not packaged on EL9 (EPEL 10 ships it, EPEL 9 does not).
 # - uv: not packaged on EL9 (EPEL 10 ships it, EPEL 9 does not).
+# - bear: packaged on EL9 (EPEL 9 ships it, EPEL 10 does not).
 #
 
 # Version control
@@ -34,6 +35,22 @@ __development_go_packages:
 
 # Java
 __development_java_package: 'java-21-openjdk-devel'
+
+# C/C++ (clang-tools-extra provides clangd, clang-format and clang-tidy)
+__development_c_packages:
+  - 'clang'
+  - 'clang-tools-extra'
+  - 'gdb'
+  - 'pkgconf'
+
+# ccache, cppcheck and bear via EPEL (bear ships in EPEL 9 but not EPEL 10).
+# valgrind ships with @Development Tools (build tools) on EL — managing it
+# separately fights that group install and breaks idempotence, so it is a
+# no-op here and comes in with the build tools.
+__development_c_ccache_package: 'ccache'
+__development_c_valgrind_package: ''
+__development_c_cppcheck_package: 'cppcheck'
+__development_c_bear_package: 'bear'
 
 # Build tools
 __development_build_packages:

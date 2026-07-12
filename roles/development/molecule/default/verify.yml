@@ -234,6 +234,28 @@
       when: __development_qml_tools_package | default('') | length > 0
 
     #
+    # C/C++ toolchain (umbrella enabled, fine-grained tools disabled)
+    #
+
+    - name: Verify | C/C++ toolchain — packages installed
+      ansible.builtin.package:
+        name: '{{ __development_c_packages }}'
+        state: present
+      check_mode: true
+      register: _dev_c_check
+      failed_when: _dev_c_check.changed
+      when: __development_c_packages | default([]) | length > 0
+
+    - name: Verify | ccache disabled — package not installed
+      ansible.builtin.package:
+        name: '{{ __development_c_ccache_package }}'
+        state: absent
+      check_mode: true
+      register: _dev_ccache_check
+      failed_when: _dev_ccache_check.changed
+      when: __development_c_ccache_package | default('') | length > 0
+
+    #
     # Toggle verification: cmake enabled, meson disabled
     #
 
