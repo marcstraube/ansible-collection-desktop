@@ -99,6 +99,27 @@ Enabling an unavailable combination is a no-op (codelldb logs a notice).
 the build-tools section, so its own toggle is a no-op there — it is present
 whenever the build tools are installed.
 
+#### Gameboy Development
+
+Game Boy / Game Boy Color homebrew tooling. Both tools are AUR-only on
+Arch and unpackaged on Debian/RedHat (upstream ships tarball and AppImage
+releases), so enabling them there is a no-op that logs a notice.
+
+| Variable                          | Default | Description                                  |
+|-----------------------------------|---------|----------------------------------------------|
+| `development_gb_gbdk_enabled`     | `false` | Enable the GBDK-2020 cross-compile toolchain |
+| `development_gb_gbstudio_enabled` | `false` | Enable the GB Studio visual game maker       |
+
+Platform support:
+
+| Tool      | Arch      | Debian Trixie | EL 9 | EL 10 |
+|-----------|-----------|---------------|------|-------|
+| GBDK-2020 | yes (AUR) | no            | no   | no    |
+| GB Studio | yes (AUR) | no            | no   | no    |
+
+`GBDK-2020` builds from source via the AUR (SDCC-based); `gb-studio-bin`
+is the AppImage-derived AUR package.
+
 ### Build Tools
 
 | Variable                    | Default | Description                      |
@@ -371,6 +392,8 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [valgrind](https://valgrind.org/) — Memory and leak debugger
 - [cppcheck](https://cppcheck.sourceforge.io/) — C/C++ static analysis
 - [bear](https://github.com/rizsotto/Bear) — compile_commands.json generator for non-CMake builds
+- [GBDK-2020](https://github.com/gbdk-2020/gbdk-2020) — Game Boy Development Kit (SDCC-based cross-compile toolchain)
+- [GB Studio](https://www.gbstudio.dev/) — Visual Game Boy game maker
 - [shfmt](https://github.com/mvdan/sh) — Shell formatter
 - [shellcheck](https://github.com/koalaman/shellcheck) — Shell script static analysis
 - [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system
