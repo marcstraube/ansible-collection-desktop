@@ -106,6 +106,43 @@ development_gb_gbdk_enabled: false
 # Enable the GB Studio visual game maker
 development_gb_gbstudio_enabled: false
 
+# devkitPro — Nintendo console homebrew toolchains
+#
+# devkitARM / devkitPPC / devkitA64 cross-compilers distributed via
+# devkitPro's own pacman repositories (dkp-libs, dkp-linux). Registering
+# those repos is package_management's job (it owns /etc/pacman.conf); to
+# enable them, merge development_devkitpro_repositories into
+# `pacman_custom_repositories` in your inventory — this role then
+# installs the signing keyring, the system-wide environment, and the
+# requested platform groups. Arch only — a no-op on Debian/RedHat until
+# the cross-collection alternative-installs strategy lands.
+
+# Enable the devkitPro toolchain block (master toggle — gates all
+# per-platform toggles below; installs devkitpro-keyring + devkit-env)
+development_devkitpro_enabled: false
+
+# devkitPro pacman repositories, provided ready-made so you do not have
+# to hand-type the signing key and server URLs. Registration itself
+# happens in marcstraube.common.package_management — wire it up once in
+# inventory group_vars:
+#   pacman_custom_repositories: "{{ development_devkitpro_repositories }}"
+development_devkitpro_repositories:
+  - name: 'dkp-libs'
+    server: 'https://pkg.devkitpro.org/packages'
+    key_id: 'BC26F752D25B92CE272E0F44F7FD5492264BB9D0'
+    keyserver: 'keyserver.ubuntu.com'
+  - name: 'dkp-linux'
+    server: 'https://pkg.devkitpro.org/packages/linux/$arch'
+
+# Per-platform toolchain groups (each pulls its devkit* compiler plus
+# libraries and tools). All require development_devkitpro_enabled.
+development_devkitpro_gba_dev_enabled: false        # Game Boy Advance (devkitARM)
+development_devkitpro_nds_dev_enabled: false        # Nintendo DS (devkitARM)
+development_devkitpro_3ds_dev_enabled: false        # Nintendo 3DS (devkitARM)
+development_devkitpro_gamecube_dev_enabled: false   # GameCube (devkitPPC)
+development_devkitpro_wii_dev_enabled: false        # Wii (devkitPPC)
+development_devkitpro_switch_dev_enabled: false     # Switch (devkitA64)
+
 #
 # Language Tooling
 #

@@ -311,6 +311,56 @@
       when: ansible_facts['os_family'] != 'Archlinux'
 
     #
+    # devkitPro (Arch only — master + gba-dev enabled, switch-dev absent).
+    # No-op on non-Arch, so nothing to verify there.
+    #
+
+    - name: Verify | devkitpro-keyring installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q devkitpro-keyring'
+      register: _dev_dkp_keyring
+      changed_when: false
+      failed_when: _dev_dkp_keyring.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | devkit-env installed (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q devkit-env'
+      register: _dev_dkp_env
+      changed_when: false
+      failed_when: _dev_dkp_env.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat devkit-env profile script (Arch)
+      ansible.builtin.stat:
+        path: /etc/profile.d/devkit-env.sh
+      register: _dev_dkp_profile
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert devkit-env profile script exists (Arch)
+      ansible.builtin.assert:
+        that:
+          - _dev_dkp_profile.stat.exists
+        fail_msg: '/etc/profile.d/devkit-env.sh not shipped by devkit-env'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | devkitARM compiler runs (Arch)
+      ansible.builtin.command:
+        cmd: '/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc --version'
+      register: _dev_dkp_gcc
+      changed_when: false
+      failed_when: _dev_dkp_gcc.rc != 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | switch-dev toolchain absent (Arch)
+      ansible.builtin.command:
+        cmd: 'pacman -Q devkitA64'
+      register: _dev_dkp_switch
+      changed_when: false
+      failed_when: _dev_dkp_switch.rc == 0
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    #
     # user_config_mode coverage — per-user git config (~/.gitconfig)
     #
 

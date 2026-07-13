@@ -120,6 +120,49 @@ Platform support:
 `GBDK-2020` builds from source via the AUR (SDCC-based); `gb-studio-bin`
 is the AppImage-derived AUR package.
 
+#### devkitPro (Nintendo Homebrew)
+
+devkitARM / devkitPPC / devkitA64 cross-compiler toolchains for Nintendo
+consoles, distributed via devkitPro's own pacman repositories. A master
+toggle enables the repo tooling; per-platform toggles select the package
+groups to install.
+
+| Variable                                     | Default | Description                            |
+|----------------------------------------------|---------|----------------------------------------|
+| `development_devkitpro_enabled`              | `false` | Master toggle (keyring + environment)  |
+| `development_devkitpro_gba_dev_enabled`      | `false` | Game Boy Advance toolchain (`gba-dev`) |
+| `development_devkitpro_nds_dev_enabled`      | `false` | Nintendo DS toolchain (`nds-dev`)      |
+| `development_devkitpro_3ds_dev_enabled`      | `false` | Nintendo 3DS toolchain (`3ds-dev`)     |
+| `development_devkitpro_gamecube_dev_enabled` | `false` | GameCube toolchain (`gamecube-dev`)    |
+| `development_devkitpro_wii_dev_enabled`      | `false` | Wii toolchain (`wii-dev`)              |
+| `development_devkitpro_switch_dev_enabled`   | `false` | Switch toolchain (`switch-dev`)        |
+
+Platform support:
+
+| Feature              | Arch | Debian Trixie | EL 9 | EL 10 |
+|----------------------|------|---------------|------|-------|
+| devkitPro toolchains | yes  | no            | no   | no    |
+
+The `dkp-libs` / `dkp-linux` repos are **registered by
+`marcstraube.common.package_management`**, which owns `/etc/pacman.conf`.
+The role ships the ready-made repo definitions in
+`development_devkitpro_repositories` (including the signing key); wire
+them into your inventory once:
+
+```yaml
+# group_vars/workstations/vars.yml
+pacman_custom_repositories: "{{ development_devkitpro_repositories }}"
+# ...or append to an existing list:
+#   pacman_custom_repositories: "{{ my_repos + development_devkitpro_repositories }}"
+```
+
+`package_management` then imports and locally signs the devkitPro master
+key; this role installs `devkitpro-keyring`, the `devkit-env` package
+(which provides `DEVKITPRO`, `DEVKITARM`, `DEVKITPPC`, `DEVKITA64` and
+`PATH` system-wide via `/etc/profile.d/devkit-env.sh`), and the selected
+platform groups. Debian/RedHat are a no-op (a notice is logged) until
+the cross-collection alternative-installs strategy lands.
+
 ### Build Tools
 
 | Variable                    | Default | Description                      |
@@ -394,6 +437,8 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [bear](https://github.com/rizsotto/Bear) — compile_commands.json generator for non-CMake builds
 - [GBDK-2020](https://github.com/gbdk-2020/gbdk-2020) — Game Boy Development Kit (SDCC-based cross-compile toolchain)
 - [GB Studio](https://www.gbstudio.dev/) — Visual Game Boy game maker
+- [devkitPro](https://devkitpro.org/) — Nintendo console homebrew toolchains (devkitARM/devkitPPC/devkitA64)
+- [devkitPro pacman](https://github.com/devkitPro/pacman) — Package manager and repositories for the toolchains
 - [shfmt](https://github.com/mvdan/sh) — Shell formatter
 - [shellcheck](https://github.com/koalaman/shellcheck) — Shell script static analysis
 - [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system

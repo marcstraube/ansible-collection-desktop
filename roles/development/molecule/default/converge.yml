@@ -4,6 +4,11 @@
 # packages when their toggle flips to false, which would otherwise make
 # play 1 reinstall on every converge). Only development_user_config_mode and
 # development_users differ between the plays.
+#
+# The devkitPro dkp-libs / dkp-linux repositories the toolchain toggles
+# depend on are registered in prepare.yml (via the real
+# marcstraube.common.package_management pacman tasks), so package_management's
+# own idempotence is not coupled to this scenario's idempotence gate.
 - name: Converge | Managed mode
   hosts: all
   gather_facts: true
@@ -20,6 +25,8 @@
     development_c_enabled: true
     development_gb_gbdk_enabled: true
     development_gb_gbstudio_enabled: true
+    development_devkitpro_enabled: true
+    development_devkitpro_gba_dev_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -79,6 +86,8 @@
     development_c_enabled: true
     development_gb_gbdk_enabled: true
     development_gb_gbstudio_enabled: true
+    development_devkitpro_enabled: true
+    development_devkitpro_gba_dev_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -153,6 +162,8 @@
     development_c_enabled: true
     development_gb_gbdk_enabled: true
     development_gb_gbstudio_enabled: true
+    development_devkitpro_enabled: true
+    development_devkitpro_gba_dev_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false

@@ -1,0 +1,77 @@
+---
+#
+# devkitPro — Nintendo console homebrew toolchains
+#
+# devkitARM / devkitPPC / devkitA64 cross-compilers and libraries,
+# distributed via devkitPro's own pacman repositories (dkp-libs,
+# dkp-linux). Registering those repos is package_management's job — it
+# owns /etc/pacman.conf; merge development_devkitpro_repositories into
+# `pacman_custom_repositories` to enable them (and thereby import and
+# locally sign the devkitPro master key). This file installs the signing
+# keyring, the system-wide environment (devkit-env), and the requested
+# platform groups.
+#
+# Arch only: the upstream dkp-pacman deb installer and the generic
+# tarball both reuse Arch-style pacman semantics under /opt/devkitpro and
+# need their own multi-distro story, so this is a no-op (a notice is
+# logged) on Debian/RedHat until the alternative-installs strategy lands.
+
+- name: DevkitPro | Report unsupported platform (non-Arch)
+  ansible.builtin.debug:
+    msg: >-
+      devkitPro toolchains are not packaged for
+      {{ ansible_facts["os_family"] }} (upstream reuses Arch pacman
+      semantics under /opt/devkitpro); skipping.
+  when: ansible_facts['os_family'] != 'Archlinux'
+
+- name: DevkitPro | Configure toolchains (Arch)
+  when: ansible_facts['os_family'] == 'Archlinux'
+  block:
+    # Preflight: the dkp-libs / dkp-linux repos are registered by
+    # marcstraube.common.package_management (which also imports and
+    # locally signs the devkitPro master key). Without that wiring the
+    # keyring below cannot be validated, so fail early with a clear
+    # pointer instead of a cryptic signature error.
+    - name: DevkitPro | Gather configured pacman repositories
+      ansible.builtin.command:
+        cmd: 'pacman-conf --repo-list'
+      register: __development_devkitpro_repo_list
+      changed_when: false
+
+    - name: DevkitPro | Assert the devkitPro repositories are registered
+      ansible.builtin.assert:
+        that:
+          - "'dkp-libs' in __development_devkitpro_repo_list.stdout_lines"
+        fail_msg: >-
+          devkitPro is enabled but the dkp-libs repository is not
+          registered. Merge development_devkitpro_repositories into
+          pacman_custom_repositories (marcstraube.common.package_management)
+          — see the development role README.
+
+    # The keyring package is served from dkp-libs and signed by the
+    # devkitPro master key (locally signed by package_management), so
+    # pacman trusts it. Its install hook populates the per-package signing
+    # keys needed for devkit-env and the platform groups below.
+    - name: DevkitPro | Install the signing keyring
+      community.general.pacman:
+        name: '{{ __development_devkitpro_keyring_package }}'
+        state: present
+      retries: 3
+      delay: 5
+
+    - name: DevkitPro | Install the system-wide environment (devkit-env)
+      community.general.pacman:
+        name: '{{ __development_devkitpro_env_package }}'
+        state: present
+      retries: 3
+      delay: 5
+
+    - name: DevkitPro | Manage platform toolchain groups
+      community.general.pacman:
+        name: '{{ item.group }}'
+        state: "{{ 'present' if item.enabled | bool else 'absent' }}"
+      loop: '{{ __development_devkitpro_groups }}'
+      loop_control:
+        label: '{{ item.group }}'
+      retries: 3
+      delay: 5

@@ -165,3 +165,28 @@
         - dev_global_disabled
       loop_control:
         label: '{{ item }}'
+
+    #
+    # devkitPro repositories (Arch) — registered exactly as
+    # marcstraube.common.package_management does in production (it owns
+    # /etc/pacman.conf), so the development role's devkitPro tasks have
+    # the dkp-libs / dkp-linux repos and a locally-signed master key to
+    # work against. Uses the role's own development_devkitpro_repositories
+    # default, proving the documented inventory wiring. Kept in prepare
+    # (runs once) so package_management's own idempotence is not coupled
+    # to this scenario's idempotence gate.
+    #
+    - name: Prepare | Register devkitPro pacman repositories (Arch)
+      when: ansible_facts['os_family'] == 'Archlinux'
+      block:
+        - name: Prepare | Load development role defaults for devkitPro repos
+          ansible.builtin.include_vars:
+            file: '{{ playbook_dir }}/../../defaults/main.yml'
+            name: __dev_defaults
+
+        - name: Prepare | Configure pacman with devkitPro custom repositories
+          ansible.builtin.include_role:
+            name: marcstraube.common.package_management
+            tasks_from: archlinux/pacman.yml
+          vars:
+            pacman_custom_repositories: '{{ __dev_defaults.development_devkitpro_repositories }}'
