@@ -179,6 +179,16 @@
     - name: Prepare | Register devkitPro pacman repositories (Arch)
       when: ansible_facts['os_family'] == 'Archlinux'
       block:
+        # The minimal CI container ships an uninitialised pacman keyring
+        # (no local signing key), so package_management's `pacman-key
+        # --lsign-key` for the devkitPro master key fails with "no secret
+        # key available to sign with". A real Arch install always has this
+        # initialised; generate it here as a container precondition.
+        - name: Prepare | Initialize the pacman keyring
+          ansible.builtin.command:
+            cmd: 'pacman-key --init'
+          changed_when: true
+
         - name: Prepare | Load development role defaults for devkitPro repos
           ansible.builtin.include_vars:
             file: '{{ playbook_dir }}/../../defaults/main.yml'
