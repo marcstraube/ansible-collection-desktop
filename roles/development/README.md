@@ -145,15 +145,22 @@ Platform support:
 
 The `dkp-libs` / `dkp-linux` repos are **registered by
 `marcstraube.common.package_management`**, which owns `/etc/pacman.conf`.
-The role ships the ready-made repo definitions in
-`development_devkitpro_repositories` (including the signing key); wire
-them into your inventory once:
+Define them in your inventory's `pacman_custom_repositories`. The role
+ships the same values in `development_devkitpro_repositories` for
+convenience, but `package_management` registers the repos *before* the
+`development` role loads its defaults — so a
+`{{ development_devkitpro_repositories }}` reference from `group_vars`
+does not resolve there. Define the repos inline:
 
 ```yaml
-# group_vars/workstations/vars.yml
-pacman_custom_repositories: "{{ development_devkitpro_repositories }}"
-# ...or append to an existing list:
-#   pacman_custom_repositories: "{{ my_repos + development_devkitpro_repositories }}"
+# group_vars/<group>/vars.yml
+pacman_custom_repositories:
+  - name: 'dkp-libs'
+    server: 'https://pkg.devkitpro.org/packages'
+    key_id: 'BC26F752D25B92CE272E0F44F7FD5492264BB9D0'
+    keyserver: 'keyserver.ubuntu.com'
+  - name: 'dkp-linux'
+    server: 'https://pkg.devkitpro.org/packages/linux/$arch'
 ```
 
 `package_management` then imports and locally signs the devkitPro master
