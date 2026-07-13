@@ -160,8 +160,10 @@ pacman_custom_repositories: "{{ development_devkitpro_repositories }}"
 key; this role installs `devkitpro-keyring`, the `devkit-env` package
 (which provides `DEVKITPRO`, `DEVKITARM`, `DEVKITPPC`, `DEVKITA64` and
 `PATH` system-wide via `/etc/profile.d/devkit-env.sh`), and the selected
-platform groups. Debian/RedHat are a no-op (a notice is logged) until
-the cross-collection alternative-installs strategy lands.
+platform groups. The groups share common members (compilers, tools), so
+they are install-only — disabling a platform toggle after install does
+not uninstall the toolchain. Debian/RedHat are a no-op (a notice is
+logged) until the cross-collection alternative-installs strategy lands.
 
 ### Build Tools
 

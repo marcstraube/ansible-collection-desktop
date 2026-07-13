@@ -136,6 +136,8 @@ development_devkitpro_repositories:
 
 # Per-platform toolchain groups (each pulls its devkit* compiler plus
 # libraries and tools). All require development_devkitpro_enabled.
+# Install-only: the groups share common members, so disabling a toggle
+# after install does not uninstall the toolchain.
 development_devkitpro_gba_dev_enabled: false        # Game Boy Advance (devkitARM)
 development_devkitpro_nds_dev_enabled: false        # Nintendo DS (devkitARM)
 development_devkitpro_3ds_dev_enabled: false        # Nintendo 3DS (devkitARM)

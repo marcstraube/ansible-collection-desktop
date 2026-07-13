@@ -66,12 +66,19 @@
       retries: 3
       delay: 5
 
-    - name: DevkitPro | Manage platform toolchain groups
+    # Install only the enabled groups. The dkp groups share common
+    # members (general-tools, devkit-env, catnip, the devkit* compilers),
+    # so removing a disabled group would drag out packages an enabled
+    # group still depends on and break the transaction. Toolchains are
+    # therefore install-only: disabling a platform toggle afterwards does
+    # not uninstall the group.
+    - name: DevkitPro | Install enabled platform toolchain groups
       community.general.pacman:
-        name: '{{ item.group }}'
-        state: "{{ 'present' if item.enabled | bool else 'absent' }}"
-      loop: '{{ __development_devkitpro_groups }}'
-      loop_control:
-        label: '{{ item.group }}'
+        name: >-
+          {{ __development_devkitpro_groups
+             | selectattr('enabled')
+             | map(attribute='group') | list }}
+        state: present
+      when: __development_devkitpro_groups | selectattr('enabled') | list | length > 0
       retries: 3
       delay: 5
