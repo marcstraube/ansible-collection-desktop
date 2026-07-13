@@ -69,6 +69,13 @@
     - development
     - development:ides
 
+- name: Main | Import Gameboy development tasks
+  ansible.builtin.import_tasks: gb_dev.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:gb-dev
+
 - name: Main | Import misc tools tasks
   ansible.builtin.import_tasks: tools.yml
   when: development_enabled | bool

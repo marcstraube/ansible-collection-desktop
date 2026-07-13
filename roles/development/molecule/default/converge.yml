@@ -18,6 +18,8 @@
     development_go_enabled: false
     development_java_enabled: false
     development_c_enabled: true
+    development_gb_gbdk_enabled: true
+    development_gb_gbstudio_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -75,6 +77,8 @@
     development_go_enabled: false
     development_java_enabled: false
     development_c_enabled: true
+    development_gb_gbdk_enabled: true
+    development_gb_gbstudio_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -147,6 +151,8 @@
     development_go_enabled: false
     development_java_enabled: false
     development_c_enabled: true
+    development_gb_gbdk_enabled: true
+    development_gb_gbstudio_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false

@@ -95,6 +95,17 @@ development_c_cppcheck_enabled: false
 # Enable bear (generates compile_commands.json for non-CMake projects)
 development_c_bear_enabled: false
 
+# Gameboy development
+#
+# GBDK-2020 and GB Studio are AUR only — no-op on Debian/RedHat.
+
+# Enable the GBDK-2020 toolchain (SDCC-based cross-compiler and
+# libraries for GB / GBC / SGB)
+development_gb_gbdk_enabled: false
+
+# Enable the GB Studio visual game maker
+development_gb_gbstudio_enabled: false
+
 #
 # Language Tooling
 #

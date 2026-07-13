@@ -111,3 +111,7 @@ __development_aur_packages:
     - 'socket-cli'
   c_codelldb:
     - 'codelldb-bin'
+  gb_gbdk:
+    - 'gbdk-2020'
+  gb_gbstudio:
+    - 'gb-studio-bin'
