@@ -115,3 +115,27 @@ __development_aur_packages:
     - 'gbdk-2020'
   gb_gbstudio:
     - 'gb-studio-bin'
+
+# devkitPro (Nintendo homebrew toolchains via the dkp-libs / dkp-linux
+# repos — registered through package_management, see defaults/main.yml).
+# The keyring and toolchains are served from the repos themselves.
+__development_devkitpro_keyring_package: 'devkitpro-keyring'
+
+# devkit-env ships /etc/profile.d/devkit-env.sh, exporting DEVKITPRO,
+# DEVKITARM, DEVKITPPC, DEVKITA64 and PATH system-wide
+__development_devkitpro_env_package: 'devkit-env'
+
+# Per-platform package groups, paired with their master-gated toggle
+__development_devkitpro_groups:
+  - group: 'gba-dev'
+    enabled: '{{ development_devkitpro_gba_dev_enabled | bool }}'
+  - group: 'nds-dev'
+    enabled: '{{ development_devkitpro_nds_dev_enabled | bool }}'
+  - group: '3ds-dev'
+    enabled: '{{ development_devkitpro_3ds_dev_enabled | bool }}'
+  - group: 'gamecube-dev'
+    enabled: '{{ development_devkitpro_gamecube_dev_enabled | bool }}'
+  - group: 'wii-dev'
+    enabled: '{{ development_devkitpro_wii_dev_enabled | bool }}'
+  - group: 'switch-dev'
+    enabled: '{{ development_devkitpro_switch_dev_enabled | bool }}'

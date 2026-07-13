@@ -76,6 +76,15 @@
     - development
     - development:gb-dev
 
+- name: Main | Import devkitPro toolchain tasks
+  ansible.builtin.import_tasks: devkitpro.yml
+  when:
+    - development_enabled | bool
+    - development_devkitpro_enabled | bool
+  tags:
+    - development
+    - development:devkitpro
+
 - name: Main | Import misc tools tasks
   ansible.builtin.import_tasks: tools.yml
   when: development_enabled | bool
