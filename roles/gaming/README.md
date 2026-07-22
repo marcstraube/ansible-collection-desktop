@@ -78,6 +78,13 @@ overrides if needed.
 \* PCSX2 is installed via AUR on Arch Linux.
 \*\* PCSX2 requires RPM Fusion on Rocky Linux (not managed by this role).
 
+| Variable                  | Default     | Description                                                 |
+| ------------------------- | ----------- | ----------------------------------------------------------- |
+| `gaming_playback_variant` | `'flatpak'` | Playback variant: `flatpak` (official bundle) or `appimage` |
+
+The Playback variants conflict with each other, so the role removes the
+unselected variant before installing the selected one.
+
 ### Game Streaming
 
 | Variable                   | Default | Arch | Debian | Rocky | Description                        |

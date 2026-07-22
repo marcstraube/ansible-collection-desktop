@@ -16,6 +16,9 @@ __gaming_aur_packages:
   heroic:
     - heroic-games-launcher-bin
   playback:
-    - playback-appimage
+    flatpak:
+      - playback-flatpak
+    appimage:
+      - playback-appimage
   pcsx2:
     - pcsx2

@@ -93,11 +93,26 @@
   retries: 3
   delay: 5
 
+# The Playback variants conflict with each other, which paru cannot
+# resolve under --noconfirm — remove the unselected variant before
+# installing the selected one (variant exclusive).
+- name: Install | Remove unselected Playback variant (Arch)
+  community.general.pacman:
+    name: >-
+      {{ __gaming_aur_packages.playback
+         | dict2items
+         | rejectattr('key', 'equalto', gaming_playback_variant)
+         | map(attribute='value') | flatten | list }}
+    state: absent
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - gaming_playback_enabled | bool
+
 - name: Install | Playback from AUR (Arch)
   become: true
   become_user: "{{ aur_builder_user | default('aur_builder') }}"
   kewlfft.aur.aur:
-    name: '{{ __gaming_aur_packages.playback }}'
+    name: '{{ __gaming_aur_packages.playback[gaming_playback_variant] }}'
     state: present
   when:
     - ansible_facts['os_family'] == 'Archlinux'
