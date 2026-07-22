@@ -29,6 +29,12 @@ gaming_retroarch_enabled: true
 # Playback game recording/replay viewer
 gaming_playback_enabled: true
 
+# Playback package variant (Arch AUR): 'flatpak' installs the official
+# Flatpak bundle (playback-flatpak), 'appimage' the AppImage repack
+# (playback-appimage). The variants conflict; the unselected one is
+# removed.
+gaming_playback_variant: 'flatpak'
+
 # PCSX2 PlayStation 2 emulator
 gaming_pcsx2_enabled: false
 

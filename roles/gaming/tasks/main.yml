@@ -13,6 +13,19 @@
   tags:
     - gaming
 
+- name: Main | Validate gaming_playback_variant
+  ansible.builtin.assert:
+    that:
+      - gaming_playback_variant in ['flatpak', 'appimage']
+    fail_msg: >-
+      gaming_playback_variant must be 'flatpak' or 'appimage',
+      got '{{ gaming_playback_variant }}'
+  when:
+    - gaming_enabled | bool
+    - gaming_playback_enabled | bool
+  tags:
+    - gaming
+
 - name: Main | Import install tasks
   ansible.builtin.import_tasks: install.yml
   when: gaming_enabled | bool
