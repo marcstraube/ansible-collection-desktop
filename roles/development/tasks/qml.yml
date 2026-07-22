@@ -6,10 +6,16 @@
 # supported distros. A single toggle covers both binaries.
 #
 
-- name: QML | Manage qml-tools
+# Install-only: on Arch the tools ship in qt6-declarative itself, a core
+# Qt6 library the desktop stack depends on (qt6-wayland, KDE frameworks,
+# ...), so removal can never succeed there. Disabling the toggle therefore
+# does not uninstall the package on any platform.
+- name: QML | Install qml-tools
   ansible.builtin.package:
     name: '{{ __development_qml_tools_package }}'
-    state: "{{ 'present' if development_qml_tools_enabled | bool else 'absent' }}"
-  when: __development_qml_tools_package | default('') | length > 0
+    state: present
+  when:
+    - development_qml_tools_enabled | bool
+    - __development_qml_tools_package | default('') | length > 0
   retries: 3
   delay: 5
