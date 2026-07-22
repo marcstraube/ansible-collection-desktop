@@ -32,11 +32,14 @@
     # locally signs the devkitPro master key). Without that wiring the
     # keyring below cannot be validated, so fail early with a clear
     # pointer instead of a cryptic signature error.
+    # check_mode: false — read-only lookup, must run under --check so the
+    # assert below sees the actual repo list instead of a skipped result.
     - name: DevkitPro | Gather configured pacman repositories
       ansible.builtin.command:
         cmd: 'pacman-conf --repo-list'
       register: __development_devkitpro_repo_list
       changed_when: false
+      check_mode: false
 
     - name: DevkitPro | Assert the devkitPro repositories are registered
       ansible.builtin.assert:

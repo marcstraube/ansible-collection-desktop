@@ -3,11 +3,14 @@
 # i386 Architecture (Debian)
 #
 
+# check_mode: false — read-only lookup, must run under --check so the
+# i386 enablement below sees the actual foreign-architecture list.
 - name: Install | Check i386 architecture (Debian)
   ansible.builtin.command:
     cmd: dpkg --print-foreign-architectures
   register: __wine_foreign_archs
   changed_when: false
+  check_mode: false
   when: ansible_facts['os_family'] == 'Debian'
 
 - name: Install | Enable i386 architecture (Debian)
@@ -98,11 +101,14 @@
 # GPU Vulkan Driver Detection (Arch Linux)
 #
 
+# check_mode: false — read-only lookup, must run under --check so the
+# vendor resolution below is based on the actual GPU list.
 - name: Install | Detect GPU vendor
   ansible.builtin.command:
     cmd: lspci -nn
   register: __wine_lspci
   changed_when: false
+  check_mode: false
   failed_when: false
   when:
     - ansible_facts['os_family'] == 'Archlinux'

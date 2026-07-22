@@ -21,11 +21,15 @@
 # multi-kernel setups (e.g. linux-lts + linux) where DKMS needs headers
 # for every bootable kernel.
 
+# check_mode: false — read-only lookup, must run under --check so the
+# kernel headers list below is built from the actual package DB instead
+# of an empty skipped result.
 - name: Install | Detect installed kernel packages
   ansible.builtin.command:
     cmd: pacman -Qq
   register: __tuxedo_installed_packages
   changed_when: false
+  check_mode: false
   when: tuxedo_drivers_enabled | bool or tuxedo_yt6801_ethernet_enabled | bool
 
 - name: Install | Build kernel headers list
