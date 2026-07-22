@@ -4,11 +4,14 @@
 #
 
 # Theme
+# check_mode: false — read-only lookup, must run under --check so the
+# theme comparison below sees the actual current theme.
 - name: Configure | Get current default theme
   ansible.builtin.command:
     cmd: plymouth-set-default-theme
   register: __plymouth_current_theme
   changed_when: false
+  check_mode: false
 
 - name: Configure | Set Plymouth theme
   ansible.builtin.command:
@@ -22,11 +25,14 @@
 #
 # Debian/RedHat integrate plymouth automatically via initramfs-tools/dracut.
 
+# check_mode: false — read-only lookup, must run under --check so the
+# hook checks below operate on the actual HOOKS line.
 - name: Configure | Read current mkinitcpio hooks (Arch)
   ansible.builtin.command:
     cmd: grep '^HOOKS=' {{ __plymouth_mkinitcpio_conf }}
   register: __plymouth_current_hooks
   changed_when: false
+  check_mode: false
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - __plymouth_mkinitcpio_conf | length > 0

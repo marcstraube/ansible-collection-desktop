@@ -18,11 +18,15 @@
       not 'TUXEDO'. Tuxedo packages may not work correctly on non-Tuxedo hardware.
   when: ansible_facts['sys_vendor'] | default('') != 'TUXEDO'
 
+# check_mode: false — read-only lookup, must run under --check so the
+# conflict warning below reflects the actual install state (the skipped
+# result carries rc=0, which would warn on every check run).
 - name: Validate | Check for auto-cpufreq conflict
   ansible.builtin.command:
     cmd: pacman -Qi auto-cpufreq
   register: __tuxedo_auto_cpufreq_check
   changed_when: false
+  check_mode: false
   # pacman -Qi exits 1 when package is not installed
   failed_when: false
   when: tuxedo_warn_conflicts_enabled | bool
