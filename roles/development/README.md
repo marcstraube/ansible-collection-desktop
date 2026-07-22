@@ -331,6 +331,10 @@ dash, ksh, mksh); `bats-core` is bash-specific.
 |---------------------------------|---------|------------------------------------------------------|
 | `development_qml_tools_enabled` | `false` | Enable Qt6 QML tools (qmllint + qmlformat, same pkg) |
 
+The QML tools are install-only — on Arch they ship in `qt6-declarative`
+itself, a core Qt6 library the desktop stack depends on, so disabling the
+toggle after install does not uninstall the package.
+
 ##### Platform support
 
 | Tool         | Arch | Debian Trixie | EL 9 | EL 10 |
