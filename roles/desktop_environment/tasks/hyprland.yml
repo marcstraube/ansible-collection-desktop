@@ -88,24 +88,11 @@
   retries: 3
   delay: 5
 
-# uwsm Desktop Entry
-- name: Hyprland | Create wayland-sessions directory
-  ansible.builtin.file:
-    path: '/usr/share/wayland-sessions'
-    state: directory
-    owner: root
-    group: root
-    mode: '0755'
-  when: desktop_environment_hyprland_uwsm_enabled | bool
-
-- name: Hyprland | Deploy uwsm desktop entry
-  ansible.builtin.template:
-    src: 'hyprland-uwsm.desktop.j2'
-    dest: '/usr/share/wayland-sessions/hyprland-uwsm.desktop'
-    owner: root
-    group: root
-    mode: '0644'
-  when: desktop_environment_hyprland_uwsm_enabled | bool
+# uwsm session desktop entry: shipped by the hyprland package itself
+# (Arch and Debian trixie-backports both install
+# /usr/share/wayland-sessions/hyprland-uwsm.desktop), so the role does
+# not deploy its own — overwriting the package file caused a ping-pong
+# with every hyprland update.
 
 # uwsm service automation (drop-ins + enable)
 - name: Hyprland | Create uwsm drop-in directories
