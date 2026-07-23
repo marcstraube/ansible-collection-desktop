@@ -312,7 +312,10 @@
 
     #
     # devkitPro (Arch only — master + gba-dev enabled, switch-dev absent).
-    # No-op on non-Arch, so nothing to verify there.
+    # No-op on non-Arch, so nothing to verify there. Skipped in CI —
+    # pkg.devkitpro.org blocks GitHub-hosted runners, so converge runs
+    # with the devkitPro master toggle disabled there (see
+    # __molecule_devkitpro_reachable in molecule.yml).
     #
 
     - name: Verify | devkitpro-keyring installed (Arch)
@@ -321,7 +324,9 @@
       register: _dev_dkp_keyring
       changed_when: false
       failed_when: _dev_dkp_keyring.rc != 0
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __molecule_devkitpro_reachable | default(true) | bool
 
     - name: Verify | devkit-env installed (Arch)
       ansible.builtin.command:
@@ -329,20 +334,26 @@
       register: _dev_dkp_env
       changed_when: false
       failed_when: _dev_dkp_env.rc != 0
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __molecule_devkitpro_reachable | default(true) | bool
 
     - name: Verify | Stat devkit-env profile script (Arch)
       ansible.builtin.stat:
         path: /etc/profile.d/devkit-env.sh
       register: _dev_dkp_profile
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __molecule_devkitpro_reachable | default(true) | bool
 
     - name: Verify | Assert devkit-env profile script exists (Arch)
       ansible.builtin.assert:
         that:
           - _dev_dkp_profile.stat.exists
         fail_msg: '/etc/profile.d/devkit-env.sh not shipped by devkit-env'
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __molecule_devkitpro_reachable | default(true) | bool
 
     - name: Verify | devkitARM compiler runs (Arch)
       ansible.builtin.command:
@@ -350,7 +361,9 @@
       register: _dev_dkp_gcc
       changed_when: false
       failed_when: _dev_dkp_gcc.rc != 0
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __molecule_devkitpro_reachable | default(true) | bool
 
     - name: Verify | switch-dev toolchain absent (Arch)
       ansible.builtin.command:

@@ -49,6 +49,13 @@ provisioner:
     converge: converge.yml
     verify: verify.yml
   inventory:
+    group_vars:
+      all:
+        # pkg.devkitpro.org rejects requests from GitHub-hosted runners
+        # with HTTP 403 (IP-based blocking), so the devkitPro repo
+        # registration and toolchain coverage only run outside CI.
+        # Local molecule runs still exercise the full devkitPro path.
+        __molecule_devkitpro_reachable: "{{ lookup('env', 'CI') != 'true' }}"
     host_vars:
       development-archlinux:
         ansible_python_interpreter: /usr/bin/python

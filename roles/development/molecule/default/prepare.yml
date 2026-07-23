@@ -174,10 +174,14 @@
     # work against. Uses the role's own development_devkitpro_repositories
     # default, proving the documented inventory wiring. Kept in prepare
     # (runs once) so package_management's own idempotence is not coupled
-    # to this scenario's idempotence gate.
+    # to this scenario's idempotence gate. Skipped in CI —
+    # pkg.devkitpro.org blocks GitHub-hosted runners with HTTP 403 (see
+    # __molecule_devkitpro_reachable in molecule.yml).
     #
     - name: Prepare | Register devkitPro pacman repositories (Arch)
-      when: ansible_facts['os_family'] == 'Archlinux'
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - __molecule_devkitpro_reachable | default(true) | bool
       block:
         # The minimal CI container ships an uninitialised pacman keyring
         # (no local signing key), so package_management's `pacman-key
