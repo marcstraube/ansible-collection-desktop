@@ -1,5 +1,30 @@
 # Changelog
 
+## [2.2.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.1.0...v2.2.0) (2026-07-23)
+
+
+### Features
+
+* **development:** add arduino-ide and classic arduino toggles ([#184](https://github.com/marcstraube/ansible-collection-desktop/issues/184)) ([2501caa](https://github.com/marcstraube/ansible-collection-desktop/commit/2501caa09ff13807ac3a726dacb9befce431d6b5)), closes [#143](https://github.com/marcstraube/ansible-collection-desktop/issues/143)
+* **development:** add C/C++ toolchain toggles ([#186](https://github.com/marcstraube/ansible-collection-desktop/issues/186)) ([73144af](https://github.com/marcstraube/ansible-collection-desktop/commit/73144af1e0d8ac038aefada41705d8b9915e5b12)), closes [#148](https://github.com/marcstraube/ansible-collection-desktop/issues/148)
+* **development:** add devkitPro subsection for Nintendo homebrew toolchains ([#188](https://github.com/marcstraube/ansible-collection-desktop/issues/188)) ([89e5ab0](https://github.com/marcstraube/ansible-collection-desktop/commit/89e5ab0c2e3fd0611ad10ed4a42fc7bc6d2778a3)), closes [#154](https://github.com/marcstraube/ansible-collection-desktop/issues/154)
+* **development:** add gb_dev subsection (gbdk-2020 + gb-studio) ([#187](https://github.com/marcstraube/ansible-collection-desktop/issues/187)) ([b5968c6](https://github.com/marcstraube/ansible-collection-desktop/commit/b5968c6597824d0a5df7c471215ecc17f87a3354)), closes [#151](https://github.com/marcstraube/ansible-collection-desktop/issues/151)
+* **development:** add uv toggle ([0810bd1](https://github.com/marcstraube/ansible-collection-desktop/commit/0810bd12565d4360ab4698d9ecaaab881e1a2c98))
+* **gaming:** make the Playback package variant selectable ([#203](https://github.com/marcstraube/ansible-collection-desktop/issues/203)) ([69dce10](https://github.com/marcstraube/ansible-collection-desktop/commit/69dce10bc5b9a78ceaa4cda258ca6fbbeafee431))
+
+
+### Bug Fixes
+
+* **desktop_environment:** rely on the packaged uwsm session desktop entry ([#201](https://github.com/marcstraube/ansible-collection-desktop/issues/201)) ([85b461f](https://github.com/marcstraube/ansible-collection-desktop/commit/85b461f9b33eedda99db20fa314e45d93f84d8c6))
+* **development:** make the qml-tools toggle install-only ([#197](https://github.com/marcstraube/ansible-collection-desktop/issues/197)) ([b707808](https://github.com/marcstraube/ansible-collection-desktop/commit/b707808d510b0695a229e9d3c57d6eb6c6a3bf72))
+* replace hardcoded aur_builder with aur_builder_user variable ([#185](https://github.com/marcstraube/ansible-collection-desktop/issues/185)) ([a27e613](https://github.com/marcstraube/ansible-collection-desktop/commit/a27e61372d14a0e1262b1c6009cfbc59cac29e5b))
+* run read-only lookup commands under --check ([#200](https://github.com/marcstraube/ansible-collection-desktop/issues/200)) ([c056bc1](https://github.com/marcstraube/ansible-collection-desktop/commit/c056bc17d414ebd99a0e7a8125fce630673a72df))
+
+
+### Documentation
+
+* **development:** fix devkitPro repo wiring example ([#192](https://github.com/marcstraube/ansible-collection-desktop/issues/192)) ([4a688a1](https://github.com/marcstraube/ansible-collection-desktop/commit/4a688a1e8ad1bd1921cc222e46674dd5055ad4d0)), closes [#191](https://github.com/marcstraube/ansible-collection-desktop/issues/191)
+
 ## [2.1.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.0.0...v2.1.0) (2026-07-08)
 
 
