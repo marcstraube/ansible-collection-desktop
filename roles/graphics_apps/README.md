@@ -7,9 +7,9 @@ Install graphics and image editing applications.
 Installs graphics, digital painting, vector graphics, and image conversion
 applications. Supports GIMP, Krita, Inkscape, XnConvert, and XnView.
 
-XnConvert and XnView are Arch Linux-only (installed from AUR). EL requires
-EPEL for GIMP and Inkscape. Krita is not available on EL 9 (not in EPEL 9)
-— it requires EL 10 with EPEL 10.
+XnConvert and XnView are Arch Linux-only (installed from AUR). On EL, GIMP and
+Inkscape come from AppStream on EL 9 but are not packaged for EL 10. Krita is
+the opposite: absent on EL 9 (not in EPEL 9), available on EL 10 via EPEL 10.
 
 Optional GIMP plugins can be installed via `graphics_apps_gimp_plugins`, and
 Inkscape extensions via `graphics_apps_inkscape_plugins`. On Arch the latter are
@@ -21,8 +21,10 @@ available as distribution packages.
 - ansible-core >= 2.17
 - `community.general` collection (pacman module)
 - `kewlfft.aur` collection (Arch Linux AUR packages)
-- EL requires EPEL to be enabled for GIMP, Inkscape, and Krita (EL 10+).
-  EPEL is managed by the `marcstraube.common.package_management` role.
+- On EL 10, Krita requires EPEL and CRB enabled (its turbojpeg dependency lives
+  in CRB); GIMP and Inkscape are not packaged for EL 10, and on EL 9 both come
+  from AppStream. EPEL and CRB are managed by the
+  `marcstraube.common.package_management` role.
 
 ## Supported Platforms
 
@@ -31,7 +33,7 @@ available as distribution packages.
 | Arch Linux                 | yes  | yes     | yes      | AUR       | AUR    |
 | Debian Trixie              | yes  | yes     | yes      | no        | no     |
 | EL 9 (Rocky, Alma, RHEL)   | yes  | no      | yes      | no        | no     |
-| EL 10 (Rocky, Alma, RHEL)  | yes  | EPEL 10 | yes      | no        | no     |
+| EL 10 (Rocky, Alma, RHEL)  | no   | EPEL 10 | no       | no        | no     |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

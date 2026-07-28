@@ -53,6 +53,15 @@
         allowerasing: true
       when: ansible_facts['os_family'] == 'RedHat'
 
+    # Krita (EPEL 10) pulls turbojpeg, which lives in CRB. EPEL itself is
+    # already enabled in the geerlingguy base images. In production both
+    # repos are managed by marcstraube.common.package_management.
+    - name: Prepare | Enable CRB repository (RedHat)
+      ansible.builtin.command:
+        cmd: dnf config-manager --set-enabled crb
+      changed_when: true
+      when: ansible_facts['os_family'] == 'RedHat'
+
     - name: Prepare | Install container dependencies (RedHat)
       ansible.builtin.package:
         name: '{{ __prepare_packages["RedHat"] }}'

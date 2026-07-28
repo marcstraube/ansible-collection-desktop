@@ -2,7 +2,9 @@
 #
 # RedHat Packages (EL 10 / EPEL 10)
 #
+# GIMP and Inkscape are not packaged for EL 10 (absent from BaseOS,
+# AppStream, CRB and EPEL 10). Krita is available in EPEL 10.
 
-__graphics_apps_gimp_package: 'gimp'
+__graphics_apps_gimp_package: ''
 __graphics_apps_krita_package: 'krita'
-__graphics_apps_inkscape_package: 'inkscape'
+__graphics_apps_inkscape_package: ''
