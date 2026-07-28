@@ -11,7 +11,10 @@ XnConvert and XnView are Arch Linux-only (installed from AUR). EL requires
 EPEL for GIMP and Inkscape. Krita is not available on EL 9 (not in EPEL 9)
 — it requires EL 10 with EPEL 10.
 
-Optional GIMP plugins can be installed via `graphics_apps_gimp_plugins`.
+Optional GIMP plugins can be installed via `graphics_apps_gimp_plugins`, and
+Inkscape extensions via `graphics_apps_inkscape_plugins`. On Arch the latter are
+installed from the AUR (e.g. `inkscape-silhouette-git`); on Debian/EL they must be
+available as distribution packages.
 
 ## Requirements
 
@@ -52,6 +55,7 @@ overrides if needed.
 | `graphics_apps_xnconvert_enabled` | `true`  | Install XnConvert (Arch only, AUR)         |
 | `graphics_apps_xnview_enabled`    | `false` | Install XnView (Arch only, AUR)            |
 | `graphics_apps_gimp_plugins`      | `[]`    | Additional GIMP plugin packages to install |
+| `graphics_apps_inkscape_plugins`  | `[]`    | Additional Inkscape extension packages     |
 
 ## Tags
 
