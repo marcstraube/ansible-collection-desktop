@@ -108,5 +108,9 @@
         - browser_initial_exist
         # Play 3 (disabled, global): never deployed
         - browser_global_disabled
+        # Play 4 (seed): existing users — file absent (created) and file
+        # already present (left untouched)
+        - browser_seed_new_file
+        - browser_seed_keep_file
       loop_control:
         label: '{{ item }}'

@@ -1,5 +1,8 @@
 ---
-# Respects mode: managed | initial | disabled
+# Respects mode: managed | initial | seed | disabled. Whole-file deploys
+# (user.js, chromium-flags.conf) honour seed via force: false (deploy if
+# absent, never overwrite). mimeapps.list manages individual handler keys
+# rather than a whole file, so it treats seed like initial.
 
 - name: Users | Bootstrap Firefox profile
   ansible.builtin.include_tasks:
@@ -27,7 +30,7 @@
     - browser_firefox_user_js_enabled | bool
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
     - >-
-      (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
       or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
           and browser_user.username in (__users_newly_created | default([])))
 
@@ -58,7 +61,7 @@
     - ansible_facts['os_family'] == 'Archlinux'
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
     - >-
-      (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
       or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
           and browser_user.username in (__users_newly_created | default([])))
 
@@ -82,7 +85,7 @@
     - browser_chromium_flags | length > 0
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
     - >-
-      (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
       or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
           and browser_user.username in (__users_newly_created | default([])))
 
@@ -107,5 +110,5 @@
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
     - >-
       (browser_user.mode | default(browser_user_config_mode)) == 'managed'
-      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
+      or ((browser_user.mode | default(browser_user_config_mode)) in ['initial', 'seed']
           and browser_user.username in (__users_newly_created | default([])))

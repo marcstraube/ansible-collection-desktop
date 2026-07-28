@@ -293,6 +293,9 @@ browser_brave_autofill_credit_card: false
 # Modes:
 #   managed  — always deploy/overwrite user config (default)
 #   initial  — deploy only when user is newly created
+#   seed     — deploy whole-file configs (user.js, chromium-flags.conf)
+#              only when absent, never overwrite; rolls new files out to
+#              existing users once. mimeapps.list treats seed like initial.
 #   disabled — skip config deployment for this user
 
 browser_users: []
@@ -302,5 +305,6 @@ browser_users: []
 
 # Default mode when user entry has no 'mode' key
 # 'initial' preserves user customisations after first deploy.
-# Set to 'managed' for continuous reconciliation.
+# 'managed' reconciles continuously; 'seed' deploys missing files once
+# without ever overwriting them.
 browser_user_config_mode: 'initial'

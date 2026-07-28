@@ -137,3 +137,48 @@
     - name: Converge | Include browser role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+
+
+# seed mode: both users are pre-existing (empty __users_newly_created), so
+# initial would skip them. seed must create chromium-flags.conf where it is
+# absent (browser_seed_new_file) and leave an already-present copy untouched
+# (browser_seed_keep_file).
+- name: Converge | Seed mode (existing users)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    browser_enabled: true
+    browser_firefox_enabled: false
+    browser_chromium_enabled: true
+    browser_chromium_policies_enabled: false
+    browser_chromium_flags_enabled: true
+    browser_chromium_flags:
+      - '--enable-experimental-web-platform-features'
+    browser_default: ''
+    browser_user_config_mode: 'seed'
+    browser_users:
+      - username: 'browser_seed_new_file'
+      - username: 'browser_seed_keep_file'
+
+  pre_tasks:
+    - name: Converge | Ensure seed-keep user config dir exists
+      ansible.builtin.file:
+        path: /home/browser_seed_keep_file/.config
+        state: directory
+        owner: browser_seed_keep_file
+        group: browser_seed_keep_file
+        mode: '0700'
+
+    - name: Converge | Pre-seed a user-edited chromium-flags.conf
+      ansible.builtin.copy:
+        content: "--user-edited-sentinel\n"
+        dest: /home/browser_seed_keep_file/.config/chromium-flags.conf
+        owner: browser_seed_keep_file
+        group: browser_seed_keep_file
+        mode: '0644'
+
+  tasks:
+    - name: Converge | Include browser role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

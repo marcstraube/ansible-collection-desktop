@@ -119,10 +119,10 @@ Chromium on Rocky Linux requires EPEL.
 
 ### User Configuration
 
-| Variable                   | Default     | Description                            |
-| -------------------------- | ----------- | -------------------------------------- |
-| `browser_users`            | `[]`        | Users for per-user profile settings    |
-| `browser_user_config_mode` | `'initial'` | Default mode: managed/initial/disabled |
+| Variable                   | Default     | Description                                  |
+| -------------------------- | ----------- | -------------------------------------------- |
+| `browser_users`            | `[]`        | Users for per-user profile settings          |
+| `browser_user_config_mode` | `'initial'` | Default mode: managed/initial/seed/disabled  |
 
 `browser_default` is applied per-user via `~/.config/mimeapps.list`
 (sections `[Default Applications]`, keys `x-scheme-handler/http`
@@ -132,10 +132,18 @@ match the `.desktop` basename of an installed browser, without the
 suffix (e.g. `firefox`, `librewolf`, `chromium`, `brave-browser`).
 Set to an empty string to skip handler management. Other entries
 in `mimeapps.list` are preserved on each run. The same
-`managed`/`initial`/`disabled` mode that governs per-user profile
+`managed`/`initial`/`seed`/`disabled` mode that governs per-user profile
 config applies here too — `initial` deploys only on newly created
-users, leaving subsequent manual changes intact. `browser_chromium_flags`
-(`~/.config/chromium-flags.conf`) follows the same per-user mode.
+users, leaving subsequent manual changes intact.
+
+`browser_chromium_flags` (`~/.config/chromium-flags.conf`) and the
+per-user `user.js` are whole-file deploys and additionally honour `seed`
+mode: the file is written only when absent (`force: false`) and never
+overwritten afterwards. Use `seed` to roll a new config out to an
+existing user once and then leave it under the user's control — unlike
+`initial`, which is gated on user creation and so never reaches existing
+users. `mimeapps.list` manages individual handler keys rather than a
+whole file, so it treats `seed` like `initial`.
 
 ### Firefox / LibreWolf preferences — locked vs. user-overridable
 
