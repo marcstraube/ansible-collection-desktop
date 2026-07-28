@@ -1,0 +1,7 @@
+{{ ansible_managed | comment }}
+#
+# Chromium launch switches, one per line. Read directly by the Arch
+# Chromium binary (downstream flags-file patch) from $XDG_CONFIG_HOME.
+{% for flag in browser_chromium_flags %}
+{{ flag }}
+{% endfor %}

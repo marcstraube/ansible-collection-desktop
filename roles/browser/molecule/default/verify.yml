@@ -123,6 +123,29 @@
           {{ (__browser_verify_chromium_policies_content.content
               | b64decode | from_json).ExtensionSettings }}
 
+    #
+    # Chromium Launch Switches (per-user chromium-flags.conf)
+    #
+
+    - name: Verify | Check chromium-flags.conf exists for test user
+      ansible.builtin.stat:
+        path: /home/browser_test_user/.config/chromium-flags.conf
+      register: __browser_verify_chromium_flags
+
+    - name: Verify | Read chromium-flags.conf content
+      ansible.builtin.slurp:
+        src: /home/browser_test_user/.config/chromium-flags.conf
+      register: __browser_verify_chromium_flags_content
+
+    - name: Verify | Assert chromium-flags.conf deployed with expected switch
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_chromium_flags.stat.exists
+          - __browser_verify_chromium_flags.stat.pw_name == 'browser_test_user'
+          - "'--enable-experimental-web-platform-features'
+            in (__browser_verify_chromium_flags_content.content | b64decode)"
+        fail_msg: 'chromium-flags.conf not deployed correctly for browser_test_user'
+
     - name: Verify | Read Firefox policies.json for Preferences check
       ansible.builtin.slurp:
         src: '{{ __browser_verify_policies_path | trim }}/policies.json'
@@ -245,11 +268,17 @@
         path: /home/browser_disabled_user/.config/mimeapps.list
       register: __browser_verify_disabled_mimeapps
 
+    - name: Verify | Check per-user-disabled user has no chromium-flags.conf
+      ansible.builtin.stat:
+        path: /home/browser_disabled_user/.config/chromium-flags.conf
+      register: __browser_verify_disabled_chromium_flags
+
     - name: Verify | Assert per-user-disabled user has no config
       ansible.builtin.assert:
         that:
           - not __browser_verify_disabled_profile.stat.exists
           - not __browser_verify_disabled_mimeapps.stat.exists
+          - not __browser_verify_disabled_chromium_flags.stat.exists
         fail_msg: 'browser config deployed for a per-user-disabled entry'
 
     #
@@ -269,12 +298,18 @@
         path: /home/browser_initial_new/.config/mimeapps.list
       register: __browser_verify_initialnew_mimeapps
 
+    - name: Verify | Check initial-new user chromium-flags.conf exists
+      ansible.builtin.stat:
+        path: /home/browser_initial_new/.config/chromium-flags.conf
+      register: __browser_verify_initialnew_chromium_flags
+
     - name: Verify | Assert initial-new user config is deployed
       ansible.builtin.assert:
         that:
           - __browser_verify_initialnew_userjs.stat.exists
           - __browser_verify_initialnew_userjs.stat.pw_name == 'browser_initial_new'
           - __browser_verify_initialnew_mimeapps.stat.exists
+          - __browser_verify_initialnew_chromium_flags.stat.exists
         fail_msg: 'browser config not deployed for newly-created initial-mode user'
 
     #
@@ -295,6 +330,11 @@
         path: /home/browser_initial_exist/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
       register: __browser_verify_initialexist_profile
 
+    - name: Verify | Check initial-exist user has no chromium-flags.conf
+      ansible.builtin.stat:
+        path: /home/browser_initial_exist/.config/chromium-flags.conf
+      register: __browser_verify_initialexist_chromium_flags
+
     - name: Verify | Assert initial-exist user config is unchanged
       ansible.builtin.assert:
         that:
@@ -302,6 +342,7 @@
             in (__browser_verify_initialexist_mimeapps.content | b64decode)"
           - "'firefox.desktop' not in (__browser_verify_initialexist_mimeapps.content | b64decode)"
           - not __browser_verify_initialexist_profile.stat.exists
+          - not __browser_verify_initialexist_chromium_flags.stat.exists
         fail_msg: 'pre-existing config was modified for existing initial-mode user'
 
     #

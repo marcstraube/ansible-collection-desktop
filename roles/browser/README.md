@@ -89,6 +89,8 @@ Chromium on Rocky Linux requires EPEL.
 | --------------------------------------------- | ----------- | --------------------------------- |
 | `browser_chromium_policies_enabled`           | `true`      | Deploy policies                   |
 | `browser_chromium_wayland_gestures_enabled`   | `true`      | Wayland gesture hook (Arch only)  |
+| `browser_chromium_flags_enabled`              | `false`     | Per-user chromium-flags.conf      |
+| `browser_chromium_flags`                      | `[]`        | Launch switches (one per line)    |
 | `browser_chromium_extensions`                 | `{...}`     | Extensions with install modes     |
 | `browser_chromium_extensions_optional`        | `{}`        | Optional extensions (merged)      |
 | `browser_chromium_policy_settings`            | `{...}`     | Additional policy settings        |
@@ -132,7 +134,8 @@ Set to an empty string to skip handler management. Other entries
 in `mimeapps.list` are preserved on each run. The same
 `managed`/`initial`/`disabled` mode that governs per-user profile
 config applies here too — `initial` deploys only on newly created
-users, leaving subsequent manual changes intact.
+users, leaving subsequent manual changes intact. `browser_chromium_flags`
+(`~/.config/chromium-flags.conf`) follows the same per-user mode.
 
 ### Firefox / LibreWolf preferences — locked vs. user-overridable
 
