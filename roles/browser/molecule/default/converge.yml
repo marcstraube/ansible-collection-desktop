@@ -41,6 +41,11 @@
       'cjpalhdlnbpafiamejdnhcphjbkeiagm':
         mode: 'force_installed'
 
+    # Exercise the optional-extension merge path
+    browser_chromium_extensions_optional:
+      'kglkahinilanaaknphakkkaigkildipe':
+        mode: 'force_installed'
+
   tasks:
     - name: Converge | Include browser role  # noqa: role-name[path]
       ansible.builtin.include_role:

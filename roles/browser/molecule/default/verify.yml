@@ -107,6 +107,22 @@
       register: __browser_verify_chromium_policies_json
       changed_when: false
 
+    - name: Verify | Read Chromium policies.json for extension merge check
+      ansible.builtin.slurp:
+        src: /etc/chromium/policies/managed/policies.json
+      register: __browser_verify_chromium_policies_content
+
+    - name: Verify | Assert optional extension merged into Chromium policies
+      ansible.builtin.assert:
+        that:
+          - "'cjpalhdlnbpafiamejdnhcphjbkeiagm' in __ext_settings"
+          - "'kglkahinilanaaknphakkkaigkildipe' in __ext_settings"
+        fail_msg: 'browser_chromium_extensions_optional not merged into ExtensionSettings'
+      vars:
+        __ext_settings: >-
+          {{ (__browser_verify_chromium_policies_content.content
+              | b64decode | from_json).ExtensionSettings }}
+
     - name: Verify | Read Firefox policies.json for Preferences check
       ansible.builtin.slurp:
         src: '{{ __browser_verify_policies_path | trim }}/policies.json'

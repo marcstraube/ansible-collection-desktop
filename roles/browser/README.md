@@ -90,6 +90,7 @@ Chromium on Rocky Linux requires EPEL.
 | `browser_chromium_policies_enabled`           | `true`      | Deploy policies                   |
 | `browser_chromium_wayland_gestures_enabled`   | `true`      | Wayland gesture hook (Arch only)  |
 | `browser_chromium_extensions`                 | `{...}`     | Extensions with install modes     |
+| `browser_chromium_extensions_optional`        | `{}`        | Optional extensions (merged)      |
 | `browser_chromium_policy_settings`            | `{...}`     | Additional policy settings        |
 
 ### Brave Options
@@ -98,6 +99,7 @@ Chromium on Rocky Linux requires EPEL.
 | ------------------------------------- | ----------- | --------------------------------- |
 | `browser_brave_policies_enabled`      | `true`      | Deploy policies                   |
 | `browser_brave_extensions`            | `{...}`     | Extensions (defaults to Chromium) |
+| `browser_brave_extensions_optional`   | `{}`        | Optional extensions (merged)      |
 | `browser_brave_homepage`              | `''`        | Homepage URL (empty = default)    |
 | `browser_brave_signin`                | `0`         | Sign-in: 0=off, 1=on, 2=required  |
 | `browser_brave_sync_disabled`         | `true`      | Disable Brave Sync                |
