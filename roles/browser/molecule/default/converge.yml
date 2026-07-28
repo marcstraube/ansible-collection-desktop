@@ -15,6 +15,11 @@
     browser_firefox_policies_enabled: true
     browser_chromium_policies_enabled: true
 
+    # Exercise the per-user chromium-flags.conf path
+    browser_chromium_flags_enabled: true
+    browser_chromium_flags:
+      - '--enable-experimental-web-platform-features'
+
     # Per-user paths now bootstrap profiles via filesystem writes,
     # no DISPLAY/D-Bus needed — keep enabled in container tests.
     browser_firefox_user_js_enabled: true
@@ -63,7 +68,14 @@
   vars:
     browser_enabled: true
     browser_firefox_enabled: true
-    browser_chromium_enabled: false
+    # Chromium policies stay off; the flags path is exercised under initial
+    # mode — deployed for the newly-created user, skipped for the existing
+    # one (same gating as user.js).
+    browser_chromium_enabled: true
+    browser_chromium_policies_enabled: false
+    browser_chromium_flags_enabled: true
+    browser_chromium_flags:
+      - '--enable-experimental-web-platform-features'
     browser_firefox_policies_enabled: false
     browser_firefox_user_js_enabled: true
     browser_firefox_preferences:

@@ -68,6 +68,19 @@ browser_chromium_policies_enabled: true
 # Wayland touchpad gesture support (pacman hook, Arch only)
 browser_chromium_wayland_gestures_enabled: true
 
+# Deploy per-user launch switches (~/.config/chromium-flags.conf)
+browser_chromium_flags_enabled: false
+
+# Launch switches written one per line to ~/.config/chromium-flags.conf.
+# Arch's Chromium binary reads this file directly (downstream patch), so
+# switches without a policy equivalent go here. Deployed per user via
+# browser_users (respects managed/initial/disabled).
+# Example:
+#   browser_chromium_flags:
+#     # Web Bluetooth (navigator.bluetooth) — not enabled by default on Linux
+#     - '--enable-experimental-web-platform-features'
+browser_chromium_flags: []
+
 #
 # Brave Options
 #

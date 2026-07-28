@@ -1,0 +1,30 @@
+---
+# Per-user Chromium launch switches. Arch's Chromium binary reads
+# ~/.config/chromium-flags.conf directly (downstream flags-file patch),
+# so switches without a policy equivalent (e.g. Web Bluetooth) are
+# deployed here instead of via policies.json.
+
+- name: Users Chromium | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ browser_user.username }}'
+
+- name: Users Chromium | Set user home fact
+  ansible.builtin.set_fact:
+    __browser_user_home: "{{ ansible_facts['getent_passwd'][browser_user.username][4] }}"
+
+- name: Users Chromium | Ensure config directory exists
+  ansible.builtin.file:
+    path: '{{ __browser_user_home }}/.config'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+
+- name: Users Chromium | Deploy chromium-flags.conf
+  ansible.builtin.template:
+    src: chromium-flags.conf.j2
+    dest: '{{ __browser_user_home }}/.config/chromium-flags.conf'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0644'
