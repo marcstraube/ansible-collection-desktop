@@ -197,6 +197,15 @@
       failed_when: _dev_uv_check.changed
       when: __development_python_uv_package | default('') | length > 0
 
+    - name: Verify | pytest — package installed
+      ansible.builtin.package:
+        name: '{{ __development_python_pytest_package }}'
+        state: present
+      check_mode: true
+      register: _dev_pytest_check
+      failed_when: _dev_pytest_check.changed
+      when: __development_python_pytest_package | default('') | length > 0
+
     - name: Verify | stylua — package installed
       ansible.builtin.package:
         name: '{{ __development_lua_stylua_package }}'

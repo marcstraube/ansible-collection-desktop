@@ -92,6 +92,8 @@ __development_shell_bats_package: 'bats'
 # Python tooling (ruff and uv are EL10-only, see vars/RedHat-9.yml)
 __development_python_ruff_package: 'ruff'
 __development_python_uv_package: 'uv'
+# pytest: CRB on EL10, AppStream on EL9 (CRB enabled by package_management)
+__development_python_pytest_package: 'python3-pytest'
 
 # Lua tooling (none packaged on EL)
 __development_lua_stylua_package: ''
