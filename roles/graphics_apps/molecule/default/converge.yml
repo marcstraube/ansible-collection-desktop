@@ -12,6 +12,7 @@
     graphics_apps_xnconvert_enabled: false
     graphics_apps_xnview_enabled: false
     graphics_apps_gimp_plugins: []
+    graphics_apps_inkscape_plugins: []
 
   tasks:
     - name: Converge | Include graphics_apps role  # noqa: role-name[path]

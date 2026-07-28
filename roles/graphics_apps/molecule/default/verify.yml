@@ -185,3 +185,45 @@
       when:
         - ansible_facts['os_family'] == 'RedHat'
         - graphics_apps_gimp_plugins | default([]) | length > 0
+
+    #
+    # Inkscape Plugins
+    #
+    # Skipped when graphics_apps_inkscape_plugins is empty (default).
+    # On Arch these are AUR packages (not built in molecule containers).
+
+    - name: Verify | Check Inkscape plugins installed (Arch)
+      ansible.builtin.command:
+        cmd: >-
+          pacman -Q {{ item }}
+      register: _gfx_inkscape_plugin_arch
+      changed_when: false
+      failed_when: _gfx_inkscape_plugin_arch.rc != 0
+      loop: "{{ graphics_apps_inkscape_plugins | default([]) }}"
+      when:
+        - ansible_facts['os_family'] == 'Archlinux'
+        - graphics_apps_inkscape_plugins | default([]) | length > 0
+
+    - name: Verify | Check Inkscape plugins installed (Debian)
+      ansible.builtin.command:
+        cmd: >-
+          dpkg -l {{ item }}
+      register: _gfx_inkscape_plugin_deb
+      changed_when: false
+      failed_when: _gfx_inkscape_plugin_deb.rc != 0
+      loop: "{{ graphics_apps_inkscape_plugins | default([]) }}"
+      when:
+        - ansible_facts['os_family'] == 'Debian'
+        - graphics_apps_inkscape_plugins | default([]) | length > 0
+
+    - name: Verify | Check Inkscape plugins installed (RedHat)
+      ansible.builtin.command:  # noqa: command-instead-of-module
+        cmd: >-
+          rpm -q {{ item }}
+      register: _gfx_inkscape_plugin_rpm
+      changed_when: false
+      failed_when: _gfx_inkscape_plugin_rpm.rc != 0
+      loop: "{{ graphics_apps_inkscape_plugins | default([]) }}"
+      when:
+        - ansible_facts['os_family'] == 'RedHat'
+        - graphics_apps_inkscape_plugins | default([]) | length > 0

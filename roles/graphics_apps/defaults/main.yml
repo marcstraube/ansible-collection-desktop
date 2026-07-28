@@ -26,6 +26,11 @@ graphics_apps_gimp_plugins: []
 # Enable Inkscape (vector graphics editor)
 graphics_apps_inkscape_enabled: true
 
+# Additional Inkscape extension packages to install.
+# On Arch these are installed from the AUR (e.g. inkscape-silhouette-git);
+# on Debian/EL they must be available as distribution packages.
+graphics_apps_inkscape_plugins: []
+
 #
 # Image Conversion/Viewing
 #
