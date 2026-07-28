@@ -368,3 +368,37 @@
           - not __browser_verify_globaldisabled_profile.stat.exists
           - not __browser_verify_globaldisabled_mimeapps.stat.exists
         fail_msg: 'browser config deployed despite global disabled mode'
+
+    #
+    # Seed Mode — Existing Users (browser_seed_new_file / _keep_file)
+    #
+    # browser_user_config_mode=seed on pre-existing users (NOT in
+    # __users_newly_created): initial would skip both. seed MUST create
+    # chromium-flags.conf where absent and MUST NOT overwrite an existing
+    # (user-edited) copy.
+    #
+
+    - name: Verify | Read seed-new-file user chromium-flags.conf
+      ansible.builtin.slurp:
+        src: /home/browser_seed_new_file/.config/chromium-flags.conf
+      register: __browser_verify_seed_new
+
+    - name: Verify | Assert seed created chromium-flags.conf for existing user
+      ansible.builtin.assert:
+        that:
+          - "'--enable-experimental-web-platform-features'
+            in (__browser_verify_seed_new.content | b64decode)"
+        fail_msg: 'seed did not create chromium-flags.conf for an existing user'
+
+    - name: Verify | Read seed-keep-file user chromium-flags.conf
+      ansible.builtin.slurp:
+        src: /home/browser_seed_keep_file/.config/chromium-flags.conf
+      register: __browser_verify_seed_keep
+
+    - name: Verify | Assert seed left the user-edited chromium-flags.conf intact
+      ansible.builtin.assert:
+        that:
+          - "'--user-edited-sentinel' in (__browser_verify_seed_keep.content | b64decode)"
+          - "'--enable-experimental-web-platform-features'
+            not in (__browser_verify_seed_keep.content | b64decode)"
+        fail_msg: 'seed overwrote a pre-existing user-edited chromium-flags.conf'

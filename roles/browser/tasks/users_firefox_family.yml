@@ -125,6 +125,8 @@
     label: 'Install.{{ item.option }}'
   when: __ff_install_hash | length > 0
 
+# seed mode deploys user.js only when absent (force: false), preserving a
+# copy the user has since edited; managed/initial reconcile it.
 - name: Users Profile | Deploy user.js
   ansible.builtin.template:
     src: user.js.j2
@@ -132,6 +134,7 @@
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
     mode: '0644'
+    force: "{{ (browser_user.mode | default(browser_user_config_mode)) != 'seed' }}"
   vars:
     __browser_template_prefs: '{{ __ff_preferences }}'
   when: __ff_preferences | length > 0

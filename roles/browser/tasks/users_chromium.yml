@@ -21,6 +21,9 @@
     group: '{{ browser_user.username }}'
     mode: '0700'
 
+# seed mode deploys the file only when absent (force: false) and never
+# overwrites a copy the user has since edited; managed/initial reconcile
+# it (force: true).
 - name: Users Chromium | Deploy chromium-flags.conf
   ansible.builtin.template:
     src: chromium-flags.conf.j2
@@ -28,3 +31,4 @@
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
     mode: '0644'
+    force: "{{ (browser_user.mode | default(browser_user_config_mode)) != 'seed' }}"
