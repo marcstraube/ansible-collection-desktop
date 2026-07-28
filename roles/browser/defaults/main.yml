@@ -147,6 +147,16 @@ browser_chromium_extensions:
   'oboonakemofpalcgghocfoadofidjkkk':
     mode: 'normal_installed'
 
+# Optional Chromium/Brave extensions (disabled by default), merged on top
+# of the baseline above. Use this for host-specific additions so the
+# shared baseline stays untouched.
+# Example:
+#   browser_chromium_extensions_optional:
+#     # Pixels Roll20 Integration
+#     'kglkahinilanaaknphakkkaigkildipe':
+#       mode: 'force_installed'
+browser_chromium_extensions_optional: {}
+
 #
 # Firefox Preferences (user.js — per-user, overridable in about:config)
 #
@@ -251,6 +261,7 @@ browser_librewolf_password_manager: false
 #
 
 browser_brave_extensions: '{{ browser_chromium_extensions }}'
+browser_brave_extensions_optional: '{{ browser_chromium_extensions_optional }}'
 browser_brave_homepage: ''
 browser_brave_signin: 0                   # 0 = disabled, 1 = enabled, 2 = required
 browser_brave_sync_disabled: true
