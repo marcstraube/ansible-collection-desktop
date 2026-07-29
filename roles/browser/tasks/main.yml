@@ -82,6 +82,21 @@
     - browser_brave_enabled | bool
     - browser_brave_policies_enabled | bool
 
+- name: Main | Include Chrome tasks
+  ansible.builtin.include_tasks:
+    file: chrome.yml
+    apply:
+      tags:
+        - browser
+        - browser:chrome
+  tags:
+    - browser
+    - browser:chrome
+  when:
+    - browser_enabled | bool
+    - browser_chrome_enabled | bool
+    - browser_chrome_policies_enabled | bool
+
 - name: Main | Include user profile tasks
   ansible.builtin.include_tasks:
     file: users.yml

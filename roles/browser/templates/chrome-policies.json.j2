@@ -1,0 +1,36 @@
+{
+  "_comment": "{{ ansible_managed }}",
+{% if browser_chrome_extensions | length > 0 or browser_chrome_extensions_optional | default({}) | length > 0 %}
+  "ExtensionSettings": {
+    "*": {
+      "blocked_install_message": "Extension installation is managed by system policy.",
+      "installation_mode": "{{ browser_extension_default_mode }}"
+    }{% if browser_chrome_extensions | length > 0 or browser_chrome_extensions_optional | default({}) | length > 0 %},{% endif %}
+
+{% for ext_id, ext_config in (browser_chrome_extensions | combine(browser_chrome_extensions_optional | default({}))) | dictsort %}
+    "{{ ext_id }}": {
+      "installation_mode": "{{ ext_config.mode | default('normal_installed') }}"{% if ext_config.url is defined %},
+      "update_url": "{{ ext_config.url }}"{% endif %}
+
+    }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+  },
+{% endif %}
+{% if browser_chrome_homepage | length > 0 %}
+  "HomepageLocation": "{{ browser_chrome_homepage }}",
+  "HomepageIsNewTabPage": false,
+{% endif %}
+{% if browser_chrome_search_provider is defined %}
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "{{ browser_chrome_search_provider.name | default('DuckDuckGo') }}",
+  "DefaultSearchProviderSearchURL": "{{ browser_chrome_search_provider.url | default('https://duckduckgo.com/?q={searchTerms}') }}",
+{% endif %}
+  "BrowserSignin": {{ browser_chrome_signin | default(0) }},
+  "SyncDisabled": {{ browser_chrome_sync_disabled | default(true) | lower }},
+  "MetricsReportingEnabled": {{ browser_chrome_metrics | default(false) | lower }},
+  "SafeBrowsingEnabled": {{ browser_chrome_safe_browsing | default(true) | lower }},
+  "PasswordManagerEnabled": {{ browser_chrome_password_manager | default(false) | lower }},
+  "AutofillAddressEnabled": {{ browser_chrome_autofill_address | default(false) | lower }},
+  "AutofillCreditCardEnabled": {{ browser_chrome_autofill_credit_card | default(false) | lower }}
+}

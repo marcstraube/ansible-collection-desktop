@@ -1,0 +1,7 @@
+{{ ansible_managed | comment }}
+#
+# Google Chrome launch switches, one per line. Sourced by the Arch
+# google-chrome AUR launcher from $XDG_CONFIG_HOME (like chromium-flags.conf).
+{% for flag in browser_chrome_flags %}
+{{ flag }}
+{% endfor %}

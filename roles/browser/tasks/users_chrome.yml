@@ -1,0 +1,34 @@
+---
+# Per-user Google Chrome launch switches. Arch's google-chrome AUR launcher
+# sources ~/.config/chrome-flags.conf (identical to chromium-flags.conf), so
+# switches without a policy equivalent (e.g. Web Bluetooth) are deployed here
+# instead of via policies.json.
+
+- name: Users Chrome | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ browser_user.username }}'
+
+- name: Users Chrome | Set user home fact
+  ansible.builtin.set_fact:
+    __browser_user_home: "{{ ansible_facts['getent_passwd'][browser_user.username][4] }}"
+
+- name: Users Chrome | Ensure config directory exists
+  ansible.builtin.file:
+    path: '{{ __browser_user_home }}/.config'
+    state: directory
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0700'
+
+# seed mode deploys the file only when absent (force: false) and never
+# overwrites a copy the user has since edited; managed/initial reconcile
+# it (force: true).
+- name: Users Chrome | Deploy chrome-flags.conf
+  ansible.builtin.template:
+    src: chrome-flags.conf.j2
+    dest: '{{ __browser_user_home }}/.config/chrome-flags.conf'
+    owner: '{{ browser_user.username }}'
+    group: '{{ browser_user.username }}'
+    mode: '0644'
+    force: "{{ (browser_user.mode | default(browser_user_config_mode)) != 'seed' }}"

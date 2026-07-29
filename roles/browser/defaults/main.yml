@@ -22,6 +22,9 @@ browser_chromium_enabled: true
 # Install Brave
 browser_brave_enabled: false
 
+# Install Google Chrome
+browser_chrome_enabled: false
+
 # Install Tor Browser
 browser_tor_enabled: false
 
@@ -87,6 +90,26 @@ browser_chromium_flags: []
 
 # Deploy extension policies
 browser_brave_policies_enabled: true
+
+#
+# Chrome Options
+#
+
+# Deploy extension policies
+browser_chrome_policies_enabled: true
+
+# Deploy per-user launch switches (~/.config/chrome-flags.conf)
+# Confirmed only for Arch's google-chrome AUR launcher, which sources this
+# file like chromium-flags.conf. Google's own launcher on Debian/EL ignores
+# it. Deployed per user via browser_users (respects managed/initial/seed).
+browser_chrome_flags_enabled: false
+
+# Launch switches written one per line to ~/.config/chrome-flags.conf.
+# See browser_chromium_flags for the equivalent Chromium mechanism.
+# Example:
+#   browser_chrome_flags:
+#     - '--enable-experimental-web-platform-features'
+browser_chrome_flags: []
 
 #
 # Extensions - Firefox/LibreWolf
@@ -283,6 +306,21 @@ browser_brave_safe_browsing: true
 browser_brave_password_manager: false
 browser_brave_autofill_address: false
 browser_brave_autofill_credit_card: false
+
+#
+# Chrome Additional Settings
+#
+
+browser_chrome_extensions: '{{ browser_chromium_extensions }}'
+browser_chrome_extensions_optional: '{{ browser_chromium_extensions_optional }}'
+browser_chrome_homepage: ''
+browser_chrome_signin: 0                  # 0 = disabled, 1 = enabled, 2 = required
+browser_chrome_sync_disabled: true
+browser_chrome_metrics: false
+browser_chrome_safe_browsing: true
+browser_chrome_password_manager: false
+browser_chrome_autofill_address: false
+browser_chrome_autofill_credit_card: false
 
 #
 # User Configuration
