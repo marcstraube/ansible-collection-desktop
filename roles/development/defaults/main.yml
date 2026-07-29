@@ -172,6 +172,9 @@ development_python_ruff_enabled: false
 # Enable uv Python package installer and resolver
 development_python_uv_enabled: false
 
+# Enable pytest Python test framework
+development_python_pytest_enabled: false
+
 # Lua
 
 # Enable stylua Lua formatter

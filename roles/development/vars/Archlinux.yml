@@ -70,6 +70,7 @@ __development_shell_bats_package: 'bats'
 # Python tooling
 __development_python_ruff_package: 'ruff'
 __development_python_uv_package: 'uv'
+__development_python_pytest_package: 'python-pytest'
 
 # Lua tooling
 __development_lua_stylua_package: 'stylua'

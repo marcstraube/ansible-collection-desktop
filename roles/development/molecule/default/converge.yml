@@ -46,6 +46,7 @@
     development_shell_bats_enabled: true
     development_python_ruff_enabled: true
     development_python_uv_enabled: true
+    development_python_pytest_enabled: true
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true
@@ -107,6 +108,7 @@
     development_shell_bats_enabled: true
     development_python_ruff_enabled: true
     development_python_uv_enabled: true
+    development_python_pytest_enabled: true
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true
@@ -183,6 +185,7 @@
     development_shell_bats_enabled: true
     development_python_ruff_enabled: true
     development_python_uv_enabled: true
+    development_python_pytest_enabled: true
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true

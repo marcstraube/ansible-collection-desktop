@@ -312,10 +312,11 @@ dash, ksh, mksh); `bats-core` is bash-specific.
 
 #### Python Tooling
 
-| Variable                          | Default | Description                                     |
-|-----------------------------------|---------|-------------------------------------------------|
-| `development_python_ruff_enabled` | `false` | Enable ruff Python linter and formatter         |
-| `development_python_uv_enabled`   | `false` | Enable uv Python package installer and resolver |
+| Variable                            | Default | Description                                     |
+|-------------------------------------|---------|-------------------------------------------------|
+| `development_python_ruff_enabled`   | `false` | Enable ruff Python linter and formatter         |
+| `development_python_uv_enabled`     | `false` | Enable uv Python package installer and resolver |
+| `development_python_pytest_enabled` | `false` | Enable pytest Python test framework             |
 
 #### Lua
 
@@ -344,6 +345,7 @@ toggle after install does not uninstall the package.
 | bats         | yes  | yes           | yes  | yes   |
 | ruff         | yes  | no            | no   | yes   |
 | uv           | yes  | no            | no   | yes   |
+| pytest       | yes  | yes           | yes  | yes   |
 | stylua       | yes  | no            | no   | no    |
 | luacheck     | yes  | yes           | no   | no    |
 | busted       | yes  | yes           | no   | no    |
@@ -457,6 +459,7 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system
 - [ruff](https://github.com/astral-sh/ruff) — Python linter and formatter
 - [uv](https://github.com/astral-sh/uv) — Python package installer and resolver
+- [pytest](https://github.com/pytest-dev/pytest) — Python test framework
 - [stylua](https://github.com/JohnnyMorganz/StyLua) — Lua formatter
 - [luacheck](https://github.com/mpeterv/luacheck) — Lua linter
 - [busted](https://github.com/lunarmodules/busted) — Lua test framework
