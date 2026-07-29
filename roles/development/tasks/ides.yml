@@ -136,7 +136,9 @@
 - name: IDEs | Generate Arduino IDE desktop override (Arch)
   ansible.builtin.command: '/usr/local/bin/arduino-ide-desktop-override'
   register: __development_arduino_override
-  changed_when: "'changed' in __development_arduino_override.stdout"
+  # The script prints 'changed: …' on a rewrite and 'unchanged' on a no-op;
+  # match the colon so the 'changed' substring in 'unchanged' is not caught.
+  changed_when: "'changed:' in __development_arduino_override.stdout"
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - development_arduino_ide_enabled | bool
