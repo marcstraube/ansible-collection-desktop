@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.3.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.2.0...v2.3.0) (2026-07-29)
+
+
+### Features
+
+* **browser:** add Google Chrome support ([#221](https://github.com/marcstraube/ansible-collection-desktop/issues/221)) ([92ef540](https://github.com/marcstraube/ansible-collection-desktop/commit/92ef540a22b8450e0f566b4c554ce8d888764316))
+* **browser:** add optional-extension merge for Chromium and Brave ([#210](https://github.com/marcstraube/ansible-collection-desktop/issues/210)) ([c87437d](https://github.com/marcstraube/ansible-collection-desktop/commit/c87437d8ea4316e008fdf350fedbf143a9cf944b)), closes [#206](https://github.com/marcstraube/ansible-collection-desktop/issues/206)
+* **browser:** add per-user Chromium launch switches (chromium-flags.conf) ([#212](https://github.com/marcstraube/ansible-collection-desktop/issues/212)) ([39ae8d3](https://github.com/marcstraube/ansible-collection-desktop/commit/39ae8d33ce221fd3bd12de881057711af8924ee4)), closes [#207](https://github.com/marcstraube/ansible-collection-desktop/issues/207)
+* **browser:** add seed per-user config mode ([#213](https://github.com/marcstraube/ansible-collection-desktop/issues/213)) ([1c7b724](https://github.com/marcstraube/ansible-collection-desktop/commit/1c7b724445dc74f1313bdce51117ffd670ab0c89)), closes [#208](https://github.com/marcstraube/ansible-collection-desktop/issues/208)
+* **development:** add pytest toggle ([#218](https://github.com/marcstraube/ansible-collection-desktop/issues/218)) ([f7b65f9](https://github.com/marcstraube/ansible-collection-desktop/commit/f7b65f964e5a9fc1685437cf4e02f657ddcce5ba)), closes [#214](https://github.com/marcstraube/ansible-collection-desktop/issues/214)
+* **graphics_apps:** add Inkscape extension install list ([#215](https://github.com/marcstraube/ansible-collection-desktop/issues/215)) ([b98afbb](https://github.com/marcstraube/ansible-collection-desktop/commit/b98afbb5c409853f5a162b58e27e7ed87e6f6eea)), closes [#209](https://github.com/marcstraube/ansible-collection-desktop/issues/209)
+
+
+### Bug Fixes
+
+* **development:** make Arduino IDE override task idempotent ([#223](https://github.com/marcstraube/ansible-collection-desktop/issues/223)) ([f9d31ae](https://github.com/marcstraube/ansible-collection-desktop/commit/f9d31aecfe65670d5e3c0588b2d899348c6bf166))
+* **graphics_apps:** correct EL 10 package availability ([#217](https://github.com/marcstraube/ansible-collection-desktop/issues/217)) ([46eee1d](https://github.com/marcstraube/ansible-collection-desktop/commit/46eee1d55f03293a2bd4c2c5622fd04d0767faaf)), closes [#216](https://github.com/marcstraube/ansible-collection-desktop/issues/216)
+
 ## [2.2.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.1.0...v2.2.0) (2026-07-23)
 
 
