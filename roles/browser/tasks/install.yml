@@ -84,6 +84,58 @@
     - browser_brave_enabled | bool
 
 #
+# Google Chrome (AUR on Arch, Google's own vendor package on Debian/EL).
+# On Debian/EL the google-chrome package's post-install script installs and
+# owns Google's apt/yum repository and signing key, so Chrome updates through
+# the normal system upgrade path. Installing the vendor package directly
+# avoids a second, conflicting Ansible-managed repository entry: Google's
+# post-install script recreates its own repo file (same name) on every
+# install, which would break idempotency.
+#
+
+- name: Install | Google Chrome from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __browser_aur_packages.chrome }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_chrome_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Install | Google Chrome vendor package (Debian)
+  ansible.builtin.apt:
+    deb: '{{ __browser_chrome_deb_url }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - browser_chrome_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Install | Import Google Chrome signing key (RedHat)
+  ansible.builtin.rpm_key:
+    key: '{{ __browser_chrome_gpg_url }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - browser_chrome_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Install | Google Chrome vendor package (RedHat)
+  ansible.builtin.dnf:
+    name: '{{ __browser_chrome_rpm_url }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - browser_chrome_enabled | bool
+  retries: 3
+  delay: 5
+
+#
 # Tor Browser
 #
 

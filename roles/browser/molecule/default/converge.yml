@@ -15,6 +15,13 @@
     browser_firefox_policies_enabled: true
     browser_chromium_policies_enabled: true
 
+    # Chrome: Google's vendor package (.deb/.rpm) install exercised on
+    # Debian/EL; the Arch AUR build is skipped in containers (like
+    # Brave/LibreWolf). Policies and the optional-extension merge are
+    # verified wherever Chrome is installed.
+    browser_chrome_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+    browser_chrome_policies_enabled: true
+
     # Exercise the per-user chromium-flags.conf path
     browser_chromium_flags_enabled: true
     browser_chromium_flags:

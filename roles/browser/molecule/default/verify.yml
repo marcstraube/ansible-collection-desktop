@@ -124,6 +124,59 @@
               | b64decode | from_json).ExtensionSettings }}
 
     #
+    # Chrome Verification (Debian/EL only — Arch AUR build skipped)
+    #
+
+    - name: Verify | Google Chrome checks
+      when: ansible_facts['os_family'] != 'Archlinux'
+      block:
+        - name: Verify | Check Google Chrome package installed
+          ansible.builtin.package:
+            name: google-chrome-stable
+            state: present
+          check_mode: true
+          register: __browser_verify_chrome
+
+        - name: Verify | Assert Google Chrome installed
+          ansible.builtin.assert:
+            that:
+              - not __browser_verify_chrome.changed
+            fail_msg: 'Google Chrome is not installed'
+
+        - name: Verify | Check Chrome policies.json exists
+          ansible.builtin.stat:
+            path: /etc/opt/chrome/policies/managed/policies.json
+          register: __browser_verify_chrome_policies
+
+        - name: Verify | Assert Chrome policies.json exists
+          ansible.builtin.assert:
+            that:
+              - __browser_verify_chrome_policies.stat.exists
+            fail_msg: 'Chrome policies.json not found'
+
+        - name: Verify | Validate Chrome policies.json is valid JSON
+          ansible.builtin.command:
+            cmd: 'python3 -c "import json; json.load(open(''/etc/opt/chrome/policies/managed/policies.json''))"'
+          register: __browser_verify_chrome_policies_json
+          changed_when: false
+
+        - name: Verify | Read Chrome policies.json for extension merge check
+          ansible.builtin.slurp:
+            src: /etc/opt/chrome/policies/managed/policies.json
+          register: __browser_verify_chrome_policies_content
+
+        - name: Verify | Assert optional extension merged into Chrome policies
+          ansible.builtin.assert:
+            that:
+              - "'cjpalhdlnbpafiamejdnhcphjbkeiagm' in __ext_settings"
+              - "'kglkahinilanaaknphakkkaigkildipe' in __ext_settings"
+            fail_msg: 'browser_chrome_extensions_optional not merged into ExtensionSettings'
+          vars:
+            __ext_settings: >-
+              {{ (__browser_verify_chrome_policies_content.content
+                  | b64decode | from_json).ExtensionSettings }}
+
+    #
     # Chromium Launch Switches (per-user chromium-flags.conf)
     #
 

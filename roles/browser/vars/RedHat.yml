@@ -5,11 +5,19 @@ __browser_firefox_i18n_package: 'firefox-langpack-{{ browser_firefox_i18n }}'
 __browser_chromium_package: 'chromium'
 __browser_tor_package: ''                 # Not available on Rocky
 
+# Google Chrome vendor package (EL). Installing Google's own .rpm lets its
+# post-install script configure and own Google's yum repository, so Chrome
+# updates via the normal dnf upgrade path. The signing key is imported
+# separately (rpm_key) so the package signature is verified on install.
+__browser_chrome_rpm_url: 'https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm'
+__browser_chrome_gpg_url: 'https://dl.google.com/linux/linux_signing_key.pub'
+
 # Policy paths
 __browser_firefox_policies_path: '/usr/lib64/firefox/distribution'
 __browser_librewolf_policies_path: ''
 __browser_chromium_policies_path: '/etc/chromium/policies'
 __browser_brave_policies_path: ''
+__browser_chrome_policies_path: '/etc/opt/chrome/policies'
 
 # Profile detection: pattern to discover any existing profile
 # (random-prefixed by Firefox itself).

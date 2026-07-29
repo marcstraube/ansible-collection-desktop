@@ -8,6 +8,7 @@ __browser_chromium_package: 'chromium'
 __browser_aur_packages:
   librewolf: 'librewolf-bin'
   brave: 'brave-bin'
+  chrome: 'google-chrome'
   tor: 'tor-browser'
   zen: 'zen-browser-bin'
 
@@ -16,6 +17,7 @@ __browser_firefox_policies_path: '/usr/lib/firefox/distribution'
 __browser_librewolf_policies_path: '/usr/lib/librewolf/distribution'
 __browser_chromium_policies_path: '/etc/chromium/policies'
 __browser_brave_policies_path: '/etc/brave/policies'
+__browser_chrome_policies_path: '/etc/opt/chrome/policies'
 
 # Profile detection: pattern to discover any existing profile
 # (random-prefixed by Firefox itself, e.g. xyz123.default-release).

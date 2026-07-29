@@ -89,6 +89,30 @@
       or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
           and browser_user.username in (__users_newly_created | default([])))
 
+- name: Users | Deploy Chrome launch switches
+  ansible.builtin.include_tasks:
+    file: users_chrome.yml
+    apply:
+      tags:
+        - browser
+        - browser:configure
+  tags:
+    - browser
+    - browser:configure
+  loop: '{{ browser_users }}'
+  loop_control:
+    loop_var: browser_user
+    label: '{{ browser_user.username }}'
+  when:
+    - browser_chrome_enabled | bool
+    - browser_chrome_flags_enabled | bool
+    - browser_chrome_flags | length > 0
+    - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
+    - >-
+      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
+      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
+          and browser_user.username in (__users_newly_created | default([])))
+
 - name: Users | Include default browser handler config
   ansible.builtin.include_tasks:
     file: users_default_handler.yml

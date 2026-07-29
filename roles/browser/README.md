@@ -6,7 +6,8 @@ Install and configure web browsers with enterprise policies and hardening.
 
 Installs and configures web browsers with system-wide enterprise policies for
 extension management, privacy hardening, and telemetry control. Supports
-Firefox, LibreWolf, Chromium, Brave, Tor Browser, and Zen Browser.
+Firefox, LibreWolf, Chromium, Brave, Google Chrome, Tor Browser, and Zen
+Browser.
 
 Browser extensions are managed via policies (force-installed, user-installable,
 or blocked). Firefox/LibreWolf system-wide locked preferences go through the
@@ -18,6 +19,15 @@ LibreWolf, Brave, Tor Browser, and Zen Browser are installed from AUR on
 Arch Linux. Tor Browser is available via `torbrowser-launcher` on Debian.
 Chromium on Rocky Linux requires EPEL.
 
+Google Chrome is available on every platform: from AUR (`google-chrome`) on
+Arch Linux, and from Google's own vendor package on Debian/EL. On Debian/EL
+the vendor package's post-install script installs and owns Google's apt/yum
+repository and signing key, so Chrome updates through the normal system
+upgrade path (the role installs the package directly rather than adding a
+second, conflicting repository entry). Chrome is opt-in
+(`browser_chrome_enabled: false`) and shares the Chromium extension and
+policy mechanism.
+
 ## Requirements
 
 - ansible-core >= 2.17
@@ -28,12 +38,12 @@ Chromium on Rocky Linux requires EPEL.
 
 ## Supported Platforms
 
-| Platform       | Firefox | Chromium     | LibreWolf | Brave | Tor    | Zen  |
-| -------------- | ------- | ------------ | --------- | ----- | ------ | ---- |
-| Arch Linux     | yes     | yes          | AUR       | AUR   | AUR    | AUR  |
-| Debian Trixie  | ESR     | yes          | no        | no    | yes    | no   |
-| EL 9           | yes     | EPEL         | no        | no    | no     | no   |
-| EL 10          | yes     | EPEL         | no        | no    | no     | no   |
+| Platform       | Firefox | LibreWolf | Tor | Zen | Chromium | Brave | Chrome |
+| -------------- | ------- | --------- | --- | --- | -------- | ----- | ------ |
+| Arch Linux     | yes     | AUR       | AUR | AUR | yes      | AUR   | AUR    |
+| Debian Trixie  | ESR     | no        | yes | no  | yes      | no    | repo   |
+| EL 9           | yes     | no        | no  | no  | EPEL     | no    | repo   |
+| EL 10          | yes     | no        | no  | no  | EPEL     | no    | repo   |
 
 ## Role Variables
 
@@ -48,11 +58,12 @@ Chromium on Rocky Linux requires EPEL.
 | Variable                     | Default     | Description                   |
 | ---------------------------- | ----------- | ----------------------------- |
 | `browser_firefox_enabled`    | `true`      | Install Firefox               |
-| `browser_chromium_enabled`   | `true`      | Install Chromium              |
 | `browser_librewolf_enabled`  | `false`     | Install LibreWolf (Arch only) |
-| `browser_brave_enabled`      | `false`     | Install Brave (Arch only)     |
 | `browser_tor_enabled`        | `false`     | Install Tor Browser           |
 | `browser_zen_enabled`        | `false`     | Install Zen Browser (Arch)    |
+| `browser_chromium_enabled`   | `true`      | Install Chromium              |
+| `browser_brave_enabled`      | `false`     | Install Brave (Arch only)     |
+| `browser_chrome_enabled`     | `false`     | Install Google Chrome         |
 | `browser_default`            | `'firefox'` | Default http/https handler    |
 
 ### Firefox Options
@@ -110,6 +121,29 @@ Chromium on Rocky Linux requires EPEL.
 | `browser_brave_password_manager`      | `false`     | Built-in password manager         |
 | `browser_brave_autofill_address`      | `false`     | Autofill address forms            |
 | `browser_brave_autofill_credit_card`  | `false`     | Autofill credit card forms        |
+
+### Chrome Options
+
+| Variable                              | Default     | Description                       |
+| ------------------------------------- | ----------- | --------------------------------- |
+| `browser_chrome_policies_enabled`     | `true`      | Deploy policies                   |
+| `browser_chrome_flags_enabled`        | `false`     | Per-user chrome-flags.conf (Arch) |
+| `browser_chrome_flags`                | `[]`        | Launch switches (one per line)    |
+| `browser_chrome_extensions`           | `{...}`     | Extensions (defaults to Chromium) |
+| `browser_chrome_extensions_optional`  | `{}`        | Optional extensions (merged)      |
+| `browser_chrome_homepage`             | `''`        | Homepage URL (empty = default)    |
+| `browser_chrome_signin`               | `0`         | Sign-in: 0=off, 1=on, 2=required  |
+| `browser_chrome_sync_disabled`        | `true`      | Disable Chrome Sync               |
+| `browser_chrome_metrics`              | `false`     | Metrics reporting                 |
+| `browser_chrome_safe_browsing`        | `true`      | Safe Browsing                     |
+| `browser_chrome_password_manager`     | `false`     | Built-in password manager         |
+| `browser_chrome_autofill_address`     | `false`     | Autofill address forms            |
+| `browser_chrome_autofill_credit_card` | `false`     | Autofill credit card forms        |
+
+Google Chrome uses the Chromium extension and policy mechanism. The launch
+switches in `browser_chrome_flags` are only read by Arch's `google-chrome`
+AUR launcher (`~/.config/chrome-flags.conf`); Google's own launcher on
+Debian/EL ignores them.
 
 ### Extension Control
 
@@ -206,9 +240,10 @@ the random-prefix profile the browser creates on first launch.
 | `browser`            | All browser tasks           |
 | `browser:install`    | Package installation        |
 | `browser:firefox`    | Firefox policy deployment   |
-| `browser:chromium`   | Chromium policy deployment  |
 | `browser:librewolf`  | LibreWolf policy deployment |
+| `browser:chromium`   | Chromium policy deployment  |
 | `browser:brave`      | Brave policy deployment     |
+| `browser:chrome`     | Chrome policy deployment    |
 | `browser:configure`  | Per-user profile config     |
 | `browser:default`    | Default browser setting     |
 
@@ -242,13 +277,16 @@ molecule test
   Reference for `policies.json` keys deployed by this role
 - [arkenfox/user.js](https://github.com/arkenfox/user.js) —
   Hardened Firefox `user.js` template the role's defaults derive from
-- [Chromium](https://www.chromium.org/) — Open-source browser project
-- [Chromium Enterprise Policy List](https://chromeenterprise.google/policies/) —
-  Reference for Chromium/Brave policy keys
 - [LibreWolf](https://librewolf.net/) — Privacy-focused Firefox fork
-- [Brave](https://brave.com/) — Privacy-focused Chromium fork
 - [Tor Browser](https://www.torproject.org/) — Anonymity-focused Firefox fork
 - [Zen Browser](https://zen-browser.app/) — Productivity-focused Firefox fork
+- [Chromium](https://www.chromium.org/) — Open-source browser project
+- [Chromium Enterprise Policy List](https://chromeenterprise.google/policies/) —
+  Reference for Chromium/Brave/Chrome policy keys
+- [Brave](https://brave.com/) — Privacy-focused Chromium fork
+- [Google Chrome](https://www.google.com/chrome/) — Chromium-based browser
+- [Linux Software Repositories](https://www.google.com/linuxrepositories/) —
+  Google's apt/yum repository the vendor package configures for updates
 
 ## License
 

@@ -1,0 +1,21 @@
+---
+- name: Chrome | Ensure policies directories exist
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - '{{ __browser_chrome_policies_path }}/managed'
+    - '{{ __browser_chrome_policies_path }}/recommended'
+  when: __browser_chrome_policies_path | length > 0
+
+- name: Chrome | Deploy managed policies
+  ansible.builtin.template:
+    src: chrome-policies.json.j2
+    dest: '{{ __browser_chrome_policies_path }}/managed/policies.json'
+    owner: root
+    group: root
+    mode: '0644'
+  when: __browser_chrome_policies_path | length > 0
