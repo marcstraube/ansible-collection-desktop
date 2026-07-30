@@ -14,6 +14,8 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+## v2.3.0 - 2026-07-29
+
 ## v2.2.0 - 2026-07-23
 
 ## v2.1.0 - 2026-07-08
