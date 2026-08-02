@@ -15,7 +15,7 @@
       paths:
         - 'vars'
   tags:
-    - desktop-environment
+    - always
 
 - name: Main | Validate LXQt variant
   ansible.builtin.assert:
@@ -28,7 +28,7 @@
     - desktop_environment_enabled | bool
     - "'lxqt' in desktop_environment_list"
   tags:
-    - desktop-environment
+    - always
 
 - name: Main | Derive desktop users from users_list (exclude root and system users)
   ansible.builtin.set_fact:
@@ -47,7 +47,7 @@
     - users_list is defined
     - users_list | length > 0
   tags:
-    - desktop-environment
+    - always
 
 - name: Main | Check if any Wayland DE selected
   ansible.builtin.set_fact:
@@ -55,7 +55,7 @@
       {{ desktop_environment_list | intersect(__desktop_environment_wayland_des) | length > 0 }}
   when: desktop_environment_enabled | bool
   tags:
-    - desktop-environment
+    - always
 
 - name: Main | Build wayland_utils config for Hyprland
   ansible.builtin.set_fact:

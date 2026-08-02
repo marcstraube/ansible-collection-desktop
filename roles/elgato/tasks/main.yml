@@ -16,7 +16,7 @@
         - 'vars'
       skip: true
   tags:
-    - elgato
+    - always
 
 - name: Main | Import install tasks
   ansible.builtin.import_tasks: install.yml

@@ -10,6 +10,8 @@
         - '{{ ansible_facts["os_family"] }}.yml'
       paths:
         - 'vars'
+  tags:
+    - always
 
 - name: Main | Import install tasks
   ansible.builtin.import_tasks:

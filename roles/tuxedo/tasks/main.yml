@@ -16,7 +16,7 @@
         - 'vars'
       skip: true
   tags:
-    - tuxedo
+    - always
 
 - name: Main | Import validation tasks
   ansible.builtin.import_tasks: validate.yml

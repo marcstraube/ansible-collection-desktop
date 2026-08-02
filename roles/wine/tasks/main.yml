@@ -12,7 +12,7 @@
         - 'vars'
       skip: true
   tags:
-    - wine
+    - always
 
 - name: Main | Warn about unsupported EL version
   ansible.builtin.debug:

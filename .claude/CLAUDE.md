@@ -74,6 +74,31 @@ All `include_tasks` in roles use `apply: tags:` for proper `--tags` filtering:
     - mytag
 ```
 
+#### Sub-tags must be self-contained
+
+A role exposes sub-tags (`<role>:<phase>`, e.g. `browser:configure`) so a single
+stage can be run in isolation. For that to work, two rules apply:
+
+1. **Entry playbooks import roles statically.** `playbooks/tasks/desktop_workstation.yml`
+   uses `import_role` (not `include_role`) for every role. A dynamic `include_role`
+   hides the role's inner sub-tags behind the include statement, so
+   `--tags browser:configure` would skip the whole role. Static `import_role`
+   exposes inner tags to `--tags` and `--list-tags`.
+
+2. **Bootstrap tasks are tagged `always`.** Any task a sub-tag path depends on —
+   OS-var loaders (`include_vars`), capability detection, derived-fact `set_fact`s —
+   must carry `tags: [always]`, not the bare role tag. Otherwise an isolated
+   sub-tag run skips the loader and fails on undefined `__<role>_*` vars.
+   Feature work keeps `role` + sub-tag; only genuine setup is `always`.
+
+```yaml
+- name: Main | Load OS-specific variables
+  ansible.builtin.include_vars: '{{ item }}'
+  with_first_found: ...
+  tags:
+    - always        # bootstrap — needed by every sub-tag path
+```
+
 ## Security
 
 - Vault files (`vault.yml`) are never accessed — only `vault.yml.example` templates

@@ -15,7 +15,7 @@
       paths:
         - 'vars'
   tags:
-    - ai
+    - always
 
 - name: Main | Include CLI tools
   ansible.builtin.include_tasks:
