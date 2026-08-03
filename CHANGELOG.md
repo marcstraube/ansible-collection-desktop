@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.4.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.3.0...v2.4.0) (2026-08-03)
+
+
+### Features
+
+* make role sub-tags selectable from the entry playbook ([#228](https://github.com/marcstraube/ansible-collection-desktop/issues/228)) ([4bb138f](https://github.com/marcstraube/ansible-collection-desktop/commit/4bb138fabb86670d0fdc3792a0af6e2213e62339)), closes [#227](https://github.com/marcstraube/ansible-collection-desktop/issues/227)
+
+
+### Bug Fixes
+
+* emit update_url for Chrome and Brave force-installed extensions ([#231](https://github.com/marcstraube/ansible-collection-desktop/issues/231)) ([8c293e9](https://github.com/marcstraube/ansible-collection-desktop/commit/8c293e94f81ec49b68eb148bc8c137e7a9c17203)), closes [#230](https://github.com/marcstraube/ansible-collection-desktop/issues/230)
+
 ## [2.3.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.2.0...v2.3.0) (2026-07-29)
 
 
