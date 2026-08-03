@@ -15,7 +15,7 @@
       paths:
         - 'vars'
   tags:
-    - pipewire
+    - always
 
 - name: Main | Import cleanup tasks
   ansible.builtin.import_tasks: cleanup.yml

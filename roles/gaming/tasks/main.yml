@@ -11,7 +11,7 @@
       paths:
         - 'vars'
   tags:
-    - gaming
+    - always
 
 - name: Main | Validate gaming_playback_variant
   ansible.builtin.assert:
@@ -24,7 +24,7 @@
     - gaming_enabled | bool
     - gaming_playback_enabled | bool
   tags:
-    - gaming
+    - always
 
 - name: Main | Import install tasks
   ansible.builtin.import_tasks: install.yml

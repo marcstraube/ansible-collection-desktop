@@ -23,7 +23,7 @@
     - users_list is defined
     - users_list | length > 0
   tags:
-    - development
+    - always
 
 - name: Main | Load OS-specific variables
   ansible.builtin.include_vars: '{{ item }}'
@@ -37,7 +37,7 @@
       paths:
         - 'vars'
   tags:
-    - development
+    - always
 
 - name: Main | Import version control tasks
   ansible.builtin.import_tasks: git.yml
