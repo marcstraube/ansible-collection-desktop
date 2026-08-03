@@ -9,8 +9,8 @@
 
 {% for ext_id, ext_config in (browser_chrome_extensions | combine(browser_chrome_extensions_optional | default({}))) | dictsort %}
     "{{ ext_id }}": {
-      "installation_mode": "{{ ext_config.mode | default('normal_installed') }}"{% if ext_config.url is defined %},
-      "update_url": "{{ ext_config.url }}"{% endif %}
+      "installation_mode": "{{ ext_config.mode | default('normal_installed') }}",
+      "update_url": "{{ ext_config.update_url | default('https://clients2.google.com/service/update2/crx') }}"
 
     }{% if not loop.last %},{% endif %}
 
