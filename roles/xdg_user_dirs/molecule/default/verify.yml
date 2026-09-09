@@ -122,9 +122,9 @@
         fail_msg: 'user-dirs.dirs deployed for a per-user-disabled entry'
 
     #
-    # Initial Mode — Newly Created User (xdg_initial_new)
+    # Initial Mode — User Without Config (xdg_initial_new)
     #
-    # xdg_user_dirs_user_config_mode=initial + user IN __users_newly_created
+    # xdg_user_dirs_user_config_mode=initial + user-dirs.dirs absent
     # → role MUST deploy the config (dirs file + freeze file).
     #
 
@@ -138,7 +138,7 @@
         that:
           - __xdg_initialnew_dirs.stat.exists
           - __xdg_initialnew_dirs.stat.pw_name == 'xdg_initial_new'
-        fail_msg: 'user-dirs.dirs not deployed for newly-created initial-mode user'
+        fail_msg: 'user-dirs.dirs not deployed for initial-mode user without config'
 
     - name: Verify | Check initial-new user freeze file exists
       ansible.builtin.stat:
@@ -149,12 +149,12 @@
       ansible.builtin.assert:
         that:
           - __xdg_initialnew_conf.stat.exists
-        fail_msg: 'user-dirs.conf freeze not deployed for newly-created initial-mode user'
+        fail_msg: 'user-dirs.conf freeze not deployed for initial-mode user without config'
 
     #
-    # Initial Mode — Existing User (xdg_initial_exist)
+    # Initial Mode — User With Existing Config (xdg_initial_exist)
     #
-    # xdg_user_dirs_user_config_mode=initial + user NOT IN __users_newly_created
+    # xdg_user_dirs_user_config_mode=initial + user-dirs.dirs already present
     # → role MUST leave the pre-existing user-dirs.dirs untouched and MUST
     #   NOT create the freeze file.
     #

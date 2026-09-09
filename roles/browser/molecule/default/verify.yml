@@ -335,9 +335,9 @@
         fail_msg: 'browser config deployed for a per-user-disabled entry'
 
     #
-    # Initial Mode — Newly Created User (browser_initial_new)
+    # Initial Mode — User Without Config (browser_initial_new)
     #
-    # browser_user_config_mode=initial + user IN __users_newly_created
+    # browser_user_config_mode=initial + no config present
     # → role MUST bootstrap the profile, user.js and mimeapps.list.
     #
 
@@ -366,11 +366,12 @@
         fail_msg: 'browser config not deployed for newly-created initial-mode user'
 
     #
-    # Initial Mode — Existing User (browser_initial_exist)
+    # Initial Mode — User With Existing Config (browser_initial_exist)
     #
-    # browser_user_config_mode=initial + user NOT IN __users_newly_created
-    # → role MUST leave the pre-existing mimeapps.list untouched and MUST
-    #   NOT bootstrap a Firefox profile.
+    # browser_user_config_mode=initial + mimeapps.list already present
+    # → role MUST leave that file untouched, while still seeding the
+    #   artifacts the user does not have yet. Gating is per artifact,
+    #   not per user.
     #
 
     - name: Verify | Read initial-exist user mimeapps.list
@@ -378,25 +379,30 @@
         src: /home/browser_initial_exist/.config/mimeapps.list
       register: __browser_verify_initialexist_mimeapps
 
-    - name: Verify | Check initial-exist user has no Firefox profile
+    - name: Verify | Check initial-exist user Firefox profile
       ansible.builtin.stat:
         path: /home/browser_initial_exist/.mozilla/firefox/{{ __browser_firefox_profile_dirname }}
       register: __browser_verify_initialexist_profile
 
-    - name: Verify | Check initial-exist user has no chromium-flags.conf
+    - name: Verify | Check initial-exist user chromium-flags.conf
       ansible.builtin.stat:
         path: /home/browser_initial_exist/.config/chromium-flags.conf
       register: __browser_verify_initialexist_chromium_flags
 
-    - name: Verify | Assert initial-exist user config is unchanged
+    - name: Verify | Assert initial-exist mimeapps.list is unchanged
       ansible.builtin.assert:
         that:
           - "'x-scheme-handler/molecule-fixture=preexisting.desktop'
             in (__browser_verify_initialexist_mimeapps.content | b64decode)"
           - "'firefox.desktop' not in (__browser_verify_initialexist_mimeapps.content | b64decode)"
-          - not __browser_verify_initialexist_profile.stat.exists
-          - not __browser_verify_initialexist_chromium_flags.stat.exists
-        fail_msg: 'pre-existing config was modified for existing initial-mode user'
+        fail_msg: 'pre-existing mimeapps.list was modified for initial-mode user'
+
+    - name: Verify | Assert initial-exist user received the absent artifacts
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_initialexist_profile.stat.exists
+          - __browser_verify_initialexist_chromium_flags.stat.exists
+        fail_msg: 'absent artifacts were not seeded for initial-mode user'
 
     #
     # Disabled Mode — Global (browser_global_disabled)
@@ -423,12 +429,11 @@
         fail_msg: 'browser config deployed despite global disabled mode'
 
     #
-    # Seed Mode — Existing Users (browser_seed_new_file / _keep_file)
+    # Initial Mode — Established Users (browser_seed_new_file / _keep_file)
     #
-    # browser_user_config_mode=seed on pre-existing users (NOT in
-    # __users_newly_created): initial would skip both. seed MUST create
-    # chromium-flags.conf where absent and MUST NOT overwrite an existing
-    # (user-edited) copy.
+    # browser_user_config_mode=initial on users that already existed:
+    # the role MUST create chromium-flags.conf where it is absent and
+    # MUST NOT overwrite an existing, user-edited copy.
     #
 
     - name: Verify | Read seed-new-file user chromium-flags.conf
@@ -436,22 +441,22 @@
         src: /home/browser_seed_new_file/.config/chromium-flags.conf
       register: __browser_verify_seed_new
 
-    - name: Verify | Assert seed created chromium-flags.conf for existing user
+    - name: Verify | Assert chromium-flags.conf was created for the established user
       ansible.builtin.assert:
         that:
           - "'--enable-experimental-web-platform-features'
             in (__browser_verify_seed_new.content | b64decode)"
-        fail_msg: 'seed did not create chromium-flags.conf for an existing user'
+        fail_msg: 'chromium-flags.conf was not created for an established user'
 
     - name: Verify | Read seed-keep-file user chromium-flags.conf
       ansible.builtin.slurp:
         src: /home/browser_seed_keep_file/.config/chromium-flags.conf
       register: __browser_verify_seed_keep
 
-    - name: Verify | Assert seed left the user-edited chromium-flags.conf intact
+    - name: Verify | Assert the user-edited chromium-flags.conf is intact
       ansible.builtin.assert:
         that:
           - "'--user-edited-sentinel' in (__browser_verify_seed_keep.content | b64decode)"
           - "'--enable-experimental-web-platform-features'
             not in (__browser_verify_seed_keep.content | b64decode)"
-        fail_msg: 'seed overwrote a pre-existing user-edited chromium-flags.conf'
+        fail_msg: 'a pre-existing user-edited chromium-flags.conf was overwritten'

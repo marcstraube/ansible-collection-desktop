@@ -101,7 +101,7 @@ browser_chrome_policies_enabled: true
 # Deploy per-user launch switches (~/.config/chrome-flags.conf)
 # Confirmed only for Arch's google-chrome AUR launcher, which sources this
 # file like chromium-flags.conf. Google's own launcher on Debian/EL ignores
-# it. Deployed per user via browser_users (respects managed/initial/seed).
+# it. Deployed per user via browser_users (respects managed/initial).
 browser_chrome_flags_enabled: false
 
 # Launch switches written one per line to ~/.config/chrome-flags.conf.
@@ -329,11 +329,9 @@ browser_chrome_autofill_credit_card: false
 # Firefox/LibreWolf profiles are auto-detected or created via --headless
 #
 # Modes:
-#   managed  — always deploy/overwrite user config (default)
-#   initial  — deploy only when user is newly created
-#   seed     — deploy whole-file configs (user.js, chromium-flags.conf)
-#              only when absent, never overwrite; rolls new files out to
-#              existing users once. mimeapps.list treats seed like initial.
+#   managed  — always deploy/overwrite user config
+#   initial  — deploy a config only when it is absent, then leave it
+#              under the user's control (default)
 #   disabled — skip config deployment for this user
 
 browser_users: []
@@ -342,7 +340,6 @@ browser_users: []
 #     mode: 'managed'
 
 # Default mode when user entry has no 'mode' key
-# 'initial' preserves user customisations after first deploy.
-# 'managed' reconciles continuously; 'seed' deploys missing files once
-# without ever overwriting them.
+# 'initial' deploys a config only when it is absent and preserves the
+# user's own edits afterwards; 'managed' reconciles continuously.
 browser_user_config_mode: 'initial'

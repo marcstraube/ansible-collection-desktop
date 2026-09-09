@@ -13,6 +13,17 @@
   ansible.builtin.set_fact:
     __browser_user_home: "{{ ansible_facts['getent_passwd'][browser_user.username][4] }}"
 
+- name: Users Chrome | Stat existing chrome-flags.conf
+  ansible.builtin.stat:
+    path: '{{ __browser_user_home }}/.config/chrome-flags.conf'
+  register: __browser_flags_stat
+
+- name: Users Chrome | Build deploy decision
+  ansible.builtin.set_fact:
+    __browser_flags_should_deploy: >-
+      {{ (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+         or not __browser_flags_stat.stat.exists }}
+
 - name: Users Chrome | Ensure config directory exists
   ansible.builtin.file:
     path: '{{ __browser_user_home }}/.config'
@@ -20,10 +31,10 @@
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
     mode: '0700'
+  when: __browser_flags_should_deploy | bool
 
-# seed mode deploys the file only when absent (force: false) and never
-# overwrites a copy the user has since edited; managed/initial reconcile
-# it (force: true).
+# `initial` writes the file only when it is absent; `managed`
+# reconciles it on every run.
 - name: Users Chrome | Deploy chrome-flags.conf
   ansible.builtin.template:
     src: chrome-flags.conf.j2
@@ -31,4 +42,4 @@
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
     mode: '0644'
-    force: "{{ (browser_user.mode | default(browser_user_config_mode)) != 'seed' }}"
+  when: __browser_flags_should_deploy | bool

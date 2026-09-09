@@ -8,6 +8,41 @@
   ansible.builtin.set_fact:
     __development_user_home: "{{ ansible_facts['getent_passwd'][dev_user.username][4] }}"
 
+# Mode semantics:
+#   managed  — reconcile every config file on each run
+#   initial  — write a file only when it is absent, preserve it after
+#   disabled — never write (gated in users.yml)
+# Each file decides on its own, so a hand-tuned settings.json survives
+# while a missing argv.json is still seeded.
+- name: Users VSCode | Stat existing per-user editor configs
+  ansible.builtin.stat:
+    path: '{{ item.path }}'
+  loop:
+    - key: 'code_settings'
+      path: '{{ __development_user_home }}/.config/Code/User/settings.json'
+    - key: 'code_argv'
+      path: '{{ __development_user_home }}/.vscode/argv.json'
+    - key: 'codium_settings'
+      path: '{{ __development_user_home }}/.config/VSCodium/User/settings.json'
+    - key: 'codium_argv'
+      path: '{{ __development_user_home }}/.vscode-oss/argv.json'
+  loop_control:
+    label: '{{ item.key }}'
+  register: __development_vscode_stats
+
+- name: Users VSCode | Build per-file deploy decision
+  ansible.builtin.set_fact:
+    __development_user_managed: >-
+      {{ (dev_user.mode | default(development_user_config_mode)) == 'managed' }}
+    __development_vscode_should_deploy: >-
+      {{
+        dict(__development_vscode_stats.results
+             | map(attribute='item.key')
+             | zip(__development_vscode_stats.results
+                   | map(attribute='stat.exists')
+                   | map('ternary', false, true)))
+      }}
+
 #
 # VSCode (proprietary)
 #
@@ -22,6 +57,9 @@
   when:
     - development_vscode_enabled | bool
     - development_vscode_settings | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['code_settings'] | default(true)
 
 - name: Users VSCode | Deploy VSCode settings.json
   ansible.builtin.copy:
@@ -33,6 +71,9 @@
   when:
     - development_vscode_enabled | bool
     - development_vscode_settings | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['code_settings'] | default(true)
 
 - name: Users VSCode | Ensure VSCode runtime directory exists
   ansible.builtin.file:
@@ -44,6 +85,9 @@
   when:
     - development_vscode_enabled | bool
     - development_vscode_argv | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['code_argv'] | default(true)
 
 - name: Users VSCode | Deploy VSCode argv.json
   ansible.builtin.copy:
@@ -55,6 +99,9 @@
   when:
     - development_vscode_enabled | bool
     - development_vscode_argv | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['code_argv'] | default(true)
 
 #
 # VSCodium (FOSS build, no MS telemetry code)
@@ -70,6 +117,9 @@
   when:
     - development_vscodium_enabled | bool
     - development_vscode_settings | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['codium_settings'] | default(true)
 
 - name: Users VSCode | Deploy VSCodium settings.json
   ansible.builtin.copy:
@@ -81,6 +131,9 @@
   when:
     - development_vscodium_enabled | bool
     - development_vscode_settings | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['codium_settings'] | default(true)
 
 - name: Users VSCode | Ensure VSCodium runtime directory exists
   ansible.builtin.file:
@@ -92,6 +145,9 @@
   when:
     - development_vscodium_enabled | bool
     - development_vscode_argv | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['codium_argv'] | default(true)
 
 - name: Users VSCode | Deploy VSCodium argv.json
   ansible.builtin.copy:
@@ -103,3 +159,6 @@
   when:
     - development_vscodium_enabled | bool
     - development_vscode_argv | length > 0
+    - >-
+      __development_user_managed | bool
+      or __development_vscode_should_deploy['codium_argv'] | default(true)
