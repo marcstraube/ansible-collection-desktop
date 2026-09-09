@@ -125,8 +125,22 @@
     label: 'Install.{{ item.option }}'
   when: __ff_install_hash | length > 0
 
-# seed mode deploys user.js only when absent (force: false), preserving a
-# copy the user has since edited; managed/initial reconcile it.
+# The profile path is only known after discovery above, so the stat
+# comes here. Profile bootstrap itself is a prerequisite, not user
+# config, and therefore runs regardless of the mode.
+- name: Users Profile | Stat existing user.js
+  ansible.builtin.stat:
+    path: '{{ __ff_profile_path }}/user.js'
+  register: __ff_user_js_stat
+
+- name: Users Profile | Build deploy decision
+  ansible.builtin.set_fact:
+    __ff_user_js_should_deploy: >-
+      {{ (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+         or not __ff_user_js_stat.stat.exists }}
+
+# `initial` writes user.js only when it is absent, preserving a copy the
+# user has since edited; `managed` reconciles it.
 - name: Users Profile | Deploy user.js
   ansible.builtin.template:
     src: user.js.j2
@@ -134,7 +148,8 @@
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
     mode: '0644'
-    force: "{{ (browser_user.mode | default(browser_user_config_mode)) != 'seed' }}"
   vars:
     __browser_template_prefs: '{{ __ff_preferences }}'
-  when: __ff_preferences | length > 0
+  when:
+    - __ff_preferences | length > 0
+    - __ff_user_js_should_deploy | bool

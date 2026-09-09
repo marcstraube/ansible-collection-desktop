@@ -1,8 +1,10 @@
 ---
-# Respects mode: managed | initial | seed | disabled. Whole-file deploys
-# (user.js, chromium-flags.conf) honour seed via force: false (deploy if
-# absent, never overwrite). mimeapps.list manages individual handler keys
-# rather than a whole file, so it treats seed like initial.
+# Respects mode: managed | initial | disabled.
+#
+# Every per-user deploy gates on its own target: `managed` reconciles
+# on each run, `initial` writes only when the artifact is absent. The
+# decision is made in the included task files, where the user's home
+# and — for Firefox — the profile path are known.
 
 - name: Users | Bootstrap Firefox profile
   ansible.builtin.include_tasks:
@@ -29,10 +31,6 @@
     - browser_firefox_enabled | bool
     - browser_firefox_user_js_enabled | bool
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
-    - >-
-      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
-      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
-          and browser_user.username in (__users_newly_created | default([])))
 
 - name: Users | Bootstrap LibreWolf profile
   ansible.builtin.include_tasks:
@@ -60,10 +58,6 @@
     - browser_librewolf_user_js_enabled | bool
     - ansible_facts['os_family'] == 'Archlinux'
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
-    - >-
-      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
-      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
-          and browser_user.username in (__users_newly_created | default([])))
 
 - name: Users | Deploy Chromium launch switches
   ansible.builtin.include_tasks:
@@ -84,10 +78,6 @@
     - browser_chromium_flags_enabled | bool
     - browser_chromium_flags | length > 0
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
-    - >-
-      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
-      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
-          and browser_user.username in (__users_newly_created | default([])))
 
 - name: Users | Deploy Chrome launch switches
   ansible.builtin.include_tasks:
@@ -108,10 +98,6 @@
     - browser_chrome_flags_enabled | bool
     - browser_chrome_flags | length > 0
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
-    - >-
-      (browser_user.mode | default(browser_user_config_mode)) in ['managed', 'seed']
-      or ((browser_user.mode | default(browser_user_config_mode)) == 'initial'
-          and browser_user.username in (__users_newly_created | default([])))
 
 - name: Users | Include default browser handler config
   ansible.builtin.include_tasks:
@@ -132,7 +118,3 @@
   when:
     - browser_default | length > 0
     - (browser_user.mode | default(browser_user_config_mode)) != 'disabled'
-    - >-
-      (browser_user.mode | default(browser_user_config_mode)) == 'managed'
-      or ((browser_user.mode | default(browser_user_config_mode)) in ['initial', 'seed']
-          and browser_user.username in (__users_newly_created | default([])))

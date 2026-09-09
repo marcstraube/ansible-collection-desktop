@@ -24,6 +24,21 @@
     mode: '0700'
   when: not __browser_user_config_dir.stat.exists
 
+# ini_file manages individual keys, so `force` cannot express the
+# initial contract here. Gate on the file instead: `managed` reconciles
+# the handler keys on every run, `initial` writes them only into a
+# mimeapps.list that does not exist yet.
+- name: Users Default Handler | Stat existing mimeapps.list
+  ansible.builtin.stat:
+    path: '{{ __browser_user_home }}/.config/mimeapps.list'
+  register: __browser_user_mimeapps
+
+- name: Users Default Handler | Build deploy decision
+  ansible.builtin.set_fact:
+    __browser_handler_should_deploy: >-
+      {{ (browser_user.mode | default(browser_user_config_mode)) == 'managed'
+         or not __browser_user_mimeapps.stat.exists }}
+
 - name: Users Default Handler | Set http/https handler in mimeapps.list
   community.general.ini_file:
     path: '{{ __browser_user_home }}/.config/mimeapps.list'
@@ -38,3 +53,4 @@
   loop:
     - 'x-scheme-handler/http'
     - 'x-scheme-handler/https'
+  when: __browser_handler_should_deploy | bool

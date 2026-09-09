@@ -71,8 +71,8 @@
         name: '{{ playbook_dir }}/../..'
 
 
-# initial mode acts only on users present in __users_newly_created (the
-# canonical fact set by marcstraube.common.users).
+# initial mode deploys only when the target config is absent, and
+# preserves it afterwards.
 - name: Converge | Initial mode (per-user gating)
   hosts: all
   gather_facts: false
@@ -139,10 +139,6 @@
         group: dev_initial_exist
         mode: '0644'
 
-    - name: Converge | Mark only dev_initial_new as newly created
-      ansible.builtin.set_fact:
-        __users_newly_created:
-          - 'dev_initial_new'
 
   tasks:
     - name: Converge | Include development role  # noqa: role-name[path]

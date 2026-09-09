@@ -1,6 +1,47 @@
 ---
 # Respects mode: managed | initial | disabled.
 # Per-user `mode:` overrides xdg_user_dirs_user_config_mode.
+#
+# `initial` gates on the existence of user-dirs.dirs: the file is
+# written once and left alone afterwards, so a user's own layout
+# survives. `managed` reconciles it on every run.
+
+- name: Users | Read passwd database
+  ansible.builtin.getent:
+    database: passwd
+  tags:
+    - xdg_user_dirs
+    - xdg_user_dirs:users
+
+- name: Users | Stat existing user-dirs.dirs
+  ansible.builtin.stat:
+    path: >-
+      {{ ansible_facts['getent_passwd'][xdg_user.username][4] }}/.config/user-dirs.dirs
+  loop: '{{ xdg_user_dirs_users }}'
+  loop_control:
+    loop_var: xdg_user
+    label: '{{ xdg_user.username }}'
+  register: __xdg_user_dirs_stats
+  when: (xdg_user.mode | default(xdg_user_dirs_user_config_mode)) != 'disabled'
+  tags:
+    - xdg_user_dirs
+    - xdg_user_dirs:users
+
+- name: Users | Build per-user deploy decision
+  ansible.builtin.set_fact:
+    __xdg_user_dirs_should_deploy: >-
+      {{
+        dict(__xdg_user_dirs_stats.results
+             | rejectattr('skipped', 'defined')
+             | map(attribute='xdg_user.username')
+             | zip(__xdg_user_dirs_stats.results
+                   | rejectattr('skipped', 'defined')
+                   | map(attribute='stat.exists')
+                   | map('ternary', false, true)))
+      }}
+  tags:
+    - xdg_user_dirs
+    - xdg_user_dirs:users
 
 - name: Users | Configure XDG user dirs
   ansible.builtin.include_tasks:
@@ -20,5 +61,4 @@
     - (xdg_user.mode | default(xdg_user_dirs_user_config_mode)) != 'disabled'
     - >-
       (xdg_user.mode | default(xdg_user_dirs_user_config_mode)) == 'managed'
-      or ((xdg_user.mode | default(xdg_user_dirs_user_config_mode)) == 'initial'
-          and xdg_user.username in (__users_newly_created | default([])))
+      or __xdg_user_dirs_should_deploy[xdg_user.username] | default(true)

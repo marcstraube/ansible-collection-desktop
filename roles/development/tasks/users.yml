@@ -4,7 +4,8 @@
 #
 # Respects mode: managed | initial | disabled
 #   managed  — overwrite on every run
-#   initial  — deploy only when user is newly created in this run
+#   initial  — deploy only when the target config is absent, then
+#              preserve it
 #   disabled — skip entirely
 # Per-user `mode:` overrides `development_user_config_mode`.
 
@@ -24,10 +25,6 @@
     label: '{{ dev_user.username }}'
   when:
     - (dev_user.mode | default(development_user_config_mode)) != 'disabled'
-    - >-
-      (dev_user.mode | default(development_user_config_mode)) == 'managed'
-      or ((dev_user.mode | default(development_user_config_mode)) == 'initial'
-          and dev_user.username in (__users_newly_created | default([])))
 
 - name: Users | Include VSCode user config
   ansible.builtin.include_tasks:
@@ -46,7 +43,3 @@
   when:
     - development_vscode_enabled | bool or development_vscodium_enabled | bool
     - (dev_user.mode | default(development_user_config_mode)) != 'disabled'
-    - >-
-      (dev_user.mode | default(development_user_config_mode)) == 'managed'
-      or ((dev_user.mode | default(development_user_config_mode)) == 'initial'
-          and dev_user.username in (__users_newly_created | default([])))

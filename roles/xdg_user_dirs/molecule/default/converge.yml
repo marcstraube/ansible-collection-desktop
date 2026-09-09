@@ -60,10 +60,6 @@
         group: xdg_initial_exist
         mode: '0600'
 
-    - name: Converge | Mark only xdg_initial_new as newly created
-      ansible.builtin.set_fact:
-        __users_newly_created:
-          - 'xdg_initial_new'
 
   tasks:
     - name: Converge | Include xdg_user_dirs role  # noqa: role-name[path]

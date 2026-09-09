@@ -14,6 +14,72 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+### `browser` — the `seed` mode is gone, `initial` covers it
+
+`seed` existed because `initial` was gated on user creation and could
+therefore never roll a newly added config file out to an already
+provisioned user. `initial` now gates on the config itself, which is
+exactly what `seed` provided, so the fourth mode has no purpose left
+and has been removed.
+
+Every per-user artifact now gates on its own target, matching the
+`keepassxc` and `wine` reference implementations: under `initial` a
+file is written only when absent and never overwritten.
+
+#### Required action
+
+Inventories using the `seed` mode must switch to `initial`, which now
+behaves identically:
+
+```yaml
+# before
+browser_user_config_mode: 'seed'
+
+# after
+browser_user_config_mode: 'initial'
+```
+
+Per-user entries need the same change:
+
+```yaml
+browser_users:
+  - username: 'johndoe'
+    mode: 'initial'      # was: 'seed'
+```
+
+### `development`, `xdg_user_dirs` — `initial` now gates on config existence
+
+The `initial` value of `<role>_user_config_mode` previously acted only
+on users that `marcstraube.common.users` had created in the same run,
+via the internal `__users_newly_created` fact. It now decides on the
+target config itself: a file is written when it is absent and left
+alone when it is present, matching `keepassxc` and `wine`.
+
+This removes a silent failure: because the fact is only populated when
+the `users` role runs earlier in the same play, a tag-scoped or
+standalone run such as `--tags development` left it empty, and
+`initial` — the default — deployed nothing at all.
+
+`development` decides per file, so a user who keeps a hand-written
+`settings.json` still receives a missing `argv.json`.
+
+#### Required action
+
+On existing fleets, both roles now deploy config for established users
+that lack it, where the previous gating skipped them. Inventories that
+relied on `initial` never touching established users must pin the
+affected role explicitly:
+
+```yaml
+# never write, not even a missing config
+development_user_config_mode: 'disabled'
+
+# or reconcile on every run
+development_user_config_mode: 'managed'
+```
+
+The same applies to `xdg_user_dirs_user_config_mode`.
+
 ## v2.4.0 - 2026-09-08
 
 ## v2.3.0 - 2026-07-29
