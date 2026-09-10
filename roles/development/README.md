@@ -4,15 +4,18 @@ Install development tools, IDEs, and programming languages.
 
 ## Description
 
-Installs and configures a development environment including version control (Git),
-programming languages (Python, Node.js, Rust, Go, Java), build tools, IDEs/editors,
-database tools, API testing tools, and miscellaneous CLI utilities. Supports per-user
-Git configuration with signing key setup.
+Installs and configures a development environment including programming
+languages (Python, Node.js, Rust, Go, Java), build tools, IDEs/editors,
+database tools, API testing tools, and miscellaneous CLI utilities. Supports
+per-user editor configuration.
+
+Git, git-lfs and the GitHub/GitLab CLIs are installed and configured by
+`marcstraube.common.git`, which the base system applies to every host.
 
 ## Requirements
 
 - ansible-core >= 2.19
-- `community.general` collection (for git_config, pipx, pacman, npm modules)
+- `community.general` collection (for pipx, pacman, npm modules)
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
 - `marcstraube.common.nodejs` role on non-Arch when enabling tools that
   install via npm (e.g. Socket CLI). The development role itself does
@@ -41,14 +44,6 @@ overrides if needed.
 | `development_enabled` | `true`  | Enable the development role |
 
 ### Version Control
-
-| Variable                         | Default | Description                            |
-|----------------------------------|---------|----------------------------------------|
-| `development_git_enabled`        | `true`  | Enable git installation                |
-| `development_git_lfs_enabled`    | `true`  | Enable git-lfs support                 |
-| `development_github_cli_enabled` | `true`  | Enable GitHub CLI (gh)                 |
-| `development_gitlab_cli_enabled` | `true`  | Enable GitLab CLI (glab)               |
-| `development_git_config`         | `{...}` | Git global configuration key/value map |
 
 ### Programming Languages
 
@@ -355,7 +350,7 @@ toggle after install does not uninstall the package.
 
 | Variable                       | Default     | Description                                      |
 |--------------------------------|-------------|--------------------------------------------------|
-| `development_users`            | `[]`        | Users to configure with git + IDE settings       |
+| `development_users`            | `[]`        | Users to configure with editor settings          |
 | `development_user_config_mode` | `'initial'` | Default mode: `managed` / `initial` / `disabled` |
 
 Each user entry supports:
@@ -364,9 +359,6 @@ Each user entry supports:
 |-------------------|----------|----------------------------------------------|
 | `username`        | yes      | System username                              |
 | `mode`            | no       | Per-user override of the global config mode  |
-| `git_name`        | no       | Git user.name                                |
-| `git_email`       | no       | Git user.email                               |
-| `git_signing_key` | no       | GPG signing key ID                           |
 
 Mode semantics — analog to `marcstraube.desktop.browser`:
 
@@ -381,7 +373,6 @@ Mode semantics — analog to `marcstraube.desktop.browser`:
 | Tag                            | Scope                      |
 |--------------------------------|----------------------------|
 | `development`                  | All role tasks             |
-| `development:git`              | Version control tasks      |
 | `development:languages`        | Programming language tasks |
 | `development:build`            | Build tools tasks          |
 | `development:ides`             | IDE installation tasks     |
@@ -413,9 +404,6 @@ Mode semantics — analog to `marcstraube.desktop.browser`:
     development_rust_enabled: true
     development_users:
       - username: 'johndoe'
-        git_name: 'John Doe'
-        git_email: 'john@example.com'
-        git_signing_key: '0x1234567890ABCDEF'
   tags:
     - development
   when: development_enabled | default(true) | bool
@@ -432,9 +420,6 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 
 ## References
 
-- [Git](https://git-scm.com/) — Distributed version control system
-- [GitHub CLI](https://cli.github.com/) — `gh` command-line tool for GitHub
-- [glab](https://gitlab.com/gitlab-org/cli) — GitLab CLI
 - [pipx](https://pipx.pypa.io/) — Install Python applications in isolated environments
 - [rustup](https://rustup.rs/) — Rust toolchain installer (used on non-Arch)
 - [VSCodium](https://vscodium.com/) — Free/libre Code-OSS binaries (telemetry-free VS Code build)

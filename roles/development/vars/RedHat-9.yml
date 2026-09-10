@@ -10,14 +10,6 @@
 # - bear: packaged on EL9 (EPEL 9 ships it, EPEL 10 does not).
 #
 
-# Version control
-__development_git_packages:
-  - 'git'
-
-__development_git_lfs_package: 'git-lfs'
-__development_github_cli_package: 'gh'
-__development_gitlab_cli_package: ''  # not in EPEL 9/10
-
 # Python
 __development_python_packages:
   - 'python3'

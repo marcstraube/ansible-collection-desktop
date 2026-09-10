@@ -9,23 +9,6 @@
 #   disabled — skip entirely
 # Per-user `mode:` overrides `development_user_config_mode`.
 
-- name: Users | Include Git user config
-  ansible.builtin.include_tasks:
-    file: users_git.yml
-    apply:
-      tags:
-        - development
-        - development:users
-  tags:
-    - development
-    - development:users
-  loop: '{{ development_users }}'
-  loop_control:
-    loop_var: dev_user
-    label: '{{ dev_user.username }}'
-  when:
-    - (dev_user.mode | default(development_user_config_mode)) != 'disabled'
-
 - name: Users | Include VSCode user config
   ansible.builtin.include_tasks:
     file: users_vscode.yml

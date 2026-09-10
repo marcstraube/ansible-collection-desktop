@@ -40,6 +40,40 @@ An inventory that still sets `ai_gemini_cli_enabled` is not an error —
 the variable is simply ignored. Gemini CLI already installed on a host is
 left in place; remove the package manually if it is no longer wanted.
 
+### `development` — version control moves to `marcstraube.common.git`
+
+Version control tooling now lives in `marcstraube.common.git`, which
+installs and configures git, git-lfs and the GitHub/GitLab CLIs on every
+supported platform and is applied to every host by the base system. The
+development role kept its own implementation alongside it, so on
+workstations both roles installed the same packages and wrote the same
+per-user git configuration — with the development role's values winning,
+because the base system runs first.
+
+The version control block is gone from `development`. Git itself is
+unaffected: it is still installed and configured, just by one role instead
+of two.
+
+#### Required action
+
+Move the settings to the `git_*` variables of `marcstraube.common.git`. The
+names map one to one apart from the prefix:
+
+| Removed                          | Replacement              |
+|----------------------------------|--------------------------|
+| `development_git_enabled`        | `git_enabled`            |
+| `development_git_lfs_enabled`    | `git_lfs_enabled`        |
+| `development_github_cli_enabled` | `git_github_cli_enabled` |
+| `development_gitlab_cli_enabled` | `git_gitlab_cli_enabled` |
+| `development_git_config`         | `git_config`             |
+
+Per-user identity is unchanged in shape: `users_list` entries keep their
+`git` attribute with `email` and `signing_key`, and `marcstraube.common.git`
+reads them from there.
+
+Inventories that set none of these variables need no action — the base
+system already applied `marcstraube.common.git` with its defaults.
+
 ### `browser` — the `seed` mode is gone, `initial` covers it
 
 `seed` existed because `initial` was gated on user creation and could

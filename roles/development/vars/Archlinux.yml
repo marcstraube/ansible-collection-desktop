@@ -3,15 +3,6 @@
 # Arch Linux Variables
 #
 
-# Version control
-__development_git_packages:
-  - 'git'
-  - 'git-delta'
-
-__development_git_lfs_package: 'git-lfs'
-__development_github_cli_package: 'github-cli'
-__development_gitlab_cli_package: 'glab'
-
 # Python
 __development_python_packages:
   - 'python'
