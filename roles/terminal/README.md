@@ -11,7 +11,7 @@ messages. Optional per-terminal configuration deployment and Kitty image support
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - No additional collections required
 
 ## Supported Platforms

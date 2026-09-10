@@ -15,7 +15,7 @@ packages.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `kewlfft.aur` collection (Arch Linux AUR packages)
 
 ## Supported Platforms

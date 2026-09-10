@@ -18,7 +18,7 @@ to exist on managed hosts.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `kewlfft.aur` collection (AUR packages on Arch Linux)
 - EPEL repository enabled (for Lutris on EL 9/10)
 - `aur_builder` system user with passwordless sudo (Arch Linux only)

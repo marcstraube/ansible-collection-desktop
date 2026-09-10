@@ -13,7 +13,7 @@ are Arch-only (AUR). They require the `aur_builder` user and the
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection
 - `kewlfft.aur` collection (AUR packages on Arch Linux only)
 - `aur_builder` user with passwordless sudo (Arch Linux, for AUR packages)

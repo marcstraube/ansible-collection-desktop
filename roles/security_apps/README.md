@@ -16,7 +16,7 @@ and a firewall GUI. Application availability varies by platform:
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection
 - `kewlfft.aur` collection (hardware wallet AUR packages on Arch Linux only)
 - `aur_builder` user with passwordless sudo (Arch Linux, for AUR packages)
