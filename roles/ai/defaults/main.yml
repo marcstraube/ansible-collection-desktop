@@ -14,11 +14,6 @@ ai_enabled: true
 # Enable Claude Code (Anthropic CLI)
 ai_claude_code_enabled: true
 
-# Enable Gemini CLI (Google)
-# DEPRECATED: Google is moving Gemini CLI behind a paid Pro tier. Superseded by
-# Antigravity (ai_antigravity_cli_enabled). Hard removal in v3.0.0 — see #146.
-ai_gemini_cli_enabled: false
-
 # Enable Antigravity CLI (Google — agentic development platform, CLI companion)
 ai_antigravity_cli_enabled: false
 

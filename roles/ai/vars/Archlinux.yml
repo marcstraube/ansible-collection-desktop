@@ -7,8 +7,6 @@
 __ai_aur_packages:
   claude_code:
     - claude-code
-  gemini_cli:
-    - gemini-cli
   antigravity_cli:
     - antigravity-cli
   opencode:

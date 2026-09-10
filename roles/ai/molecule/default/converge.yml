@@ -8,7 +8,6 @@
 
     # Skip AUR/external packages in CI containers
     ai_claude_code_enabled: false
-    ai_gemini_cli_enabled: false
     ai_antigravity_cli_enabled: false
     ai_codex_enabled: false
     ai_opencode_enabled: false

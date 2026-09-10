@@ -62,10 +62,10 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ### Development & AI
 
-| Role            | Description                               |
-| --------------- | ----------------------------------------- |
-| **development** | Languages, IDEs, build tools, Podman, Git |
-| **ai**          | Claude Code, Ollama, Gemini CLI, API keys |
+| Role            | Description                                |
+| --------------- | ------------------------------------------ |
+| **development** | Languages, IDEs, build tools, Podman, Git  |
+| **ai**          | Claude Code, Ollama, Antigravity, API keys |
 
 ### Multimedia & Graphics
 
