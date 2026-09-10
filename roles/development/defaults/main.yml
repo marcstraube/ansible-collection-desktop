@@ -7,29 +7,6 @@
 development_enabled: true
 
 #
-# Version Control
-#
-
-# Enable git installation
-development_git_enabled: true
-
-# Enable git-lfs support
-development_git_lfs_enabled: true
-
-# Enable GitHub CLI (gh)
-development_github_cli_enabled: true
-
-# Enable GitLab CLI (glab)
-development_gitlab_cli_enabled: true
-
-# Git global configuration
-development_git_config:
-  core.editor: 'nvim'
-  init.defaultBranch: 'main'
-  pull.rebase: 'true'
-  push.autoSetupRemote: 'true'
-
-#
 # Programming Languages
 #
 

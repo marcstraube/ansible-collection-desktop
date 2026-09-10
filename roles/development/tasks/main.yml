@@ -3,6 +3,9 @@
 # Development Main Tasks
 #
 
+# The git attribute marks an account as a developer workstation user.
+# Its values are consumed by marcstraube.common.git, not here — this role
+# only needs the names to write per-user editor configuration.
 - name: Main | Derive development users from users_list (exclude system users)
   ansible.builtin.set_fact:
     development_users: >-
@@ -13,10 +16,7 @@
           | selectattr('git', 'defined')
           | selectattr('system', 'defined')
           | rejectattr('system', 'equalto', true) | list)
-         | community.general.json_query(
-             '[].{username: name, git_name: comment, git_email: git.email, '
-             + 'git_signing_key: git.signing_key}'
-           ) }}
+         | community.general.json_query('[].{username: name}') }}
   when:
     - development_enabled | bool
     - development_users | length == 0
@@ -38,15 +38,6 @@
         - 'vars'
   tags:
     - always
-
-- name: Main | Import version control tasks
-  ansible.builtin.import_tasks: git.yml
-  when:
-    - development_enabled | bool
-    - development_git_enabled | bool
-  tags:
-    - development
-    - development:git
 
 - name: Main | Import programming languages tasks
   ansible.builtin.import_tasks: languages.yml

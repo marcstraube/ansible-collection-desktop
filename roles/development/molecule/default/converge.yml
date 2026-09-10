@@ -17,8 +17,6 @@
 
   vars:
     development_enabled: true
-    development_git_enabled: true
-    development_git_lfs_enabled: true
     development_python_enabled: true
     development_nodejs_enabled: false
     development_rust_enabled: false
@@ -79,8 +77,6 @@
 
   vars:
     development_enabled: true
-    development_git_enabled: true
-    development_git_lfs_enabled: true
     development_python_enabled: true
     development_nodejs_enabled: false
     development_rust_enabled: false
@@ -126,20 +122,6 @@
         git_name: 'Dev Initial Exist'
         git_email: 'exist@example.com'
 
-  pre_tasks:
-    - name: Converge | Pre-seed existing user .gitconfig to prove it is left untouched
-      ansible.builtin.copy:
-        content: |
-          [user]
-          name = Preexisting Fixture
-          [molecule]
-          fixture = preexisting
-        dest: /home/dev_initial_exist/.gitconfig
-        owner: dev_initial_exist
-        group: dev_initial_exist
-        mode: '0644'
-
-
   tasks:
     - name: Converge | Include development role  # noqa: role-name[path]
       ansible.builtin.include_role:
@@ -152,8 +134,6 @@
 
   vars:
     development_enabled: true
-    development_git_enabled: true
-    development_git_lfs_enabled: true
     development_python_enabled: true
     development_nodejs_enabled: false
     development_rust_enabled: false
