@@ -14,6 +14,32 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+### `ai` — `ai_gemini_cli_enabled` is removed
+
+The variable was deprecated in v2.1.0 after Google moved Gemini CLI behind
+a paid Pro tier, with Antigravity named as the replacement. It is gone now,
+along with the AUR and npm install tasks behind it.
+
+`ai_opencode_gemini_auth_enabled` is unaffected — that is the OpenCode auth
+plugin for Gemini credentials, a separate feature.
+
+#### Required action
+
+Remove the variable from your inventory. Hosts that want the replacement
+enable Antigravity instead:
+
+```yaml
+# Before
+ai_gemini_cli_enabled: true
+
+# After
+ai_antigravity_cli_enabled: true
+```
+
+An inventory that still sets `ai_gemini_cli_enabled` is not an error —
+the variable is simply ignored. Gemini CLI already installed on a host is
+left in place; remove the package manually if it is no longer wanted.
+
 ### `browser` — the `seed` mode is gone, `initial` covers it
 
 `seed` existed because `initial` was gated on user creation and could

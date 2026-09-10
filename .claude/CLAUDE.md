@@ -33,7 +33,7 @@ directory structure, variable naming, task patterns, and template rules.
 | `browser` | Firefox, LibreWolf, Chromium, Brave | Hardening, extension policies |
 | `keepassxc` | Password manager | Secret service, browser integration |
 | `development` | Languages, build tools, IDEs, Git | Container tools (Podman) |
-| `ai` | Claude Code, Ollama, Gemini CLI | API key management |
+| `ai` | Claude Code, Ollama, Antigravity | API key management |
 | `pipewire` | Audio stack | Replaces PulseAudio |
 | `bluetooth` | BlueZ configuration | Security timeouts, MAC privacy |
 | `terminal` | Ghostty, Alacritty, Kitty, Foot | Per-user config |
