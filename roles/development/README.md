@@ -11,7 +11,7 @@ Git configuration with signing key setup.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection (for git_config, pipx, pacman, npm modules)
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
 - `marcstraube.common.nodejs` role on non-Arch when enabling tools that

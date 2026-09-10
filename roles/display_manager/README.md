@@ -10,7 +10,7 @@ greeters (gtkgreet, regreet) running under Hyprland, Sway, or Cage.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 
 ## Supported Platforms
 

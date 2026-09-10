@@ -22,7 +22,7 @@ see "Known limitations on EL10" below.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection (pacman module on Arch Linux)
 - **Rocky Linux:** EPEL + CRB repositories enabled
 

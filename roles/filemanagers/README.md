@@ -14,7 +14,7 @@ Terminal file managers (mc, vifm, ranger, nnn, lf) are managed by
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - EPEL repository on Rocky Linux (managed by `marcstraube.common.package_management`)
 
 ## Supported Platforms

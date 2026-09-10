@@ -6,6 +6,7 @@ per-user configuration management.
 
 ## Requirements
 
+- ansible-core >= 2.19
 - `community.general` collection (for `ini_file` module)
 
 Browser extension installation is handled by the `marcstraube.desktop.browser`

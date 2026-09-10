@@ -16,7 +16,7 @@ pulls KF5 libraries that live in CRB.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - Collections: `kewlfft.aur` (Arch Linux AUR support)
 
 ## Supported Platforms

@@ -16,7 +16,7 @@ all three package repositories.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - Target host's chosen UTF-8 locale must be generated (`/etc/locale.gen`
   enabled and `locale-gen` run); the `marcstraube.common.base` role
   handles this.

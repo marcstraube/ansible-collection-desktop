@@ -11,7 +11,7 @@ environment configuration, and per-user Wine prefix initialization.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - Arch Linux: `multilib` repository enabled — set
   `pacman_multilib_enabled: true` in inventory and run the
   `marcstraube.common.package_management` role first (or use the

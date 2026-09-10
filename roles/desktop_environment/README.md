@@ -10,7 +10,7 @@ Wayland utilities integration, theme installation, and common desktop applicatio
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection
 - `kewlfft.aur` collection (Arch Linux AUR packages)
 - `marcstraube.desktop.wayland_utils` role (optional, for Wayland DEs)

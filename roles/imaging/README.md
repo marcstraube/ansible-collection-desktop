@@ -15,7 +15,7 @@ ImageMagick, and GraphicsMagick are not in the base repos.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - Collections: `kewlfft.aur` (Arch Linux AUR support)
 
 ## Supported Platforms

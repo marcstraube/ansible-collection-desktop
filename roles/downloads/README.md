@@ -12,7 +12,7 @@ for a given OS are silently skipped.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `kewlfft.aur` collection (Arch Linux AUR packages)
 - EPEL repository on Rocky Linux (managed by `marcstraube.common.package_management`)
 

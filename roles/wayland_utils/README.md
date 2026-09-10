@@ -12,7 +12,7 @@ skipped. Use Arch Linux or Debian for full Wayland coverage.
 
 ## Requirements
 
-None.
+- ansible-core >= 2.19
 
 ## Supported Platforms
 

@@ -4,6 +4,7 @@ Install office applications and document tools.
 
 ## Requirements
 
+- ansible-core >= 2.19
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
 
 ## Supported Platforms

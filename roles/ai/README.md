@@ -17,7 +17,7 @@ API keys are managed by the user via environment variables (not by this role).
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection (npm, pipx, pacman modules)
 - `kewlfft.aur` collection (AUR packages on Arch Linux)
 - Node.js and npm (for CLI tools on non-Arch)

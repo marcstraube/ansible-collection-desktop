@@ -14,7 +14,7 @@ and pairing timeouts. The ALSA audio backend on Arch Linux is installed via AUR
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection (pacman module)
 - `kewlfft.aur` collection (Arch Linux AUR packages)
 

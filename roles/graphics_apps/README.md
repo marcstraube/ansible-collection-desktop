@@ -18,7 +18,7 @@ available as distribution packages.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `community.general` collection (pacman module)
 - `kewlfft.aur` collection (Arch Linux AUR packages)
 - On EL 10, Krita requires EPEL and CRB enabled (its turbojpeg dependency lives

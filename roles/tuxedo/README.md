@@ -14,7 +14,7 @@ conflicts with the tccd power management daemon.
 
 ## Requirements
 
-- ansible-core >= 2.17
+- ansible-core >= 2.19
 - `kewlfft.aur` collection (Arch Linux AUR packages)
 - TUXEDO hardware (validated at runtime, non-fatal warning)
 
