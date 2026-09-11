@@ -1,5 +1,30 @@
 # Changelog
 
+## [3.0.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.4.0...v3.0.0) (2026-09-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop version control tooling from the development role ([#241](https://github.com/marcstraube/ansible-collection-desktop/issues/241))
+* remove Gemini CLI from the ai role ([#240](https://github.com/marcstraube/ansible-collection-desktop/issues/240))
+* gate initial user_config_mode on config existence ([#237](https://github.com/marcstraube/ansible-collection-desktop/issues/237))
+
+### Features
+
+* gate initial user_config_mode on config existence ([#237](https://github.com/marcstraube/ansible-collection-desktop/issues/237)) ([7bb0d68](https://github.com/marcstraube/ansible-collection-desktop/commit/7bb0d68733036bb28a73bb1854112ae35be02ac3)), closes [#179](https://github.com/marcstraube/ansible-collection-desktop/issues/179)
+* remove Gemini CLI from the ai role ([#240](https://github.com/marcstraube/ansible-collection-desktop/issues/240)) ([b254aa4](https://github.com/marcstraube/ansible-collection-desktop/commit/b254aa4b5a9d76a148e39f5135d7cac439354114)), closes [#146](https://github.com/marcstraube/ansible-collection-desktop/issues/146)
+
+
+### Code Refactoring
+
+* drop version control tooling from the development role ([#241](https://github.com/marcstraube/ansible-collection-desktop/issues/241)) ([4fb4064](https://github.com/marcstraube/ansible-collection-desktop/commit/4fb40645e2138ddef37f4f229945bb2430acd008)), closes [#233](https://github.com/marcstraube/ansible-collection-desktop/issues/233)
+
+
+### Documentation
+
+* **migration:** drop nonexistent hyprland autostart variable ([#243](https://github.com/marcstraube/ansible-collection-desktop/issues/243)) ([74d720a](https://github.com/marcstraube/ansible-collection-desktop/commit/74d720a58be6b97ba2b198c3242bc2f3a6a67524)), closes [#242](https://github.com/marcstraube/ansible-collection-desktop/issues/242)
+* **readme:** document the ansible-core 2.19 floor in every role README ([#239](https://github.com/marcstraube/ansible-collection-desktop/issues/239)) ([2cd55ff](https://github.com/marcstraube/ansible-collection-desktop/commit/2cd55ff9bd695d373c781c6fbe8345bcd730d5af)), closes [#236](https://github.com/marcstraube/ansible-collection-desktop/issues/236)
+
 ## [2.4.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.3.0...v2.4.0) (2026-09-08)
 
 
