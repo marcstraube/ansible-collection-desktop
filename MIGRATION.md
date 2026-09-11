@@ -480,8 +480,8 @@ wine_user_config_mode: 'managed'
 ### `wayland_utils` — `swww` renamed to `awww` + matugen toggle (#93)
 
 The wallpaper-daemon mapping key and the upstream binary name changed
-from `swww` to `awww`. Inventories that pin the wallpaper daemon or
-reference it from Hyprland autostart must update.
+from `swww` to `awww`. Inventories that pin the wallpaper daemon must
+update.
 
 A new toggle `wayland_utils_matugen_enabled` (default `false`) opts
 into Material You colour generation via the `matugen` tool.
@@ -490,18 +490,12 @@ into Material You colour generation via the `matugen` tool.
 
 ```yaml
 wayland_utils_wallpaper: 'swww'
-
-desktop_environment_hyprland_autostart:
-  - "swww init"
 ```
 
 #### After
 
 ```yaml
 wayland_utils_wallpaper: 'awww'
-
-desktop_environment_hyprland_autostart:
-  - "awww init"
 ```
 
 ### `browser` — Firefox locked prefs migrated to `policies.json` Preferences policy (#104)
