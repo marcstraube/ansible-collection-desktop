@@ -14,6 +14,8 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+## v3.0.0 - 2026-09-11
+
 ### `ai` — `ai_gemini_cli_enabled` is removed
 
 The variable was deprecated in v2.1.0 after Google moved Gemini CLI behind
