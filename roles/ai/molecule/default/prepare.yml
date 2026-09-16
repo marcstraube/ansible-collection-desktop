@@ -36,3 +36,81 @@
         mode: '0440'
         validate: 'visudo -cf %s'
       when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Claude Desktop user-config fixture.
+    #
+    # The role derives the per-user entry from the one the claude-desktop
+    # package ships. Building that package from the AUR would drag in the
+    # qemu/edk2-ovmf/virtiofsd chain for a code path that is OS-independent,
+    # so the scenario exercises it where the install task is a no-op anyway:
+    # on non-Arch the role only prints a notice, and this fixture stands in
+    # for the packaged entry.
+    - name: Prepare | Install desktop-file-utils (non-Arch)
+      ansible.builtin.package:
+        name: 'desktop-file-utils'
+        state: present
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Prepare | Create test users (non-Arch)
+      ansible.builtin.user:
+        name: '{{ item }}'
+        create_home: true
+        shell: /bin/bash
+      loop:
+        # managed: reconciled on every run, own password store
+        - ai_managed_user
+        # initial: entry absent (deployed) and present (kept untouched)
+        - ai_initial_new
+        - ai_initial_exist
+        # disabled: never deployed
+        - ai_disabled_user
+        # derived from users_list via the ai attribute
+        - ai_derived_user
+      loop_control:
+        label: '{{ item }}'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Prepare | Deploy packaged Claude Desktop entry fixture (non-Arch)
+      ansible.builtin.copy:
+        dest: '/usr/share/applications/claude-desktop.desktop'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Name=Claude
+          Exec=/usr/bin/claude-desktop %U
+          Terminal=false
+          Type=Application
+          MimeType=x-scheme-handler/claude;
+          Actions=new-window;
+
+          [Desktop Action new-window]
+          Name=New Window
+          Exec=/usr/bin/claude-desktop --new-window
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    # Pre-seeded entry for the initial-mode keep case: the role must leave
+    # this file exactly as it is, foreign switch included.
+    - name: Prepare | Ensure applications directory for the keep case (non-Arch)
+      ansible.builtin.file:
+        path: '/home/ai_initial_exist/.local/share/applications'
+        state: directory
+        owner: 'ai_initial_exist'
+        group: 'ai_initial_exist'
+        mode: '0755'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Prepare | Pre-seed a hand-edited entry (non-Arch)
+      ansible.builtin.copy:
+        dest: '/home/ai_initial_exist/.local/share/applications/claude-desktop.desktop'
+        owner: 'ai_initial_exist'
+        group: 'ai_initial_exist'
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Name=Claude
+          Exec=/usr/bin/claude-desktop --password-store=basic --molecule-fixture %U
+          Terminal=false
+          Type=Application
+      when: ansible_facts['os_family'] != 'Archlinux'

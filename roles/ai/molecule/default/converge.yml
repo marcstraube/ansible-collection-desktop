@@ -12,7 +12,6 @@
     ai_codex_enabled: false
     ai_opencode_enabled: false
     ai_aider_enabled: false
-    ai_claude_cowork_service_enabled: false
     ai_claude_desktop_enabled: false
     ai_antigravity_enabled: false
     ai_opencode_desktop_enabled: false
@@ -24,3 +23,75 @@
     - name: Converge | Include ai role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+
+# Per-user Claude Desktop entry.
+#
+# Runs where the Claude Desktop install task is a no-op — on Arch it would
+# build claude-desktop from the AUR, which the container test has no reason
+# to do. prepare.yml stands in for the packaged entry the role derives from.
+- name: Converge — Claude Desktop user config (non-Arch)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: true
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: false
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+    ai_user_config_mode: 'initial'
+    ai_users:
+      - username: 'ai_managed_user'
+        mode: 'managed'
+        password_store: 'kwallet6'  # pragma: allowlist secret
+      - username: 'ai_initial_new'
+      - username: 'ai_initial_exist'
+      - username: 'ai_disabled_user'
+        mode: 'disabled'
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+# Same role, users derived from users_list instead of a configured list.
+- name: Converge — Claude Desktop user derivation (non-Arch)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: true
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: false
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+    users_list:
+      - name: 'ai_derived_user'
+        ai: true
+      - name: 'ai_disabled_user'
+      - name: 'ai_system_account'
+        system: true
+        ai: true
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] != 'Archlinux'

@@ -8,3 +8,8 @@ __ai_comfyui_repo_url: 'https://github.com/comfyanonymous/ComfyUI.git'
 
 # ComfyUI-Manager Git repository URL
 __ai_comfyui_manager_repo_url: 'https://github.com/ltdrdata/ComfyUI-Manager.git'
+
+# Desktop entry shipped by the claude-desktop package. The per-user override
+# in ~/.local/share/applications/ is a copy of this file with the credential
+# backend appended to every Exec= line.
+__ai_claude_desktop_entry: '/usr/share/applications/claude-desktop.desktop'

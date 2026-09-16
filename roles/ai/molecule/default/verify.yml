@@ -8,3 +8,99 @@
       ansible.builtin.assert:
         that: true
         fail_msg: 'AI role did not complete'
+
+- name: Verify Claude Desktop user config
+  hosts: all
+  gather_facts: true
+
+  vars:
+    __ai_verify_entry: '.local/share/applications/claude-desktop.desktop'
+
+  tasks:
+    - name: Verify | Read deployed entries
+      ansible.builtin.slurp:
+        src: '/home/{{ item }}/{{ __ai_verify_entry }}'
+      loop:
+        - 'ai_managed_user'
+        - 'ai_initial_new'
+        - 'ai_initial_exist'
+        - 'ai_derived_user'
+      loop_control:
+        label: '{{ item }}'
+      register: __ai_verify_entries
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Build content map
+      ansible.builtin.set_fact:
+        __ai_verify_content: >-
+          {{ dict(__ai_verify_entries.results
+                  | map(attribute='item')
+                  | zip(__ai_verify_entries.results
+                        | map(attribute='content')
+                        | map('b64decode'))) }}
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert managed user got its own password store
+      ansible.builtin.assert:
+        that:
+          - >-
+            '--password-store=kwallet6 %U' in __ai_verify_content['ai_managed_user']
+          - >-
+            '--new-window --password-store=kwallet6' in __ai_verify_content['ai_managed_user']
+        fail_msg: 'managed user entry missing the per-user password store on every Exec line'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert initial user got the default password store
+      ansible.builtin.assert:
+        that:
+          - >-
+            '--password-store=gnome-libsecret %U' in __ai_verify_content['ai_initial_new']
+        fail_msg: 'initial user entry missing the default password store'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert initial mode kept the pre-existing entry
+      ansible.builtin.assert:
+        that:
+          - "'--molecule-fixture' in __ai_verify_content['ai_initial_exist']"
+          - "'gnome-libsecret' not in __ai_verify_content['ai_initial_exist']"
+        fail_msg: 'initial mode overwrote a hand-edited entry'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert derived user was configured
+      ansible.builtin.assert:
+        that:
+          - >-
+            '--password-store=gnome-libsecret %U' in __ai_verify_content['ai_derived_user']
+        fail_msg: 'user derived from the users_list ai attribute got no entry'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Stat entries that must not exist
+      ansible.builtin.stat:
+        path: '/home/{{ item }}/{{ __ai_verify_entry }}'
+      loop:
+        - 'ai_disabled_user'
+        - 'ai_system_account'
+      loop_control:
+        label: '{{ item }}'
+      register: __ai_verify_absent
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert disabled and system users were skipped
+      ansible.builtin.assert:
+        that:
+          - not (__ai_verify_absent.results | map(attribute='stat.exists') | select | list | length)
+        fail_msg: 'an entry was written for a disabled or system user'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert the desktop database was refreshed
+      ansible.builtin.stat:
+        path: '/home/ai_managed_user/.local/share/applications/mimeinfo.cache'
+      register: __ai_verify_mimeinfo
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert mimeinfo.cache exists
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_mimeinfo.stat.exists
+        fail_msg: 'update-desktop-database did not run for the managed user'
+      when: ansible_facts['os_family'] != 'Archlinux'

@@ -5,6 +5,21 @@
 
 # Claude Desktop
 
+# claude-desktop ships Chat, Cowork and Claude Code in one package and pulls
+# the virtiofsd/qemu/edk2-ovmf/socat chain Cowork's VM needs. It replaces both
+# claude-desktop-bin, its former AUR name, and claude-cowork-service, the
+# deprecated standalone Cowork backend whose systemd user unit would keep
+# serving a function the app now provides itself. Removal runs first so the
+# install does not hit a file conflict with the old package.
+- name: Desktop | Remove superseded Claude packages (Arch)
+  become: true
+  community.general.pacman:
+    name: '{{ __ai_claude_desktop_superseded_packages }}'
+    state: absent
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_claude_desktop_enabled | bool
+
 - name: Desktop | Install Claude Desktop from AUR (Arch)
   become: true
   become_user: "{{ aur_builder_user | default('aur_builder') }}"

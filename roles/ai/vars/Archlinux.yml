@@ -17,10 +17,8 @@ __ai_aur_packages:
     - opencode-gemini-auth
   aider:
     - aider
-  claude_cowork_service:
-    - claude-cowork-service
   claude_desktop:
-    - claude-desktop-bin
+    - claude-desktop
   antigravity:
     - antigravity
   opencode_desktop:
@@ -30,6 +28,14 @@ __ai_aur_packages:
 
 # CLI Tools
 __ai_codex_package: 'openai-codex'
+
+# Superseded by the claude-desktop package, removed when Claude Desktop is
+# installed. claude-desktop-bin is the AUR package's former name and would
+# conflict with it; claude-cowork-service is the deprecated, unmaintained
+# Cowork backend whose function claude-desktop now ships itself.
+__ai_claude_desktop_superseded_packages:
+  - claude-desktop-bin
+  - claude-cowork-service
 
 # Local AI
 __ai_ollama_package: 'ollama'

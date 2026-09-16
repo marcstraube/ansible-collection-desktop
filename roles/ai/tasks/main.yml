@@ -3,6 +3,31 @@
 # AI Tools Main Tasks
 #
 
+# ai_users takes precedence; only derive when the operator left it empty.
+- name: Main | Set user derivation guard
+  ansible.builtin.set_fact:
+    __ai_derive_users: '{{ ai_users | length == 0 }}'
+  tags:
+    - always
+
+# The ai attribute marks an account as a user of the AI desktop tooling.
+# Only the name is consumed here; per-user settings live in ai_users.
+# Same derivation contract as the other per-user roles.
+- name: Main | Derive AI users from users_list (exclude system users)
+  ansible.builtin.set_fact:
+    ai_users: >-
+      {{ ai_users + [{'username': item.name}] }}
+  loop: >-
+    {{ users_list | default([]) | selectattr('ai', 'defined') | list }}
+  loop_control:
+    label: '{{ item.name }}'
+  when:
+    - ai_enabled | bool
+    - __ai_derive_users | default(false) | bool
+    - not (item.system | default(false) | bool)
+  tags:
+    - always
+
 - name: Main | Load OS-specific variables
   ansible.builtin.include_vars: '{{ item }}'
   with_first_found:
@@ -66,3 +91,18 @@
   tags:
     - ai
     - ai:comfyui
+
+- name: Main | Include user configuration
+  ansible.builtin.include_tasks:
+    file: users.yml
+    apply:
+      tags:
+        - ai
+        - ai:users
+  when:
+    - ai_enabled | bool
+    - ai_claude_desktop_enabled | bool
+    - ai_users | length > 0
+  tags:
+    - ai
+    - ai:users
