@@ -82,11 +82,25 @@
 # and the sign-in redirect back into the app fails. Not a handler: it runs
 # per user, and a handler deferred to the end of the play would only see the
 # loop variable of the last one.
+#
+# Runs as root rather than as the user: the command rewrites a cache file in
+# the directory it is given and needs no user identity, while an unprivileged
+# become_user depends on a working sudo/PAM stack the target may not have.
+# The cache it writes is therefore chowned back in the next task.
 - name: Users Claude Desktop | Refresh user desktop database  # noqa: no-handler
   become: true
-  become_user: '{{ ai_user.username }}'
   ansible.builtin.command:
     cmd: 'update-desktop-database {{ __ai_user_home }}/.local/share/applications'
   changed_when: true
+  when:
+    - __ai_claude_desktop_entry_deployed is changed
+
+- name: Users Claude Desktop | Hand the refreshed cache back to the user  # noqa: no-handler
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_user_home }}/.local/share/applications/mimeinfo.cache'
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: '0644'
   when:
     - __ai_claude_desktop_entry_deployed is changed
