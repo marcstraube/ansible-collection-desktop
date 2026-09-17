@@ -6,8 +6,8 @@ Install AI development tools.
 
 Installs AI CLI tools, desktop applications, and local inference engines.
 Supports Claude Code, Antigravity, OpenAI Codex, OpenCode, Aider,
-Ollama, LM Studio, Claude Desktop, OpenCode Desktop, and ComfyUI (Stable
-Diffusion).
+Ollama, LM Studio, Claude Desktop (Chat, Cowork and Claude Code),
+OpenCode Desktop, and ComfyUI (Stable Diffusion).
 
 On Arch Linux, tools are installed via native packages (AUR/community/extra).
 On Debian and Rocky Linux, tools are installed via npm, pipx, install scripts,
@@ -51,15 +51,34 @@ API keys are managed by the user via environment variables (not by this role).
 | `ai_opencode_claude_auth_enabled`  | `false` | OpenCode auth plugin for Claude creds          |
 | `ai_opencode_gemini_auth_enabled`  | `false` | OpenCode auth plugin for Gemini creds          |
 | `ai_aider_enabled`                 | `false` | Install Aider (pair programming)               |
-| `ai_claude_cowork_service_enabled` | `false` | Install Claude Cowork Service (Arch only, AUR) |
 
 ### Desktop Applications
 
-| Variable                      | Default | Description                                  |
-| ----------------------------- | ------- | -------------------------------------------- |
-| `ai_claude_desktop_enabled`   | `false` | Install Claude Desktop (Arch only)           |
-| `ai_antigravity_enabled`      | `false` | Install Antigravity (Arch only)              |
-| `ai_opencode_desktop_enabled` | `false` | Install OpenCode Desktop (AUR / .deb / .rpm) |
+| Variable                             | Default              | Description                                     |
+| ------------------------------------ | -------------------- | ----------------------------------------------- |
+| `ai_claude_desktop_enabled`          | `false`              | Install Claude Desktop (Arch only)              |
+| `ai_claude_desktop_password_store`   | `'gnome-libsecret'`  | Credential backend for the per-user entry       |
+| `ai_antigravity_enabled`             | `false`              | Install Antigravity (Arch only)                 |
+| `ai_opencode_desktop_enabled`        | `false`              | Install OpenCode Desktop (AUR / .deb / .rpm)    |
+
+**Claude Desktop ships Cowork.** The `claude-desktop` package covers Chat,
+Cowork and Claude Code in one app and pulls in the
+`virtiofsd`/`qemu-system-x86`/`edk2-ovmf`/`socat` chain Cowork's VM needs. The
+separate `claude-cowork-service` backend is deprecated and unmaintained
+upstream, so enabling `ai_claude_desktop_enabled` removes it — the two do not
+overlap on files, but its systemd user unit serves a function the app now
+provides itself. The same step removes `claude-desktop-bin`, the AUR
+package's former name, which would otherwise conflict with the install.
+
+**Credential backend.** Claude Desktop is Chromium-based and picks its
+password store from the detected desktop. On compositors it does not
+recognize, sign-in data is stored unencrypted and switching sessions logs the
+user out. The role's per-user entry pins the backend explicitly:
+
+| Keystore                                              | `password_store`  |
+| ----------------------------------------------------- | ----------------- |
+| freedesktop Secret Service (KeePassXC, GNOME Keyring) | `gnome-libsecret` |
+| KWallet                                               | `kwallet6`        |
 
 ### Local AI / Inference
 
@@ -113,6 +132,47 @@ because no upstream package exists yet (see `tasks/comfyui-archlinux.yml`
 for the documented exception to the project's "Arch installs go through
 repos or AUR" rule).
 
+### User Configuration
+
+The role copies the packaged Claude Desktop entry into a user's
+`~/.local/share/applications/`, appends `--password-store=<backend>` to every
+`Exec=` line and refreshes the desktop database — skipping that last step
+breaks the `claude://` sign-in redirect.
+
+| Variable               | Default     | Description                                      |
+| ---------------------- | ----------- | ------------------------------------------------ |
+| `ai_users`             | `[]`        | Users to configure with a Claude Desktop entry   |
+| `ai_user_config_mode`  | `'initial'` | Default mode: `managed` / `initial` / `disabled` |
+
+Each user entry supports:
+
+| Key              | Required | Description                                             |
+| ---------------- | -------- | ------------------------------------------------------- |
+| `username`       | yes      | System username                                         |
+| `mode`           | no       | Per-user override of the global config mode             |
+| `password_store` | no       | Per-user override of `ai_claude_desktop_password_store` |
+
+Left empty, `ai_users` derives from `users_list` entries carrying an `ai`
+attribute, the standard derivation across the `marcstraube` collections:
+
+```yaml
+users_list:
+  - name: 'johndoe'
+    ai: true
+```
+
+Mode semantics:
+
+| Mode       | First run                     | Subsequent runs                            |
+| ---------- | ----------------------------- | ------------------------------------------ |
+| `managed`  | deploy                        | overwrite (always reconcile)               |
+| `initial`  | deploy if the entry is absent | leave the user's own edits alone           |
+| `disabled` | skip                          | skip                                       |
+
+`initial` gates on the entry file itself, not on whether the account was
+created in the same run, so a tag-scoped run still deploys. Nothing is written
+to any home directory while `ai_users` is empty or Claude Desktop is disabled.
+
 ## Tags
 
 | Tag          | Scope                              |
@@ -122,6 +182,7 @@ repos or AUR" rule).
 | `ai:desktop` | Desktop application installation   |
 | `ai:local`   | Local AI tools (Ollama, LM Studio) |
 | `ai:comfyui` | ComfyUI installation               |
+| `ai:users`   | Per-user Claude Desktop entry      |
 
 ## Example Playbook
 

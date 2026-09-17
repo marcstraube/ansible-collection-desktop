@@ -1,0 +1,101 @@
+---
+- name: Users Claude Desktop | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ ai_user.username }}'
+
+- name: Users Claude Desktop | Set user home fact
+  ansible.builtin.set_fact:
+    __ai_user_home: "{{ ansible_facts['getent_passwd'][ai_user.username][4] }}"
+
+# The packaged entry is the source the override is derived from, so without
+# it there is nothing to write — on non-Arch hosts the role never installs
+# Claude Desktop and this skips the whole user.
+- name: Users Claude Desktop | Stat packaged desktop entry
+  ansible.builtin.stat:
+    path: '{{ __ai_claude_desktop_entry }}'
+  register: __ai_claude_desktop_packaged_stat
+
+- name: Users Claude Desktop | Stat existing user desktop entry
+  ansible.builtin.stat:
+    path: '{{ __ai_user_home }}/.local/share/applications/{{ __ai_claude_desktop_entry | basename }}'
+  register: __ai_claude_desktop_user_stat
+
+# Mode semantics:
+#   managed  — reconcile the entry on every run
+#   initial  — write it only when absent, so a hand-edited entry (extra
+#              Chromium switches, a different password store) survives
+#   disabled — never write (gated in users.yml)
+# The gate is the entry itself, never whether the account was created in
+# this run: a tag-scoped run would otherwise silently deploy nothing.
+- name: Users Claude Desktop | Build deploy decision
+  ansible.builtin.set_fact:
+    __ai_claude_desktop_should_deploy: >-
+      {{ (ai_user.mode | default(ai_user_config_mode)) == 'managed'
+         or not __ai_claude_desktop_user_stat.stat.exists }}
+
+- name: Users Claude Desktop | Read packaged desktop entry
+  ansible.builtin.slurp:
+    src: '{{ __ai_claude_desktop_entry }}'
+  register: __ai_claude_desktop_packaged_content
+  when:
+    - __ai_claude_desktop_should_deploy | bool
+    - __ai_claude_desktop_packaged_stat.stat.exists
+
+- name: Users Claude Desktop | Ensure user applications directory exists
+  ansible.builtin.file:
+    path: '{{ __ai_user_home }}/.local/share/applications'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: '0755'
+  when:
+    - __ai_claude_desktop_should_deploy | bool
+    - __ai_claude_desktop_packaged_stat.stat.exists
+
+# Every Exec= line gets the flag, including the ones behind [Desktop Action]
+# groups — a window opened from a launcher action would otherwise run with a
+# different credential backend than the main entry. The optional trailing
+# group keeps the field code (%u, %U, %f, %F) last, where the spec expects
+# it, and the lookahead leaves a line that already carries the flag alone.
+- name: Users Claude Desktop | Deploy desktop entry with credential backend
+  ansible.builtin.copy:
+    content: >-
+      {{ __ai_claude_desktop_packaged_content.content | b64decode
+         | regex_replace('(?m)^Exec=(?!.*--password-store)(.*?)( %[uUfF])?$',
+                         'Exec=\1 --password-store='
+                         ~ (ai_user.password_store | default(ai_claude_desktop_password_store))
+                         ~ '\2') }}
+    dest: '{{ __ai_user_home }}/.local/share/applications/{{ __ai_claude_desktop_entry | basename }}'
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: '0644'
+  register: __ai_claude_desktop_entry_deployed
+  when:
+    - __ai_claude_desktop_should_deploy | bool
+    - __ai_claude_desktop_packaged_stat.stat.exists
+
+# Without this the claude:// handler keeps resolving to the packaged entry
+# and the sign-in redirect back into the app fails. Not a handler: it runs
+# per user, and a handler deferred to the end of the play would only see the
+# loop variable of the last one.
+#
+# Not run as the user: the command rewrites a cache file in the directory it
+# is given and needs no user identity, while switching to an unprivileged
+# account depends on a working sudo/PAM stack the target may not have. The
+# cache it writes is handed back to the user in the next task.
+- name: Users Claude Desktop | Refresh user desktop database  # noqa: no-handler
+  ansible.builtin.command:
+    cmd: 'update-desktop-database {{ __ai_user_home }}/.local/share/applications'
+  changed_when: true
+  when:
+    - __ai_claude_desktop_entry_deployed is changed
+
+- name: Users Claude Desktop | Hand the refreshed cache back to the user  # noqa: no-handler
+  ansible.builtin.file:
+    path: '{{ __ai_user_home }}/.local/share/applications/mimeinfo.cache'
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: '0644'
+  when:
+    - __ai_claude_desktop_entry_deployed is changed

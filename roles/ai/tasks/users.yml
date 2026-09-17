@@ -1,0 +1,27 @@
+---
+#
+# AI User Configuration
+#
+# Respects mode: managed | initial | disabled
+#   managed  — overwrite on every run
+#   initial  — deploy only when the target config is absent, then
+#              preserve it
+#   disabled — skip entirely
+# Per-user `mode:` overrides `ai_user_config_mode`.
+
+- name: Users | Include Claude Desktop entry config
+  ansible.builtin.include_tasks:
+    file: users_claude_desktop.yml
+    apply:
+      tags:
+        - ai
+        - ai:users
+  tags:
+    - ai
+    - ai:users
+  loop: '{{ ai_users }}'
+  loop_control:
+    loop_var: ai_user
+    label: '{{ ai_user.username }}'
+  when:
+    - (ai_user.mode | default(ai_user_config_mode)) != 'disabled'

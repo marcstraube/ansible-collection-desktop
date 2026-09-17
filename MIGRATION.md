@@ -14,6 +14,34 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+### `ai` — `ai_claude_cowork_service_enabled` is removed
+
+`claude-desktop` now ships Chat, Cowork and Claude Code in one package and
+pulls in the `virtiofsd`/`qemu-system-x86`/`edk2-ovmf`/`socat` chain Cowork's
+VM needs. The separate backend the toggle installed,
+`claude-cowork-service`, describes itself as deprecated and unmaintained
+upstream, superseded by the official Claude Desktop package.
+
+The toggle and its tasks are gone. Enabling `ai_claude_desktop_enabled` now
+removes `claude-cowork-service` where it is installed, so the old systemd
+user unit stops serving a function the desktop app provides itself.
+
+#### Required action
+
+Drop the variable from your inventory and enable Claude Desktop instead:
+
+```yaml
+# Before
+ai_claude_cowork_service_enabled: true
+
+# After
+ai_claude_desktop_enabled: true
+```
+
+An inventory that still sets `ai_claude_cowork_service_enabled` is not an
+error — the variable is simply ignored — but the package silently stops being
+installed.
+
 ### `ai` — `ai_gemini_cli_enabled` is removed
 
 The variable was deprecated in v2.1.0 after Google moved Gemini CLI behind

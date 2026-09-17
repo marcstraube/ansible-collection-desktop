@@ -32,17 +32,24 @@ ai_opencode_gemini_auth_enabled: false
 # Enable Aider (AI pair programming)
 ai_aider_enabled: false
 
-# Enable Claude Cowork Service (native backend for Claude Desktop Cowork —
-# Arch only; AUR-packaged)
-ai_claude_cowork_service_enabled: false
-
 #
 # Desktop Applications
 #
 # GUI-based AI tools
 
-# Enable Claude Desktop (official Anthropic app)
+# Enable Claude Desktop (official Anthropic app — ships Chat, Cowork and
+# Claude Code in one package). Installing it removes the superseded
+# claude-cowork-service backend.
 ai_claude_desktop_enabled: false
+
+# Credential backend written as --password-store= into the per-user Claude
+# Desktop entry. Claude Desktop is Chromium-based and falls back to
+# unencrypted storage on compositors it does not recognize, which logs the
+# user out on every session switch. Pick the backend matching the host's
+# keystore: 'gnome-libsecret' for the freedesktop Secret Service (KeePassXC,
+# GNOME Keyring), 'kwallet6' for KWallet. Overridable per user entry via
+# 'password_store'. Deployed per user via ai_users.
+ai_claude_desktop_password_store: 'gnome-libsecret'  # pragma: allowlist secret
 
 # Enable Antigravity (Google — agent-first desktop IDE, Antigravity 2.0
 # multi-agent orchestration platform)
@@ -97,3 +104,28 @@ ai_comfyui_home: '/var/lib/comfyui'
 ai_comfyui_manager_enabled: true
 # Enable and start the ComfyUI service
 ai_comfyui_service_enabled: true
+
+#
+# User Configuration
+#
+# Users for whom to deploy the per-user Claude Desktop entry.
+#
+# Left empty, the list derives from users_list entries carrying an 'ai'
+# attribute, the standard derivation across the marcstraube collections.
+#
+# Modes:
+#   managed  — always deploy/overwrite the desktop entry
+#   initial  — deploy the entry only when it is absent, then leave it
+#              under the user's control (default)
+#   disabled — skip config deployment for this user
+
+ai_users: []
+# ai_users:
+#   - username: 'johndoe'
+#     mode: 'managed'
+#     password_store: 'kwallet6'
+
+# Default mode when a user entry has no 'mode' key
+# 'initial' deploys the entry only when it is absent, so hand-added
+# Chromium switches survive; 'managed' reconciles continuously.
+ai_user_config_mode: 'initial'
