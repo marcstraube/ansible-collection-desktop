@@ -14,6 +14,8 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+## v3.0.0 - 2026-09-17
+
 ### `ai` — `ai_claude_cowork_service_enabled` is removed
 
 `claude-desktop` now ships Chat, Cowork and Claude Code in one package and
