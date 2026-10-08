@@ -39,7 +39,12 @@
       {{ (browser_user.mode | default(browser_user_config_mode)) == 'managed'
          or not __browser_user_mimeapps.stat.exists }}
 
-- name: Users Default Handler | Set http/https handler in mimeapps.list
+# No mode: desktop programs rewrite mimeapps.list to register their own URL
+# handlers and may change its permissions. Enforcing a mode would report a
+# change after every such rewrite although the handlers are still correct.
+# A new file gets the umask default; owner/group stay because the task runs
+# as root.
+- name: Users Default Handler | Set http/https handler in mimeapps.list  # noqa: risky-file-permissions
   community.general.ini_file:
     path: '{{ __browser_user_home }}/.config/mimeapps.list'
     section: 'Default Applications'
@@ -47,7 +52,6 @@
     value: '{{ browser_default }}.desktop'
     owner: '{{ browser_user.username }}'
     group: '{{ browser_user.username }}'
-    mode: '0644'
     no_extra_spaces: true
     create: true
   loop:

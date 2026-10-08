@@ -230,6 +230,14 @@
           - __browser_verify_mimeapps.stat.exists
         fail_msg: 'mimeapps.list not created for browser_test_user'
 
+    # The role sets no mode on purpose, but a file it creates must still
+    # belong to the user, not to root.
+    - name: Verify | Assert mimeapps.list belongs to the test user
+      ansible.builtin.assert:
+        that:
+          - __browser_verify_mimeapps.stat.pw_name == 'browser_test_user'
+        fail_msg: 'mimeapps.list owned by {{ __browser_verify_mimeapps.stat.pw_name }}'
+
     - name: Verify | Read mimeapps.list content
       ansible.builtin.slurp:
         src: /home/browser_test_user/.config/mimeapps.list
