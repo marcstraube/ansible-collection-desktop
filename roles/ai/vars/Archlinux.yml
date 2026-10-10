@@ -29,6 +29,7 @@ __ai_aur_packages:
 # CLI Tools
 __ai_codex_package: 'openai-codex'
 
+# TODO(4.0): remove
 # Superseded by the claude-desktop package, removed when Claude Desktop is
 # installed. claude-desktop-bin is the AUR package's former name and would
 # conflict with it; claude-cowork-service is the deprecated, unmaintained

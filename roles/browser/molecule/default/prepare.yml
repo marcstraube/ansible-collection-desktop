@@ -91,6 +91,26 @@
       when: ansible_facts['os_family'] == 'Archlinux'
 
     #
+    # Legacy Policies (Arch)
+    #
+
+    # Earlier releases wrote Firefox policies into the package's distribution
+    # directory; verify.yml asserts the role removes this file.
+    - name: Prepare | Create legacy Firefox policies directory (Arch)
+      ansible.builtin.file:
+        path: /usr/lib/firefox/distribution
+        state: directory
+        mode: '0755'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Plant legacy Firefox policies.json (Arch)
+      ansible.builtin.copy:
+        content: '{"policies": {}}'
+        dest: /usr/lib/firefox/distribution/policies.json
+        mode: '0644'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    #
     # Test User (for mimeapps.list handler verification)
     #
 

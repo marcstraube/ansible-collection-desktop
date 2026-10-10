@@ -14,3 +14,11 @@
     owner: root
     group: root
     mode: '0644'
+
+# TODO(4.0): remove — earlier releases wrote the policies into the package's
+# distribution directory, which the file under /etc now supersedes.
+- name: Firefox | Remove legacy policies.json
+  ansible.builtin.file:
+    path: '{{ __browser_firefox_legacy_policies_file }}'
+    state: absent
+  when: __browser_firefox_legacy_policies_file | length > 0
