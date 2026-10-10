@@ -13,7 +13,9 @@ communication_enabled: true
 # Enable Slack team communication
 communication_slack_enabled: true
 
-# Enable Slack Wayland variant
+# DEPRECATED: ignored. The slack-desktop-wayland AUR package is gone and
+# slack-desktop runs as a native Wayland client on its own (Electron >= 38.2).
+# Removal in v4.0.0 — see #253.
 communication_slack_wayland_enabled: false
 
 # Enable Telegram instant messaging

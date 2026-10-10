@@ -67,6 +67,25 @@
 # AUR Packages (Arch)
 #
 
+- name: Install | Warn about Slack Wayland deprecation
+  ansible.builtin.debug:
+    msg: >
+      communication_slack_wayland_enabled is DEPRECATED, ignored, and will be
+      removed in v4.0.0. slack-desktop runs as a native Wayland client on its
+      own. See #253.
+  when: communication_slack_wayland_enabled | bool
+
+# TODO(4.0): remove — the slack-desktop-wayland AUR package is gone. Removal
+# runs first so the install does not hit a conflict with the old package.
+- name: Install | Remove superseded Slack packages (Arch)
+  community.general.pacman:
+    name: '{{ __communication_slack_superseded_packages }}'
+    state: absent
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - communication_slack_enabled | bool
+    - __communication_slack_superseded_packages | length > 0
+
 - name: Install | Slack from AUR (Arch)
   become: true
   become_user: "{{ aur_builder_user | default('aur_builder') }}"
@@ -76,20 +95,6 @@
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - communication_slack_enabled | bool
-    - not (communication_slack_wayland_enabled | bool)
-  retries: 3
-  delay: 5
-
-- name: Install | Slack Wayland from AUR (Arch)
-  become: true
-  become_user: "{{ aur_builder_user | default('aur_builder') }}"
-  kewlfft.aur.aur:
-    name: '{{ __communication_aur_packages.slack_wayland }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'Archlinux'
-    - communication_slack_enabled | bool
-    - communication_slack_wayland_enabled | bool
   retries: 3
   delay: 5
 
