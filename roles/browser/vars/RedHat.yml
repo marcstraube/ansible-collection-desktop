@@ -4,6 +4,8 @@ __browser_firefox_package: 'firefox'
 __browser_firefox_i18n_package: 'firefox-langpack-{{ browser_firefox_i18n }}'
 __browser_chromium_package: 'chromium'
 __browser_tor_package: ''                 # Not available on Rocky
+__browser_librewolf_package: ''           # Not packaged
+__browser_librewolf_superseded_packages: []  # TODO(4.0): remove
 
 # Google Chrome vendor package (EL). Installing Google's own .rpm lets its
 # post-install script configure and own Google's yum repository, so Chrome
@@ -18,6 +20,10 @@ __browser_librewolf_policies_path: ''
 __browser_chromium_policies_path: '/etc/chromium/policies'
 __browser_brave_policies_path: ''
 __browser_chrome_policies_path: '/etc/opt/chrome/policies'
+
+# TODO(4.0): remove — legacy policy file cleanup applies to Arch only
+__browser_firefox_legacy_policies_file: ''
+__browser_librewolf_legacy_policies_file: ''
 
 # Profile detection: pattern to discover any existing profile
 # (random-prefixed by Firefox itself).

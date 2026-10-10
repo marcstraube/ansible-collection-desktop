@@ -40,7 +40,7 @@
     - name: Verify | Set Firefox policies path fact
       ansible.builtin.set_fact:
         __browser_verify_policies_path: >-
-          {% if ansible_facts['os_family'] == 'Archlinux' %}/usr/lib/firefox/distribution{%
+          {% if ansible_facts['os_family'] == 'Archlinux' %}/etc/firefox/policies{%
           elif ansible_facts['os_family'] == 'Debian' %}/etc/firefox-esr/policies{%
           else %}/usr/lib64/firefox/distribution{% endif %}
 
@@ -72,6 +72,21 @@
         cmd: 'python3 -c "import json; json.load(open(''{{ __browser_verify_policies_path | trim }}/policies.json''))"'
       register: __browser_verify_firefox_policies_json
       changed_when: false
+
+    # prepare.yml plants a policies.json in the distribution directory, where
+    # earlier releases wrote it; the role must remove it.
+    - name: Verify | Check legacy Firefox policies.json (Arch)
+      ansible.builtin.stat:
+        path: /usr/lib/firefox/distribution/policies.json
+      register: __browser_verify_firefox_legacy_policies
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert legacy Firefox policies.json is removed (Arch)
+      ansible.builtin.assert:
+        that:
+          - not __browser_verify_firefox_legacy_policies.stat.exists
+        fail_msg: 'Legacy /usr/lib/firefox/distribution/policies.json still present'
+      when: ansible_facts['os_family'] == 'Archlinux'
 
     #
     # Chromium Verification

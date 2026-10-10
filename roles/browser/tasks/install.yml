@@ -22,18 +22,59 @@
   delay: 5
 
 #
-# LibreWolf (AUR on Arch, not available elsewhere)
+# LibreWolf (official repository on Arch, not available elsewhere)
 #
 
-- name: Install | LibreWolf from AUR (Arch)
-  become: true
-  become_user: "{{ aur_builder_user | default('aur_builder') }}"
-  kewlfft.aur.aur:
-    name: '{{ __browser_aur_packages.librewolf }}'
-    state: present
+# TODO(4.0): remove — LibreWolf moved from the AUR to extra. Removal runs
+# first so the install does not hit a file conflict with the old package.
+- name: Install | Remove superseded LibreWolf packages (Arch)
+  community.general.pacman:
+    name: '{{ __browser_librewolf_superseded_packages }}'
+    state: absent
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - browser_librewolf_enabled | bool
+    - __browser_librewolf_superseded_packages | length > 0
+
+# TODO(4.0): remove — earlier releases wrote the policies into the package's
+# distribution directory. A file there that no package owns blocks the
+# install of the official package with a file conflict.
+- name: Install | Check legacy LibreWolf policies file
+  ansible.builtin.stat:
+    path: '{{ __browser_librewolf_legacy_policies_file }}'
+  register: __browser_librewolf_legacy_policies
+  when:
+    - browser_librewolf_enabled | bool
+    - __browser_librewolf_legacy_policies_file | length > 0
+
+- name: Install | Check owner of legacy LibreWolf policies file (Arch)
+  ansible.builtin.command:
+    cmd: 'pacman -Qqo {{ __browser_librewolf_legacy_policies_file }}'
+  register: __browser_librewolf_legacy_policies_owner
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - browser_librewolf_enabled | bool
+    - __browser_librewolf_legacy_policies.stat.exists | default(false)
+
+- name: Install | Remove unowned legacy LibreWolf policies file
+  ansible.builtin.file:
+    path: '{{ __browser_librewolf_legacy_policies_file }}'
+    state: absent
+  when:
+    - browser_librewolf_enabled | bool
+    - __browser_librewolf_legacy_policies.stat.exists | default(false)
+    - __browser_librewolf_legacy_policies_owner.rc | default(0) != 0
+
+- name: Install | LibreWolf packages
+  ansible.builtin.package:
+    name: '{{ __browser_librewolf_package }}'
+    state: present
+  when:
+    - browser_librewolf_enabled | bool
+    - __browser_librewolf_package | length > 0
   retries: 3
   delay: 5
 
@@ -43,8 +84,8 @@
       LibreWolf is not available in standard repositories for
       {{ ansible_facts["os_family"] }}. Please install manually or via Flatpak.
   when:
-    - ansible_facts['os_family'] != 'Archlinux'
     - browser_librewolf_enabled | bool
+    - __browser_librewolf_package | length == 0
 
 #
 # Chromium

@@ -15,9 +15,16 @@ Mozilla `Preferences` policy inside `policies.json` (whitelist-bound, see
 upstream `Policies.sys.mjs`). Per-user, user-overridable hardening lives in
 `<profile>/user.js`.
 
-LibreWolf, Brave, Tor Browser, and Zen Browser are installed from AUR on
-Arch Linux. Tor Browser is available via `torbrowser-launcher` on Debian.
-Chromium on Rocky Linux requires EPEL.
+On Arch Linux the Firefox and LibreWolf policies are written to
+`/etc/firefox/policies/policies.json` and
+`/etc/librewolf/policies/policies.json`. The browser reads that file first and
+then ignores `distribution/policies.json` in its install directory, which
+belongs to the package and is replaced on package updates.
+
+LibreWolf is installed from the official repository on Arch Linux. Brave, Tor
+Browser, and Zen Browser are installed from AUR on Arch Linux. Tor Browser is
+available via `torbrowser-launcher` on Debian. Chromium on Rocky Linux
+requires EPEL.
 
 Google Chrome is available on every platform: from AUR (`google-chrome`) on
 Arch Linux, and from Google's own vendor package on Debian/EL. On Debian/EL
@@ -40,7 +47,7 @@ policy mechanism.
 
 | Platform       | Firefox | LibreWolf | Tor | Zen | Chromium | Brave | Chrome |
 | -------------- | ------- | --------- | --- | --- | -------- | ----- | ------ |
-| Arch Linux     | yes     | AUR       | AUR | AUR | yes      | AUR   | AUR    |
+| Arch Linux     | yes     | yes       | AUR | AUR | yes      | AUR   | AUR    |
 | Debian Trixie  | ESR     | no        | yes | no  | yes      | no    | repo   |
 | EL 9           | yes     | no        | no  | no  | EPEL     | no    | repo   |
 | EL 10          | yes     | no        | no  | no  | EPEL     | no    | repo   |

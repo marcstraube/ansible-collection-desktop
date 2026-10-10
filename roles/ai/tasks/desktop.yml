@@ -5,6 +5,7 @@
 
 # Claude Desktop
 
+# TODO(4.0): remove the superseded-package removal below.
 # claude-desktop ships Chat, Cowork and Claude Code in one package and pulls
 # the virtiofsd/qemu/edk2-ovmf/socat chain Cowork's VM needs. It replaces both
 # claude-desktop-bin, its former AUR name, and claude-cowork-service, the
