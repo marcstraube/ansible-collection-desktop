@@ -1,0 +1,24 @@
+---
+#
+# Archlinux-Specific Variables
+#
+
+# ADB tools and udev rules (official extra repo)
+__virtual_reality_adb_packages:
+  - android-tools
+  - android-udev
+
+# AUR packages grouped by purpose
+__virtual_reality_aur_packages:
+  # Both are split packages of one pkgbase, and makepkg checks the
+  # dependencies of all of them. kewlfft.aur calls the helper once per
+  # package, so the dashboard goes first: it depends on wivrn-server,
+  # which lets paru resolve the dependencies of both (e.g. qcoro).
+  wivrn:
+    - wivrn-dashboard
+    - wivrn-server
+  xrizer:
+    - xrizer
+    - lib32-xrizer
+  alvr:
+    - alvr

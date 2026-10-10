@@ -1,0 +1,88 @@
+---
+#
+# Platform Notice
+#
+# WiVRn, ALVR and xrizer are only packaged for Arch Linux (AUR). Debian
+# and EL get nothing installed; WiVRn is available there via Flathub.
+#
+
+- name: Install | Show VR availability notice
+  ansible.builtin.debug:
+    msg: >-
+      VR streaming servers are not packaged for
+      {{ ansible_facts["os_family"] }}. Please install WiVRn via Flatpak
+      (Flathub: io.github.wivrn.wivrn); the Flatpak bundles xrizer and
+      OpenComposite.
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - virtual_reality_wivrn_enabled | bool
+      or virtual_reality_alvr_enabled | bool
+      or virtual_reality_xrizer_enabled | bool
+
+#
+# Headset Access
+#
+
+- name: Install | ADB tools and udev rules
+  ansible.builtin.package:
+    name: '{{ __virtual_reality_adb_packages }}'
+    state: present
+  when:
+    - virtual_reality_adb_enabled | bool
+    - __virtual_reality_adb_packages | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+#
+# AUR Packages (Arch Linux)
+#
+
+- name: Install | WiVRn from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __virtual_reality_aur_packages.wivrn }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - virtual_reality_wivrn_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Install | Assert multilib repo is enabled for xrizer (Arch)
+  ansible.builtin.assert:
+    that:
+      - pacman_multilib_enabled | default(false) | bool
+    fail_msg: >-
+      xrizer ships a 32-bit build (lib32-xrizer) for 32-bit SteamVR
+      titles, which depends on the multilib repository. Set
+      `pacman_multilib_enabled: true` in inventory and run the
+      `marcstraube.common.package_management` role first (or use the
+      `base-system` tag).
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - virtual_reality_xrizer_enabled | bool
+
+- name: Install | xrizer from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __virtual_reality_aur_packages.xrizer }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - virtual_reality_xrizer_enabled | bool
+  retries: 3
+  delay: 5
+
+- name: Install | ALVR from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __virtual_reality_aur_packages.alvr }}'
+    state: present
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - virtual_reality_alvr_enabled | bool
+  retries: 3
+  delay: 5
