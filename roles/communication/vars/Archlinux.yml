@@ -21,6 +21,10 @@ __communication_sieve_package: 'kmail'
 # KDE Connect package
 __communication_kdeconnect_package: 'kdeconnect'
 
+# TODO(4.0): remove — replaced by slack-desktop, which runs on Wayland natively
+__communication_slack_superseded_packages:
+  - slack-desktop-wayland
+
 #
 # AUR Packages
 #
@@ -28,8 +32,6 @@ __communication_kdeconnect_package: 'kdeconnect'
 __communication_aur_packages:
   slack:
     - slack-desktop
-  slack_wayland:
-    - slack-desktop-wayland
   threema:
     - threema-desktop-bin
   zoom:

@@ -45,12 +45,17 @@ overrides if needed.
 | Variable                              | Default | Description                       |
 |---------------------------------------|---------|-----------------------------------|
 | `communication_slack_enabled`         | `true`  | Enable Slack team communication   |
-| `communication_slack_wayland_enabled` | `false` | Enable Slack Wayland variant      |
+| `communication_slack_wayland_enabled` | `false` | Ignored (deprecated)              |
 | `communication_telegram_enabled`      | `true`  | Enable Telegram instant messaging |
 | `communication_threema_enabled`       | `true`  | Enable Threema secure messaging   |
 | `communication_signal_enabled`        | `false` | Enable Signal Desktop             |
 | `communication_discord_enabled`       | `false` | Enable Discord                    |
 | `communication_element_enabled`       | `false` | Enable Element Matrix client      |
+
+> **Deprecation:** `communication_slack_wayland_enabled` is deprecated, ignored,
+> and will be removed in v4.0.0. `slack-desktop` runs as a native Wayland client
+> on its own; the role removes `slack-desktop-wayland` where it is installed.
+> See #253.
 
 ### Email Filters
 

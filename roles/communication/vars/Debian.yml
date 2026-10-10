@@ -15,6 +15,7 @@ __communication_kdeconnect_package: 'kdeconnect'
 
 # Packages not available without external repos
 __communication_slack_package: ''
+__communication_slack_superseded_packages: []  # TODO(4.0): remove
 __communication_signal_package: ''
 __communication_discord_package: ''
 __communication_element_package: ''
