@@ -64,7 +64,7 @@ overrides if needed.
 
 | Variable                  | Default | Description                         |
 | ------------------------- | ------- | ----------------------------------- |
-| `virtual_reality_enabled` | `true`  | Enable/disable virtual_reality role |
+| `virtual_reality_enabled` | `false` | Enable/disable virtual_reality role |
 
 ### Streaming Servers
 
@@ -157,7 +157,7 @@ firewalld_ports:
       ansible.builtin.include_role:
         name: marcstraube.desktop.virtual_reality
       tags: [virtual-reality]
-      when: virtual_reality_enabled | default(true) | bool
+      when: virtual_reality_enabled | default(false) | bool
 ```
 
 ## Testing
