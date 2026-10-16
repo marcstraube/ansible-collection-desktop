@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    virtual_reality_enabled: true
+    # The AUR builds (WiVRn, xrizer, ALVR) are too heavy for container
+    # tests and xrizer needs multilib — skip them on Arch. Debian/EL keep
+    # the defaults to exercise the availability notice.
+    virtual_reality_wivrn_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+    virtual_reality_xrizer_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+    virtual_reality_alvr_enabled: false
+    virtual_reality_adb_enabled: true
+
+  tasks:
+    - name: Converge | Include virtual_reality role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

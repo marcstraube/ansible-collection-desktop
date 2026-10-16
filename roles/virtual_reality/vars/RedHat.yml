@@ -1,0 +1,7 @@
+---
+#
+# RedHat-Specific Variables
+#
+
+# No streaming server is packaged for EL, so nothing is installed
+__virtual_reality_adb_packages: []

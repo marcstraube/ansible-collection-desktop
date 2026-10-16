@@ -88,11 +88,12 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ### Gaming & Hobby
 
-| Role       | Description                            |
-| ---------- | -------------------------------------- |
-| **gaming** | Gaming platforms, emulators, launchers |
-| **wine**   | Wine Windows compatibility layer       |
-| **cad**    | CAD applications                       |
+| Role                | Description                             |
+| ------------------- | --------------------------------------- |
+| **gaming**          | Gaming platforms, emulators, launchers  |
+| **virtual_reality** | VR streaming to standalone headsets     |
+| **wine**            | Wine Windows compatibility layer        |
+| **cad**             | CAD applications                        |
 
 ## Installation
 
