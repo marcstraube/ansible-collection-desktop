@@ -3,8 +3,9 @@
 # Role Control
 #
 
-# Enable the virtual_reality role
-virtual_reality_enabled: true
+# Enable the virtual_reality role. Off by default: VR streaming needs a
+# capable GPU, so a host opts in through its inventory.
+virtual_reality_enabled: false
 
 #
 # Streaming Servers
