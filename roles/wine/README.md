@@ -46,7 +46,7 @@ Wine is not available for EL 10 — the role warns and skips on unsupported vers
 
 | Variable | Default | Description |
 | -------- | ------- | ----------- |
-| `wine_enabled` | `true` | Enable the wine role |
+| `wine_enabled` | `false` | Enable the wine role |
 
 ### Wine Variant
 
@@ -126,7 +126,7 @@ wine_users:
   ansible.builtin.include_role:
     name: marcstraube.desktop.wine
   tags: [wine]
-  when: wine_enabled | default(true) | bool
+  when: wine_enabled | default(false) | bool
 ```
 
 ## Testing

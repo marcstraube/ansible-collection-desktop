@@ -36,7 +36,7 @@ overrides if needed.
 
 | Variable               | Default | Description         |
 | ---------------------- | ------- | ------------------- |
-| `filemanagers_enabled` | `true`  | Enable/disable role |
+| `filemanagers_enabled` | `false` | Enable/disable role |
 
 ### GUI File Managers
 
@@ -66,7 +66,7 @@ overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.filemanagers
       tags: [filemanagers]
-      when: filemanagers_enabled | default(true) | bool
+      when: filemanagers_enabled | default(false) | bool
 ```
 
 ## Testing

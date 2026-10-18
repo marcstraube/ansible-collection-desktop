@@ -40,7 +40,7 @@ overrides if needed.
 
 | Variable                | Default | Description                       |
 |-------------------------|---------|-----------------------------------|
-| `security_apps_enabled` | `true`  | Enable/disable security_apps role |
+| `security_apps_enabled` | `false` | Enable/disable security_apps role |
 
 ### Encryption
 
@@ -80,7 +80,7 @@ overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.security_apps
       tags: [security-apps]
-      when: security_apps_enabled | default(true) | bool
+      when: security_apps_enabled | default(false) | bool
 ```
 
 ## Testing

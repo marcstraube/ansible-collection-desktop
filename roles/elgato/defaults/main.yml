@@ -3,8 +3,9 @@
 # Role Control
 #
 
-# Enable the elgato role
-elgato_enabled: true
+# Enable the elgato role. Off by default: a host opts in through its
+# inventory.
+elgato_enabled: false
 
 #
 # Device Tools

@@ -3,8 +3,9 @@
 # Role Control
 #
 
-# Enable the system_apps role
-system_apps_enabled: true
+# Enable the system_apps role. Off by default: a host opts in through its
+# inventory.
+system_apps_enabled: false
 
 #
 # Disk Management

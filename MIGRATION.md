@@ -14,6 +14,61 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+### Application and peripheral roles are opt-in
+
+`playbooks/tasks/desktop_workstation.yml` imports its roles statically with
+`import_role` and guarded fifteen of them with `when: <role>_enabled |
+default(false) | bool`, as if they were opt-in. Under `import_role` that
+`default()` never applies: the condition is attached to every task of the
+imported role and evaluated with the role's `defaults/main.yml` in scope, where
+every one of these toggles was `true`. The fifteen roles therefore ran on every
+host that did not disable them in its inventory.
+
+The role default is now the single source of truth and matches what the task
+file always suggested. These roles default to `false`:
+
+| Role            | Toggle                  |
+| --------------- | ----------------------- |
+| `ai`            | `ai_enabled`            |
+| `cad`           | `cad_enabled`           |
+| `communication` | `communication_enabled` |
+| `downloads`     | `downloads_enabled`     |
+| `elgato`        | `elgato_enabled`        |
+| `filemanagers`  | `filemanagers_enabled`  |
+| `gaming`        | `gaming_enabled`        |
+| `graphics_apps` | `graphics_apps_enabled` |
+| `imaging`       | `imaging_enabled`       |
+| `multimedia`    | `multimedia_enabled`    |
+| `remote_access` | `remote_access_enabled` |
+| `security_apps` | `security_apps_enabled` |
+| `system_apps`   | `system_apps_enabled`   |
+| `tuxedo`        | `tuxedo_enabled`        |
+| `wine`          | `wine_enabled`          |
+
+The import conditions read `when: <role>_enabled | bool` from now on: under
+`import_role` the role default is in scope, so a playbook `default()` never
+applied. The core desktop roles (`desktop_environment`, `display_manager`,
+`terminal`, `pipewire`, `bluetooth`, `xdg_user_dirs`, `browser`, `keepassxc`,
+`office`, `development`) keep their default of `true`.
+
+#### Required action
+
+Hosts that should keep one of these roles must enable it in their inventory.
+An inventory that never set the toggle relied on the role default and loses
+the role otherwise:
+
+```yaml
+# group_vars/workstations/vars.yml
+multimedia_enabled: true
+graphics_apps_enabled: true
+communication_enabled: true
+```
+
+Inventories that already set `<role>_enabled` explicitly, in either direction,
+are unaffected. The standalone playbooks `laptop_full.yml` and
+`workstation_full.yml` set the toggles as play variables and are unaffected as
+well.
+
 ### `ai` — `ai_claude_cowork_service_enabled` is removed
 
 `claude-desktop` now ships Chat, Cowork and Claude Code in one package and

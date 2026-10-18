@@ -37,7 +37,7 @@ overrides if needed.
 
 | Variable                | Default | Description                       |
 | ----------------------- | ------- | --------------------------------- |
-| `remote_access_enabled` | `true`  | Enable the remote_access role     |
+| `remote_access_enabled` | `false` | Enable the remote_access role     |
 
 ### Remote Desktop
 
@@ -84,7 +84,7 @@ overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.remote_access
       tags: [remote-access]
-      when: remote_access_enabled | default(true) | bool
+      when: remote_access_enabled | default(false) | bool
 ```
 
 ## Testing

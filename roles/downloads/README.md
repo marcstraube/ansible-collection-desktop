@@ -35,7 +35,7 @@ overrides if needed.
 
 | Variable            | Default | Description         |
 |---------------------|---------|---------------------|
-| `downloads_enabled` | `true`  | Enable/disable role |
+| `downloads_enabled` | `false` | Enable/disable role |
 
 ### Torrent Clients
 
@@ -76,7 +76,7 @@ overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.downloads
       tags: [downloads]
-      when: downloads_enabled | default(true) | bool
+      when: downloads_enabled | default(false) | bool
 ```
 
 ## Testing

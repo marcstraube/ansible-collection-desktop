@@ -38,7 +38,7 @@ API keys are managed by the user via environment variables (not by this role).
 
 | Variable     | Default | Description            |
 | ------------ | ------- | ---------------------- |
-| `ai_enabled` | `true`  | Enable/disable AI role |
+| `ai_enabled` | `false` | Enable/disable AI role |
 
 ### CLI Tools
 
@@ -194,7 +194,7 @@ to any home directory while `ai_users` is empty or Claude Desktop is disabled.
       ansible.builtin.include_role:
         name: marcstraube.desktop.ai
       tags: [ai]
-      when: ai_enabled | default(true) | bool
+      when: ai_enabled | default(false) | bool
 ```
 
 ## Testing
