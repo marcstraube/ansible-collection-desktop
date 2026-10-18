@@ -3,8 +3,9 @@
 # Role Control
 #
 
-# Enable the gaming role
-gaming_enabled: true
+# Enable the gaming role. Off by default: a host opts in through its
+# inventory.
+gaming_enabled: false
 
 #
 # Gaming Platforms

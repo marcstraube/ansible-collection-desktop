@@ -38,7 +38,7 @@ overrides if needed.
 
 | Variable             | Default | Description                |
 |----------------------|---------|----------------------------|
-| `multimedia_enabled` | `true`  | Enable the multimedia role |
+| `multimedia_enabled` | `false` | Enable the multimedia role |
 
 ### Video Players
 
@@ -103,7 +103,7 @@ overrides if needed.
     name: marcstraube.desktop.multimedia
   tags:
     - multimedia
-  when: multimedia_enabled | default(true) | bool
+  when: multimedia_enabled | default(false) | bool
 ```
 
 ## Testing

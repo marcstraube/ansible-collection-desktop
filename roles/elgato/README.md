@@ -33,7 +33,7 @@ work but are not actively tested.
 
 | Variable         | Default | Description         |
 | ---------------- | ------- | ------------------- |
-| `elgato_enabled` | `true`  | Enable/disable role |
+| `elgato_enabled` | `false` | Enable/disable role |
 
 ### Device Tools
 
@@ -68,7 +68,7 @@ work but are not actively tested.
       ansible.builtin.include_role:
         name: marcstraube.desktop.elgato
       tags: [elgato]
-      when: elgato_enabled | default(true) | bool
+      when: elgato_enabled | default(false) | bool
 ```
 
 ## Testing

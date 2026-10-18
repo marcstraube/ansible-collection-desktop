@@ -3,8 +3,8 @@
 # Role Control
 #
 
-# Enable the cad role
-cad_enabled: true
+# Enable the cad role. Off by default: a host opts in through its inventory.
+cad_enabled: false
 
 #
 # CAD Applications

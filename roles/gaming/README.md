@@ -52,7 +52,7 @@ overrides if needed.
 
 | Variable         | Default | Description                |
 | ---------------- | ------- | -------------------------- |
-| `gaming_enabled` | `true`  | Enable/disable gaming role |
+| `gaming_enabled` | `false` | Enable/disable gaming role |
 
 ### Gaming Platforms
 
@@ -108,7 +108,7 @@ unselected variant before installing the selected one.
       ansible.builtin.include_role:
         name: marcstraube.desktop.gaming
       tags: [gaming]
-      when: gaming_enabled | default(true) | bool
+      when: gaming_enabled | default(false) | bool
 ```
 
 ## Testing

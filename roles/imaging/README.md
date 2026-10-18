@@ -37,7 +37,7 @@ overrides if needed.
 
 | Variable          | Default | Description             |
 | ----------------- | ------- | ----------------------- |
-| `imaging_enabled` | `true`  | Enable the imaging role |
+| `imaging_enabled` | `false` | Enable the imaging role |
 
 ### Scanning Applications
 
@@ -77,7 +77,7 @@ overrides if needed.
   ansible.builtin.include_role:
     name: marcstraube.desktop.imaging
   tags: [imaging]
-  when: imaging_enabled | default(true) | bool
+  when: imaging_enabled | default(false) | bool
 ```
 
 ## Testing

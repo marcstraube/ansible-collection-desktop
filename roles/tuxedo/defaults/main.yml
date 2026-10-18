@@ -3,8 +3,9 @@
 # Role Control
 #
 
-# Enable the tuxedo role
-tuxedo_enabled: true
+# Enable the tuxedo role. Off by default: a host opts in through its
+# inventory.
+tuxedo_enabled: false
 
 #
 # Packages

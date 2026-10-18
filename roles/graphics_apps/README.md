@@ -45,7 +45,7 @@ overrides if needed.
 
 | Variable                | Default | Description         |
 | ----------------------- | ------- | ------------------- |
-| `graphics_apps_enabled` | `true`  | Enable/disable role |
+| `graphics_apps_enabled` | `false` | Enable/disable role |
 
 ### Applications to Install
 
@@ -75,7 +75,7 @@ overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.graphics_apps
       tags: [graphics-apps]
-      when: graphics_apps_enabled | bool
+      when: graphics_apps_enabled | default(false) | bool
 ```
 
 ## Testing

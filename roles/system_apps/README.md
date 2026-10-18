@@ -56,7 +56,7 @@ and are skipped automatically. The role install tasks already guard with
 
 | Variable              | Default | Description                         |
 |-----------------------|---------|-------------------------------------|
-| `system_apps_enabled` | `true`  | Enable/disable the system_apps role |
+| `system_apps_enabled` | `false` | Enable/disable the system_apps role |
 
 ### Disk Management
 
@@ -110,7 +110,7 @@ and are skipped automatically. The role install tasks already guard with
       ansible.builtin.include_role:
         name: marcstraube.desktop.system_apps
       tags: [system-apps]
-      when: system_apps_enabled | default(true) | bool
+      when: system_apps_enabled | default(false) | bool
 ```
 
 ## Testing

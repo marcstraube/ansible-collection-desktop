@@ -3,8 +3,8 @@
 # Role Control
 #
 
-# Enable the wine role
-wine_enabled: true
+# Enable the wine role. Off by default: a host opts in through its inventory.
+wine_enabled: false
 
 #
 # Wine Variant

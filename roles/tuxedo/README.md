@@ -33,7 +33,7 @@ but are not actively tested. Use distro-specific vars overrides if needed.
 
 | Variable         | Default | Description         |
 | ---------------- | ------- | ------------------- |
-| `tuxedo_enabled` | `true`  | Enable/disable role |
+| `tuxedo_enabled` | `false` | Enable/disable role |
 
 ### Packages
 
@@ -75,7 +75,7 @@ but are not actively tested. Use distro-specific vars overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.tuxedo
       tags: [tuxedo]
-      when: tuxedo_enabled | default(true) | bool
+      when: tuxedo_enabled | default(false) | bool
 ```
 
 ## Testing

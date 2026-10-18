@@ -34,7 +34,7 @@ overrides if needed.
 
 | Variable      | Default | Description         |
 | ------------- | ------- | ------------------- |
-| `cad_enabled` | `true`  | Enable/disable role |
+| `cad_enabled` | `false` | Enable/disable role |
 
 ### Applications
 
@@ -63,7 +63,7 @@ overrides if needed.
       ansible.builtin.include_role:
         name: marcstraube.desktop.cad
       tags: [cad]
-      when: cad_enabled | default(true) | bool
+      when: cad_enabled | default(false) | bool
 ```
 
 ## Testing

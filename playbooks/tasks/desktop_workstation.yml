@@ -5,8 +5,10 @@
 # Task file for desktop workstation configuration — single source of truth.
 # Imported by playbooks/desktop_workstation.yml (standalone) and infra playbooks.
 #
-# Roles default to enabled or disabled as shown — override via inventory.
-# See each role's defaults/main.yml for available variables.
+# Each role's defaults/main.yml decides whether it runs (`<role>_enabled`):
+# core desktop roles are on, application and peripheral roles are opt-in.
+# Override per host/group via inventory. See each role's defaults/main.yml
+# for available variables.
 #
 # Tag scheme:
 #   desktop         All roles in this file
@@ -16,6 +18,10 @@
 # Roles are imported statically (import_role) so their internal sub-tags are
 # exposed to --tags / --list-tags. Run `ansible-playbook … --list-tags` to see
 # the full set. Dynamic include_role would hide sub-tags behind the include.
+#
+# The import condition reads the role toggle without a default(): under
+# import_role the condition is evaluated with the role defaults in scope, so a
+# playbook default() would never apply.
 # =============================================================================
 
 #
@@ -27,7 +33,7 @@
   tags:
     - desktop
     - desktop-environment
-  when: desktop_environment_enabled | default(true) | bool
+  when: desktop_environment_enabled | bool
 
 - name: Desktop | Import display_manager role
   ansible.builtin.import_role:
@@ -35,7 +41,7 @@
   tags:
     - desktop
     - display-manager
-  when: display_manager_enabled | default(true) | bool
+  when: display_manager_enabled | bool
 
 #
 # Core Desktop
@@ -46,7 +52,7 @@
   tags:
     - desktop
     - terminal
-  when: terminal_enabled | default(true) | bool
+  when: terminal_enabled | bool
 
 - name: Desktop | Import pipewire role
   ansible.builtin.import_role:
@@ -54,7 +60,7 @@
   tags:
     - desktop
     - pipewire
-  when: pipewire_enabled | default(true) | bool
+  when: pipewire_enabled | bool
 
 - name: Desktop | Import bluetooth role
   ansible.builtin.import_role:
@@ -62,7 +68,7 @@
   tags:
     - desktop
     - bluetooth
-  when: bluetooth_enabled | default(true) | bool
+  when: bluetooth_enabled | bool
 
 - name: Desktop | Import xdg_user_dirs role
   ansible.builtin.import_role:
@@ -70,7 +76,7 @@
   tags:
     - desktop
     - xdg_user_dirs
-  when: xdg_user_dirs_enabled | default(true) | bool
+  when: xdg_user_dirs_enabled | bool
 
 - name: Desktop | Import filemanagers role
   ansible.builtin.import_role:
@@ -78,7 +84,7 @@
   tags:
     - desktop
     - filemanagers
-  when: filemanagers_enabled | default(false) | bool
+  when: filemanagers_enabled | bool
 
 #
 # Productivity
@@ -89,7 +95,7 @@
   tags:
     - desktop
     - browser
-  when: browser_enabled | default(true) | bool
+  when: browser_enabled | bool
 
 - name: Desktop | Import keepassxc role
   ansible.builtin.import_role:
@@ -97,7 +103,7 @@
   tags:
     - desktop
     - keepassxc
-  when: keepassxc_enabled | default(true) | bool
+  when: keepassxc_enabled | bool
 
 - name: Desktop | Import office role
   ansible.builtin.import_role:
@@ -105,7 +111,7 @@
   tags:
     - desktop
     - office
-  when: office_enabled | default(true) | bool
+  when: office_enabled | bool
 
 #
 # Development
@@ -116,7 +122,7 @@
   tags:
     - desktop
     - development
-  when: development_enabled | default(true) | bool
+  when: development_enabled | bool
 
 #
 # AI Tools
@@ -127,7 +133,7 @@
   tags:
     - desktop
     - ai
-  when: ai_enabled | default(false) | bool
+  when: ai_enabled | bool
 
 #
 # Applications
@@ -138,7 +144,7 @@
   tags:
     - desktop
     - multimedia
-  when: multimedia_enabled | default(false) | bool
+  when: multimedia_enabled | bool
 
 - name: Desktop | Import graphics_apps role
   ansible.builtin.import_role:
@@ -146,7 +152,7 @@
   tags:
     - desktop
     - graphics-apps
-  when: graphics_apps_enabled | default(false) | bool
+  when: graphics_apps_enabled | bool
 
 - name: Desktop | Import cad role
   ansible.builtin.import_role:
@@ -154,7 +160,7 @@
   tags:
     - desktop
     - cad
-  when: cad_enabled | default(false) | bool
+  when: cad_enabled | bool
 
 - name: Desktop | Import imaging role
   ansible.builtin.import_role:
@@ -162,7 +168,7 @@
   tags:
     - desktop
     - imaging
-  when: imaging_enabled | default(false) | bool
+  when: imaging_enabled | bool
 
 - name: Desktop | Import downloads role
   ansible.builtin.import_role:
@@ -170,7 +176,7 @@
   tags:
     - desktop
     - downloads
-  when: downloads_enabled | default(false) | bool
+  when: downloads_enabled | bool
 
 - name: Desktop | Import gaming role
   ansible.builtin.import_role:
@@ -178,7 +184,7 @@
   tags:
     - desktop
     - gaming
-  when: gaming_enabled | default(false) | bool
+  when: gaming_enabled | bool
 
 - name: Desktop | Import wine role
   ansible.builtin.import_role:
@@ -186,7 +192,7 @@
   tags:
     - desktop
     - wine
-  when: wine_enabled | default(false) | bool
+  when: wine_enabled | bool
 
 - name: Desktop | Import communication role
   ansible.builtin.import_role:
@@ -194,7 +200,7 @@
   tags:
     - desktop
     - communication
-  when: communication_enabled | default(false) | bool
+  when: communication_enabled | bool
 
 - name: Desktop | Import remote_access role
   ansible.builtin.import_role:
@@ -202,7 +208,7 @@
   tags:
     - desktop
     - remote-access
-  when: remote_access_enabled | default(false) | bool
+  when: remote_access_enabled | bool
 
 - name: Desktop | Import security_apps role
   ansible.builtin.import_role:
@@ -210,7 +216,7 @@
   tags:
     - desktop
     - security-apps
-  when: security_apps_enabled | default(false) | bool
+  when: security_apps_enabled | bool
 
 - name: Desktop | Import system_apps role
   ansible.builtin.import_role:
@@ -218,7 +224,7 @@
   tags:
     - desktop
     - system-apps
-  when: system_apps_enabled | default(false) | bool
+  when: system_apps_enabled | bool
 
 #
 # Peripherals
@@ -229,7 +235,7 @@
   tags:
     - desktop
     - elgato
-  when: elgato_enabled | default(false) | bool
+  when: elgato_enabled | bool
 
 - name: Desktop | Import tuxedo role
   ansible.builtin.import_role:
@@ -237,4 +243,4 @@
   tags:
     - desktop
     - tuxedo
-  when: tuxedo_enabled | default(false) | bool
+  when: tuxedo_enabled | bool

@@ -38,7 +38,7 @@ overrides if needed.
 
 | Variable                | Default | Description                   |
 |-------------------------|---------|-------------------------------|
-| `communication_enabled` | `true`  | Enable the communication role |
+| `communication_enabled` | `false` | Enable the communication role |
 
 ### Messaging
 
@@ -91,7 +91,7 @@ overrides if needed.
   ansible.builtin.include_role:
     name: marcstraube.desktop.communication
   tags: [communication]
-  when: communication_enabled | default(true) | bool
+  when: communication_enabled | default(false) | bool
 ```
 
 ## Testing
