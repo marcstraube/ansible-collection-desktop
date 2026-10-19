@@ -33,7 +33,7 @@ directory structure, variable naming, task patterns, and template rules.
 | `display_manager` | greetd, GDM, SDDM, LightDM | Configurable greeter + compositor |
 | `browser` | Firefox, LibreWolf, Chromium, Brave | Hardening, extension policies |
 | `keepassxc` | Password manager | Secret service, browser integration |
-| `development` | Languages, build tools, IDEs, Git | Container tools (Podman) |
+| `development` | IDEs, database/API tools, homebrew toolchains | Languages and CLI tooling live in common |
 | `ai` | Claude Code, Ollama, Antigravity | API key management |
 | `pipewire` | Audio stack | Replaces PulseAudio |
 | `bluetooth` | BlueZ configuration | Security timeouts, MAC privacy |

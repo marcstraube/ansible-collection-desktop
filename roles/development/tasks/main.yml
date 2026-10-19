@@ -39,20 +39,6 @@
   tags:
     - always
 
-- name: Main | Import programming languages tasks
-  ansible.builtin.import_tasks: languages.yml
-  when: development_enabled | bool
-  tags:
-    - development
-    - development:languages
-
-- name: Main | Import build tools tasks
-  ansible.builtin.import_tasks: build.yml
-  when: development_enabled | bool
-  tags:
-    - development
-    - development:build
-
 - name: Main | Import IDEs tasks
   ansible.builtin.import_tasks: ides.yml
   when: development_enabled | bool
@@ -76,26 +62,12 @@
     - development
     - development:devkitpro
 
-- name: Main | Import misc tools tasks
+- name: Main | Import database tools tasks
   ansible.builtin.import_tasks: tools.yml
   when: development_enabled | bool
   tags:
     - development
     - development:tools
-
-- name: Main | Import shell tooling tasks
-  ansible.builtin.import_tasks: shell.yml
-  when: development_enabled | bool
-  tags:
-    - development
-    - development:shell
-
-- name: Main | Import Python tooling tasks
-  ansible.builtin.import_tasks: python_tooling.yml
-  when: development_enabled | bool
-  tags:
-    - development
-    - development:python-tooling
 
 - name: Main | Import Lua tooling tasks
   ansible.builtin.import_tasks: lua.yml

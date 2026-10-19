@@ -14,6 +14,73 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+### `development` — languages and CLI tooling moved to `marcstraube.common`
+
+The role installed programming languages, build tools and CLI tooling next to
+the IDEs, which kept all of that workstation-only. Those blocks now live in
+`marcstraube.common`, where every host type can use them, and the toggles
+changed collection, name and default:
+
+| Removed from `development`                              | Now                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------- |
+| `development_python_enabled`                            | `python_enabled`                                        |
+| `development_python_tools`                              | `python_pipx_tools`                                     |
+| `development_python_<tool>_enabled`                     | `python_<tool>_enabled`                                 |
+| `development_nodejs_enabled`                            | `nodejs_enabled`                                        |
+| `development_rust_enabled`                              | `rust_enabled`, `rust_install_method`                   |
+| `development_rust_components`                           | `rust_components`                                       |
+| `development_go_enabled`                                | `go_enabled`                                            |
+| `development_java_enabled`                              | `java_enabled`, `java_version`                          |
+| `development_c_enabled`, `development_c_<tool>_enabled` | `build_tools_c_enabled`, `build_tools_c_<tool>_enabled` |
+| `development_<make/cmake/meson/ninja>_enabled`          | `build_tools_enabled`, `build_tools_<tool>_enabled`     |
+| `development_<jq/yq/direnv/pre_commit>_enabled`         | `utils_dev_<tool>_enabled`                              |
+| `development_shell_<tool>_enabled`                      | `utils_dev_<tool>_enabled`                              |
+| `development_httpie_enabled`                            | `utils_net_httpie_enabled`                              |
+| `development_socket_cli_enabled`                        | `security_scanners_socket_enabled`                      |
+
+`development` keeps the IDEs and editors, the database and API tools, the Lua
+and QML tooling, the Game Boy and devkitPro toolchains and the per-user editor
+configuration. The tags `development:languages`, `development:build`,
+`development:shell` and `development:python-tooling` are gone.
+
+Two defaults changed with the move. The common roles are opt-in
+(`<role>_enabled: false`), where `development` installed Python, Node.js, make,
+CMake, Meson, Ninja, jq, yq, direnv, pre-commit, httpie and shellcheck on
+every workstation by default. The common roles only install; `development`
+removed a tool when its toggle was switched off.
+
+#### Required action
+
+Enable the common roles and tools you relied on in the workstation
+`group_vars`, and drop the old `development_*` toggles:
+
+```yaml
+# Before
+development_python_enabled: true
+development_nodejs_enabled: true
+development_rust_enabled: true
+development_rust_components: ['rustfmt', 'clippy']
+development_c_enabled: true
+development_jq_enabled: true
+development_shell_shellcheck_enabled: true
+development_socket_cli_enabled: true
+
+# After
+python_enabled: true
+nodejs_enabled: true
+rust_enabled: true
+rust_components: ['rustfmt', 'clippy']
+build_tools_enabled: true
+build_tools_c_enabled: true
+utils_dev_jq_enabled: true
+utils_dev_shellcheck_enabled: true
+security_scanners_enabled: true
+security_scanners_socket_enabled: true
+```
+
+Tools installed by the old defaults stay on the host; remove them by hand if
+they are no longer wanted.
+
 ### Application and peripheral roles are opt-in
 
 `playbooks/tasks/desktop_workstation.yml` imports its roles statically with

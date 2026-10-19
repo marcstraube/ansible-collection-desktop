@@ -1,9 +1,9 @@
 ---
 # All three plays share an identical feature-toggle set so the per-play
-# manage tasks stay idempotent across the sequence (the tool roles remove
-# packages when their toggle flips to false, which would otherwise make
-# play 1 reinstall on every converge). Only development_user_config_mode and
-# development_users differ between the plays.
+# manage tasks stay idempotent across the sequence (the database tool tasks
+# remove packages when their toggle flips to false, which would otherwise
+# make play 1 reinstall on every converge). Only development_user_config_mode
+# and development_users differ between the plays.
 #
 # The devkitPro dkp-libs / dkp-linux repositories the toolchain toggles
 # depend on are registered in prepare.yml (via the real
@@ -17,12 +17,6 @@
 
   vars:
     development_enabled: true
-    development_python_enabled: true
-    development_nodejs_enabled: false
-    development_rust_enabled: false
-    development_go_enabled: false
-    development_java_enabled: false
-    development_c_enabled: true
     development_gb_gbdk_enabled: true
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
@@ -32,27 +26,12 @@
     development_zed_enabled: false
     development_arduino_ide_enabled: false
     development_arduino_classic_enabled: false
-    development_cmake_enabled: true
-    development_meson_enabled: false
-    development_ninja_enabled: false
-    development_jq_enabled: true
-    development_yq_enabled: false
-    development_direnv_enabled: false
-    development_pre_commit_enabled: false
-    development_shell_shfmt_enabled: true
-    development_shell_shellcheck_enabled: true
-    development_shell_bats_enabled: true
-    development_python_ruff_enabled: true
-    development_python_uv_enabled: true
-    development_python_pytest_enabled: true
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true
     development_qml_tools_enabled: true
     development_dbeaver_enabled: false
     development_pgadmin_enabled: false
-    development_httpie_enabled: false
-    development_socket_cli_enabled: true
     development_user_config_mode: 'managed'
     development_users:
       - username: 'dev_managed_user'
@@ -77,12 +56,6 @@
 
   vars:
     development_enabled: true
-    development_python_enabled: true
-    development_nodejs_enabled: false
-    development_rust_enabled: false
-    development_go_enabled: false
-    development_java_enabled: false
-    development_c_enabled: true
     development_gb_gbdk_enabled: true
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
@@ -92,27 +65,12 @@
     development_zed_enabled: false
     development_arduino_ide_enabled: false
     development_arduino_classic_enabled: false
-    development_cmake_enabled: true
-    development_meson_enabled: false
-    development_ninja_enabled: false
-    development_jq_enabled: true
-    development_yq_enabled: false
-    development_direnv_enabled: false
-    development_pre_commit_enabled: false
-    development_shell_shfmt_enabled: true
-    development_shell_shellcheck_enabled: true
-    development_shell_bats_enabled: true
-    development_python_ruff_enabled: true
-    development_python_uv_enabled: true
-    development_python_pytest_enabled: true
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true
     development_qml_tools_enabled: true
     development_dbeaver_enabled: false
     development_pgadmin_enabled: false
-    development_httpie_enabled: false
-    development_socket_cli_enabled: true
     development_user_config_mode: 'initial'
     development_users:
       - username: 'dev_initial_new'
@@ -134,12 +92,6 @@
 
   vars:
     development_enabled: true
-    development_python_enabled: true
-    development_nodejs_enabled: false
-    development_rust_enabled: false
-    development_go_enabled: false
-    development_java_enabled: false
-    development_c_enabled: true
     development_gb_gbdk_enabled: true
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
@@ -149,27 +101,12 @@
     development_zed_enabled: false
     development_arduino_ide_enabled: false
     development_arduino_classic_enabled: false
-    development_cmake_enabled: true
-    development_meson_enabled: false
-    development_ninja_enabled: false
-    development_jq_enabled: true
-    development_yq_enabled: false
-    development_direnv_enabled: false
-    development_pre_commit_enabled: false
-    development_shell_shfmt_enabled: true
-    development_shell_shellcheck_enabled: true
-    development_shell_bats_enabled: true
-    development_python_ruff_enabled: true
-    development_python_uv_enabled: true
-    development_python_pytest_enabled: true
     development_lua_stylua_enabled: true
     development_lua_luacheck_enabled: true
     development_lua_busted_enabled: true
     development_qml_tools_enabled: true
     development_dbeaver_enabled: false
     development_pgadmin_enabled: false
-    development_httpie_enabled: false
-    development_socket_cli_enabled: true
     development_user_config_mode: 'disabled'
     development_users:
       - username: 'dev_global_disabled'

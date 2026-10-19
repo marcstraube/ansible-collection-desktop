@@ -1,39 +1,7 @@
 ---
 #
-# Misc Development Tools Installation
+# Database Tools Installation
 #
-
-- name: Tools | Manage jq
-  ansible.builtin.package:
-    name: '{{ __development_jq_package }}'
-    state: "{{ 'present' if development_jq_enabled | bool else 'absent' }}"
-  when: __development_jq_package | default('') | length > 0
-  retries: 3
-  delay: 5
-
-- name: Tools | Manage yq
-  ansible.builtin.package:
-    name: '{{ __development_yq_package }}'
-    state: "{{ 'present' if development_yq_enabled | bool else 'absent' }}"
-  when: __development_yq_package | default('') | length > 0
-  retries: 3
-  delay: 5
-
-- name: Tools | Manage direnv
-  ansible.builtin.package:
-    name: '{{ __development_direnv_package }}'
-    state: "{{ 'present' if development_direnv_enabled | bool else 'absent' }}"
-  when: __development_direnv_package | default('') | length > 0
-  retries: 3
-  delay: 5
-
-- name: Tools | Manage pre-commit
-  ansible.builtin.package:
-    name: '{{ __development_pre_commit_package }}'
-    state: "{{ 'present' if development_pre_commit_enabled | bool else 'absent' }}"
-  when: __development_pre_commit_package | default('') | length > 0
-  retries: 3
-  delay: 5
 
 - name: Tools | Manage DBeaver
   ansible.builtin.package:
@@ -48,40 +16,5 @@
     name: '{{ __development_pgadmin_package }}'
     state: "{{ 'present' if development_pgadmin_enabled | bool else 'absent' }}"
   when: __development_pgadmin_package | default('') | length > 0
-  retries: 3
-  delay: 5
-
-- name: Tools | Manage httpie
-  ansible.builtin.package:
-    name: '{{ __development_httpie_package }}'
-    state: "{{ 'present' if development_httpie_enabled | bool else 'absent' }}"
-  when: __development_httpie_package | default('') | length > 0
-  retries: 3
-  delay: 5
-
-# Socket CLI — npm-native supply-chain scanner. AUR wraps the upstream
-# npm package; non-Arch installs it via npm directly.
-
-- name: Tools | Install Socket CLI from AUR (Arch)
-  become: true
-  become_user: "{{ aur_builder_user | default('aur_builder') }}"
-  kewlfft.aur.aur:
-    name: '{{ __development_aur_packages.security_socket_cli }}'
-    state: present
-  when:
-    - ansible_facts['os_family'] == 'Archlinux'
-    - development_socket_cli_enabled | bool
-  retries: 3
-  delay: 5
-
-- name: Tools | Install Socket CLI via npm (non-Arch)
-  become: true
-  community.general.npm:
-    name: 'socket'
-    global: true
-    state: present
-  when:
-    - ansible_facts['os_family'] != 'Archlinux'
-    - development_socket_cli_enabled | bool
   retries: 3
   delay: 5

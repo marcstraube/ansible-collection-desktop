@@ -3,65 +3,11 @@
 # Arch Linux Variables
 #
 
-# Python
-__development_python_packages:
-  - 'python'
-  - 'python-pip'
-  - 'python-pipx'
-
-# Rust
-__development_rust_packages:
-  - 'rust'
-
-# Go
-__development_go_packages:
-  - 'go'
-
-# Java
-__development_java_package: 'jdk-openjdk'
-
-# C/C++ (clang bundles clang-format, clang-tidy and clangd)
-__development_c_packages:
-  - 'clang'
-  - 'gdb'
-  - 'pkgconf'
-
-__development_c_ccache_package: 'ccache'
-__development_c_valgrind_package: 'valgrind'
-__development_c_cppcheck_package: 'cppcheck'
-__development_c_bear_package: 'bear'
-
-# Build tools
-__development_build_packages:
-  - 'base-devel'
-  - 'make'
-
-__development_cmake_package: 'cmake'
-__development_meson_package: 'meson'
-__development_ninja_package: 'ninja'
-
 # Database tools
 __development_dbeaver_package: 'dbeaver'
 __development_pgadmin_package: 'pgadmin4'
 
 # API tools
-__development_httpie_package: 'httpie'
-
-# Misc tools
-__development_jq_package: 'jq'
-__development_yq_package: 'yq'
-__development_direnv_package: 'direnv'
-__development_pre_commit_package: 'pre-commit'
-
-# Shell tooling
-__development_shell_shfmt_package: 'shfmt'
-__development_shell_shellcheck_package: 'shellcheck'
-__development_shell_bats_package: 'bats'
-
-# Python tooling
-__development_python_ruff_package: 'ruff'
-__development_python_uv_package: 'uv'
-__development_python_pytest_package: 'python-pytest'
 
 # Lua tooling
 __development_lua_stylua_package: 'stylua'
@@ -99,10 +45,6 @@ __development_aur_packages:
     - 'insomnia-bin'
   api_tools_bruno:
     - 'bruno-bin'
-  security_socket_cli:
-    - 'socket-cli'
-  c_codelldb:
-    - 'codelldb-bin'
   gb_gbdk:
     - 'gbdk-2020'
   gb_gbstudio:
