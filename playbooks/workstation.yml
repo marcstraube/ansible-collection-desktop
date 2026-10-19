@@ -1,0 +1,31 @@
+---
+# =============================================================================
+# Workstation Playbook
+# =============================================================================
+# Desktop collection roles for workstations (desktops and laptops).
+# Core desktop roles default to enabled, application and peripheral roles
+# are opt-in — enable or disable per host/group via inventory. Run
+# marcstraube.common.base_system first for the base system.
+#
+# Usage:
+#   ansible-playbook marcstraube.desktop.workstation -i inventory/
+#   ansible-playbook marcstraube.desktop.workstation -i inventory/ --tags browser
+#
+# Configure roles via inventory variables (group_vars/host_vars).
+# See each role's defaults/main.yml for available variables.
+# =============================================================================
+
+- name: Workstation Configuration
+  hosts: workstations
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Desktop | Import system update tasks
+      ansible.builtin.import_tasks:
+        file: tasks/system_update.yml
+
+  tasks:
+    - name: Desktop | Import workstation tasks
+      ansible.builtin.import_tasks:
+        file: tasks/workstation.yml

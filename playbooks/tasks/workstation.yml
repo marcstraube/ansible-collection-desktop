@@ -1,9 +1,9 @@
 ---
 # =============================================================================
-# Desktop Workstation Tasks
+# Workstation Tasks
 # =============================================================================
-# Task file for desktop workstation configuration — single source of truth.
-# Imported by playbooks/desktop_workstation.yml (standalone) and infra playbooks.
+# Task file for workstation configuration — single source of truth.
+# Import it from a play with `ansible.builtin.import_tasks`.
 #
 # Each role's defaults/main.yml decides whether it runs (`<role>_enabled`):
 # core desktop roles are on, application and peripheral roles are opt-in.

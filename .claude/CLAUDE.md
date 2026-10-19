@@ -57,8 +57,11 @@ The role deploys a minimal compositor config (`greetd-hyprland.conf` or
 
 | Playbook                   | Purpose                      | Hosts          |
 | -------------------------- | ---------------------------- | -------------- |
-| `desktop_workstation.yml`  | Full desktop setup           | `workstations` |
-| `laptop.yml`               | Laptop-specific additions    | `laptops`      |
+| `workstation.yml`          | Desktop roles (thin wrapper) | `workstations` |
+
+`workstation.yml` imports `playbooks/tasks/workstation.yml`, the single
+source of truth for the role list and toggles. No play variables: all
+settings come from the inventory.
 
 ### Tag Usage
 
@@ -80,7 +83,7 @@ All `include_tasks` in roles use `apply: tags:` for proper `--tags` filtering:
 A role exposes sub-tags (`<role>:<phase>`, e.g. `browser:configure`) so a single
 stage can be run in isolation. For that to work, two rules apply:
 
-1. **Entry playbooks import roles statically.** `playbooks/tasks/desktop_workstation.yml`
+1. **Entry playbooks import roles statically.** `playbooks/tasks/workstation.yml`
    uses `import_role` (not `include_role`) for every role. A dynamic `include_role`
    hides the role's inner sub-tags behind the include statement, so
    `--tags browser:configure` would skip the whole role. Static `import_role`

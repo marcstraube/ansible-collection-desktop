@@ -83,7 +83,8 @@ they are no longer wanted.
 
 ### Application and peripheral roles are opt-in
 
-`playbooks/tasks/desktop_workstation.yml` imports its roles statically with
+`playbooks/tasks/desktop_workstation.yml` (now `playbooks/tasks/workstation.yml`)
+imports its roles statically with
 `import_role` and guarded fifteen of them with `when: <role>_enabled |
 default(false) | bool`, as if they were opt-in. Under `import_role` that
 `default()` never applies: the condition is attached to every task of the
@@ -132,9 +133,7 @@ communication_enabled: true
 ```
 
 Inventories that already set `<role>_enabled` explicitly, in either direction,
-are unaffected. The standalone playbooks `laptop_full.yml` and
-`workstation_full.yml` set the toggles as play variables and are unaffected as
-well.
+are unaffected.
 
 ### `ai` — `ai_claude_cowork_service_enabled` is removed
 
@@ -306,6 +305,45 @@ clone before running the role, so the manager is not loaded twice:
 ```bash
 sudo rm -rf /opt/comfyui/custom_nodes/ComfyUI-Manager
 ```
+
+### Playbooks — one `workstation` playbook, the standalone playbooks are gone
+
+`laptop.yml`, `laptop_full.yml`, `workstation_full.yml` and `security.yml`
+are removed. Their play variables were not read by any role, their summaries
+reported features that were not configured, and `laptop.yml` included roles
+that do not exist. `desktop_workstation.yml` is renamed to `workstation.yml`
+and its task file to `playbooks/tasks/workstation.yml`; it takes all settings
+from the inventory.
+
+#### Required action
+
+Run the renamed playbook and set role toggles and variables in the inventory:
+
+```bash
+# Before
+ansible-playbook marcstraube.desktop.desktop_workstation -i inventory/
+ansible-playbook marcstraube.desktop.laptop -i inventory/
+
+# After
+ansible-playbook marcstraube.common.base_system -i inventory/
+ansible-playbook marcstraube.desktop.workstation -i inventory/
+```
+
+Plays that import the task file use the new path:
+
+```yaml
+# Before
+ansible.builtin.import_tasks:
+  file: <collections>/marcstraube/desktop/playbooks/tasks/desktop_workstation.yml
+
+# After
+ansible.builtin.import_tasks:
+  file: <collections>/marcstraube/desktop/playbooks/tasks/workstation.yml
+```
+
+Roles from `marcstraube.common` that the removed playbooks included, such as
+`energy_management`, `firewalld` or `apparmor`, run from
+`marcstraube.common.base_system`.
 
 ## v2.4.0 - 2026-09-08
 
