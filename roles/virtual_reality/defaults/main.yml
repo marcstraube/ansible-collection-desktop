@@ -1,0 +1,31 @@
+---
+#
+# Role Control
+#
+
+# Enable the virtual_reality role
+virtual_reality_enabled: true
+
+#
+# Streaming Servers
+#
+
+# WiVRn streaming server and dashboard (OpenXR via Monado, no SteamVR needed)
+virtual_reality_wivrn_enabled: true
+
+# ALVR streaming server (requires SteamVR)
+virtual_reality_alvr_enabled: false
+
+#
+# Compatibility
+#
+
+# xrizer OpenVR-to-OpenXR layer, so SteamVR titles run on WiVRn/Monado
+virtual_reality_xrizer_enabled: true
+
+#
+# Headset Access
+#
+
+# ADB tools and udev rules for sideloading the headset client and wired streaming
+virtual_reality_adb_enabled: true

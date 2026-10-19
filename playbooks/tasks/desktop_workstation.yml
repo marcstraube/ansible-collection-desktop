@@ -186,6 +186,14 @@
     - gaming
   when: gaming_enabled | bool
 
+- name: Desktop | Import virtual_reality role
+  ansible.builtin.import_role:
+    name: marcstraube.desktop.virtual_reality
+  tags:
+    - desktop
+    - virtual-reality
+  when: virtual_reality_enabled | bool
+
 - name: Desktop | Import wine role
   ansible.builtin.import_role:
     name: marcstraube.desktop.wine
