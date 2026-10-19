@@ -1,0 +1,51 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    #
+    # ADB Tools and udev Rules
+    #
+
+    - name: Verify | Check ADB binary
+      ansible.builtin.stat:
+        path: /usr/bin/adb
+      register: __virtual_reality_adb_binary
+
+    - name: Verify | Check Android udev rules
+      ansible.builtin.stat:
+        path: /usr/lib/udev/rules.d/51-android.rules
+      register: __virtual_reality_udev_rules
+
+    - name: Verify | Assert ADB tools and udev rules are installed (Arch)
+      ansible.builtin.assert:
+        that:
+          - __virtual_reality_adb_binary.stat.exists
+          - __virtual_reality_udev_rules.stat.exists
+        fail_msg: 'ADB binary or Android udev rules missing on Arch Linux'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert nothing is installed (Debian/EL)
+      ansible.builtin.assert:
+        that:
+          - not __virtual_reality_adb_binary.stat.exists
+          - not __virtual_reality_udev_rules.stat.exists
+        fail_msg: 'The role must not install anything on Debian/EL'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    #
+    # Streaming Servers
+    #
+
+    - name: Verify | Check WiVRn server binary
+      ansible.builtin.stat:
+        path: /usr/bin/wivrn-server
+      register: __virtual_reality_wivrn_binary
+
+    - name: Verify | Assert WiVRn is not installed (Debian/EL)
+      ansible.builtin.assert:
+        that:
+          - not __virtual_reality_wivrn_binary.stat.exists
+        fail_msg: 'WiVRn must not be installed on Debian/EL'
+      when: ansible_facts['os_family'] != 'Archlinux'

@@ -87,6 +87,9 @@
     gaming_playback: true
     gaming_steam: false           # Optional: Proprietary, large
 
+    # Virtual reality
+    virtual_reality_enabled: false  # Optional: VR headset streaming
+
     # Security applications
     security_apps_enabled: true
     security_apps_veracrypt: true
@@ -213,6 +216,14 @@
         - gaming
         - applications
 
+    - name: Virtual Reality | Include virtual_reality role
+      ansible.builtin.include_role:
+        name: marcstraube.desktop.virtual_reality
+      when: virtual_reality_enabled | bool
+      tags:
+        - virtual-reality
+        - applications
+
     # =========================================================================
     # SECURITY APPLICATIONS
     # =========================================================================
@@ -278,6 +289,7 @@
           - "  - Multimedia: {{ 'ENABLED' if multimedia_enabled else 'DISABLED' }}"
           - "  - Downloads: {{ 'ENABLED' if downloads_enabled else 'DISABLED' }}"
           - "  - Gaming: {{ 'ENABLED' if gaming_enabled else 'DISABLED' }}"
+          - "  - Virtual Reality: {{ 'ENABLED' if virtual_reality_enabled else 'DISABLED' }}"
           - "  - Security Apps: {{ 'ENABLED' if security_apps_enabled else 'DISABLED' }}"
           - "  - Communication: {{ 'ENABLED' if communication_enabled else 'DISABLED' }}"
           - "  - Remote Access: {{ 'ENABLED' if remote_access_enabled else 'DISABLED' }}"
