@@ -7,70 +7,8 @@
 development_enabled: true
 
 #
-# Programming Languages
+# Homebrew Toolchains
 #
-
-# Python
-
-# Enable Python installation
-development_python_enabled: true
-
-# Python tools to install via pipx (Debian/RedHat only, Arch uses native packages)
-development_python_tools: []
-# Example:
-#   development_python_tools:
-#     - 'black'
-#     - 'flake8'
-#     - 'mypy'
-
-# Node.js (installed via marcstraube.common.nodejs role)
-
-# Enable Node.js
-development_nodejs_enabled: true
-
-# Rust
-
-# Enable Rust installation
-development_rust_enabled: false
-
-# Rust components to install via rustup (Debian/RedHat only, Arch uses native packages)
-development_rust_components: []
-# Example:
-#   development_rust_components:
-#     - 'rustfmt'
-#     - 'clippy'
-
-# Go
-
-# Enable Go installation
-development_go_enabled: false
-
-# Java (OpenJDK)
-
-# Enable Java installation (version pinning is per-OS — see vars/{distro}.yml;
-# for per-project version control use mise/sdkman/asdf instead)
-development_java_enabled: false
-
-# C/C++
-
-# Enable the core C/C++ tooling block (clang incl. clang-format,
-# clang-tidy and clangd, gdb, pkgconf)
-development_c_enabled: false
-
-# Enable codelldb LLDB debug adapter (AUR only — no-op on Debian/RedHat)
-development_c_codelldb_enabled: false
-
-# Enable ccache compiler cache
-development_c_ccache_enabled: false
-
-# Enable valgrind memory and leak debugger
-development_c_valgrind_enabled: false
-
-# Enable cppcheck static analysis
-development_c_cppcheck_enabled: false
-
-# Enable bear (generates compile_commands.json for non-CMake projects)
-development_c_bear_enabled: false
 
 # Gameboy development
 #
@@ -132,32 +70,10 @@ development_devkitpro_switch_dev_enabled: false     # Switch (devkitA64)
 #
 # Language Tooling
 #
-# Linters, formatters, and test frameworks for shell, Python, Lua, and
-# QML. Each toggle resolves to a `__development_<tool>_package` variable
-# in vars/{distro}.yml — empty on distros without an upstream package,
-# in which case the install task is a no-op.
-
-# Shell
-
-# Enable shfmt shell formatter (POSIX sh, bash, mksh)
-development_shell_shfmt_enabled: false
-
-# Enable shellcheck shell linter (sh, bash, dash, ksh)
-development_shell_shellcheck_enabled: true
-
-# Enable bats-core Bash test framework (bash-only)
-development_shell_bats_enabled: false
-
-# Python Tooling
-
-# Enable ruff Python linter and formatter
-development_python_ruff_enabled: false
-
-# Enable uv Python package installer and resolver
-development_python_uv_enabled: false
-
-# Enable pytest Python test framework
-development_python_pytest_enabled: false
+# Linters, formatters, and test frameworks for Lua and QML. Each toggle
+# resolves to a `__development_<tool>_package` variable in vars/{distro}.yml
+# — empty on distros without an upstream package, in which case the
+# install task is a no-op.
 
 # Lua
 
@@ -174,22 +90,6 @@ development_lua_busted_enabled: false
 
 # Enable Qt6 QML tools (qmllint + qmlformat — single package)
 development_qml_tools_enabled: false
-
-#
-# Build Tools
-#
-
-# Enable make and core build tools
-development_make_enabled: true
-
-# Enable cmake
-development_cmake_enabled: true
-
-# Enable meson
-development_meson_enabled: true
-
-# Enable ninja
-development_ninja_enabled: true
 
 #
 # IDEs and Editors
@@ -230,9 +130,6 @@ development_pgadmin_enabled: false
 # API Tools
 #
 
-# Enable httpie CLI HTTP client
-development_httpie_enabled: true
-
 # Enable Postman
 development_postman_enabled: false
 
@@ -241,33 +138,6 @@ development_insomnia_enabled: false
 
 # Enable Bruno (open-source Postman alternative)
 development_bruno_enabled: false
-
-#
-# Misc Tools
-#
-
-# Enable jq JSON processor
-development_jq_enabled: true
-
-# Enable yq YAML processor
-development_yq_enabled: true
-
-# Enable direnv directory-based env vars
-development_direnv_enabled: true
-
-# Enable pre-commit git hooks
-development_pre_commit_enabled: true
-
-#
-# Security Tooling
-#
-# Supply-chain / dependency scanners. PM-native tools are installed
-# from their canonical source: AUR on Arch (which wraps the upstream
-# package manager), and the upstream package manager directly on
-# Debian/RedHat.
-
-# Enable Socket CLI (npm dependency supply-chain scanner)
-development_socket_cli_enabled: false
 
 #
 # User Configuration

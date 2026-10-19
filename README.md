@@ -64,7 +64,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 | Role            | Description                                |
 | --------------- | ------------------------------------------ |
-| **development** | Languages, IDEs, build tools, Podman, Git  |
+| **development** | IDEs, database/API tools, homebrew SDKs    |
 | **ai**          | Claude Code, Ollama, Antigravity, API keys |
 
 ### Multimedia & Graphics

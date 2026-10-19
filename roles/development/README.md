@@ -1,26 +1,25 @@
 # marcstraube.desktop.development
 
-Install development tools, IDEs, and programming languages.
+Install developer desktop applications: IDEs and editors, database and API
+tools, console homebrew toolchains, and per-user editor configuration.
 
 ## Description
 
-Installs and configures a development environment including programming
-languages (Python, Node.js, Rust, Go, Java), build tools, IDEs/editors,
-database tools, API testing tools, and miscellaneous CLI utilities. Supports
-per-user editor configuration.
+Installs the graphical side of a development workstation: IDEs and editors
+(VS Code, VSCodium, Zed, JetBrains, Arduino), database and API tools, Lua and
+QML tooling, Game Boy and devkitPro homebrew toolchains, and per-user editor
+settings.
 
-Git, git-lfs and the GitHub/GitLab CLIs are installed and configured by
-`marcstraube.common.git`, which the base system applies to every host.
+Languages, build tools and CLI tooling live in `marcstraube.common`, which the
+base system applies to every host: `python`, `nodejs`, `rust`, `go`, `java`,
+`build_tools`, `security_scanners`, the developer tools category of `utils`
+and `git`.
 
 ## Requirements
 
 - ansible-core >= 2.19
-- `community.general` collection (for pipx, pacman, npm modules)
+- `community.general` collection (for pacman and user modules)
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
-- `marcstraube.common.nodejs` role on non-Arch when enabling tools that
-  install via npm (e.g. Socket CLI). The development role itself does
-  not install Node.js; `development_nodejs_enabled` is a marker the
-  inventory uses to gate the common role.
 
 ## Supported Platforms
 
@@ -43,56 +42,7 @@ overrides if needed.
 |-----------------------|---------|-----------------------------|
 | `development_enabled` | `true`  | Enable the development role |
 
-### Version Control
-
-### Programming Languages
-
-| Variable                      | Default | Description                           |
-|-------------------------------|---------|---------------------------------------|
-| `development_python_enabled`  | `true`  | Enable Python installation            |
-| `development_python_tools`    | `[]`    | Python tools via pipx (non-Arch)      |
-| `development_nodejs_enabled`  | `true`  | Enable Node.js                        |
-| `development_rust_enabled`    | `false` | Enable Rust installation              |
-| `development_rust_components` | `[]`    | Rust components via rustup (non-Arch) |
-| `development_go_enabled`      | `false` | Enable Go installation                |
-| `development_java_enabled`    | `false` | Enable Java installation              |
-| `development_c_enabled`       | `false` | Enable C/C++ toolchain installation   |
-
-#### C/C++
-
-`development_c_enabled` installs the core C/C++ tooling block: `clang`
-(with `clang-format`, `clang-tidy` and the `clangd` LSP server), `gdb`
-and `pkgconf`. Fine-grained toggles add optional helpers:
-
-| Variable                          | Default | Description                                            |
-|-----------------------------------|---------|--------------------------------------------------------|
-| `development_c_codelldb_enabled`  | `false` | Enable codelldb LLDB debug adapter (Arch AUR only)     |
-| `development_c_ccache_enabled`    | `false` | Enable ccache compiler cache                           |
-| `development_c_valgrind_enabled`  | `false` | Enable valgrind memory and leak debugger               |
-| `development_c_cppcheck_enabled`  | `false` | Enable cppcheck static analysis                        |
-| `development_c_bear_enabled`      | `false` | Enable bear (`compile_commands.json` for non-CMake)    |
-
-Platform support:
-
-| Tool       | Arch      | Debian Trixie | EL 9       | EL 10      |
-|------------|-----------|---------------|------------|------------|
-| core block | yes       | yes           | yes        | yes        |
-| codelldb   | yes (AUR) | no            | no         | no         |
-| ccache     | yes       | yes           | yes (EPEL) | yes (EPEL) |
-| valgrind   | yes       | yes           | yes\*      | yes\*      |
-| cppcheck   | yes       | yes           | yes (EPEL) | yes (EPEL) |
-| bear       | yes       | yes           | yes (EPEL) | no         |
-
-On Debian the core block additionally installs the separate `clangd`,
-`clang-format` and `clang-tidy` packages; on EL they ship in
-`clang-tools-extra`. `codelldb` is the LLDB debug adapter used by
-VS Code/VSCodium/Zed for native debugging; upstream distributes only a
-VSIX archive, so it is AUR-only. `bear` is not packaged in EPEL 10.
-Enabling an unavailable combination is a no-op (codelldb logs a notice).
-
-\* On EL, `valgrind` ships with the `@Development Tools` group pulled in by
-the build-tools section, so its own toggle is a no-op there — it is present
-whenever the build tools are installed.
+### Homebrew Toolchains
 
 #### Gameboy Development
 
@@ -171,15 +121,6 @@ platform groups. The groups share common members (compilers, tools), so
 they are install-only — disabling a platform toggle after install does
 not uninstall the toolchain. Debian/RedHat are a no-op (a notice is
 logged) until the cross-collection alternative-installs strategy lands.
-
-### Build Tools
-
-| Variable                    | Default | Description                      |
-|-----------------------------|---------|----------------------------------|
-| `development_make_enabled`  | `true`  | Enable make and core build tools |
-| `development_cmake_enabled` | `true`  | Enable cmake                     |
-| `development_meson_enabled` | `true`  | Enable meson                     |
-| `development_ninja_enabled` | `true`  | Enable ninja                     |
 
 ### IDEs and Editors
 
@@ -262,61 +203,18 @@ hook, and generator script.
 
 | Variable                       | Default | Description     |
 |--------------------------------|---------|-----------------|
-| `development_httpie_enabled`   | `true`  | Enable httpie   |
 | `development_postman_enabled`  | `false` | Enable Postman  |
 | `development_insomnia_enabled` | `false` | Enable Insomnia |
 | `development_bruno_enabled`    | `false` | Enable Bruno    |
 
-### Misc Tools
-
-| Variable                         | Default | Description                        |
-|----------------------------------|---------|------------------------------------|
-| `development_jq_enabled`         | `true`  | Enable jq JSON processor           |
-| `development_yq_enabled`         | `true`  | Enable yq YAML processor           |
-| `development_direnv_enabled`     | `true`  | Enable direnv directory-based envs |
-| `development_pre_commit_enabled` | `true`  | Enable pre-commit git hooks        |
-
-### Security Tooling
-
-| Variable                         | Default | Description                                          |
-|----------------------------------|---------|------------------------------------------------------|
-| `development_socket_cli_enabled` | `false` | Enable Socket CLI (npm supply-chain scanner)         |
-
-Socket CLI is an npm-native tool. Arch installs the AUR package
-`socket-cli` (which wraps the upstream npm package); Debian and EL
-install the `socket` npm package globally via `community.general.npm`.
-On non-Arch, `marcstraube.common.nodejs` must be applied before this
-role to provide `npm`.
-
 ### Language Tooling
 
-Per-tool toggles for distro-packaged linters, formatters, and test frameworks.
-Each toggle resolves to a `__development_<tool>_package` variable in
-`vars/{distro}.yml`. Distros without an upstream package map to `''`, in which
-case the install task is a no-op — see "Platform support" below.
-
-For tools installed via a language package manager (`pipx`, `rustup`) the
-role uses the free-form lists `development_python_tools` and
-`development_rust_components` under "Programming Languages" above.
-
-#### Shell
-
-`shfmt` and `shellcheck` cover multiple shell dialects (POSIX sh, bash,
-dash, ksh, mksh); `bats-core` is bash-specific.
-
-| Variable                                 | Default | Description                          |
-|------------------------------------------|---------|--------------------------------------|
-| `development_shell_shfmt_enabled`        | `false` | Enable shfmt shell formatter         |
-| `development_shell_shellcheck_enabled`   | `true`  | Enable shellcheck shell linter       |
-| `development_shell_bats_enabled`         | `false` | Enable bats-core Bash test framework |
-
-#### Python Tooling
-
-| Variable                            | Default | Description                                     |
-|-------------------------------------|---------|-------------------------------------------------|
-| `development_python_ruff_enabled`   | `false` | Enable ruff Python linter and formatter         |
-| `development_python_uv_enabled`     | `false` | Enable uv Python package installer and resolver |
-| `development_python_pytest_enabled` | `false` | Enable pytest Python test framework             |
+Per-tool toggles for distro-packaged Lua and QML linters, formatters, and
+test frameworks. Each toggle resolves to a `__development_<tool>_package`
+variable in `vars/{distro}.yml`. Distros without an upstream package map to
+`''`, in which case the install task is a no-op — see "Platform support"
+below. Shell and Python tooling live in `marcstraube.common.utils` and
+`marcstraube.common.python`.
 
 #### Lua
 
@@ -340,12 +238,6 @@ toggle after install does not uninstall the package.
 
 | Tool         | Arch | Debian Trixie | EL 9 | EL 10 |
 |--------------|------|---------------|------|-------|
-| shfmt        | yes  | yes           | no   | no    |
-| shellcheck   | yes  | yes           | yes  | yes   |
-| bats         | yes  | yes           | yes  | yes   |
-| ruff         | yes  | no            | no   | yes   |
-| uv           | yes  | no            | no   | yes   |
-| pytest       | yes  | yes           | yes  | yes   |
 | stylua       | yes  | no            | no   | no    |
 | luacheck     | yes  | yes           | no   | no    |
 | busted       | yes  | yes           | no   | no    |
@@ -378,12 +270,10 @@ Mode semantics — analog to `marcstraube.desktop.browser`:
 | Tag                            | Scope                      |
 |--------------------------------|----------------------------|
 | `development`                  | All role tasks             |
-| `development:languages`        | Programming language tasks |
-| `development:build`            | Build tools tasks          |
 | `development:ides`             | IDE installation tasks     |
-| `development:tools`            | Misc tools tasks           |
-| `development:shell`            | Shell tooling tasks        |
-| `development:python-tooling`   | Python tooling tasks       |
+| `development:gb-dev`           | Game Boy toolchain tasks   |
+| `development:devkitpro`        | devkitPro toolchain tasks  |
+| `development:tools`            | Database tools tasks       |
 | `development:lua`              | Lua tooling tasks          |
 | `development:qml`              | QML tooling tasks          |
 | `development:users`            | User configuration tasks   |
@@ -406,7 +296,7 @@ Mode semantics — analog to `marcstraube.desktop.browser`:
   ansible.builtin.include_role:
     name: marcstraube.desktop.development
   vars:
-    development_rust_enabled: true
+    development_vscodium_enabled: true
     development_users:
       - username: 'johndoe'
   tags:
