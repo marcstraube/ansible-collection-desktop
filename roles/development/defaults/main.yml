@@ -103,6 +103,11 @@ development_devkitpro_enabled: false
 # happens in marcstraube.common.package_management — wire it up once in
 # inventory group_vars:
 #   pacman_custom_repositories: "{{ development_devkitpro_repositories }}"
+# devkitPro signs with two master keys (WinterMute and fincs; see the
+# master-keyids file of devkitPro/devkitpro-keyring). The repository
+# databases are signed with the second one, so both keys have to be imported
+# and locally signed. pacman keys are global, so each repository entry
+# carries one of them.
 development_devkitpro_repositories:
   - name: 'dkp-libs'
     server: 'https://pkg.devkitpro.org/packages'
@@ -110,6 +115,8 @@ development_devkitpro_repositories:
     keyserver: 'keyserver.ubuntu.com'
   - name: 'dkp-linux'
     server: 'https://pkg.devkitpro.org/packages/linux/$arch'
+    key_id: '032F4C9D0B8FF3BC84019B7862C7609ADA219C60'
+    keyserver: 'keyserver.ubuntu.com'
 
 # Per-platform toolchain groups (each pulls its devkit* compiler plus
 # libraries and tools). All require development_devkitpro_enabled.
