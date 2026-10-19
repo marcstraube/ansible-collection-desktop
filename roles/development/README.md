@@ -156,10 +156,15 @@ pacman_custom_repositories:
     keyserver: 'keyserver.ubuntu.com'
   - name: 'dkp-linux'
     server: 'https://pkg.devkitpro.org/packages/linux/$arch'
+    key_id: '032F4C9D0B8FF3BC84019B7862C7609ADA219C60'
+    keyserver: 'keyserver.ubuntu.com'
 ```
 
-`package_management` then imports and locally signs the devkitPro master
-key; this role installs `devkitpro-keyring`, the `devkit-env` package
+devkitPro signs with two master keys (WinterMute and fincs, listed in
+`master-keyids` of the `devkitpro-keyring` repository); the repository
+databases carry the signature of the second one. pacman keys are global, so
+each repository entry imports one of the two. `package_management` imports
+and locally signs both; this role installs `devkitpro-keyring`, the `devkit-env` package
 (which provides `DEVKITPRO`, `DEVKITARM`, `DEVKITPPC`, `DEVKITA64` and
 `PATH` system-wide via `/etc/profile.d/devkit-env.sh`), and the selected
 platform groups. The groups share common members (compilers, tools), so
