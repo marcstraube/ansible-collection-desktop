@@ -54,11 +54,9 @@ __ai_comfyui_aur_gpu_map:
   nvidia: 'cuda'
   amd: 'rocm'
   cpu: 'cpu'
-# AUR-fixed paths and identity (set by comfyui.sysusers / PKGBUILD _prefix).
-__ai_comfyui_aur_user: 'comfy'
-__ai_comfyui_aur_group: 'comfy'
-__ai_comfyui_aur_user_home: '/var/lib/comfyui'
-__ai_comfyui_aur_install_dir: '/opt/comfyui'
+# ComfyUI-Manager — AUR package (installs into the comfyui venv and adds a
+# systemd drop-in that starts ComfyUI with --enable-manager)
+__ai_comfyui_manager_aur_package: 'comfyui-manager'
 
 # ComfyUI — manual install fallback (kept for parity but not used on Arch)
 __ai_comfyui_python: 'python'

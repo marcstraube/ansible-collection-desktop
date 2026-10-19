@@ -127,10 +127,16 @@ user out. The role's per-user entry pins the backend explicitly:
   index is fragile against Python version drift. The role fails fast with a
   clear message (see issue #122). Use Arch Linux for AMD/ROCm.
 
-**ComfyUI-Manager** is installed via manual git-clone on both paths
-because no upstream package exists yet (see `tasks/comfyui-archlinux.yml`
-for the documented exception to the project's "Arch installs go through
-repos or AUR" rule).
+**ComfyUI-Manager** (`ai_comfyui_manager_enabled`):
+
+- **Arch Linux**: AUR package `comfyui-manager`. It installs the manager
+  into the venv of the `comfyui` package and ships a systemd drop-in that
+  starts `comfyui.service` with `--enable-manager`. The role restarts
+  ComfyUI after the package changes. The `cm-cli` command runs the
+  manager's CLI as the service user, e.g.
+  `sudo -u comfy cm-cli show installed`.
+- **Debian**: git clone into `custom_nodes/ComfyUI-Manager` as the service
+  user.
 
 ### User Configuration
 

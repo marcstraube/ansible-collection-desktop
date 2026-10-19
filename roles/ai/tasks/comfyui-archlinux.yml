@@ -11,11 +11,9 @@
 # `ai_comfyui_install_dir`, `ai_comfyui_home` are *not* honored on the
 # Arch path — the AUR package determines those.
 #
-# ComfyUI-Manager has no AUR package yet, so it is installed via a
-# manual git-clone as `comfy`. This is the documented exception to the
-# project rule that Arch installs go through official repos or AUR.
-# An AUR submission for `comfyui-manager` is tracked separately and
-# would let this block collapse into a kewlfft.aur.aur install.
+# ComfyUI-Manager comes from the AUR package `comfyui-manager`: it
+# installs the manager into the venv of the `comfyui` package and ships a
+# systemd drop-in that starts comfyui.service with --enable-manager.
 
 - name: ComfyUI | Install AUR package
   become: true
@@ -28,32 +26,18 @@
   retries: 3
   delay: 5
 
-# Pre-create the Ansible remote_tmp under comfy's home so the next
-# `become_user: comfy` task does not emit the generic 0700 warning.
-# Running git as `comfy` (rather than as root + chown) keeps git's
-# safe.directory check happy on repeated runs — root would refuse to
-# touch a comfy-owned repo and abort with `dubious ownership`.
-- name: ComfyUI | Pre-create Ansible remote_tmp under comfy home
+# Installed after the comfyui package, whose post-install scriptlet
+# creates the venv the manager is installed into.
+- name: ComfyUI | Install ComfyUI-Manager AUR package
   become: true
-  ansible.builtin.file:
-    path: '{{ __ai_comfyui_aur_user_home }}/.ansible/tmp'
-    state: directory
-    owner: '{{ __ai_comfyui_aur_user }}'
-    group: '{{ __ai_comfyui_aur_group }}'
-    mode: '0700'
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __ai_comfyui_manager_aur_package }}'
+    state: present
   when: ai_comfyui_manager_enabled | bool
-
-- name: ComfyUI | Clone ComfyUI-Manager
-  become: true
-  become_user: '{{ __ai_comfyui_aur_user }}'
-  ansible.builtin.git:
-    repo: '{{ __ai_comfyui_manager_repo_url }}'
-    dest: "{{ __ai_comfyui_aur_install_dir }}/custom_nodes/ComfyUI-Manager"
-    version: 'main'
-    update: true
-  when: ai_comfyui_manager_enabled | bool
-  retries: 5
-  delay: 10
+  retries: 3
+  delay: 5
+  notify: Restart ComfyUI
 
 - name: ComfyUI | Manage service
   become: true

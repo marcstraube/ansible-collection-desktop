@@ -290,6 +290,23 @@ development_user_config_mode: 'managed'
 
 The same applies to `xdg_user_dirs_user_config_mode`.
 
+### `ai` — ComfyUI-Manager on Arch Linux comes from the AUR
+
+On Arch Linux the role installs ComfyUI-Manager from the AUR package
+`comfyui-manager` instead of cloning it with git into
+`/opt/comfyui/custom_nodes/ComfyUI-Manager`. The package installs the
+manager into the ComfyUI venv and starts `comfyui.service` with
+`--enable-manager`. Settings in `/opt/comfyui/user/__manager/` are kept.
+
+#### Required action
+
+On Arch hosts with `ai_comfyui_manager_enabled: true`, remove the old git
+clone before running the role, so the manager is not loaded twice:
+
+```bash
+sudo rm -rf /opt/comfyui/custom_nodes/ComfyUI-Manager
+```
+
 ## v2.4.0 - 2026-09-08
 
 ## v2.3.0 - 2026-07-29
