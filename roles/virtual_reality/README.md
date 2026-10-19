@@ -71,7 +71,7 @@ overrides if needed.
 | Variable                        | Default | Description                                                          |
 | ------------------------------- | ------- | -------------------------------------------------------------------- |
 | `virtual_reality_wivrn_enabled` | `true`  | WiVRn server and dashboard (`wivrn-server`, `wivrn-dashboard`, AUR)  |
-| `virtual_reality_alvr_enabled`  | `false` | ALVR streaming server (`alvr`, AUR); requires SteamVR                |
+| `virtual_reality_alvr_enabled`  | `false` | ALVR streaming server (`alvr-bin`, AUR); requires SteamVR            |
 
 ### Compatibility
 

@@ -20,5 +20,7 @@ __virtual_reality_aur_packages:
   xrizer:
     - xrizer
     - lib32-xrizer
+  # Upstream release build: the source package `alvr` compiles a bundled
+  # FFmpeg that fails to configure with the current toolchain.
   alvr:
-    - alvr
+    - alvr-bin
