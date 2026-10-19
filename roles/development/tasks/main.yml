@@ -6,22 +6,28 @@
 # The git attribute marks an account as a developer workstation user.
 # Its values are consumed by marcstraube.common.git, not here — this role
 # only needs the names to write per-user editor configuration.
+# development_users takes precedence; only derive when the operator left it
+# empty. The guard is fixed before the loop, because the list stops being
+# empty after the first derived user.
+- name: Main | Set user derivation guard
+  ansible.builtin.set_fact:
+    __development_derive_users: '{{ development_users | length == 0 }}'
+  when: development_enabled | bool
+  tags:
+    - always
+
 - name: Main | Derive development users from users_list (exclude system users)
   ansible.builtin.set_fact:
     development_users: >-
-      {{ (users_list | default([])
-          | selectattr('git', 'defined')
-          | selectattr('system', 'undefined') | list
-          + users_list | default([])
-          | selectattr('git', 'defined')
-          | selectattr('system', 'defined')
-          | rejectattr('system', 'equalto', true) | list)
-         | community.general.json_query('[].{username: name}') }}
+      {{ development_users + [{'username': item.name}] }}
+  loop: >-
+    {{ users_list | default([]) | selectattr('git', 'defined') | list }}
+  loop_control:
+    label: '{{ item.name }}'
   when:
     - development_enabled | bool
-    - development_users | length == 0
-    - users_list is defined
-    - users_list | length > 0
+    - __development_derive_users | default(false) | bool
+    - not (item.system | default(false) | bool)
   tags:
     - always
 
