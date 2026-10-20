@@ -120,6 +120,36 @@ collections:
 
 ## Usage
 
+### Playbook
+
+`marcstraube.desktop.workstation` runs the desktop roles on the
+`workstations` group (desktops and laptops). Core desktop roles default to
+enabled, application and peripheral roles are opt-in; set
+`<role>_enabled` and the role variables in the inventory. Run
+`marcstraube.common.base_system` first for the base system:
+
+```bash
+ansible-playbook marcstraube.common.base_system -i inventory/
+ansible-playbook marcstraube.desktop.workstation -i inventory/
+```
+
+Or combine both in one playbook:
+
+```yaml
+# site.yml
+- name: Base system
+  ansible.builtin.import_playbook: marcstraube.common.base_system
+
+- name: Workstations
+  ansible.builtin.import_playbook: marcstraube.desktop.workstation
+```
+
+`playbooks/tasks/workstation.yml` imports every role of the collection with
+`import_role` and the role toggles, so a play can import that task file
+instead of listing the roles itself.
+
+### Individual roles
+
 All roles use `include_role` with boolean toggles:
 
 ```yaml
