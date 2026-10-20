@@ -1,5 +1,52 @@
 # Changelog
 
+## [3.0.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.4.0...v3.0.0) (2026-10-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* **playbooks:** keep one workstation playbook and drop the standalone playbooks ([#277](https://github.com/marcstraube/ansible-collection-desktop/issues/277))
+* **ai:** install ComfyUI-Manager from the AUR on Arch Linux ([#274](https://github.com/marcstraube/ansible-collection-desktop/issues/274))
+* **development:** the development_* toggles for languages, build tools, CLI tooling, Python and shell tooling, httpie and the Socket CLI are removed. The common roles that replace them are opt-in, where development installed Python, Node.js, the build systems, jq, yq, direnv, pre-commit, httpie and shellcheck by default, and they install without removing.
+* hosts that relied on the application and peripheral roles running by default must enable them in their inventory, for example multimedia_enabled: true. See MIGRATION.md.
+* replace the Cowork toggle with per-user Claude Desktop config ([#247](https://github.com/marcstraube/ansible-collection-desktop/issues/247))
+* drop version control tooling from the development role ([#241](https://github.com/marcstraube/ansible-collection-desktop/issues/241))
+* remove Gemini CLI from the ai role ([#240](https://github.com/marcstraube/ansible-collection-desktop/issues/240))
+* gate initial user_config_mode on config existence ([#237](https://github.com/marcstraube/ansible-collection-desktop/issues/237))
+
+### Features
+
+* add virtual_reality role for VR streaming to standalone headsets ([#256](https://github.com/marcstraube/ansible-collection-desktop/issues/256)) ([df24a7c](https://github.com/marcstraube/ansible-collection-desktop/commit/df24a7ccfcc2b1424ea461381a5adcaed9855576))
+* **ai:** install ComfyUI-Manager from the AUR on Arch Linux ([#274](https://github.com/marcstraube/ansible-collection-desktop/issues/274)) ([def18cb](https://github.com/marcstraube/ansible-collection-desktop/commit/def18cb10f4d2a670cf6d7c6eb69a6a2bc5224e5))
+* gate initial user_config_mode on config existence ([#237](https://github.com/marcstraube/ansible-collection-desktop/issues/237)) ([7bb0d68](https://github.com/marcstraube/ansible-collection-desktop/commit/7bb0d68733036bb28a73bb1854112ae35be02ac3)), closes [#179](https://github.com/marcstraube/ansible-collection-desktop/issues/179)
+* remove Gemini CLI from the ai role ([#240](https://github.com/marcstraube/ansible-collection-desktop/issues/240)) ([b254aa4](https://github.com/marcstraube/ansible-collection-desktop/commit/b254aa4b5a9d76a148e39f5135d7cac439354114)), closes [#146](https://github.com/marcstraube/ansible-collection-desktop/issues/146)
+* replace the Cowork toggle with per-user Claude Desktop config ([#247](https://github.com/marcstraube/ansible-collection-desktop/issues/247)) ([c950d55](https://github.com/marcstraube/ansible-collection-desktop/commit/c950d5569927a2078d659cb39c6c6cc6db95a75f)), closes [#245](https://github.com/marcstraube/ansible-collection-desktop/issues/245)
+
+
+### Bug Fixes
+
+* **browser:** install LibreWolf from the official Arch repository ([#252](https://github.com/marcstraube/ansible-collection-desktop/issues/252)) ([8621074](https://github.com/marcstraube/ansible-collection-desktop/commit/8621074e5492b0596ef154ff096c08e2ee367198))
+* **browser:** stop enforcing the mode of mimeapps.list ([#249](https://github.com/marcstraube/ansible-collection-desktop/issues/249)) ([75277ad](https://github.com/marcstraube/ansible-collection-desktop/commit/75277adba0bc6e9045b0fd032946c7ec2a7245fb)), closes [#248](https://github.com/marcstraube/ansible-collection-desktop/issues/248)
+* **communication:** install slack-desktop in place of the removed Wayland package ([#254](https://github.com/marcstraube/ansible-collection-desktop/issues/254)) ([de75d3d](https://github.com/marcstraube/ansible-collection-desktop/commit/de75d3dd27b7c67ac8faaacc0e2e649ecba497e2))
+* **development:** import both devkitPro master keys ([#266](https://github.com/marcstraube/ansible-collection-desktop/issues/266)) ([fbf92e7](https://github.com/marcstraube/ansible-collection-desktop/commit/fbf92e7c952ffe889543bef8a45a0742a0e34950)), closes [#265](https://github.com/marcstraube/ansible-collection-desktop/issues/265)
+* **galaxy:** require marcstraube.common 3.0.0 ([#278](https://github.com/marcstraube/ansible-collection-desktop/issues/278)) ([5c44b0e](https://github.com/marcstraube/ansible-collection-desktop/commit/5c44b0eafd0126c4b8c771b3d1e50e6d36a67c04))
+* make application and peripheral roles opt-in by default ([#258](https://github.com/marcstraube/ansible-collection-desktop/issues/258)) ([1db8868](https://github.com/marcstraube/ansible-collection-desktop/commit/1db8868f03db27634949aaef115d760cd568f537)), closes [#257](https://github.com/marcstraube/ansible-collection-desktop/issues/257)
+* **virtual_reality:** install ALVR from the upstream release build ([#272](https://github.com/marcstraube/ansible-collection-desktop/issues/272)) ([83f4c00](https://github.com/marcstraube/ansible-collection-desktop/commit/83f4c0034149d310e21c35fa87b40974a7384165))
+
+
+### Code Refactoring
+
+* **development:** derive users without json_query ([#270](https://github.com/marcstraube/ansible-collection-desktop/issues/270)) ([c2922f5](https://github.com/marcstraube/ansible-collection-desktop/commit/c2922f5c71f99da69bc5eb686d9c688fbedf000f)), closes [#246](https://github.com/marcstraube/ansible-collection-desktop/issues/246)
+* **development:** move languages and CLI tooling to common ([#269](https://github.com/marcstraube/ansible-collection-desktop/issues/269)) ([15b7a82](https://github.com/marcstraube/ansible-collection-desktop/commit/15b7a822e76008c2c6a10c4a9baa6e5a78a6b09b)), closes [#267](https://github.com/marcstraube/ansible-collection-desktop/issues/267)
+* drop version control tooling from the development role ([#241](https://github.com/marcstraube/ansible-collection-desktop/issues/241)) ([4fb4064](https://github.com/marcstraube/ansible-collection-desktop/commit/4fb40645e2138ddef37f4f229945bb2430acd008)), closes [#233](https://github.com/marcstraube/ansible-collection-desktop/issues/233)
+* **playbooks:** keep one workstation playbook and drop the standalone playbooks ([#277](https://github.com/marcstraube/ansible-collection-desktop/issues/277)) ([6ac37e1](https://github.com/marcstraube/ansible-collection-desktop/commit/6ac37e1fa1c51d59f474ca5308065dfa3fbca120))
+
+
+### Documentation
+
+* **migration:** drop nonexistent hyprland autostart variable ([#243](https://github.com/marcstraube/ansible-collection-desktop/issues/243)) ([74d720a](https://github.com/marcstraube/ansible-collection-desktop/commit/74d720a58be6b97ba2b198c3242bc2f3a6a67524)), closes [#242](https://github.com/marcstraube/ansible-collection-desktop/issues/242)
+* **readme:** document the ansible-core 2.19 floor in every role README ([#239](https://github.com/marcstraube/ansible-collection-desktop/issues/239)) ([2cd55ff](https://github.com/marcstraube/ansible-collection-desktop/commit/2cd55ff9bd695d373c781c6fbe8345bcd730d5af)), closes [#236](https://github.com/marcstraube/ansible-collection-desktop/issues/236)
+
 ## [2.4.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.3.0...v2.4.0) (2026-09-08)
 
 

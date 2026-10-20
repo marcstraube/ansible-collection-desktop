@@ -14,6 +14,8 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+## v3.0.0 - 2026-10-20
+
 ### `development` — languages and CLI tooling moved to `marcstraube.common`
 
 The role installed programming languages, build tools and CLI tooling next to
