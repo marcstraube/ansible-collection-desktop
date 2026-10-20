@@ -47,7 +47,7 @@ build_ignore:
   - '__pycache__'
   - 'roles/*/molecule'
 dependencies:
-  marcstraube.common: '>=2.0.0'
+  marcstraube.common: '>=3.0.0'
   community.general: '>=8.0.0'
   ansible.posix: '>=1.5.0'
   kewlfft.aur: '>=0.11.0'
