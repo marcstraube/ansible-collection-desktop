@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.1 (2026-10-22)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+
+
+**Full Changelog**: https://github.com/marcstraube/ansible-collection-desktop/compare/v3.0.0...v3.0.1
+
 ## [3.0.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.4.0...v3.0.0) (2026-10-20)
 
 
