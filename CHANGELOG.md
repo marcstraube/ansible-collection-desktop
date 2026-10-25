@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.1 (2026-10-25)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Documentation
+* docs(readme): require version 3 in the requirements file example by @marcstraube in https://github.com/marcstraube/ansible-collection-desktop/pull/287
+
+
+**Full Changelog**: https://github.com/marcstraube/ansible-collection-desktop/compare/v3.0.0...v3.0.1
+
 ## [3.0.0](https://github.com/marcstraube/ansible-collection-desktop/compare/v2.4.0...v3.0.0) (2026-10-20)
 
 

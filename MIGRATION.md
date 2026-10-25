@@ -14,6 +14,8 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+## v3.0.1 - 2026-10-25
+
 ## v3.0.0 - 2026-10-20
 
 ### `development` — languages and CLI tooling moved to `marcstraube.common`
