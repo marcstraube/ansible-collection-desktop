@@ -1,4 +1,29 @@
 ---
+# Runs against a single inventory host so the source file is created once;
+# the implicit localhost has no inventory_dir to resolve the source path from.
+- name: Prepare custom ACP files on the controller
+  hosts: all[0]
+  gather_facts: false
+
+  tasks:
+    - name: Prepare | Create inventory ACP source directory
+      ansible.builtin.file:
+        path: '{{ inventory_dir }}/files/acp'
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      become: false
+
+    - name: Prepare | Create custom ACP profile set
+      ansible.builtin.copy:
+        content: |
+          ; Molecule test profile set
+          .include /usr/share/alsa-card-profile/mixer/profile-sets/default.conf
+        dest: '{{ inventory_dir }}/files/acp/molecule-test.conf'
+        mode: '0644'
+      delegate_to: localhost
+      become: false
+
 - name: Prepare
   hosts: all
   gather_facts: true
@@ -19,6 +44,15 @@
       ansible.builtin.dnf:
         update_cache: true
       when: ansible_facts['os_family'] == 'RedHat'
+
+    # The Debian image ships without udev; desktops always have it
+    - name: Prepare | Install udev (Debian)
+      ansible.builtin.apt:
+        name: udev
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
+      retries: 3
+      delay: 5
 
     - name: Prepare | Install base-devel and sudo (Arch)
       community.general.pacman:

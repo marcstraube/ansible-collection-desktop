@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+# Selects an ALSA Card Profile (ACP) profile set for specific sound cards.
+# Runs after 90-pipewire-alsa.rules and overrides its ACP_PROFILE_SET.
+
+SUBSYSTEM!="sound", GOTO="pipewire_acp_end"
+ACTION!="change", GOTO="pipewire_acp_end"
+KERNEL!="card*", GOTO="pipewire_acp_end"
+{% for rule in __pipewire_acp_rules %}
+
+# {{ rule.name }}
+{{ rule.match }}, ENV{ACP_PROFILE_SET}="{{ rule.profile_set }}"
+{% endfor %}
+
+LABEL="pipewire_acp_end"

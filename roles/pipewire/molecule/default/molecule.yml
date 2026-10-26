@@ -61,6 +61,11 @@ provisioner:
   config_options:
     defaults:
       allow_broken_conditionals: true
+    # prepare.yml writes ACP source files below inventory/files/, which
+    # Ansible would otherwise try to parse as inventory sources ('$$' escapes
+    # the regex anchor from molecule's variable substitution)
+    inventory:
+      ignore_patterns: '^files$$'
 verifier:
   name: ansible
 scenario:

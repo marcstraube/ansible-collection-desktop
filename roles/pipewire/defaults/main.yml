@@ -43,6 +43,17 @@ pipewire_alsa_enabled: true
 pipewire_jack_enabled: false
 
 #
+# ALSA Support
+#
+
+# Install ALSA firmware for sound cards with an onboard DSP (alsa-firmware).
+# Not packaged on Debian.
+pipewire_alsa_firmware_enabled: false
+
+# Install ALSA command-line utilities (alsa-utils: alsactl, alsamixer, amixer, aplay)
+pipewire_alsa_utils_enabled: false
+
+#
 # Bluetooth
 #
 
@@ -101,6 +112,34 @@ pipewire_min_quantum: 32
 
 # Maximum quantum
 pipewire_max_quantum: 2048
+
+#
+# ALSA Card Profiles
+#
+# Mixer path and profile-set files deployed to /etc/alsa-card-profile/mixer/,
+# udev rules deployed to /etc/udev/rules.d/91-pipewire-acp.rules
+
+# Bundled quirks for specific sound cards, each limited to its card by a udev
+# rule: creative_ae5_plus
+pipewire_acp_quirks: []
+
+# Custom ACP files, read from {{ inventory_dir }}/files/acp/ and deployed
+# under their file name (type: paths or profile-sets)
+pipewire_acp_files: []
+# Example:
+#   pipewire_acp_files:
+#     - src: 'my-card-analog-output.conf'
+#       type: 'paths'
+#     - src: 'my-card.conf'
+#       type: 'profile-sets'
+
+# udev rules that select a profile set for a specific sound card
+pipewire_acp_udev_rules: []
+# Example:
+#   pipewire_acp_udev_rules:
+#     - name: 'My sound card'
+#       match: 'ATTRS{subsystem_vendor}=="0x1234", ATTRS{subsystem_device}=="0x5678"'
+#       profile_set: 'my-card.conf'
 
 #
 # Cleanup
