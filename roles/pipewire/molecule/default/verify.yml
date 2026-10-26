@@ -35,3 +35,84 @@
       changed_when: false
       failed_when: __verify_pipewire_rpm.rc != 0
       when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Verify | Assert ALSA packages installed
+      ansible.builtin.assert:
+        that:
+          - "'alsa-utils' in ansible_facts['packages']"
+          - >-
+            ansible_facts['os_family'] == 'Debian'
+            or 'alsa-firmware' in ansible_facts['packages']
+
+    - name: Verify | Stat bundled quirk files
+      ansible.builtin.stat:
+        path: '/etc/alsa-card-profile/mixer/{{ item }}'
+      loop:
+        - paths/creative-ae5-plus-analog-output.conf
+        - paths/creative-ae5-plus-analog-output.conf.common
+        - paths/creative-ae5-plus-analog-output-headphones.conf
+        - paths/creative-ae5-plus-analog-output-lineout.conf
+        - profile-sets/creative-ae5-plus.conf
+        - profile-sets/molecule-test.conf
+      register: __verify_acp_files
+
+    - name: Verify | Assert ACP files deployed
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.mode == '0644'
+          - item.stat.pw_name == 'root'
+        fail_msg: '{{ item.item }} missing or wrong permissions'
+        quiet: true
+      loop: '{{ __verify_acp_files.results }}'
+      loop_control:
+        label: '{{ item.item }}'
+
+    - name: Verify | Stat packaged default profile set included by the quirk
+      ansible.builtin.stat:
+        path: /usr/share/alsa-card-profile/mixer/profile-sets/default.conf
+      register: __verify_acp_default
+
+    - name: Verify | Assert packaged default profile set exists
+      ansible.builtin.assert:
+        that:
+          - __verify_acp_default.stat.exists
+
+    - name: Verify | Read quirk path includes
+      ansible.builtin.command:
+        cmd: >-
+          grep -h '^.include' /etc/alsa-card-profile/mixer/paths/creative-ae5-plus-analog-output.conf
+          /etc/alsa-card-profile/mixer/paths/creative-ae5-plus-analog-output-headphones.conf
+          /etc/alsa-card-profile/mixer/paths/creative-ae5-plus-analog-output-lineout.conf
+      register: __verify_acp_includes
+      changed_when: false
+
+    - name: Verify | Assert quirk paths include the quirk common file
+      ansible.builtin.assert:
+        that:
+          - __verify_acp_includes.stdout_lines | length == 3
+          - >-
+            __verify_acp_includes.stdout_lines | unique
+            == ['.include creative-ae5-plus-analog-output.conf.common']
+
+    - name: Verify | Read udev rules
+      ansible.builtin.slurp:
+        src: /etc/udev/rules.d/91-pipewire-acp.rules
+      register: __verify_acp_udev
+
+    - name: Verify | Assert udev rules select the profile sets
+      vars:
+        __verify_acp_udev_content: '{{ __verify_acp_udev.content | b64decode }}'
+      ansible.builtin.assert:
+        that:
+          - >-
+            'ATTRS{subsystem_vendor}=="0x1102", ATTRS{subsystem_device}=="0x0191",
+            ENV{ACP_PROFILE_SET}="creative-ae5-plus.conf"' in __verify_acp_udev_content
+          - >-
+            'ATTRS{subsystem_vendor}=="0x1234", ATTRS{subsystem_device}=="0x5678",
+            ENV{ACP_PROFILE_SET}="molecule-test.conf"' in __verify_acp_udev_content
+          - "'LABEL=\"pipewire_acp_end\"' in __verify_acp_udev_content"
