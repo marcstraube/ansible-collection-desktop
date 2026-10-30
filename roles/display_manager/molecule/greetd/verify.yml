@@ -4,8 +4,10 @@
   gather_facts: true
 
   vars:
-    # Arch ships Hyprland 0.57 or later, which reads Lua config only.
-    __verify_greeter_config: /etc/greetd/hyprland.lua
+    # Arch ships Hyprland 0.57 or later (Lua config only); the Debian stub
+    # reports an older release (hyprlang config).
+    __verify_greeter_config: >-
+      /etc/greetd/hyprland.{{ 'conf' if ansible_facts['os_family'] == 'Debian' else 'lua' }}
 
   tasks:
     - name: Verify | Read greetd config
@@ -33,6 +35,25 @@
           - "'kb_layout = \"de\",' in __verify_greeter_content.content | b64decode"
           - "'kb_variant = \"nodeadkeys\",' in __verify_greeter_content.content | b64decode"
           - "'#' not in __verify_greeter_content.content | b64decode"
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert hyprlang greeter config content
+      ansible.builtin.assert:
+        that:
+          - >-
+            'exec-once = gtkgreet -l -s /usr/share/wayland-sessions; hyprctl dispatch exit'
+            in __verify_greeter_content.content | b64decode
+          - "'kb_layout = de' in __verify_greeter_content.content | b64decode"
+          - "'kb_variant = nodeadkeys' in __verify_greeter_content.content | b64decode"
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check greeter package installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg-query -W -f=${Status} gtkgreet'
+      register: __verify_gtkgreet
+      changed_when: false
+      failed_when: __verify_gtkgreet.stdout != 'install ok installed'
+      when: ansible_facts['os_family'] == 'Debian'
 
     - name: Verify | Create runtime directory for Hyprland (Arch)
       ansible.builtin.file:

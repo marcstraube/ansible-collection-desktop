@@ -3,6 +3,17 @@
 # Display Manager Installation
 #
 
+- name: Install | Assert greetd greeter is available
+  ansible.builtin.assert:
+    that:
+      - display_manager_greetd_greeter in __display_manager_greetd_greeter_packages
+    fail_msg: >-
+      greetd greeter '{{ display_manager_greetd_greeter }}' is not available
+      on {{ ansible_facts['distribution'] }}; choose one of
+      {{ __display_manager_greetd_greeter_packages.keys() | join(', ') }}.
+    quiet: true
+  when: display_manager_name == 'greetd'
+
 - name: Install | Build package list
   ansible.builtin.set_fact:
     __display_manager_install_packages: >-

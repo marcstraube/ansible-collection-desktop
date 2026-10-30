@@ -70,6 +70,9 @@ overrides if needed.
 | `display_manager_greetd_keyboard_layout`    | `''`       | Keyboard layout (XKB format, empty = system default)    |
 | `display_manager_greetd_keyboard_variant`   | `''`       | Keyboard variant                                        |
 
+regreet is not packaged for Debian; the role stops with an error when the
+selected greeter is not available on the platform.
+
 ### Autologin
 
 | Variable                            | Default | Description                         |
@@ -133,7 +136,8 @@ molecule test -s greetd
 ```
 
 Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
-(`greetd` scenario: Arch Linux; greetd with a graphical greeter on Hyprland)
+(`greetd` scenario: Arch Linux, Debian Trixie; greetd with a graphical
+greeter on Hyprland)
 
 ## References
 
