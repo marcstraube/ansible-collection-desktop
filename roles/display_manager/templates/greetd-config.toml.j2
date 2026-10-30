@@ -18,7 +18,7 @@ command = "{{ display_manager_greetd_greeter_command }}"
 {% if display_manager_greetd_greeter_compositor == 'cage' %}
 command = "cage -s -- {{ __display_manager_greetd_greeter_cmds[display_manager_greetd_greeter] }}"
 {% elif display_manager_greetd_greeter_compositor in ['hyprland', 'sway'] %}
-command = "{{ __display_manager_greetd_compositor_binaries[display_manager_greetd_greeter_compositor] }} --config /etc/greetd/{{ display_manager_greetd_greeter_compositor }}.conf"
+command = "{{ __display_manager_greetd_compositor_binaries[display_manager_greetd_greeter_compositor] }} --config {{ __display_manager_greetd_compositor_config }}"
 {% endif %}
 {% elif display_manager_greetd_greeter == 'tuigreet' %}
 command = "tuigreet --cmd {{ display_manager_greetd_default_session }}"
