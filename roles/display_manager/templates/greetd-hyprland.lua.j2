@@ -1,0 +1,21 @@
+{{ ansible_managed | comment(decoration='-- ') }}
+
+hl.on("hyprland.start", function()
+    hl.exec_cmd("{{ __display_manager_greetd_greeter_cmds[display_manager_greetd_greeter] }}; hyprctl dispatch 'hl.dsp.exit()'")
+end)
+
+hl.config({
+{% if display_manager_greetd_keyboard_layout | length > 0 %}
+    input = {
+        kb_layout = "{{ display_manager_greetd_keyboard_layout }}",
+{% if display_manager_greetd_keyboard_variant | length > 0 %}
+        kb_variant = "{{ display_manager_greetd_keyboard_variant }}",
+{% endif %}
+    },
+{% endif %}
+    misc = {
+        disable_hyprland_logo = true,
+        disable_splash_rendering = true,
+        disable_hyprland_guiutils_check = true,
+    },
+})

@@ -50,8 +50,9 @@ The `display_manager` role supports configurable greeters:
 Default is `agreety` (built-in, no dependencies). When using graphical greeters,
 set `display_manager_greetd_greeter_compositor` to `hyprland` or `sway`.
 
-The role deploys a minimal compositor config (`greetd-hyprland.conf` or
-`greetd-sway.conf`) that launches the greeter and exits.
+The role deploys a minimal compositor config that launches the greeter and
+exits: `/etc/greetd/hyprland.lua` (Hyprland 0.57+, Lua only),
+`/etc/greetd/hyprland.conf` (older Hyprland) or `/etc/greetd/sway.conf`.
 
 ## Playbooks
 

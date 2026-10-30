@@ -119,14 +119,21 @@ overrides if needed.
   when: display_manager_enabled | default(true) | bool
 ```
 
+The role writes the greeter compositor config to `/etc/greetd/`. For
+Hyprland 0.57 and later, which reads Lua config only, it deploys
+`hyprland.lua`; for older releases `hyprland.conf` (hyprlang). The format
+follows the Hyprland version installed on the host.
+
 ## Testing
 
 ```bash
 cd roles/display_manager
 molecule test
+molecule test -s greetd
 ```
 
 Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
+(`greetd` scenario: Arch Linux; greetd with a graphical greeter on Hyprland)
 
 ## References
 
