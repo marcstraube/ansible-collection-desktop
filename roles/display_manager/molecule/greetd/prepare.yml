@@ -100,3 +100,14 @@
         name: hyprland
         state: present
       when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Debian Trixie ships no Hyprland; a stub reporting a release before
+    # 0.57 exercises the hyprlang config path.
+    - name: Prepare | Install Hyprland version stub (Debian)
+      ansible.builtin.copy:
+        dest: /usr/local/bin/Hyprland
+        content: |
+          #!/bin/sh
+          echo 'Hyprland 0.56.2 built from branch v0.56.2 at commit 0000000 (stub).'
+        mode: '0755'
+      when: ansible_facts['os_family'] == 'Debian'

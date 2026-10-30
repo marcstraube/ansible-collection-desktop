@@ -8,7 +8,9 @@
     display_manager_name: 'greetd'
     display_manager_service_enabled: false
     display_manager_autologin_enabled: false
-    display_manager_greetd_greeter: 'regreet'
+    # regreet is not packaged for Debian
+    display_manager_greetd_greeter: >-
+      {{ 'gtkgreet' if ansible_facts['os_family'] == 'Debian' else 'regreet' }}
     display_manager_greetd_greeter_compositor: 'hyprland'
     display_manager_greetd_keyboard_layout: 'de'
     display_manager_greetd_keyboard_variant: 'nodeadkeys'

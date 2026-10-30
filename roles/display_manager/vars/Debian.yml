@@ -24,10 +24,10 @@ __display_manager_lightdm_greeter_names:
   slick: 'slick-greeter'
 
 # greetd greeter packages
+# regreet is not packaged for Debian.
 __display_manager_greetd_greeter_packages:
-  gtkgreet: 'greetd-gtkgreet'
-  regreet: 'greetd-regreet'
-  tuigreet: 'greetd-tuigreet'
+  gtkgreet: 'gtkgreet'
+  tuigreet: 'tuigreet'
   agreety: ''
 
 # GDM config path
