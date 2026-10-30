@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.0.2 (2026-10-30)
+
+<!-- Release notes generated using configuration in .github/release.yml at main -->
+
+## What's Changed
+### Bug Fixes
+* fix(display_manager): deploy Lua greeter config for Hyprland 0.57 by @marcstraube in https://github.com/marcstraube/ansible-collection-desktop/pull/295
+* fix(display_manager): use Debian greetd greeter package names by @marcstraube in https://github.com/marcstraube/ansible-collection-desktop/pull/301
+### Other Changes
+* chore: release 3.0.2 by @marcstraube in https://github.com/marcstraube/ansible-collection-desktop/pull/298
+
+
+**Full Changelog**: https://github.com/marcstraube/ansible-collection-desktop/compare/v3.0.1...v3.0.2
+
 ## 3.0.1 (2026-10-25)
 
 <!-- Release notes generated using configuration in .github/release.yml at main -->
