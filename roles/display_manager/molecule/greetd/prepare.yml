@@ -1,0 +1,113 @@
+---
+#
+# Prepare containers for molecule testing
+#
+
+- name: Prepare
+  hosts: all
+  gather_facts: true
+
+  vars:
+    __prepare_packages:
+      Debian:
+        - systemd
+        - systemd-timesyncd
+        - locales
+        - dbus
+      RedHat:
+        - glibc-langpack-en
+        - glibc-locale-source
+
+  tasks:
+    #
+    # Package Cache
+    #
+
+    - name: Prepare | Update package cache (Arch)
+      community.general.pacman:
+        update_cache: true
+        upgrade: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Update package cache (Debian)
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Prepare | Update package cache (RedHat)
+      ansible.builtin.dnf:
+        update_cache: true
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # Container Dependencies
+    #
+
+    - name: Prepare | Replace curl-minimal with curl (RedHat)
+      ansible.builtin.dnf:
+        name:
+          - curl
+        state: present
+        allowerasing: true
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Prepare | Install container dependencies
+      ansible.builtin.package:
+        name: '{{ __prepare_packages[ansible_facts["os_family"]] }}'
+        state: present
+      when: ansible_facts['os_family'] in __prepare_packages
+
+    - name: Prepare | Start D-Bus (RedHat)
+      ansible.builtin.systemd_service:
+        name: dbus-broker
+        state: started
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    #
+    # AUR Builder (Arch)
+    #
+
+    - name: Prepare | Install base-devel and sudo (Arch)
+      community.general.pacman:
+        name:
+          - base-devel
+          - sudo
+        state: present
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Create aur_builder user (Arch)
+      ansible.builtin.user:
+        name: aur_builder
+        group: wheel
+        create_home: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Configure sudoers for aur_builder (Arch)
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/aur_builder
+        line: 'aur_builder ALL=(ALL) NOPASSWD: ALL'
+        create: true
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    #
+    # Greeter Compositor
+    #
+
+    - name: Prepare | Install Hyprland (Arch)
+      community.general.pacman:
+        name: hyprland
+        state: present
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Debian Trixie ships no Hyprland; a stub reporting a release before
+    # 0.57 exercises the hyprlang config path.
+    - name: Prepare | Install Hyprland version stub (Debian)
+      ansible.builtin.copy:
+        dest: /usr/local/bin/Hyprland
+        content: |
+          #!/bin/sh
+          echo 'Hyprland 0.56.2 built from branch v0.56.2 at commit 0000000 (stub).'
+        mode: '0755'
+      when: ansible_facts['os_family'] == 'Debian'

@@ -1,0 +1,77 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  vars:
+    # Arch ships Hyprland 0.57 or later (Lua config only); the Debian stub
+    # reports an older release (hyprlang config).
+    __verify_greeter_config: >-
+      /etc/greetd/hyprland.{{ 'conf' if ansible_facts['os_family'] == 'Debian' else 'lua' }}
+
+  tasks:
+    - name: Verify | Read greetd config
+      ansible.builtin.slurp:
+        src: /etc/greetd/config.toml
+      register: __verify_greetd_config
+
+    - name: Verify | Assert greetd starts Hyprland with the greeter config
+      ansible.builtin.assert:
+        that:
+          - >-
+            ('command = "start-hyprland -- --config ' ~ __verify_greeter_config ~ '"')
+            in (__verify_greetd_config.content | b64decode)
+        fail_msg: 'config.toml does not point at {{ __verify_greeter_config }}'
+
+    - name: Verify | Read greeter compositor config
+      ansible.builtin.slurp:
+        src: '{{ __verify_greeter_config }}'
+      register: __verify_greeter_content
+
+    - name: Verify | Assert Lua greeter config content
+      ansible.builtin.assert:
+        that:
+          - "'hl.exec_cmd(\"regreet; hyprctl dispatch' in __verify_greeter_content.content | b64decode"
+          - "'kb_layout = \"de\",' in __verify_greeter_content.content | b64decode"
+          - "'kb_variant = \"nodeadkeys\",' in __verify_greeter_content.content | b64decode"
+          - "'#' not in __verify_greeter_content.content | b64decode"
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert hyprlang greeter config content
+      ansible.builtin.assert:
+        that:
+          - >-
+            'exec-once = gtkgreet -l -s /usr/share/wayland-sessions; hyprctl dispatch exit'
+            in __verify_greeter_content.content | b64decode
+          - "'kb_layout = de' in __verify_greeter_content.content | b64decode"
+          - "'kb_variant = nodeadkeys' in __verify_greeter_content.content | b64decode"
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Check greeter package installed (Debian)
+      ansible.builtin.command:
+        cmd: 'dpkg-query -W -f=${Status} gtkgreet'
+      register: __verify_gtkgreet
+      changed_when: false
+      failed_when: __verify_gtkgreet.stdout != 'install ok installed'
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Create runtime directory for Hyprland (Arch)
+      ansible.builtin.file:
+        path: /run/verify-hyprland
+        state: directory
+        owner: greeter
+        mode: '0700'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Hyprland refuses to run as root; check as the greeter user.
+    - name: Verify | Check Lua greeter config with Hyprland (Arch)
+      ansible.builtin.command:
+        cmd: 'runuser -u greeter -- Hyprland --verify-config --config /etc/greetd/hyprland.lua'
+      environment:
+        XDG_RUNTIME_DIR: /run/verify-hyprland
+      register: __verify_hyprland_config
+      changed_when: false
+      failed_when: >-
+        __verify_hyprland_config.rc != 0
+        or 'config ok' not in __verify_hyprland_config.stdout
+      when: ansible_facts['os_family'] == 'Archlinux'

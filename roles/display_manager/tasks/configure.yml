@@ -61,6 +61,34 @@
     mode: '0755'
   when: display_manager_name == 'greetd'
 
+# Hyprland 0.57 reads its config as Lua only; older releases (still shipped
+# by some distributions) read hyprlang only.
+- name: Configure | Detect Hyprland version
+  ansible.builtin.command:
+    cmd: 'Hyprland --version'
+  register: __display_manager_hyprland_version_cmd
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when:
+    - display_manager_name == 'greetd'
+    - display_manager_greetd_greeter_compositor == 'hyprland'
+
+- name: Configure | Set greeter compositor config path
+  ansible.builtin.set_fact:
+    __display_manager_greetd_compositor_config: >-
+      /etc/greetd/{{ display_manager_greetd_greeter_compositor }}.{{
+        'lua' if __display_manager_hyprland_version is version('0.57', '>=') else 'conf' }}
+  vars:
+    # Unknown version (not installed yet): assume a current release.
+    __display_manager_hyprland_version: >-
+      {{ (__display_manager_hyprland_version_cmd.stdout | default('')
+          | regex_search('Hyprland v?([0-9]+\.[0-9]+(\.[0-9]+)?)', '\1')
+          | default(['999'], true) | first)
+         if display_manager_greetd_greeter_compositor == 'hyprland'
+         else '0' }}
+  when: display_manager_name == 'greetd'
+
 - name: Configure | Deploy greetd config
   ansible.builtin.template:
     src: 'greetd-config.toml.j2'
@@ -73,8 +101,8 @@
 
 - name: Configure | Deploy greeter compositor config
   ansible.builtin.template:
-    src: 'greetd-{{ display_manager_greetd_greeter_compositor }}.conf.j2'
-    dest: '/etc/greetd/{{ display_manager_greetd_greeter_compositor }}.conf'
+    src: 'greetd-{{ __display_manager_greetd_compositor_config | basename }}.j2'
+    dest: '{{ __display_manager_greetd_compositor_config }}'
     owner: root
     group: root
     mode: '0644'
