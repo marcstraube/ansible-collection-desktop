@@ -16,6 +16,11 @@ __pipewire_session_managers:
 __pipewire_pulse_package: pipewire-pulse
 __pipewire_alsa_package: pipewire-alsa
 __pipewire_jack_package: pipewire-jack
+
+# Not packaged on Debian (firmware-misc-nonfree lacks ctefx-desktop.bin)
+__pipewire_alsa_firmware_package: ''
+__pipewire_alsa_utils_package: alsa-utils
+
 # Not packaged separately on Debian
 __pipewire_zeroconf_package: ''
 

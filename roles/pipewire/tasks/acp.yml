@@ -1,0 +1,56 @@
+---
+#
+# ALSA Card Profile Tasks
+#
+
+- name: ACP | Ensure ACP config directories exist
+  ansible.builtin.file:
+    path: '{{ __pipewire_acp_config_dir }}/{{ item }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - paths
+    - profile-sets
+
+- name: ACP | Deploy bundled quirk files
+  ansible.builtin.copy:
+    src: 'acp/{{ item }}/'
+    dest: '{{ __pipewire_acp_config_dir }}/'
+    owner: root
+    group: root
+    mode: '0644'
+    directory_mode: '0755'
+  loop: '{{ pipewire_acp_quirks }}'
+  notify: Restart PipeWire
+
+- name: ACP | Deploy custom ACP files
+  ansible.builtin.copy:
+    src: '{{ inventory_dir }}/files/acp/{{ item.src }}'
+    dest: '{{ __pipewire_acp_config_dir }}/{{ item.type }}/{{ item.src | basename }}'
+    owner: root
+    group: root
+    mode: '0644'
+  loop: '{{ pipewire_acp_files }}'
+  loop_control:
+    label: '{{ item.type }}/{{ item.src | basename }}'
+  notify: Restart PipeWire
+
+- name: ACP | Build udev rule list
+  ansible.builtin.set_fact:
+    __pipewire_acp_rules: >-
+      {{ (pipewire_acp_quirks | map('extract', __pipewire_acp_quirks) | list)
+         + pipewire_acp_udev_rules }}
+
+- name: ACP | Deploy udev rules
+  ansible.builtin.template:
+    src: 'pipewire-acp.rules.j2'
+    dest: '{{ __pipewire_acp_udev_config_file }}'
+    owner: root
+    group: root
+    mode: '0644'
+  when: __pipewire_acp_rules | length > 0
+  notify:
+    - PipeWire reload udev
+    - Restart PipeWire
