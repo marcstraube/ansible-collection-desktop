@@ -14,6 +14,14 @@
   tags:
     - keepassxc
 
+# keepassxc_users takes precedence; only derive when the operator left it
+# empty. The guard is fixed before the derivation replaces the list.
+- name: Main | Set user derivation guard
+  ansible.builtin.set_fact:
+    __keepassxc_derive_users: '{{ keepassxc_users | length == 0 }}'
+  tags:
+    - keepassxc
+
 - name: Main | Derive users from users_list (exclude root and system users)
   ansible.builtin.set_fact:
     keepassxc_users: >-
@@ -26,9 +34,31 @@
          | rejectattr('system', 'equalto', true) | list }}
   when:
     - keepassxc_enabled | bool
-    - keepassxc_users | length == 0
+    - __keepassxc_derive_users | bool
     - users_list is defined
     - users_list | length > 0
+  tags:
+    - keepassxc
+
+# Reading lang from derived users_list entries is deprecated and will be
+# removed in v4.0.0. The flag is set on every run so the warning below fires
+# only while the deprecated path is in use.
+- name: Main | Detect deprecated lang attribute on users_list
+  ansible.builtin.set_fact:
+    __keepassxc_users_list_lang_deprecated: >-
+      {{ keepassxc_enabled | bool
+         and __keepassxc_derive_users | bool
+         and keepassxc_users | selectattr('lang', 'defined') | list | length > 0 }}
+  tags:
+    - keepassxc
+
+- name: Main | Warn about users_list lang attribute deprecation
+  ansible.builtin.debug:
+    msg: >
+      Reading lang from users_list entries is DEPRECATED and will be removed
+      in v4.0.0. From then on lang is read from keepassxc_users entries only.
+      Set lang on keepassxc_users entries instead. See #304.
+  when: __keepassxc_users_list_lang_deprecated | bool
   tags:
     - keepassxc
 

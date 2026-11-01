@@ -53,7 +53,9 @@ keepassxc_ssh_agent_enabled: false
 keepassxc_autostart_enabled: false
 
 # Default locale for GenericName translation in autostart entry.
-# Per-user override via 'lang' attribute on users_list / keepassxc_users.
+# Per-user override via 'lang' attribute on keepassxc_users entries.
+# DEPRECATED: 'lang' on users_list entries still applies while
+# keepassxc_users is empty. Removal in v4.0.0 — see #304.
 keepassxc_locale: 'en_US.UTF-8'
 
 #
@@ -75,7 +77,8 @@ keepassxc_user_config_mode: 'initial'
 # Users
 #
 
-# Users list (single source of truth, typically mapped from users_list)
+# Users list (single source of truth)
+# Empty: all regular users from users_list (root and system users excluded).
 # Per-user opt-out: set autostart/secret_service to false
 keepassxc_users: []
 # Example:

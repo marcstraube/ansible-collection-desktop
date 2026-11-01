@@ -110,8 +110,9 @@ ai_comfyui_service_enabled: true
 #
 # Users for whom to deploy the per-user Claude Desktop entry.
 #
-# Left empty, the list derives from users_list entries carrying an 'ai'
-# attribute, the standard derivation across the marcstraube collections.
+# DEPRECATED: left empty, the list derives from users_list entries carrying
+# an 'ai' attribute (system users excluded). Removal in v4.0.0 — from then on
+# an empty list means no users; set ai_users explicitly. See #304.
 #
 # Modes:
 #   managed  — always deploy/overwrite the desktop entry

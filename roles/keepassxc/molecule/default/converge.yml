@@ -78,7 +78,52 @@
     keepassxc_users:
       - name: 'kp_global_disabled'
 
+    # A configured keepassxc_users wins over users_list, lang included.
+    users_list:
+      - name: 'kp_global_disabled'
+        lang: 'de_DE.UTF-8'
+
   tasks:
     - name: Converge | Include keepassxc role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+
+    - name: Converge | Assert no users_list lang deprecation warning
+      ansible.builtin.assert:
+        that:
+          - not (__keepassxc_users_list_lang_deprecated | bool)
+        fail_msg: 'deprecation warning fired although keepassxc_users is set'
+        quiet: true
+
+
+# Users derived from users_list. The derived entry carries the deprecated
+# lang attribute; the global disabled mode keeps the derived users from
+# touching any home directory.
+- name: Converge | Users derived from users_list
+  hosts: all
+  gather_facts: false
+
+  vars:
+    keepassxc_enabled: true
+    keepassxc_secret_service_enabled: false
+    keepassxc_autostart_enabled: false
+    keepassxc_user_config_mode: 'disabled'
+    users_list:
+      - name: 'root'
+      - name: 'kp_global_disabled'
+        lang: 'de_DE.UTF-8'
+      - name: 'kp_system_account'
+        system: true
+
+  tasks:
+    - name: Converge | Include keepassxc role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+    - name: Converge | Assert users_list lang deprecation warning and derivation
+      ansible.builtin.assert:
+        that:
+          - __keepassxc_users_list_lang_deprecated | bool
+          - keepassxc_users | map(attribute='name') | list == ['kp_global_disabled']
+        fail_msg: 'users_list derivation or its lang deprecation warning is wrong'
+        quiet: true

@@ -257,6 +257,15 @@ Each user entry supports:
 | `username`        | yes      | System username                              |
 | `mode`            | no       | Per-user override of the global config mode  |
 
+Left empty, `development_users` derives from `users_list` entries carrying a
+`git` attribute (system users excluded).
+
+> **Deprecation:** deriving `development_users` from the `users_list` `git`
+> attribute is deprecated and will be removed in v4.0.0. The role prints a
+> warning while it derives users this way. From v4.0.0 an empty
+> `development_users` means no users; set `development_users` explicitly.
+> See #304.
+
 Mode semantics — analog to `marcstraube.desktop.browser`:
 
 | Mode       | First run                       | Subsequent runs                          |

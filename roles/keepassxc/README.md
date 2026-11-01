@@ -91,10 +91,15 @@ The `GenericName` field in the deployed autostart entry is translated
 from the system `.desktop` file (`/usr/share/applications/org.keepassxc.KeePassXC.desktop`)
 using the requested locale. Resolution order:
 
-1. Per-user `lang` attribute on the user entry (`keepassxc_users[*].lang`
-   or `users_list[*].lang` — both flow through)
+1. Per-user `lang` attribute on the user entry (`keepassxc_users[*].lang`,
+   or `users_list[*].lang` while `keepassxc_users` is empty)
 2. `keepassxc_locale` (host-level default)
 3. English fallback (`GenericName=Password Manager`)
+
+> **Deprecation:** reading `lang` from `users_list` entries is deprecated and
+> will be removed in v4.0.0. The role prints a warning while a derived user
+> carries `lang`. From v4.0.0 `lang` is read from `keepassxc_users` entries
+> only. See #304.
 
 Wire `keepassxc_locale: "{{ base_locale }}"` in inventory to follow a
 project-wide locale.
@@ -113,6 +118,9 @@ project-wide locale.
 | Variable          | Default | Description                           |
 | ----------------- | ------- | ------------------------------------- |
 | `keepassxc_users` | `[]`    | Users list for per-user configuration |
+
+Left empty, `keepassxc_users` defaults to all regular users from `users_list`
+(`root` and `system: true` entries excluded).
 
 User config mode semantics:
 

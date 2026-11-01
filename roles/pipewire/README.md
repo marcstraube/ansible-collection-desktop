@@ -89,6 +89,13 @@ no effect there.
 | `pipewire_realtime_enabled` | `true`  | Enable real-time scheduling                                  |
 | `pipewire_realtime_users`   | `[]`    | Users to add to realtime group (empty = all from users_list) |
 
+> **Deprecation:** an empty `pipewire_realtime_users` adds every `users_list`
+> entry to the realtime group, `root` and `system: true` entries included. This
+> is deprecated; from v4.0.0 an empty `pipewire_realtime_users` covers regular
+> users only (`root` and `system: true` entries excluded). Set
+> `pipewire_realtime_users` explicitly to keep other accounts in the group.
+> See #304.
+
 ### GUI Tools
 
 | Variable                  | Default          | Description                              |
