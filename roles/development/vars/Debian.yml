@@ -3,13 +3,6 @@
 # Debian Variables
 #
 
-# IDEs (need external repos or Flatpak)
-__development_vscodium_package: ''
-__development_vscode_package: ''
-__development_jetbrains_toolbox_package: ''
-__development_phpstorm_packages: []
-__development_zed_package: ''
-
 # Arduino: IDE 2.x is Flatpak/AppImage only (no-op via ides.yml notice);
 # the classic 1.x IDE is packaged officially
 __development_arduino_classic_package: 'arduino'
@@ -21,10 +14,6 @@ __development_serial_groups:
 # Database tools
 __development_dbeaver_package: ''
 __development_pgadmin_package: ''
-
-# API tools
-__development_postman_package: ''
-__development_bruno_package: ''
 
 # Lua tooling (stylua not packaged in Debian)
 __development_lua_stylua_package: ''

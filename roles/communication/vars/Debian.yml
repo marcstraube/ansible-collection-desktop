@@ -14,12 +14,7 @@ __communication_sieve_package: 'kmail'
 __communication_kdeconnect_package: 'kdeconnect'
 
 # Packages not available without external repos
-__communication_slack_package: ''
 __communication_slack_superseded_packages: []  # TODO(4.0): remove
 __communication_signal_package: ''
 __communication_discord_package: ''
 __communication_element_package: ''
-__communication_threema_package: ''
-__communication_zoom_package: ''
-__communication_teams_package: ''
-__communication_jitsi_package: ''
