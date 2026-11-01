@@ -11,8 +11,7 @@ desktop_environment_enabled: true
 #
 
 # List of usernames for user-scoped service management
-# Map from inventory:
-# desktop_environment_users: "{{ users_list | rejectattr('name', 'equalto', 'root') | map(attribute='name') | list }}"
+# Empty: all regular users from users_list (root and system users excluded).
 desktop_environment_users: []
 
 #

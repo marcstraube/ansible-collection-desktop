@@ -82,6 +82,9 @@ pipewire_32bit_enabled: false
 pipewire_realtime_enabled: true
 
 # Users to add to realtime group (empty = all users from users_list)
+# DEPRECATED: the empty default includes root and system users. From v4.0.0
+# an empty list covers all regular users from users_list only (root and
+# system users excluded). See #304.
 pipewire_realtime_users: []
 
 #

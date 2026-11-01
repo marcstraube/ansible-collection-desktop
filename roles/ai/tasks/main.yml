@@ -28,6 +28,27 @@
   tags:
     - always
 
+# Deriving ai_users from the users_list ai attribute is deprecated and will
+# be removed in v4.0.0. The flag is set on every run so the warning below
+# fires only while the deprecated path is in use.
+- name: Main | Detect deprecated ai attribute on users_list
+  ansible.builtin.set_fact:
+    __ai_users_list_attribute_deprecated: >-
+      {{ ai_enabled | bool
+         and __ai_derive_users | default(false) | bool
+         and users_list | default([]) | selectattr('ai', 'defined') | list | length > 0 }}
+  tags:
+    - always
+
+- name: Main | Warn about users_list ai attribute deprecation
+  ansible.builtin.debug:
+    msg: >
+      Deriving ai_users from the users_list ai attribute is DEPRECATED and
+      will be removed in v4.0.0. Set ai_users instead. See #304.
+  when: __ai_users_list_attribute_deprecated | bool
+  tags:
+    - always
+
 - name: Main | Load OS-specific variables
   ansible.builtin.include_vars: '{{ item }}'
   with_first_found:

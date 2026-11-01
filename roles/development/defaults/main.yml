@@ -146,6 +146,10 @@ development_bruno_enabled: false
 # Users to configure with development settings (git + IDEs).
 # Per-user mode (managed/initial/disabled) can be set per entry; the
 # top-level default below applies when an entry omits it.
+#
+# DEPRECATED: left empty, the list derives from users_list entries carrying
+# a 'git' attribute (system users excluded). Removal in v4.0.0 — from then on
+# an empty list means no users; set development_users explicitly. See #304.
 development_users: []
 # Example:
 #   - username: 'johndoe'

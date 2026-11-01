@@ -159,13 +159,18 @@ Each user entry supports:
 | `password_store` | no       | Per-user override of `ai_claude_desktop_password_store` |
 
 Left empty, `ai_users` derives from `users_list` entries carrying an `ai`
-attribute, the standard derivation across the `marcstraube` collections:
+attribute (system users excluded):
 
 ```yaml
 users_list:
   - name: 'johndoe'
     ai: true
 ```
+
+> **Deprecation:** deriving `ai_users` from the `users_list` `ai` attribute is
+> deprecated and will be removed in v4.0.0. The role prints a warning while it
+> derives users this way. From v4.0.0 an empty `ai_users` means no users; set
+> `ai_users` explicitly. See #304.
 
 Mode semantics:
 

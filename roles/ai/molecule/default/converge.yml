@@ -57,10 +57,23 @@
       - username: 'ai_disabled_user'
         mode: 'disabled'
 
+    # A configured ai_users wins over the deprecated users_list attribute.
+    users_list:
+      - name: 'ai_derived_user'
+        ai: true
+
   tasks:
     - name: Converge | Include ai role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Converge | Assert no users_list deprecation warning
+      ansible.builtin.assert:
+        that:
+          - not (__ai_users_list_attribute_deprecated | bool)
+        fail_msg: 'deprecation warning fired although ai_users is set'
+        quiet: true
       when: ansible_facts['os_family'] != 'Archlinux'
 
 # Same role, users derived from users_list instead of a configured list.
@@ -94,4 +107,12 @@
     - name: Converge | Include ai role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Converge | Assert users_list deprecation warning
+      ansible.builtin.assert:
+        that:
+          - __ai_users_list_attribute_deprecated | bool
+        fail_msg: 'no deprecation warning for the users_list ai attribute'
+        quiet: true
       when: ansible_facts['os_family'] != 'Archlinux'
