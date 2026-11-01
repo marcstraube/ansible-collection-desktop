@@ -9,7 +9,10 @@
       {{ office_libreoffice_fresh_enabled | bool |
          ternary(__office_libreoffice_fresh_package, __office_libreoffice_still_package) }}
     state: present
-  when: office_libreoffice_enabled | bool
+  when:
+    - office_libreoffice_enabled | bool
+    - (office_libreoffice_fresh_enabled | bool
+       | ternary(__office_libreoffice_fresh_package, __office_libreoffice_still_package)) | length > 0
   retries: 3
   delay: 5
 
@@ -20,6 +23,7 @@
   when:
     - office_libreoffice_enabled | bool
     - office_libreoffice_i18n | length > 0
+    - __office_libreoffice_i18n_package | length > 0
   retries: 3
   delay: 5
 
@@ -55,7 +59,9 @@
   ansible.builtin.package:
     name: '{{ __office_pdf_viewers[office_pdf_viewer] }}'
     state: present
-  when: office_pdf_viewer | length > 0
+  when:
+    - office_pdf_viewer | length > 0
+    - __office_pdf_viewers[office_pdf_viewer] | default('') | length > 0
   retries: 3
   delay: 5
 
@@ -86,6 +92,7 @@
   when:
     - office_thunderbird_enabled | bool
     - office_thunderbird_i18n | length > 0
+    - __office_thunderbird_i18n_package | length > 0
   retries: 3
   delay: 5
 
@@ -205,7 +212,9 @@
   ansible.builtin.package:
     name: '{{ __office_texstudio_package }}'
     state: present
-  when: office_texstudio_enabled | bool
+  when:
+    - office_texstudio_enabled | bool
+    - __office_texstudio_package | length > 0
   retries: 3
   delay: 5
 
@@ -260,7 +269,9 @@
   ansible.builtin.package:
     name: '{{ __office_calibre_package }}'
     state: present
-  when: office_calibre_enabled | bool
+  when:
+    - office_calibre_enabled | bool
+    - __office_calibre_package | length > 0
   retries: 3
   delay: 5
 
