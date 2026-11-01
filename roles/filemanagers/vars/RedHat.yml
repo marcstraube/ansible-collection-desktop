@@ -2,13 +2,10 @@
 #
 # RedHat 10 Packages
 #
-# EPEL 10 packages fewer GUI file managers than EPEL 9: Thunar and nemo
-# are not packaged.
-#
 
-__filemanagers_thunar_package: ''
+__filemanagers_thunar_package: ''  # not in EPEL 10
 __filemanagers_dolphin_package: 'dolphin'
 __filemanagers_nautilus_package: 'nautilus'
 __filemanagers_pcmanfm_package: ''  # not in EPEL on any EL
-__filemanagers_nemo_package: ''
-__filemanagers_doublecmd_package: ''
+__filemanagers_nemo_package: ''  # not in EPEL 10
+__filemanagers_doublecmd_package: ''  # not in EPEL on any EL

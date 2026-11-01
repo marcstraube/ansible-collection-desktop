@@ -8,4 +8,4 @@ __filemanagers_dolphin_package: 'dolphin'
 __filemanagers_nautilus_package: 'nautilus'
 __filemanagers_pcmanfm_package: ''  # not in EPEL on any EL
 __filemanagers_nemo_package: 'nemo'
-__filemanagers_doublecmd_package: ''
+__filemanagers_doublecmd_package: ''  # not in EPEL on any EL
