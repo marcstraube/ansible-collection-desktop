@@ -1,0 +1,17 @@
+---
+#
+# Shared Variables
+#
+
+# ALSA Card Profiles
+
+__pipewire_acp_config_dir: /etc/alsa-card-profile/mixer
+__pipewire_acp_udev_config_file: /etc/udev/rules.d/91-pipewire-acp.rules
+
+# Bundled quirks: files under files/acp/<quirk>/ plus the udev rule that
+# selects the quirk's profile set for its card
+__pipewire_acp_quirks:
+  creative_ae5_plus:
+    name: 'Creative Sound BlasterX AE-5 Plus (CA0132)'
+    match: 'ATTRS{subsystem_vendor}=="0x1102", ATTRS{subsystem_device}=="0x0191"'
+    profile_set: 'creative-ae5-plus.conf'

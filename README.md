@@ -8,7 +8,7 @@
 ## Description
 
 Desktop workstation roles for Arch Linux, Debian Trixie, and EL 9/10.
-27 roles covering desktop environments, display managers, browsers,
+Roles covering desktop environments, display managers, browsers,
 development tools, multimedia, office, and productivity applications.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
