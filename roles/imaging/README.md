@@ -11,7 +11,8 @@ available on Arch Linux only (AUR package).
 
 On Rocky Linux, EPEL must be enabled before running this role (typically
 via `marcstraube.common.package_management`) — simple-scan, skanlite,
-ImageMagick, and GraphicsMagick are not in the base repos.
+ImageMagick, and GraphicsMagick are not in the base repos. On EL 9, skanlite
+also needs CRB for its KF5 libraries.
 
 ## Requirements
 
@@ -24,7 +25,7 @@ ImageMagick, and GraphicsMagick are not in the base repos.
 | -------------------------- | ------------------------------------- |
 | Arch Linux                 | Native packages + AUR                 |
 | Debian Trixie              | Official repo packages                |
-| EL 9 (Rocky, Alma, RHEL)   | EPEL packages                         |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB packages                   |
 | EL 10 (Rocky, Alma, RHEL)  | EPEL packages — xsane not available   |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,

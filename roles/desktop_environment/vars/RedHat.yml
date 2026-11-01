@@ -1,60 +1,54 @@
 ---
 #
-# RedHat Variables
+# RedHat 10 Variables
 #
 
 #
 # Hyprland
 #
+# Not packaged in EPEL 10.
 
-__desktop_environment_hyprland_packages:
-  - 'hyprland'
+__desktop_environment_hyprland_packages: []
 
-# Extras (available in EPEL)
-__desktop_environment_hyprland_hypridle_package: 'hypridle'
-__desktop_environment_hyprland_hyprlock_package: 'hyprlock'
-__desktop_environment_hyprland_hyprpaper_package: 'hyprpaper'
-__desktop_environment_hyprland_hyprpicker_package: 'hyprpicker'
-__desktop_environment_hyprland_hyprcursor_package: 'hyprcursor'
+__desktop_environment_hyprland_hypridle_package: ''
+__desktop_environment_hyprland_hyprlock_package: ''
+__desktop_environment_hyprland_hyprpaper_package: ''
+__desktop_environment_hyprland_hyprpicker_package: ''
+__desktop_environment_hyprland_hyprcursor_package: ''
 __desktop_environment_hyprland_hyprshot_package: ''
 __desktop_environment_hyprland_hyprsunset_package: ''
-
-# Extras (not available on RedHat)
 __desktop_environment_hyprland_hyprlauncher_package: ''
 __desktop_environment_hyprland_hyprpwcenter_package: ''
 
-__desktop_environment_hyprland_portal_package: 'xdg-desktop-portal-hyprland'
+__desktop_environment_hyprland_portal_package: ''
 __desktop_environment_hyprland_polkit_package: ''
 __desktop_environment_hyprland_uwsm_package: ''
 
 #
 # Sway
 #
+# Not packaged in EPEL 10.
 
-__desktop_environment_sway_packages:
-  - 'sway'
+__desktop_environment_sway_packages: []
 
-__desktop_environment_sway_extras_packages:
-  - 'swaylock'
-  - 'swayidle'
-  - 'swaybg'
+__desktop_environment_sway_extras_packages: []
 
-__desktop_environment_sway_portal_package: 'xdg-desktop-portal-wlr'
+__desktop_environment_sway_portal_package: ''
 
 #
 # i3
 #
+# Not packaged in EPEL 10.
 
-__desktop_environment_i3_packages:
-  - 'i3'
+__desktop_environment_i3_packages: []
 
 __desktop_environment_i3_status_packages:
-  i3status: 'i3status'
-  i3blocks: 'i3blocks'
-  polybar: 'polybar'
+  i3status: ''
+  i3blocks: ''
+  polybar: ''
 
-__desktop_environment_i3_dmenu_package: 'dmenu'
-__desktop_environment_i3_picom_package: 'picom'
+__desktop_environment_i3_dmenu_package: ''
+__desktop_environment_i3_picom_package: ''
 
 #
 # KDE
@@ -92,44 +86,33 @@ __desktop_environment_gnome_tweaks_package: 'gnome-tweaks'
 #
 # XFCE
 #
+# Not packaged in EPEL 10.
 
-__desktop_environment_xfce_packages:
-  - '@xfce-desktop-environment'
-
-# Included in group
+__desktop_environment_xfce_packages: []
 __desktop_environment_xfce_goodies_package: ''
-__desktop_environment_xfce_whiskermenu_package: 'xfce4-whiskermenu-plugin'
+__desktop_environment_xfce_whiskermenu_package: ''
 
 #
 # LXDE
 #
+# Not packaged in EPEL 10.
 
-__desktop_environment_lxde_minimal_packages:
-  - 'lxde-common'
-  - 'lxsession'
-  - 'openbox'
-  - 'lxpanel'
-  - 'pcmanfm'
+__desktop_environment_lxde_minimal_packages: []
 
-__desktop_environment_lxde_full_packages:
-  - '@lxde-desktop-environment'
+__desktop_environment_lxde_full_packages: []
 
 #
 # LXQt
 #
+# Not packaged in EPEL 10.
 
-# LXQt is not packaged for EL 9/10 even with EPEL — the group reference
-# below is a placeholder; both variants will fail to install. Track in
-# a follow-up issue if LXQt-on-EL support is needed.
-__desktop_environment_lxqt_minimal_packages:
-  - '@lxqt-desktop-environment'
+__desktop_environment_lxqt_minimal_packages: []
 
-__desktop_environment_lxqt_full_packages:
-  - '@lxqt-desktop-environment'
+__desktop_environment_lxqt_full_packages: []
 
 __desktop_environment_lxqt_icon_packages:
-  breeze-icons: 'breeze-icon-theme'
-  oxygen-icons: 'oxygen-icon-theme'
+  breeze-icons: ''
+  oxygen-icons: ''
 
 #
 # Themes

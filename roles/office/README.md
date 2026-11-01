@@ -13,13 +13,17 @@ Install office applications and document tools.
 |---------------------------|------------------------|
 | Arch Linux                | Native packages + AUR  |
 | Debian Trixie             | Official repo packages |
-| EL 9 (Rocky, Alma, RHEL)  | EPEL packages          |
-| EL 10 (Rocky, Alma, RHEL) | EPEL packages          |
+| EL 9 (Rocky, Alma, RHEL)  | EPEL + CRB packages    |
+| EL 10 (Rocky, Alma, RHEL) | EPEL + CRB packages    |
 
-Packages not available on EL 9: `gnome-contacts`, `foliate`, `gscan2pdf`.
+Packages not available on EL 9: `calibre`, `foliate`, `texstudio`,
+`gnome-contacts`, `mupdf`.
 
-Packages not available on EL 10: `calibre`, `foliate`, `texstudio`,
-`gnome-calendar`, `gnome-contacts`. `evince` is replaced by GNOME Papers.
+Packages not available on EL 10: `libreoffice`, `calibre`, `foliate`,
+`texstudio`, `gnome-calendar`, `gnome-contacts`, `zathura`. `evince` is
+replaced by GNOME Papers.
+
+On EL, the `thunderbird` package ships all language packs.
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars
