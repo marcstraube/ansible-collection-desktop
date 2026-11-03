@@ -77,6 +77,11 @@ ai_ollama_models: []
 # Enable and start the Ollama service
 ai_ollama_service_enabled: true
 
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu'. Arch Linux installs the
+# matching ollama-<backend> package next to ollama; the upstream install
+# script on Debian and EL detects the GPU itself and ignores this variable.
+ai_ollama_backend: 'cpu'
+
 # Enable LM Studio
 ai_lmstudio_enabled: false
 

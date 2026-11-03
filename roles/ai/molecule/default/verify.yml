@@ -104,3 +104,42 @@
           - __ai_verify_mimeinfo.stat.exists
         fail_msg: 'update-desktop-database did not run for the managed user'
       when: ansible_facts['os_family'] != 'Archlinux'
+
+- name: Verify Ollama backend
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert Ollama and the Vulkan backend are installed
+      ansible.builtin.assert:
+        that:
+          - "'ollama' in ansible_facts['packages']"
+          - "'ollama-vulkan' in ansible_facts['packages']"
+          - "'ollama-rocm' not in ansible_facts['packages']"
+          - "'ollama-cuda' not in ansible_facts['packages']"
+        fail_msg: 'expected ollama and ollama-vulkan, and no other backend'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Run role with an invalid Ollama backend
+      block:
+        - name: Verify | Include ai role with ai_ollama_backend 'opencl'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_ollama_enabled: true
+            ai_ollama_backend: 'opencl'
+
+        - name: Verify | Fail when the invalid backend was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_ollama_backend 'opencl'."
+      rescue:
+        - name: Verify | Assert rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true

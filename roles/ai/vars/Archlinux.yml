@@ -40,6 +40,15 @@ __ai_claude_desktop_superseded_packages:
 
 # Local AI
 __ai_ollama_package: 'ollama'
+# Compute backend (ai_ollama_backend) → extra package next to ollama
+__ai_ollama_backend_packages:
+  rocm:
+    - 'ollama-rocm'
+  vulkan:
+    - 'ollama-vulkan'
+  cuda:
+    - 'ollama-cuda'
+  cpu: []
 
 # Service names
 __ai_ollama_service: 'ollama.service'

@@ -5,17 +5,26 @@
 
 # Ollama
 
+- name: Local | Build Ollama package list (Arch)
+  ansible.builtin.set_fact:
+    __ai_ollama_packages: >-
+      {{ [__ai_ollama_package] + __ai_ollama_backend_packages[ai_ollama_backend] }}
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_ollama_enabled | bool
+
+# Ollama loads its backends at startup, so a new backend needs a restart.
 - name: Local | Install Ollama
   become: true
   ansible.builtin.package:
-    name: '{{ __ai_ollama_package }}'
+    name: '{{ __ai_ollama_packages }}'
     state: present
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_ollama_enabled | bool
-    - __ai_ollama_package | length > 0
   retries: 3
   delay: 5
+  notify: Restart Ollama
 
 - name: Local | Download Ollama install script (non-Arch)
   become: true
