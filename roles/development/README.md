@@ -15,6 +15,11 @@ base system applies to every host: `python`, `nodejs`, `rust`, `go`, `java`,
 `build_tools`, `security_scanners`, the developer tools category of `utils`
 and `git`.
 
+The tool toggles are install-only: turning a toggle off after install does
+not uninstall the package, which may be installed manually or through another
+role. Files the role creates for a tool, such as the Arduino IDE desktop
+override, are removed when its toggle is turned off.
+
 ## Requirements
 
 - ansible-core >= 2.19
@@ -117,10 +122,8 @@ each repository entry imports one of the two. `package_management` imports
 and locally signs both; this role installs `devkitpro-keyring`, the `devkit-env` package
 (which provides `DEVKITPRO`, `DEVKITARM`, `DEVKITPPC`, `DEVKITA64` and
 `PATH` system-wide via `/etc/profile.d/devkit-env.sh`), and the selected
-platform groups. The groups share common members (compilers, tools), so
-they are install-only — disabling a platform toggle after install does
-not uninstall the toolchain. Debian/RedHat are a no-op (a notice is
-logged) until the cross-collection alternative-installs strategy lands.
+platform groups. Debian/RedHat are a no-op (a notice is logged) until the
+cross-collection alternative-installs strategy lands.
 
 ### IDEs and Editors
 
@@ -229,10 +232,6 @@ below. Shell and Python tooling live in `marcstraube.common.utils` and
 | Variable                        | Default | Description                                          |
 |---------------------------------|---------|------------------------------------------------------|
 | `development_qml_tools_enabled` | `false` | Enable Qt6 QML tools (qmllint + qmlformat, same pkg) |
-
-The QML tools are install-only — on Arch they ship in `qt6-declarative`
-itself, a core Qt6 library the desktop stack depends on, so disabling the
-toggle after install does not uninstall the package.
 
 ##### Platform support
 
