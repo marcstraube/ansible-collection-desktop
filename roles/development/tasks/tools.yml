@@ -3,18 +3,22 @@
 # Database Tools Installation
 #
 
-- name: Tools | Manage DBeaver
+- name: Tools | Install DBeaver
   ansible.builtin.package:
     name: '{{ __development_dbeaver_package }}'
-    state: "{{ 'present' if development_dbeaver_enabled | bool else 'absent' }}"
-  when: __development_dbeaver_package | default('') | length > 0
+    state: present
+  when:
+    - __development_dbeaver_package | default('') | length > 0
+    - development_dbeaver_enabled | bool
   retries: 3
   delay: 5
 
-- name: Tools | Manage pgAdmin
+- name: Tools | Install pgAdmin
   ansible.builtin.package:
     name: '{{ __development_pgadmin_package }}'
-    state: "{{ 'present' if development_pgadmin_enabled | bool else 'absent' }}"
-  when: __development_pgadmin_package | default('') | length > 0
+    state: present
+  when:
+    - __development_pgadmin_package | default('') | length > 0
+    - development_pgadmin_enabled | bool
   retries: 3
   delay: 5
