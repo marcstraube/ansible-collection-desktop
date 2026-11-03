@@ -56,6 +56,59 @@
       when: __development_qml_tools_package | default('') | length > 0
 
     #
+    # Game Engines — Godot toggles on (Arch only: Debian must not get the
+    # distribution's Godot 3.6, EL has no package); Unreal Engine enabled
+    # without a vendor file, so the package is never installed and only the
+    # AUR clone of the helper proves it ran up to the notice.
+    #
+
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Verify | Assert godot and godot-mono are installed (Arch)
+      ansible.builtin.assert:
+        that:
+          - "'godot' in ansible_facts['packages']"
+          - "'godot-mono' in ansible_facts['packages']"
+        fail_msg: 'godot and godot-mono are not both installed'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the Godot toggles are a no-op (non-Arch)
+      ansible.builtin.assert:
+        that:
+          - "'godot' not in ansible_facts['packages']"
+          - "'godot-mono' not in ansible_facts['packages']"
+        fail_msg: 'the Godot toggles installed a package on {{ ansible_facts["os_family"] }}'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert unreal-engine-bin is not installed
+      ansible.builtin.assert:
+        that:
+          - "'unreal-engine-bin' not in ansible_facts['packages']"
+        fail_msg: 'unreal-engine-bin is installed although no vendor file exists'
+
+    - name: Verify | Stat the unreal-engine-bin AUR clone of the helper (Arch)
+      ansible.builtin.stat:
+        path: /var/cache/aur_builder/vendor_packages/unreal-engine-bin/PKGBUILD
+      register: _dev_unreal_clone
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Find staged vendor files (Arch)
+      ansible.builtin.find:
+        paths: /var/cache/aur_builder/vendor_packages/sources
+      register: _dev_unreal_staged
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the helper cloned unreal-engine-bin and staged nothing (Arch)
+      ansible.builtin.assert:
+        that:
+          - _dev_unreal_clone.stat.exists
+          - _dev_unreal_staged.matched == 0
+        fail_msg: 'vendor_packages did not clone unreal-engine-bin, or a vendor file was staged'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    #
     # devkitPro (Arch only — master + gba-dev enabled, switch-dev absent).
     # No-op on non-Arch, so nothing to verify there. Skipped in CI —
     # pkg.devkitpro.org blocks GitHub-hosted runners, so converge runs

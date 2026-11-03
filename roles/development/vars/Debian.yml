@@ -22,3 +22,8 @@ __development_lua_busted_package: 'lua-busted'
 
 # QML tooling (qmllint + qmlformat ship in the same package)
 __development_qml_tools_package: 'qt6-declarative-dev-tools'
+
+# Game engines: Debian Trixie ships Godot 3.6 as `godot`, a different major
+# version than the Godot 4 packages on Arch, and no Mono build — both no-op
+__development_godot_package: ''
+__development_godot_mono_package: ''

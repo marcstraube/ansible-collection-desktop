@@ -90,6 +90,13 @@
     - development
     - development:devkitpro
 
+- name: Main | Import game engine tasks
+  ansible.builtin.import_tasks: game_engines.yml
+  when: development_enabled | bool
+  tags:
+    - development
+    - development:game-engines
+
 - name: Main | Import database tools tasks
   ansible.builtin.import_tasks: tools.yml
   when: development_enabled | bool

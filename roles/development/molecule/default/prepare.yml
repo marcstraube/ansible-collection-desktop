@@ -102,13 +102,26 @@
       when: ansible_facts['os_family'] == 'RedHat'
 
     #
-    # AUR Builder (Arch)
+    # AUR Builder (Arch) — as marcstraube.common.package_management creates
+    # it in production: own group and home below /var/cache. The
+    # vendor_packages helper (Unreal Engine) owns its build directory by
+    # that group and derives the directory from the builder's home.
     #
+
+    - name: Prepare | Create aur_builder group (Arch)
+      ansible.builtin.group:
+        name: aur_builder
+        system: true
+      when: ansible_facts['os_family'] == 'Archlinux'
 
     - name: Prepare | Create aur_builder user (Arch)
       ansible.builtin.user:
         name: aur_builder
-        group: wheel
+        group: aur_builder
+        home: /var/cache/aur_builder
+        shell: /usr/bin/nologin
+        comment: 'umask=022'
+        system: true
         create_home: true
       when: ansible_facts['os_family'] == 'Archlinux'
 

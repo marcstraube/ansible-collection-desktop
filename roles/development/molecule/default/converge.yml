@@ -11,6 +11,12 @@
 # own idempotence is not coupled to this scenario's idempotence gate.
 # devkitPro coverage is disabled in CI via __molecule_devkitpro_reachable
 # (molecule.yml) — pkg.devkitpro.org blocks GitHub-hosted runners.
+#
+# The game engine toggles are on everywhere: Godot installs on Arch and is
+# a no-op elsewhere; Unreal Engine runs without a vendor file (the default
+# vendor_packages_dir below the molecule inventory does not exist), so the
+# helper clones the AUR repository — network, like the other AUR installs
+# here — prints its notice and skips the package without failing.
 - name: Converge | Managed mode
   hosts: all
   gather_facts: true
@@ -21,6 +27,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -74,6 +83,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -110,6 +122,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -145,6 +160,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
