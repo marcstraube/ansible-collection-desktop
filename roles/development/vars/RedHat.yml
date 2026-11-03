@@ -22,3 +22,7 @@ __development_lua_busted_package: ''
 
 # QML tooling (qmllint + qmlformat in qt6-qtdeclarative-devel — appstream on EL10)
 __development_qml_tools_package: 'qt6-qtdeclarative-devel'
+
+# Game engines (none packaged on EL)
+__development_godot_package: ''
+__development_godot_mono_package: ''

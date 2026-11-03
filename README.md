@@ -23,7 +23,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 ## Requirements
 
 - ansible-core >= 2.19
-- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) >= 3.0.0
+- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) >= 3.1.0
 
 ## Included Roles
 
@@ -62,10 +62,10 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ### Development & AI
 
-| Role            | Description                                |
-| --------------- | ------------------------------------------ |
-| **development** | IDEs, database/API tools, homebrew SDKs    |
-| **ai**          | Claude Code, Ollama, Antigravity, API keys |
+| Role            | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| **development** | IDEs, database/API tools, game engines, homebrew SDKs |
+| **ai**          | Claude Code, Ollama, Antigravity, API keys            |
 
 ### Multimedia & Graphics
 

@@ -1,0 +1,69 @@
+---
+#
+# Game Engines Installation
+#
+# Godot: official packages on Arch Linux (extra), a no-op elsewhere —
+# Debian 13 ships Godot 3.6 under the same package name, a different major
+# version, and EL has no package, so vars/{Debian,RedHat}.yml map both
+# packages to ''.
+#
+# Unreal Engine: the AUR package unreal-engine-bin takes the engine archive
+# from a file downloaded by hand (Epic account, EULA), which makepkg cannot
+# fetch. The build is delegated to marcstraube.common.vendor_packages: it
+# installs the package from a pacman repository when one carries it, builds
+# it from the archive in vendor_packages_dir on the controller otherwise,
+# and prints a notice without failing the play when the archive is missing.
+#
+# All install-only: a toggle turned off leaves the package in place.
+
+- name: Game Engines | Install Godot
+  ansible.builtin.package:
+    name: '{{ __development_godot_package }}'
+    state: present
+  when:
+    - development_godot_enabled | bool
+    - __development_godot_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Game Engines | Install Godot with C# support
+  ansible.builtin.package:
+    name: '{{ __development_godot_mono_package }}'
+    state: present
+  when:
+    - development_godot_mono_enabled | bool
+    - __development_godot_mono_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+# The helper has no toggle of its own; this role's toggle decides.
+# include_role does not pass the tags of its task on to the included
+# tasks, so apply carries them and a tag-scoped run reaches the helper.
+- name: Game Engines | Install Unreal Engine from the vendor file (Arch)
+  ansible.builtin.include_role:
+    name: marcstraube.common.vendor_packages
+    tasks_from: aur.yml
+    apply:
+      tags:
+        - development
+        - development:game-engines
+  vars:
+    vendor_packages_aur_name: 'unreal-engine-bin'
+    vendor_packages_file_pattern: 'Linux_Unreal_Engine_{pkgver}.zip'
+    vendor_packages_download_url: 'https://www.unrealengine.com/linux'
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - development_unreal_engine_enabled | bool
+  tags:
+    - development
+    - development:game-engines
+
+- name: Game Engines | Unreal Engine not available notice (non-Arch)
+  ansible.builtin.debug:
+    msg: >-
+      Unreal Engine is not packaged for {{ ansible_facts["os_family"] }}
+      (Epic ships the Linux build as a zip archive; the unreal-engine-bin
+      package is Arch only); skipping.
+  when:
+    - ansible_facts['os_family'] != 'Archlinux'
+    - development_unreal_engine_enabled | bool
