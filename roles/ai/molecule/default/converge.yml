@@ -18,6 +18,8 @@
     ai_ollama_enabled: false
     # whisper.cpp with the CPU backend; a no-op on Debian and EL
     ai_whisper_enabled: true
+    # Hugging Face CLI; a no-op on Debian and EL
+    ai_huggingface_cli_enabled: true
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: false
 
@@ -198,6 +200,59 @@
     - name: Converge | Include ai role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Backend list: the packages of every listed backend, cpu adds nothing. Runs
+# after the Vulkan play, so the packages are already present and the play
+# installs nothing new.
+- name: Converge — Ollama and whisper.cpp backend list (Arch)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: false
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: true
+    ai_ollama_backend: ['vulkan', 'cpu']
+    ai_ollama_environment:
+      OLLAMA_CONTEXT_LENGTH: '32768'
+      OLLAMA_FLASH_ATTENTION: '1'
+    ai_whisper_enabled: true
+    ai_whisper_backend: ['vulkan', 'cpu']
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Converge | Assert the Ollama backend list builds the package list
+      ansible.builtin.assert:
+        that:
+          - __ai_ollama_packages == ['ollama', 'ollama-vulkan']
+        fail_msg: >-
+          backend list installs {{ __ai_ollama_packages }},
+          expected ['ollama', 'ollama-vulkan']
+        quiet: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Converge | Assert the whisper.cpp backend list builds the package list
+      ansible.builtin.assert:
+        that:
+          - __ai_whisper_packages == ['whisper-cpp', 'ggml-vulkan']
+        fail_msg: >-
+          backend list installs {{ __ai_whisper_packages }},
+          expected ['whisper-cpp', 'ggml-vulkan']
+        quiet: true
       when: ansible_facts['os_family'] == 'Archlinux'
 
 # Deprecated ai_comfyui_gpu: the vendor name maps to the backend name. ComfyUI

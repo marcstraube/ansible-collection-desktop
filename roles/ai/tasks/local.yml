@@ -8,7 +8,11 @@
 - name: Local | Build Ollama package list (Arch)
   ansible.builtin.set_fact:
     __ai_ollama_packages: >-
-      {{ [__ai_ollama_package] + __ai_ollama_backend_packages[ai_ollama_backend] }}
+      {{ ([__ai_ollama_package]
+          + __ai_ollama_backends
+            | map('extract', __ai_ollama_backend_packages)
+            | flatten)
+         | unique }}
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_ollama_enabled | bool
@@ -118,7 +122,11 @@
 - name: Local | Build whisper.cpp package list
   ansible.builtin.set_fact:
     __ai_whisper_packages: >-
-      {{ [__ai_whisper_package] + __ai_whisper_backend_packages[ai_whisper_backend] }}
+      {{ ([__ai_whisper_package]
+          + __ai_whisper_backends
+            | map('extract', __ai_whisper_backend_packages)
+            | flatten)
+         | unique }}
   when:
     - ai_whisper_enabled | bool
     - __ai_whisper_package | length > 0
@@ -131,6 +139,19 @@
   when:
     - ai_whisper_enabled | bool
     - __ai_whisper_package | length > 0
+  retries: 3
+  delay: 5
+
+# Hugging Face CLI
+
+- name: Local | Install Hugging Face CLI
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_huggingface_cli_package }}'
+    state: present
+  when:
+    - ai_huggingface_cli_enabled | bool
+    - __ai_huggingface_cli_package | length > 0
   retries: 3
   delay: 5
 

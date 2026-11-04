@@ -73,13 +73,34 @@
   tags:
     - always
 
+# ai_ollama_backend takes one backend or a list of them. A string is also a
+# sequence in Jinja, so only a real list is kept as is; every other value is
+# wrapped and then fails the check below unless it is a valid backend name.
+- name: Main | Normalize ai_ollama_backend to a list
+  ansible.builtin.set_fact:
+    __ai_ollama_backends: >-
+      {{ ai_ollama_backend
+         if (ai_ollama_backend is sequence
+             and ai_ollama_backend is not string
+             and ai_ollama_backend is not mapping)
+         else [ai_ollama_backend] }}
+  when:
+    - ai_enabled | bool
+    - ai_ollama_enabled | bool
+  tags:
+    - always
+
 - name: Main | Validate ai_ollama_backend
   ansible.builtin.assert:
     that:
-      - ai_ollama_backend in ['rocm', 'vulkan', 'cuda', 'cpu']
+      - __ai_ollama_backends | length > 0
+      - >-
+        __ai_ollama_backends
+        | reject('in', ['rocm', 'vulkan', 'cuda', 'cpu'])
+        | list | length == 0
     fail_msg: >-
-      ai_ollama_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu',
-      got '{{ ai_ollama_backend }}'
+      ai_ollama_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu', or a
+      non-empty list of them, got '{{ ai_ollama_backend }}'
   when:
     - ai_enabled | bool
     - ai_ollama_enabled | bool
@@ -99,13 +120,34 @@
   tags:
     - always
 
+# ai_whisper_backend takes one backend or a list of them. A string is also a
+# sequence in Jinja, so only a real list is kept as is; every other value is
+# wrapped and then fails the check below unless it is a valid backend name.
+- name: Main | Normalize ai_whisper_backend to a list
+  ansible.builtin.set_fact:
+    __ai_whisper_backends: >-
+      {{ ai_whisper_backend
+         if (ai_whisper_backend is sequence
+             and ai_whisper_backend is not string
+             and ai_whisper_backend is not mapping)
+         else [ai_whisper_backend] }}
+  when:
+    - ai_enabled | bool
+    - ai_whisper_enabled | bool
+  tags:
+    - always
+
 - name: Main | Validate ai_whisper_backend
   ansible.builtin.assert:
     that:
-      - ai_whisper_backend in ['rocm', 'vulkan', 'cuda', 'cpu']
+      - __ai_whisper_backends | length > 0
+      - >-
+        __ai_whisper_backends
+        | reject('in', ['rocm', 'vulkan', 'cuda', 'cpu'])
+        | list | length == 0
     fail_msg: >-
-      ai_whisper_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu',
-      got '{{ ai_whisper_backend }}'
+      ai_whisper_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu', or a
+      non-empty list of them, got '{{ ai_whisper_backend }}'
   when:
     - ai_enabled | bool
     - ai_whisper_enabled | bool
