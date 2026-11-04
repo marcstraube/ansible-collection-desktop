@@ -50,6 +50,18 @@ __ai_ollama_backend_packages:
     - 'ollama-cuda'
   cpu: []
 
+__ai_whisper_package: 'whisper-cpp'
+# Compute backend (ai_whisper_backend) → ggml backend package next to
+# whisper-cpp
+__ai_whisper_backend_packages:
+  rocm:
+    - 'ggml-hip'
+  vulkan:
+    - 'ggml-vulkan'
+  cuda:
+    - 'ggml-cuda'
+  cpu: []
+
 # Service names
 __ai_ollama_service: 'ollama.service'
 
@@ -57,12 +69,6 @@ __ai_ollama_service: 'ollama.service'
 # See roles/ai/tasks/comfyui-archlinux.yml for the install flow.
 # These are AUR PKGBUILD facts, not inventory-tunable.
 __ai_comfyui_aur_package: 'comfyui'
-# GPU backend (ai_comfyui_gpu) → COMFYUI_GPU env var consumed by PKGBUILD
-# post_install hook to choose the PyTorch wheel index (ROCm / CUDA / CPU).
-__ai_comfyui_aur_gpu_map:
-  nvidia: 'cuda'
-  amd: 'rocm'
-  cpu: 'cpu'
 # ComfyUI-Manager — AUR package (installs into the comfyui venv and adds a
 # systemd drop-in that starts ComfyUI with --enable-manager)
 __ai_comfyui_manager_aur_package: 'comfyui-manager'

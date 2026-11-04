@@ -82,14 +82,36 @@ ai_ollama_service_enabled: true
 # script on Debian and EL detects the GPU itself and ignores this variable.
 ai_ollama_backend: 'cpu'
 
+# Environment variables for the Ollama server, rendered into a systemd drop-in
+# (/etc/systemd/system/ollama.service.d/ansible.conf). An empty mapping removes
+# the drop-in. See https://docs.ollama.com/faq for the available settings.
+ai_ollama_environment: {}
+# Example:
+#   ai_ollama_environment:
+#     OLLAMA_CONTEXT_LENGTH: '32768'
+#     OLLAMA_FLASH_ATTENTION: '1'
+
+# Enable whisper.cpp (local speech recognition; Arch only)
+ai_whisper_enabled: false
+
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu'. Arch Linux installs the
+# matching ggml backend package next to whisper-cpp; 'cpu' uses the ggml CPU
+# backend that whisper-cpp depends on.
+ai_whisper_backend: 'cpu'
+
 # Enable LM Studio
 ai_lmstudio_enabled: false
 
 # Enable ComfyUI (Stable Diffusion node-based UI)
 ai_comfyui_enabled: false
-# GPU backend: 'nvidia', 'amd', or 'cpu' (amd is Arch-only — Debian has no
-# native ROCm PyTorch package; see README)
-ai_comfyui_gpu: 'nvidia'
+# Compute backend: 'cuda', 'rocm' or 'cpu'. Arch Linux passes it to the AUR
+# package; Debian supports 'cuda' and 'cpu' only (no native ROCm PyTorch
+# package; see README). The default changes to 'cpu' in v4.0.0; set it
+# explicitly to keep CUDA.
+ai_comfyui_backend: 'cuda'
+# DEPRECATED: ai_comfyui_gpu ('nvidia', 'amd', 'cpu') still works and maps to
+# ai_comfyui_backend ('cuda', 'rocm', 'cpu'). Removal in v4.0.0.
+# ai_comfyui_gpu: 'nvidia'
 # Git branch/tag
 ai_comfyui_version: 'master'
 # Installation directory

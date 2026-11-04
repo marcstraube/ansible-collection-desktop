@@ -9,6 +9,9 @@ __ai_comfyui_repo_url: 'https://github.com/comfyanonymous/ComfyUI.git'
 # ComfyUI-Manager Git repository URL
 __ai_comfyui_manager_repo_url: 'https://github.com/ltdrdata/ComfyUI-Manager.git'
 
+# systemd drop-in directory for the Ollama service (environment settings)
+__ai_ollama_dropin_dir: '/etc/systemd/system/ollama.service.d'
+
 # Desktop entry shipped by the claude-desktop package. The per-user override
 # in ~/.local/share/applications/ is a copy of this file with the credential
 # backend appended to every Exec= line.

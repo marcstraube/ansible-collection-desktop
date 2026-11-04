@@ -1,0 +1,5 @@
+{{ ansible_managed | comment }}
+[Service]
+{% for key, value in ai_ollama_environment | dictsort %}
+Environment="{{ key }}={{ value }}"
+{% endfor %}

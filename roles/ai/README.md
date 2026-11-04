@@ -6,7 +6,7 @@ Install AI development tools.
 
 Installs AI CLI tools, desktop applications, and local inference engines.
 Supports Claude Code, Antigravity, OpenAI Codex, OpenCode, Aider,
-Ollama, LM Studio, Claude Desktop (Chat, Cowork and Claude Code),
+Ollama, whisper.cpp, LM Studio, Claude Desktop (Chat, Cowork and Claude Code),
 OpenCode Desktop, and ComfyUI (Stable Diffusion).
 
 On Arch Linux, tools are installed via native packages (AUR/community/extra).
@@ -88,6 +88,9 @@ user out. The role's per-user entry pins the backend explicitly:
 | `ai_ollama_models`          | `[]`    | Models to pull after install                                      |
 | `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service                                     |
 | `ai_ollama_backend`         | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
+| `ai_ollama_environment`     | `{}`    | Environment variables for the Ollama server (systemd drop-in)     |
+| `ai_whisper_enabled`        | `false` | Install whisper.cpp speech recognition (Arch only)                |
+| `ai_whisper_backend`        | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
 | `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only)                                     |
 
 **Ollama backend** (`ai_ollama_backend`):
@@ -104,12 +107,44 @@ user out. The role's per-user entry pins the backend explicitly:
 - **Debian / EL**: the upstream install script detects AMD and NVIDIA GPUs
   itself and installs the matching runtime; the variable has no effect.
 
+**Ollama server settings** (`ai_ollama_environment`):
+
+Ollama reads its server settings from environment variables. The role renders
+each entry as an `Environment=` line into the systemd drop-in
+`/etc/systemd/system/ollama.service.d/ansible.conf` and restarts Ollama when
+the drop-in changes; an empty mapping removes the drop-in. Both the Arch
+package and the upstream install script ship `ollama.service`, so this works
+on every platform.
+
+```yaml
+ai_ollama_environment:
+  OLLAMA_CONTEXT_LENGTH: '32768'   # default context window
+  OLLAMA_FLASH_ATTENTION: '1'      # flash attention
+  OLLAMA_KEEP_ALIVE: '30m'         # keep models loaded
+  OLLAMA_HOST: '127.0.0.1:11434'   # listen address
+```
+
+See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
+
+**whisper.cpp** (`ai_whisper_enabled`, `ai_whisper_backend`):
+
+- **Arch Linux**: installs `whisper-cpp` from `extra`. It depends on `ggml`,
+  which brings the CPU backend; the role installs the selected GPU backend
+  next to it: `ggml-hip` (AMD; pulls in `rocm-hip-runtime`, roughly 1.3 GiB),
+  `ggml-vulkan` (any Vulkan GPU, roughly 44 MiB) or `ggml-cuda` (NVIDIA;
+  roughly 150 MiB plus CUDA). `cpu` installs nothing extra. ggml loads every
+  installed backend at runtime, so the same GPU can show up once per backend;
+  applications select the device themselves.
+- **Debian / EL**: whisper.cpp is not packaged (Debian ships it from forky
+  on), so the toggle is a no-op. Build it from source:
+  <https://github.com/ggml-org/whisper.cpp>.
+
 ### ComfyUI (Stable Diffusion)
 
 | Variable                      | Default                 | Description                                                |
 | ----------------------------- | ----------------------- | ---------------------------------------------------------- |
 | `ai_comfyui_enabled`          | `false`                 | Install ComfyUI                                            |
-| `ai_comfyui_gpu`              | `'nvidia'`              | GPU backend: `nvidia`, `amd`, or `cpu`                     |
+| `ai_comfyui_backend`          | `'cuda'`                | Compute backend: `cuda`, `rocm` or `cpu`                   |
 | `ai_comfyui_version`          | `'master'`              | Git branch/tag (manual path only)                          |
 | `ai_comfyui_install_dir`      | `'/opt/comfyui'`        | Installation directory (manual path only)                  |
 | `ai_comfyui_home`             | `'/var/lib/comfyui'`    | Service user home (manual path only; FHS state directory)  |
@@ -120,23 +155,32 @@ user out. The role's per-user entry pins the backend explicitly:
 | `ai_comfyui_manager_enabled`  | `true`                  | Install ComfyUI-Manager                                    |
 | `ai_comfyui_service_enabled`  | `true`                  | Enable systemd service                                     |
 
+> **Deprecation:** `ai_comfyui_gpu` (`nvidia`, `amd`, `cpu`) is deprecated and
+> will be removed in v4.0.0. Use `ai_comfyui_backend` instead: `nvidia` becomes
+> `cuda`, `amd` becomes `rocm`, `cpu` stays `cpu`. While `ai_comfyui_gpu` is
+> set, the role maps its value and prints a warning.
+>
+> **Default change:** the default of `ai_comfyui_backend` changes from `cuda`
+> to `cpu` in v4.0.0, so it works on every host. Set
+> `ai_comfyui_backend: 'cuda'` explicitly to keep CUDA.
+
 **Install path differs by OS family:**
 
 - **Arch Linux**: installs the AUR `comfyui` package via `kewlfft.aur.aur`.
   The PKGBUILD owns the install dir (`/opt/comfyui`), the service user
   (`comfy`), the Python venv, the PyTorch wheel selection (driven by
-  `COMFYUI_GPU={cuda,rocm,cpu}` mapped from `ai_comfyui_gpu`), and the
+  `COMFYUI_GPU`, set to `ai_comfyui_backend`), and the
   systemd unit. Inventory variables marked *(manual path only)* in the
   table above are **not honored** on Arch — they are fixed by the AUR
   PKGBUILD.
-- **Debian** (`ai_comfyui_gpu: nvidia` or `cpu`): from-source install with
-  native PyTorch. The role installs `python3-torch-cuda` (nvidia) or
+- **Debian** (`ai_comfyui_backend: cuda` or `cpu`): from-source install with
+  native PyTorch. The role installs `python3-torch-cuda` (cuda) or
   `python3-torch` (cpu) plus `python3-torchvision` and `python3-torchaudio`
   from Debian's repositories, then builds a `--system-site-packages` venv so
   ComfyUI sees them. ComfyUI's own requirements are installed into the venv;
   torch is already satisfied by the native packages. All *(manual path only)*
   variables above apply.
-- **Debian with `ai_comfyui_gpu: amd`, and all Rocky Linux / EL hosts**:
+- **Debian with `ai_comfyui_backend: rocm`, and all Rocky Linux / EL hosts**:
   **unsupported**. No complete native PyTorch stack
   (torch/torchvision/torchaudio) is packaged there, and the upstream pip wheel
   index is fragile against Python version drift. The role fails fast with a
@@ -201,14 +245,14 @@ to any home directory while `ai_users` is empty or Claude Desktop is disabled.
 
 ## Tags
 
-| Tag          | Scope                              |
-| ------------ | ---------------------------------- |
-| `ai`         | All AI tasks                       |
-| `ai:cli`     | CLI tool installation              |
-| `ai:desktop` | Desktop application installation   |
-| `ai:local`   | Local AI tools (Ollama, LM Studio) |
-| `ai:comfyui` | ComfyUI installation               |
-| `ai:users`   | Per-user Claude Desktop entry      |
+| Tag          | Scope                                           |
+| ------------ | ----------------------------------------------- |
+| `ai`         | All AI tasks                                    |
+| `ai:cli`     | CLI tool installation                           |
+| `ai:desktop` | Desktop application installation                |
+| `ai:local`   | Local AI tools (Ollama, whisper.cpp, LM Studio) |
+| `ai:comfyui` | ComfyUI installation                            |
+| `ai:users`   | Per-user Claude Desktop entry                   |
 
 ## Example Playbook
 

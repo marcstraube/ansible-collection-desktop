@@ -49,6 +49,30 @@
   tags:
     - always
 
+# TODO(4.0): remove the ai_comfyui_gpu fallback and its warning.
+# ai_comfyui_gpu took vendor names; map them to the backend names.
+- name: Main | Handle deprecated ai_comfyui_gpu
+  ansible.builtin.set_fact:
+    ai_comfyui_backend: >-
+      {{ {'nvidia': 'cuda', 'amd': 'rocm', 'cpu': 'cpu'}.get(ai_comfyui_gpu, ai_comfyui_gpu) }}
+  when:
+    - ai_enabled | bool
+    - ai_comfyui_gpu is defined
+  tags:
+    - always
+
+- name: Main | Warn about deprecated ai_comfyui_gpu
+  ansible.builtin.debug:
+    msg: >-
+      ai_comfyui_gpu is DEPRECATED and will be removed in v4.0.0. Use
+      ai_comfyui_backend instead ('nvidia' becomes 'cuda', 'amd' becomes
+      'rocm', 'cpu' stays 'cpu').
+  when:
+    - ai_enabled | bool
+    - ai_comfyui_gpu is defined
+  tags:
+    - always
+
 - name: Main | Validate ai_ollama_backend
   ansible.builtin.assert:
     that:
@@ -59,6 +83,45 @@
   when:
     - ai_enabled | bool
     - ai_ollama_enabled | bool
+  tags:
+    - always
+
+- name: Main | Validate ai_ollama_environment
+  ansible.builtin.assert:
+    that:
+      - ai_ollama_environment is mapping
+    fail_msg: >-
+      ai_ollama_environment must be a mapping of environment variables,
+      got '{{ ai_ollama_environment }}'
+  when:
+    - ai_enabled | bool
+    - ai_ollama_enabled | bool
+  tags:
+    - always
+
+- name: Main | Validate ai_whisper_backend
+  ansible.builtin.assert:
+    that:
+      - ai_whisper_backend in ['rocm', 'vulkan', 'cuda', 'cpu']
+    fail_msg: >-
+      ai_whisper_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu',
+      got '{{ ai_whisper_backend }}'
+  when:
+    - ai_enabled | bool
+    - ai_whisper_enabled | bool
+  tags:
+    - always
+
+- name: Main | Validate ai_comfyui_backend
+  ansible.builtin.assert:
+    that:
+      - ai_comfyui_backend in ['cuda', 'rocm', 'cpu']
+    fail_msg: >-
+      ai_comfyui_backend must be 'cuda', 'rocm' or 'cpu',
+      got '{{ ai_comfyui_backend }}'
+  when:
+    - ai_enabled | bool
+    - ai_comfyui_enabled | bool
   tags:
     - always
 
