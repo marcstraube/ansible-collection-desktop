@@ -242,3 +242,23 @@
             that:
               - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
             quiet: true
+
+    - name: Verify | Run role with an invalid ComfyUI backend
+      block:
+        - name: Verify | Include ai role with ai_comfyui_backend 'vulkan'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_comfyui_enabled: true
+            ai_comfyui_backend: 'vulkan'
+
+        - name: Verify | Fail when the invalid ComfyUI backend was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_comfyui_backend 'vulkan'."
+      rescue:
+        - name: Verify | Assert ComfyUI rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_comfyui_backend must be')
+            quiet: true

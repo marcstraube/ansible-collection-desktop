@@ -144,7 +144,7 @@ See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
 | Variable                      | Default                 | Description                                                |
 | ----------------------------- | ----------------------- | ---------------------------------------------------------- |
 | `ai_comfyui_enabled`          | `false`                 | Install ComfyUI                                            |
-| `ai_comfyui_gpu`              | `'nvidia'`              | GPU backend: `nvidia`, `amd`, or `cpu`                     |
+| `ai_comfyui_backend`          | `'cuda'`                | Compute backend: `cuda`, `rocm` or `cpu`                   |
 | `ai_comfyui_version`          | `'master'`              | Git branch/tag (manual path only)                          |
 | `ai_comfyui_install_dir`      | `'/opt/comfyui'`        | Installation directory (manual path only)                  |
 | `ai_comfyui_home`             | `'/var/lib/comfyui'`    | Service user home (manual path only; FHS state directory)  |
@@ -155,23 +155,32 @@ See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
 | `ai_comfyui_manager_enabled`  | `true`                  | Install ComfyUI-Manager                                    |
 | `ai_comfyui_service_enabled`  | `true`                  | Enable systemd service                                     |
 
+> **Deprecation:** `ai_comfyui_gpu` (`nvidia`, `amd`, `cpu`) is deprecated and
+> will be removed in v4.0.0. Use `ai_comfyui_backend` instead: `nvidia` becomes
+> `cuda`, `amd` becomes `rocm`, `cpu` stays `cpu`. While `ai_comfyui_gpu` is
+> set, the role maps its value and prints a warning.
+>
+> **Default change:** the default of `ai_comfyui_backend` changes from `cuda`
+> to `cpu` in v4.0.0, so it works on every host. Set
+> `ai_comfyui_backend: 'cuda'` explicitly to keep CUDA.
+
 **Install path differs by OS family:**
 
 - **Arch Linux**: installs the AUR `comfyui` package via `kewlfft.aur.aur`.
   The PKGBUILD owns the install dir (`/opt/comfyui`), the service user
   (`comfy`), the Python venv, the PyTorch wheel selection (driven by
-  `COMFYUI_GPU={cuda,rocm,cpu}` mapped from `ai_comfyui_gpu`), and the
+  `COMFYUI_GPU`, set to `ai_comfyui_backend`), and the
   systemd unit. Inventory variables marked *(manual path only)* in the
   table above are **not honored** on Arch — they are fixed by the AUR
   PKGBUILD.
-- **Debian** (`ai_comfyui_gpu: nvidia` or `cpu`): from-source install with
-  native PyTorch. The role installs `python3-torch-cuda` (nvidia) or
+- **Debian** (`ai_comfyui_backend: cuda` or `cpu`): from-source install with
+  native PyTorch. The role installs `python3-torch-cuda` (cuda) or
   `python3-torch` (cpu) plus `python3-torchvision` and `python3-torchaudio`
   from Debian's repositories, then builds a `--system-site-packages` venv so
   ComfyUI sees them. ComfyUI's own requirements are installed into the venv;
   torch is already satisfied by the native packages. All *(manual path only)*
   variables above apply.
-- **Debian with `ai_comfyui_gpu: amd`, and all Rocky Linux / EL hosts**:
+- **Debian with `ai_comfyui_backend: rocm`, and all Rocky Linux / EL hosts**:
   **unsupported**. No complete native PyTorch stack
   (torch/torchvision/torchaudio) is packaged there, and the upstream pip wheel
   index is fragile against Python version drift. The role fails fast with a
