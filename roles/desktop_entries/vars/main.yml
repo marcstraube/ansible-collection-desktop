@@ -1,0 +1,67 @@
+---
+#
+# Paths
+#
+
+# Directory of the packaged desktop entries
+__desktop_entries_packaged_dir: '/usr/share/applications'
+
+# Directory of the overrides and role-provided entries; comes before
+# __desktop_entries_packaged_dir in XDG_DATA_DIRS, so an entry there takes
+# precedence over the packaged entry of the same name
+__desktop_entries_override_dir: '/usr/local/share/applications'
+
+# Override or role-provided entry of the current call
+__desktop_entries_path: '{{ __desktop_entries_override_dir }}/{{ desktop_entries_file }}'
+
+#
+# Marker
+#
+
+# First line of every file the role writes. Names the calling role, so a
+# removal only touches the files of that caller and never an entry placed by
+# hand or by another role.
+__desktop_entries_marker: '# Managed by Ansible (marcstraube.desktop.{{ desktop_entries_caller }})'
+
+#
+# Caller Values
+#
+# Optional caller variables with their defaults, so the tasks read one name
+
+__desktop_entries_environment: '{{ desktop_entries_environment | default({}) }}'
+__desktop_entries_set: '{{ desktop_entries_set | default({}) }}'
+__desktop_entries_append: '{{ desktop_entries_append | default({}) }}'
+__desktop_entries_state: "{{ desktop_entries_state | default('present') }}"
+__desktop_entries_categories: '{{ desktop_entries_categories | default([]) }}'
+__desktop_entries_mime_types: '{{ desktop_entries_mime_types | default([]) }}'
+
+# Fields of entry.yml that hold free text (one line each)
+__desktop_entries_entry_fields:
+  desktop_entries_name: "{{ desktop_entries_name | default('') }}"
+  desktop_entries_generic_name: "{{ desktop_entries_generic_name | default('') }}"
+  desktop_entries_comment: "{{ desktop_entries_comment | default('') }}"
+  desktop_entries_exec: "{{ desktop_entries_exec | default('') }}"
+  desktop_entries_icon: "{{ desktop_entries_icon | default('') }}"
+
+#
+# Validation
+#
+
+# Name of the calling role (the part after marcstraube.desktop.)
+__desktop_entries_caller_regex: '^[a-z0-9_]+$'
+
+# Desktop file ID: a file name without a directory, ending in .desktop
+__desktop_entries_file_regex: '^[A-Za-z0-9_.+-]+\.desktop$'
+
+# Environment variable names and values. Values are limited to characters
+# that need no quoting in a desktop entry Exec= key.
+__desktop_entries_environment_name_regex: '^[A-Za-z_][A-Za-z0-9_]*$'
+__desktop_entries_environment_value_regex: '^[A-Za-z0-9_.,:/=+@-]*$'
+
+# Desktop entry keys without a locale suffix
+__desktop_entries_key_regex: '^[A-Za-z0-9-]+$'
+
+# Characters a value must not contain: line breaks end the key, a ; inside a
+# list value splits it into two values
+__desktop_entries_line_break_regex: '[\r\n]'
+__desktop_entries_list_value_regex: '[\r\n;]'

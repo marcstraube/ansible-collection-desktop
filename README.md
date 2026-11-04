@@ -94,6 +94,16 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 | **virtual_reality** | VR streaming to standalone headsets     |
 | **wine**            | Wine Windows compatibility layer        |
 | **cad**             | CAD applications                        |
+| **printing_3d**     | Slicers for FDM and resin 3D printers   |
+
+### Helper Roles
+
+Used by other roles through `include_role` and `tasks_from`; no toggle, no
+inventory variables and not part of the `workstation` playbook.
+
+| Role                | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| **desktop_entries** | Desktop entry overrides (environment, keys) and role launchers  |
 
 ## Installation
 

@@ -1,0 +1,17 @@
+---
+# Runs before a write: an existing file at the target path must carry the
+# marker of this caller. A file placed by hand, by another role or by another
+# caller of this role is never overwritten.
+
+- name: Guard | Import ownership tasks
+  ansible.builtin.import_tasks: ownership.yml
+
+- name: Guard | Fail on a foreign desktop entry
+  ansible.builtin.fail:
+    msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      {{ __desktop_entries_path }} exists and was not created by this role for
+      {{ desktop_entries_caller }} (it does not carry the marker
+      '{{ __desktop_entries_marker }}'). Remove or rename the file by hand,
+      or choose another desktop_entries_file.
+  when: __desktop_entries_foreign | bool

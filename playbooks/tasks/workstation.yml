@@ -162,6 +162,14 @@
     - cad
   when: cad_enabled | bool
 
+- name: Desktop | Import printing_3d role
+  ansible.builtin.import_role:
+    name: marcstraube.desktop.printing_3d
+  tags:
+    - desktop
+    - printing-3d
+  when: printing_3d_enabled | bool
+
 - name: Desktop | Import imaging role
   ansible.builtin.import_role:
     name: marcstraube.desktop.imaging

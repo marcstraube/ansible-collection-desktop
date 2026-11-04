@@ -1,0 +1,87 @@
+---
+# The role installs no packages, so the scenario needs no package cache. It
+# needs packaged desktop entries as the source of the overrides and files in
+# the override directory that the role must leave alone.
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Prepare | Ensure packaged and override directories exist
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      loop:
+        - '/usr/share/applications'
+        - '/usr/local/share/applications'
+
+    # Packaged entry with an Exec= line in the main group and one in a
+    # [Desktop Action] group, a localized Name[de]= and a Categories= list
+    - name: Prepare | Deploy packaged entry fixture
+      ansible.builtin.copy:
+        dest: '/usr/share/applications/molecule-app.desktop'
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Name=Molecule App
+          Name[de]=Molecule Anwendung
+          Exec=/usr/bin/molecule-app %U
+          TryExec=/usr/bin/molecule-app
+          Terminal=false
+          Categories=Graphics;
+          Actions=new-window;
+
+          [Desktop Action new-window]
+          Name=New Window
+          Exec=/usr/bin/molecule-app --new-window
+
+    # Packaged entry that only gets an environment; verify.yml removes its
+    # override again with a call without changes
+    - name: Prepare | Deploy second packaged entry fixture
+      ansible.builtin.copy:
+        dest: '/usr/share/applications/molecule-env.desktop'
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Name=Molecule Env
+          Exec=/usr/bin/molecule-env
+
+    # Packaged entries with the names of the foreign entry and of the entry of
+    # another caller: an override of them reaches the write path, where the
+    # role must refuse to replace the existing file (verify.yml)
+    - name: Prepare | Deploy packaged entries behind existing override files
+      ansible.builtin.copy:
+        dest: '/usr/share/applications/{{ item }}'
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Name=Molecule Packaged
+          Exec=/usr/bin/molecule-packaged
+      loop:
+        - 'molecule-foreign.desktop'
+        - 'molecule-other.desktop'
+
+    # A desktop entry without any marker in the override directory: the role
+    # must never remove it
+    - name: Prepare | Deploy foreign entry without a marker
+      ansible.builtin.copy:
+        dest: '/usr/local/share/applications/molecule-foreign.desktop'
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Type=Application
+          Name=Molecule Foreign
+          Exec=/usr/bin/molecule-foreign

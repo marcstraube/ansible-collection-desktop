@@ -1,0 +1,47 @@
+---
+# Checks shared by both entry points: the caller, the file name and the
+# environment. Imported first, so invalid input fails before any change.
+
+- name: Validate | Assert caller and file name
+  ansible.builtin.assert:
+    that:
+      - desktop_entries_caller | default('') | string is match(__desktop_entries_caller_regex)
+      - desktop_entries_file | default('') | string is match(__desktop_entries_file_regex)
+    fail_msg: >-
+      marcstraube.desktop.desktop_entries needs desktop_entries_caller (the
+      name of the calling role: lowercase letters, digits, underscore) and
+      desktop_entries_file (a file name ending in .desktop, without a
+      directory) from the calling role; got caller
+      '{{ desktop_entries_caller | default('') }}' and file
+      '{{ desktop_entries_file | default('') }}'.
+    quiet: true
+
+- name: Validate | Assert environment is a mapping
+  ansible.builtin.assert:
+    that:
+      - __desktop_entries_environment is mapping
+    fail_msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      desktop_entries_environment must be a mapping of variable names to values.
+    quiet: true
+
+- name: Validate | Assert environment names and values
+  ansible.builtin.assert:
+    that:
+      - __desktop_entries_invalid_names | length == 0
+      - __desktop_entries_invalid_values | length == 0
+    fail_msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      desktop_entries_environment needs variable names made of letters, digits
+      and underscore, not starting with a digit, and values made of letters,
+      digits and the characters _ . , : / = + @ - only. Invalid names:
+      [{{ __desktop_entries_invalid_names | join(', ') }}]; invalid values:
+      [{{ __desktop_entries_invalid_values | join(', ') }}].
+    quiet: true
+  vars:
+    __desktop_entries_invalid_names: >-
+      {{ __desktop_entries_environment | dict2items | map(attribute='key') | map('string')
+         | reject('match', __desktop_entries_environment_name_regex) | list }}
+    __desktop_entries_invalid_values: >-
+      {{ __desktop_entries_environment | dict2items | map(attribute='value') | map('string')
+         | reject('match', __desktop_entries_environment_value_regex) | list }}

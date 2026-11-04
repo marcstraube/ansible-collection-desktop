@@ -1,0 +1,130 @@
+---
+# Override of a packaged desktop entry. Copies
+# __desktop_entries_packaged_dir/<file> to __desktop_entries_override_dir/<file>,
+# which takes precedence, and applies the changes of the calling role:
+# desktop_entries_environment (env prefix on every Exec= line),
+# desktop_entries_set (keys of [Desktop Entry]) and desktop_entries_append
+# (values of list keys in [Desktop Entry]).
+#
+# Without any change, or when the packaged entry is missing (the application
+# is not installed), the override of this caller is removed; a file without
+# the caller's marker is never touched.
+
+#
+# Validation
+#
+
+- name: Override | Import shared validation tasks
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Override | Assert set and append types
+  ansible.builtin.assert:
+    that:
+      - __desktop_entries_set is mapping
+      - __desktop_entries_append is mapping
+      - >-
+        __desktop_entries_set | dict2items | map(attribute='value')
+        | reject('string') | reject('number') | reject('boolean') | list | length == 0
+      - >-
+        __desktop_entries_append | dict2items | map(attribute='value')
+        | reject('sequence') | list | length == 0
+      - >-
+        __desktop_entries_append | dict2items | map(attribute='value')
+        | select('string') | list | length == 0
+    fail_msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      desktop_entries_set must map keys to single values and
+      desktop_entries_append must map keys to lists of values.
+    quiet: true
+
+# Values are compared as text: per key the set value, and the append values
+# joined with a comma (a ; inside an append value is invalid)
+- name: Override | Assert set and append keys and values
+  ansible.builtin.assert:
+    that:
+      - __desktop_entries_invalid_keys | length == 0
+      - __desktop_entries_invalid_set_values | length == 0
+      - __desktop_entries_invalid_append_values | length == 0
+    fail_msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      desktop_entries_set and desktop_entries_append need desktop entry keys
+      (letters, digits and -, no locale suffix), values without line breaks
+      and list values without ;. Invalid keys:
+      [{{ __desktop_entries_invalid_keys | join(', ') }}]; keys with invalid
+      values: [{{ (__desktop_entries_invalid_set_values + __desktop_entries_invalid_append_values)
+      | join(', ') }}].
+    quiet: true
+  vars:
+    __desktop_entries_invalid_keys: >-
+      {{ ((__desktop_entries_set | list) + (__desktop_entries_append | list))
+         | map('string') | reject('match', __desktop_entries_key_regex) | unique | list }}
+    __desktop_entries_invalid_set_values: >-
+      {{ dict(__desktop_entries_set | list
+              | zip(__desktop_entries_set | dict2items | map(attribute='value') | map('string')))
+         | dict2items | selectattr('value', 'search', __desktop_entries_line_break_regex)
+         | map(attribute='key') | list }}
+    __desktop_entries_invalid_append_values: >-
+      {{ dict(__desktop_entries_append | list
+              | zip(__desktop_entries_append | dict2items | map(attribute='value') | map('join', ',')))
+         | dict2items | selectattr('value', 'search', __desktop_entries_list_value_regex)
+         | map(attribute='key') | list }}
+
+#
+# Override
+#
+
+- name: Override | Decide whether the caller requests changes
+  ansible.builtin.set_fact:
+    __desktop_entries_changes: >-
+      {{ (__desktop_entries_environment | length
+          + __desktop_entries_set | length
+          + __desktop_entries_append | length) > 0 }}
+
+# The packaged entry is the source of the override. Without it the
+# application is not installed (or its package ships no such entry).
+- name: Override | Stat packaged desktop entry
+  ansible.builtin.stat:
+    path: '{{ __desktop_entries_packaged_dir }}/{{ desktop_entries_file }}'
+  register: __desktop_entries_packaged_stat
+  when: __desktop_entries_changes | bool
+
+- name: Override | Decide whether to write the override
+  ansible.builtin.set_fact:
+    __desktop_entries_write: >-
+      {{ __desktop_entries_changes | bool
+         and __desktop_entries_packaged_stat.stat.isreg | default(false) }}
+
+- name: Override | Write override
+  when: __desktop_entries_write | bool
+  block:
+    - name: Override | Import guard tasks
+      ansible.builtin.import_tasks: guard.yml
+
+    - name: Override | Read packaged desktop entry
+      ansible.builtin.slurp:
+        src: '{{ __desktop_entries_packaged_dir }}/{{ desktop_entries_file }}'
+      register: __desktop_entries_packaged
+
+    - name: Override | Ensure override directory exists
+      ansible.builtin.file:
+        path: '{{ __desktop_entries_override_dir }}'
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Override | Deploy desktop entry override
+      ansible.builtin.template:
+        src: override.desktop.j2
+        dest: '{{ __desktop_entries_path }}'
+        owner: root
+        group: root
+        mode: '0644'
+
+#
+# Removal
+#
+
+- name: Override | Import removal tasks
+  ansible.builtin.import_tasks: remove.yml
+  when: not (__desktop_entries_write | bool)

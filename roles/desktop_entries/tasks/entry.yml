@@ -1,0 +1,93 @@
+---
+# Role-provided desktop entry for an application whose package ships none.
+# Writes __desktop_entries_override_dir/<file> from the fields of the calling
+# role (state present) or removes it again (state absent) when it carries the
+# marker of this caller.
+
+#
+# Validation
+#
+
+- name: Entry | Import shared validation tasks
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Entry | Assert state
+  ansible.builtin.assert:
+    that:
+      - __desktop_entries_state in ['present', 'absent']
+    fail_msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      desktop_entries_state must be 'present' or 'absent', got
+      '{{ __desktop_entries_state }}'.
+    quiet: true
+
+- name: Entry | Assert fields
+  ansible.builtin.assert:
+    that:
+      - __desktop_entries_entry_fields.desktop_entries_name | string | length > 0
+      - __desktop_entries_entry_fields.desktop_entries_exec | string | length > 0
+      - __desktop_entries_invalid_fields | length == 0
+      - __desktop_entries_categories is sequence
+      - __desktop_entries_categories is not string
+      - __desktop_entries_mime_types is sequence
+      - __desktop_entries_mime_types is not string
+      - __desktop_entries_invalid_lists | length == 0
+      - desktop_entries_terminal | default(false) is boolean
+    fail_msg: >-
+      desktop_entries ({{ desktop_entries_caller }}, {{ desktop_entries_file }}):
+      a role-provided entry needs desktop_entries_name and desktop_entries_exec;
+      the text fields must not contain line breaks, desktop_entries_categories
+      and desktop_entries_mime_types must be lists of values without line
+      breaks and ;, and desktop_entries_terminal must be a boolean. Invalid
+      fields: [{{ (__desktop_entries_invalid_fields + __desktop_entries_invalid_lists) | join(', ') }}].
+    quiet: true
+  vars:
+    __desktop_entries_invalid_fields: >-
+      {{ __desktop_entries_entry_fields | dict2items
+         | selectattr('value', 'string')
+         | selectattr('value', 'search', __desktop_entries_line_break_regex)
+         | map(attribute='key') | list }}
+    __desktop_entries_invalid_lists: >-
+      {{ (['desktop_entries_categories']
+          if __desktop_entries_categories | map('string')
+             | select('search', __desktop_entries_list_value_regex) | list | length > 0
+          else [])
+         + (['desktop_entries_mime_types']
+            if __desktop_entries_mime_types | map('string')
+               | select('search', __desktop_entries_list_value_regex) | list | length > 0
+            else []) }}
+  when: __desktop_entries_state == 'present'
+
+#
+# Present
+#
+
+- name: Entry | Write role-provided entry
+  when: __desktop_entries_state == 'present'
+  block:
+    - name: Entry | Import guard tasks
+      ansible.builtin.import_tasks: guard.yml
+
+    - name: Entry | Ensure entry directory exists
+      ansible.builtin.file:
+        path: '{{ __desktop_entries_override_dir }}'
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Entry | Deploy role-provided entry
+      ansible.builtin.template:
+        src: entry.desktop.j2
+        dest: '{{ __desktop_entries_path }}'
+        owner: root
+        group: root
+        mode: '0644'
+
+#
+# Absent
+#
+
+- name: Entry | Import removal tasks
+  ansible.builtin.import_tasks: remove.yml
+  when: __desktop_entries_state == 'absent'
