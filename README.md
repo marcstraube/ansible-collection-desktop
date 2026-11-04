@@ -95,6 +95,15 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 | **wine**            | Wine Windows compatibility layer        |
 | **cad**             | CAD applications                        |
 
+### Helper Roles
+
+Used by other roles through `include_role` and `tasks_from`; no toggle, no
+inventory variables and not part of the `workstation` playbook.
+
+| Role                | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| **desktop_entries** | Desktop entry overrides (environment, keys) and role launchers  |
+
 ## Installation
 
 ### From Ansible Galaxy

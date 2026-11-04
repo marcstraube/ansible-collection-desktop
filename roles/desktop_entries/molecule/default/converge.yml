@@ -1,0 +1,119 @@
+---
+# The role has no toggle and no standalone run: every task calls an entry
+# point with fixture values, the way a calling role does.
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    # environment, set and append on the packaged fixture with a
+    # [Desktop Action] group
+    - name: Converge | Override the packaged entry with all changes  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: override.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-app.desktop'
+        desktop_entries_environment:
+          WEBKIT_DISABLE_DMABUF_RENDERER: '1'
+          MESA_LOADER_DRIVER_OVERRIDE: 'zink'
+        desktop_entries_set:
+          Name: 'Molecule App (Override)'
+          StartupWMClass: 'molecule-app'
+        desktop_entries_append:
+          # Graphics is already in the packaged list, Development is listed twice
+          Categories:
+            - 'Graphics'
+            - 'Development'
+            - 'Development'
+          Keywords:
+            - 'molecule'
+            - 'test'
+
+    - name: Converge | Override the second packaged entry with an environment only  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: override.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-env.desktop'
+        desktop_entries_environment:
+          QT_QPA_PLATFORM: 'xcb'
+
+    # No packaged entry: nothing to override, the call is a no-op
+    - name: Converge | Override a missing packaged entry  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: override.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-missing.desktop'
+        desktop_entries_environment:
+          QT_QPA_PLATFORM: 'xcb'
+
+    - name: Converge | Write a role-provided entry with all fields  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: entry.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-launcher.desktop'
+        desktop_entries_name: 'Molecule Launcher'
+        desktop_entries_generic_name: 'Test launcher'
+        desktop_entries_comment: 'Role-provided desktop entry'
+        desktop_entries_exec: 'molecule-launcher %F'
+        desktop_entries_icon: 'applications-engineering'
+        desktop_entries_categories:
+          - 'Graphics'
+          - '3DGraphics'
+        desktop_entries_mime_types:
+          - 'model/stl'
+        desktop_entries_environment:
+          DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: '1'
+
+    # An entry of another caller: the calls of 'molecule' below must keep it
+    - name: Converge | Write a role-provided entry of another caller  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: entry.yml
+      vars:
+        desktop_entries_caller: 'molecule_other'
+        desktop_entries_file: 'molecule-other.desktop'
+        desktop_entries_name: 'Molecule Other'
+        desktop_entries_exec: 'molecule-other'
+
+    - name: Converge | Remove the entry of another caller as entry  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: entry.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-other.desktop'
+        desktop_entries_state: 'absent'
+
+    - name: Converge | Remove the entry of another caller as override  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: override.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-other.desktop'
+
+    # The foreign entry from prepare.yml carries no marker
+    - name: Converge | Remove the foreign entry as entry  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: entry.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-foreign.desktop'
+        desktop_entries_state: 'absent'
+
+    - name: Converge | Remove the foreign entry as override  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: override.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-foreign.desktop'

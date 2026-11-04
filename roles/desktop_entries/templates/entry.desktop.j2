@@ -1,0 +1,22 @@
+{{ __desktop_entries_marker }}
+{{ ansible_managed | comment }}
+[Desktop Entry]
+Type=Application
+Name={{ desktop_entries_name }}
+{% if desktop_entries_generic_name | default('') | length > 0 %}
+GenericName={{ desktop_entries_generic_name }}
+{% endif %}
+{% if desktop_entries_comment | default('') | length > 0 %}
+Comment={{ desktop_entries_comment }}
+{% endif %}
+Exec={{ desktop_entries_exec | marcstraube.desktop.desktop_entries_exec(__desktop_entries_environment) }}
+{% if desktop_entries_icon | default('') | length > 0 %}
+Icon={{ desktop_entries_icon }}
+{% endif %}
+Terminal={{ desktop_entries_terminal | default(false) | bool | ternary('true', 'false') }}
+{% if __desktop_entries_categories | length > 0 %}
+Categories={{ __desktop_entries_categories | join(';') }};
+{% endif %}
+{% if __desktop_entries_mime_types | length > 0 %}
+MimeType={{ __desktop_entries_mime_types | join(';') }};
+{% endif %}
