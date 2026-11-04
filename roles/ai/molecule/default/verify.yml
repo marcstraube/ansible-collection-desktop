@@ -243,6 +243,86 @@
               - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
             quiet: true
 
+    - name: Verify | Run role with an invalid entry in the Ollama backend list
+      block:
+        - name: Verify | Include ai role with ai_ollama_backend ['vulkan', 'opencl']  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_ollama_enabled: true
+            ai_ollama_backend: ['vulkan', 'opencl']
+
+        - name: Verify | Fail when the invalid Ollama backend list was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_ollama_backend ['vulkan', 'opencl']."
+      rescue:
+        - name: Verify | Assert Ollama backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an empty Ollama backend list
+      block:
+        - name: Verify | Include ai role with an empty ai_ollama_backend  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_ollama_enabled: true
+            ai_ollama_backend: []
+
+        - name: Verify | Fail when the empty Ollama backend list was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an empty ai_ollama_backend.'
+      rescue:
+        - name: Verify | Assert empty Ollama backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an invalid entry in the whisper.cpp backend list
+      block:
+        - name: Verify | Include ai role with ai_whisper_backend ['vulkan', 'opencl']  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_whisper_enabled: true
+            ai_whisper_backend: ['vulkan', 'opencl']
+
+        - name: Verify | Fail when the invalid whisper.cpp backend list was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_whisper_backend ['vulkan', 'opencl']."
+      rescue:
+        - name: Verify | Assert whisper.cpp backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an empty whisper.cpp backend list
+      block:
+        - name: Verify | Include ai role with an empty ai_whisper_backend  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_whisper_enabled: true
+            ai_whisper_backend: []
+
+        - name: Verify | Fail when the empty whisper.cpp backend list was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an empty ai_whisper_backend.'
+      rescue:
+        - name: Verify | Assert empty whisper.cpp backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
+            quiet: true
+
     - name: Verify | Run role with an invalid ComfyUI backend
       block:
         - name: Verify | Include ai role with ai_comfyui_backend 'vulkan'  # noqa: role-name[path]

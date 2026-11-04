@@ -87,25 +87,33 @@ user out. The role's per-user entry pins the backend explicitly:
 | `ai_ollama_enabled`         | `false` | Install Ollama LLM server                                         |
 | `ai_ollama_models`          | `[]`    | Models to pull after install                                      |
 | `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service                                     |
-| `ai_ollama_backend`         | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
+| `ai_ollama_backend`         | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only)   |
 | `ai_ollama_environment`     | `{}`    | Environment variables for the Ollama server (systemd drop-in)     |
 | `ai_whisper_enabled`        | `false` | Install whisper.cpp speech recognition (Arch only)                |
-| `ai_whisper_backend`        | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
+| `ai_whisper_backend`        | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only)   |
 | `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only)                                     |
 
 **Ollama backend** (`ai_ollama_backend`):
 
 - **Arch Linux**: the `ollama` package runs inference on the CPU. The GPU
   backends ship as separate packages in `extra`, and the role installs the
-  selected one next to `ollama`: `ollama-rocm` (AMD; roughly 3 GiB plus the
-  ROCm libraries), `ollama-vulkan` (any Vulkan GPU, roughly 44 MiB) or
-  `ollama-cuda` (NVIDIA; roughly 1 GiB plus CUDA). `cpu` installs nothing
-  extra. ROCm supports RDNA 3 and newer AMD cards without overrides. The role
-  restarts Ollama when the packages change, since Ollama loads its backends at
-  startup. Switching the backend installs the new package and leaves the
-  previous one in place.
+  package of every selected backend next to `ollama`: `ollama-rocm` (AMD;
+  roughly 3 GiB plus the ROCm libraries), `ollama-vulkan` (any Vulkan GPU,
+  roughly 44 MiB) or `ollama-cuda` (NVIDIA; roughly 1 GiB plus CUDA). `cpu`
+  installs nothing extra. ROCm supports RDNA 3 and newer AMD cards without
+  overrides. The role restarts Ollama when the packages change, since Ollama
+  loads its backends at startup. Switching the backend installs the new
+  package and leaves the previous one in place.
+- **Several backends**: a list installs the backend packages side by side,
+  for example ROCm and Vulkan for applications that support only one of
+  them. Ollama can then see the same GPU once per backend; the application
+  selects the device.
 - **Debian / EL**: the upstream install script detects AMD and NVIDIA GPUs
   itself and installs the matching runtime; the variable has no effect.
+
+```yaml
+ai_ollama_backend: ['rocm', 'vulkan']   # several backends side by side
+```
 
 **Ollama server settings** (`ai_ollama_environment`):
 
@@ -129,10 +137,12 @@ See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
 **whisper.cpp** (`ai_whisper_enabled`, `ai_whisper_backend`):
 
 - **Arch Linux**: installs `whisper-cpp` from `extra`. It depends on `ggml`,
-  which brings the CPU backend; the role installs the selected GPU backend
+  which brings the CPU backend; the role installs every selected GPU backend
   next to it: `ggml-hip` (AMD; pulls in `rocm-hip-runtime`, roughly 1.3 GiB),
   `ggml-vulkan` (any Vulkan GPU, roughly 44 MiB) or `ggml-cuda` (NVIDIA;
-  roughly 150 MiB plus CUDA). `cpu` installs nothing extra. ggml loads every
+  roughly 150 MiB plus CUDA). `cpu` installs nothing extra. A list such as
+  `ai_whisper_backend: ['rocm', 'vulkan']` installs several backends side by
+  side, for applications that support only one of them. ggml loads every
   installed backend at runtime, so the same GPU can show up once per backend;
   applications select the device themselves.
 - **Debian / EL**: whisper.cpp is not packaged (Debian ships it from forky

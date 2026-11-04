@@ -77,10 +77,14 @@ ai_ollama_models: []
 # Enable and start the Ollama service
 ai_ollama_service_enabled: true
 
-# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu'. Arch Linux installs the
-# matching ollama-<backend> package next to ollama; the upstream install
-# script on Debian and EL detects the GPU itself and ignores this variable.
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu', or a list of them.
+# Arch Linux installs the matching ollama-<backend> package of every listed
+# backend next to ollama; the upstream install script on Debian and EL
+# detects the GPU itself and ignores this variable.
 ai_ollama_backend: 'cpu'
+# Example (several backends side by side; Ollama can see the same GPU once
+# per backend):
+#   ai_ollama_backend: ['rocm', 'vulkan']
 
 # Environment variables for the Ollama server, rendered into a systemd drop-in
 # (/etc/systemd/system/ollama.service.d/ansible.conf). An empty mapping removes
@@ -94,10 +98,14 @@ ai_ollama_environment: {}
 # Enable whisper.cpp (local speech recognition; Arch only)
 ai_whisper_enabled: false
 
-# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu'. Arch Linux installs the
-# matching ggml backend package next to whisper-cpp; 'cpu' uses the ggml CPU
-# backend that whisper-cpp depends on.
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu', or a list of them.
+# Arch Linux installs the matching ggml backend package of every listed
+# backend next to whisper-cpp; 'cpu' uses the ggml CPU backend that
+# whisper-cpp depends on.
 ai_whisper_backend: 'cpu'
+# Example (several backends side by side; ggml can see the same GPU once per
+# backend):
+#   ai_whisper_backend: ['rocm', 'vulkan']
 
 # Enable LM Studio
 ai_lmstudio_enabled: false
