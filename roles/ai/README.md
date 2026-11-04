@@ -6,8 +6,8 @@ Install AI development tools.
 
 Installs AI CLI tools, desktop applications, and local inference engines.
 Supports Claude Code, Antigravity, OpenAI Codex, OpenCode, Aider,
-Ollama, whisper.cpp, LM Studio, Claude Desktop (Chat, Cowork and Claude Code),
-OpenCode Desktop, and ComfyUI (Stable Diffusion).
+Ollama, whisper.cpp, the Hugging Face CLI, LM Studio, Claude Desktop (Chat,
+Cowork and Claude Code), OpenCode Desktop, and ComfyUI (Stable Diffusion).
 
 On Arch Linux, tools are installed via native packages (AUR/community/extra).
 On Debian and Rocky Linux, tools are installed via npm, pipx, install scripts,
@@ -82,16 +82,17 @@ user out. The role's per-user entry pins the backend explicitly:
 
 ### Local AI / Inference
 
-| Variable                    | Default | Description                                                       |
-| --------------------------- | ------- | ----------------------------------------------------------------- |
-| `ai_ollama_enabled`         | `false` | Install Ollama LLM server                                         |
-| `ai_ollama_models`          | `[]`    | Models to pull after install                                      |
-| `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service                                     |
-| `ai_ollama_backend`         | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only)   |
-| `ai_ollama_environment`     | `{}`    | Environment variables for the Ollama server (systemd drop-in)     |
-| `ai_whisper_enabled`        | `false` | Install whisper.cpp speech recognition (Arch only)                |
-| `ai_whisper_backend`        | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only)   |
-| `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only)                                     |
+| Variable                     | Default | Description                                                     |
+| ---------------------------- | ------- | --------------------------------------------------------------- |
+| `ai_ollama_enabled`          | `false` | Install Ollama LLM server                                       |
+| `ai_ollama_models`           | `[]`    | Models to pull after install                                    |
+| `ai_ollama_service_enabled`  | `true`  | Enable Ollama systemd service                                   |
+| `ai_ollama_backend`          | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only) |
+| `ai_ollama_environment`      | `{}`    | Environment variables for the Ollama server (systemd drop-in)   |
+| `ai_whisper_enabled`         | `false` | Install whisper.cpp speech recognition (Arch only)              |
+| `ai_whisper_backend`         | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only) |
+| `ai_huggingface_cli_enabled` | `false` | Install the Hugging Face CLI `hf` (Arch only)                   |
+| `ai_lmstudio_enabled`        | `false` | Install LM Studio (Arch only)                                   |
 
 **Ollama backend** (`ai_ollama_backend`):
 
@@ -148,6 +149,18 @@ See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
 - **Debian / EL**: whisper.cpp is not packaged (Debian ships it from forky
   on), so the toggle is a no-op. Build it from source:
   <https://github.com/ggml-org/whisper.cpp>.
+
+**Hugging Face CLI** (`ai_huggingface_cli_enabled`):
+
+`hf` downloads models and datasets from the Hugging Face Hub, for example GGUF
+models for whisper.cpp or llama.cpp-based tools and checkpoints for ComfyUI.
+Gated models need an access token: `hf auth login` stores it per user in
+`~/.cache/huggingface/token`; the role does not manage it.
+
+- **Arch Linux**: installs `python-huggingface-hub` from `extra`, which ships
+  `hf`.
+- **Debian / EL**: the CLI is not packaged, so the toggle is a no-op. Install
+  it per user with `pipx install huggingface_hub`.
 
 ### ComfyUI (Stable Diffusion)
 
@@ -255,14 +268,14 @@ to any home directory while `ai_users` is empty or Claude Desktop is disabled.
 
 ## Tags
 
-| Tag          | Scope                                           |
-| ------------ | ----------------------------------------------- |
-| `ai`         | All AI tasks                                    |
-| `ai:cli`     | CLI tool installation                           |
-| `ai:desktop` | Desktop application installation                |
-| `ai:local`   | Local AI tools (Ollama, whisper.cpp, LM Studio) |
-| `ai:comfyui` | ComfyUI installation                            |
-| `ai:users`   | Per-user Claude Desktop entry                   |
+| Tag          | Scope                                                             |
+| ------------ | ----------------------------------------------------------------- |
+| `ai`         | All AI tasks                                                      |
+| `ai:cli`     | CLI tool installation                                             |
+| `ai:desktop` | Desktop application installation                                  |
+| `ai:local`   | Local AI tools (Ollama, whisper.cpp, Hugging Face CLI, LM Studio) |
+| `ai:comfyui` | ComfyUI installation                                              |
+| `ai:users`   | Per-user Claude Desktop entry                                     |
 
 ## Example Playbook
 

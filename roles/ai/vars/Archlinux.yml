@@ -62,6 +62,8 @@ __ai_whisper_backend_packages:
     - 'ggml-cuda'
   cpu: []
 
+__ai_huggingface_cli_package: 'python-huggingface-hub'
+
 # Service names
 __ai_ollama_service: 'ollama.service'
 

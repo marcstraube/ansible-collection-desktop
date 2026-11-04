@@ -9,6 +9,29 @@
         that: true
         fail_msg: 'AI role did not complete'
 
+# Hugging Face CLI: installed on Arch only; the toggle is a no-op on Debian and EL
+- name: Verify Hugging Face CLI
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert python-huggingface-hub is installed
+      ansible.builtin.assert:
+        that:
+          - "'python-huggingface-hub' in ansible_facts['packages']"
+        fail_msg: 'python-huggingface-hub is not installed'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Run hf version
+      ansible.builtin.command:
+        cmd: 'hf version'
+      changed_when: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
 - name: Verify Claude Desktop user config
   hosts: all
   gather_facts: true

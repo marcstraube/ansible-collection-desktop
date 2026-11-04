@@ -142,6 +142,19 @@
   retries: 3
   delay: 5
 
+# Hugging Face CLI
+
+- name: Local | Install Hugging Face CLI
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_huggingface_cli_package }}'
+    state: present
+  when:
+    - ai_huggingface_cli_enabled | bool
+    - __ai_huggingface_cli_package | length > 0
+  retries: 3
+  delay: 5
+
 # LM Studio
 
 - name: Local | Install LM Studio from AUR (Arch)

@@ -18,6 +18,8 @@
     ai_ollama_enabled: false
     # whisper.cpp with the CPU backend; a no-op on Debian and EL
     ai_whisper_enabled: true
+    # Hugging Face CLI; a no-op on Debian and EL
+    ai_huggingface_cli_enabled: true
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: false
 

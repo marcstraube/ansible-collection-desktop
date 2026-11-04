@@ -107,6 +107,9 @@ ai_whisper_backend: 'cpu'
 # backend):
 #   ai_whisper_backend: ['rocm', 'vulkan']
 
+# Enable the Hugging Face CLI (hf; model and dataset downloads; Arch only)
+ai_huggingface_cli_enabled: false
+
 # Enable LM Studio
 ai_lmstudio_enabled: false
 
