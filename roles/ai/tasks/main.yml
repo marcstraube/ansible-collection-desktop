@@ -49,6 +49,19 @@
   tags:
     - always
 
+- name: Main | Validate ai_ollama_backend
+  ansible.builtin.assert:
+    that:
+      - ai_ollama_backend in ['rocm', 'vulkan', 'cuda', 'cpu']
+    fail_msg: >-
+      ai_ollama_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu',
+      got '{{ ai_ollama_backend }}'
+  when:
+    - ai_enabled | bool
+    - ai_ollama_enabled | bool
+  tags:
+    - always
+
 - name: Main | Load OS-specific variables
   ansible.builtin.include_vars: '{{ item }}'
   with_first_found:

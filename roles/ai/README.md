@@ -82,12 +82,27 @@ user out. The role's per-user entry pins the backend explicitly:
 
 ### Local AI / Inference
 
-| Variable                    | Default | Description                   |
-| --------------------------- | ------- | ----------------------------- |
-| `ai_ollama_enabled`         | `false` | Install Ollama LLM server     |
-| `ai_ollama_models`          | `[]`    | Models to pull after install  |
-| `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service |
-| `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only) |
+| Variable                    | Default | Description                                                       |
+| --------------------------- | ------- | ----------------------------------------------------------------- |
+| `ai_ollama_enabled`         | `false` | Install Ollama LLM server                                         |
+| `ai_ollama_models`          | `[]`    | Models to pull after install                                      |
+| `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service                                     |
+| `ai_ollama_backend`         | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
+| `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only)                                     |
+
+**Ollama backend** (`ai_ollama_backend`):
+
+- **Arch Linux**: the `ollama` package runs inference on the CPU. The GPU
+  backends ship as separate packages in `extra`, and the role installs the
+  selected one next to `ollama`: `ollama-rocm` (AMD; roughly 3 GiB plus the
+  ROCm libraries), `ollama-vulkan` (any Vulkan GPU, roughly 44 MiB) or
+  `ollama-cuda` (NVIDIA; roughly 1 GiB plus CUDA). `cpu` installs nothing
+  extra. ROCm supports RDNA 3 and newer AMD cards without overrides. The role
+  restarts Ollama when the packages change, since Ollama loads its backends at
+  startup. Switching the backend installs the new package and leaves the
+  previous one in place.
+- **Debian / EL**: the upstream install script detects AMD and NVIDIA GPUs
+  itself and installs the matching runtime; the variable has no effect.
 
 ### ComfyUI (Stable Diffusion)
 
