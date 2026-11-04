@@ -1,0 +1,7 @@
+---
+#
+# RedHat Packages (EL 9 / EL 10)
+#
+
+__printing_3d_prusaslicer_package: ''   # Not in EPEL 9 or EPEL 10
+__printing_3d_cura_package: ''          # Not in EPEL 9 or EPEL 10

@@ -1,0 +1,88 @@
+---
+#
+# FDM Slicers
+#
+
+- name: Install | OrcaSlicer from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __printing_3d_aur_packages.orcaslicer }}'
+    state: present
+  when:
+    - printing_3d_orcaslicer_enabled | bool
+    - (__printing_3d_aur_packages | default({}))['orcaslicer'] | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | PrusaSlicer
+  ansible.builtin.package:
+    name: '{{ __printing_3d_prusaslicer_package }}'
+    state: present
+  when:
+    - printing_3d_prusaslicer_enabled | bool
+    - __printing_3d_prusaslicer_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | UltiMaker Cura
+  ansible.builtin.package:
+    name: '{{ __printing_3d_cura_package }}'
+    state: present
+  when:
+    - printing_3d_cura_enabled | bool
+    - __printing_3d_cura_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | UltiMaker Cura from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __printing_3d_aur_packages.cura }}'
+    state: present
+  when:
+    - printing_3d_cura_enabled | bool
+    - (__printing_3d_aur_packages | default({}))['cura'] | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+#
+# Resin (MSLA) Slicers and Tools
+#
+
+- name: Install | Chitubox Basic from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __printing_3d_aur_packages.chitubox }}'
+    state: present
+  when:
+    - printing_3d_chitubox_enabled | bool
+    - (__printing_3d_aur_packages | default({}))['chitubox'] | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | Lychee Slicer from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __printing_3d_aur_packages.lychee }}'
+    state: present
+  when:
+    - printing_3d_lychee_enabled | bool
+    - (__printing_3d_aur_packages | default({}))['lychee'] | default([]) | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | UVtools from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __printing_3d_aur_packages.uvtools }}'
+    state: present
+  when:
+    - printing_3d_uvtools_enabled | bool
+    - (__printing_3d_aur_packages | default({}))['uvtools'] | default([]) | length > 0
+  retries: 3
+  delay: 5

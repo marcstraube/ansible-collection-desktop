@@ -94,6 +94,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 | **virtual_reality** | VR streaming to standalone headsets     |
 | **wine**            | Wine Windows compatibility layer        |
 | **cad**             | CAD applications                        |
+| **printing_3d**     | Slicers for FDM and resin 3D printers   |
 
 ### Helper Roles
 

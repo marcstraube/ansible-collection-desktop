@@ -1,0 +1,53 @@
+---
+#
+# Role Control
+#
+
+# Enable the printing_3d role. Off by default: a host opts in through its inventory.
+printing_3d_enabled: false
+
+#
+# FDM Slicers
+#
+
+# Install OrcaSlicer (Arch only, AUR)
+printing_3d_orcaslicer_enabled: false
+
+# Install PrusaSlicer (Arch and Debian)
+printing_3d_prusaslicer_enabled: false
+
+# Install UltiMaker Cura (Arch from the AUR, Debian)
+printing_3d_cura_enabled: false
+
+#
+# Resin (MSLA) Slicers and Tools
+#
+
+# Install Chitubox Basic (Arch only, AUR)
+printing_3d_chitubox_enabled: false
+
+# Install Lychee Slicer (Arch only, AUR)
+printing_3d_lychee_enabled: false
+
+# Install UVtools (Arch only, AUR). The role adds a desktop entry
+# (/usr/local/share/applications/uvtools.desktop) while this is on, since the
+# package ships none; turning it off removes the entry.
+printing_3d_uvtools_enabled: false
+
+#
+# Application Environment
+#
+# Environment variables per application, applied through a copy of the
+# packaged desktop entry in /usr/local/share/applications/
+
+# Mapping of application name (orcaslicer, prusaslicer, cura, chitubox,
+# lychee, uvtools) to a mapping of environment variables. Each entry prefixes
+# every Exec= line of the application's desktop entries with
+# `env NAME=value ...`; removing an entry removes the override. uvtools sets
+# the Exec= line of the role-provided UVtools entry.
+printing_3d_environment: {}
+# Example:
+#   printing_3d_environment:
+#     orcaslicer:
+#       WEBKIT_DISABLE_DMABUF_RENDERER: '1'
+#       MESA_LOADER_DRIVER_OVERRIDE: 'zink'
