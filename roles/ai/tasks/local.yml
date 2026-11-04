@@ -76,6 +76,27 @@
   register: __ai_ollama_pull
   changed_when: "'pulling' in __ai_ollama_pull.stdout"
 
+# whisper.cpp
+
+- name: Local | Build whisper.cpp package list
+  ansible.builtin.set_fact:
+    __ai_whisper_packages: >-
+      {{ [__ai_whisper_package] + __ai_whisper_backend_packages[ai_whisper_backend] }}
+  when:
+    - ai_whisper_enabled | bool
+    - __ai_whisper_package | length > 0
+
+- name: Local | Install whisper.cpp
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_whisper_packages }}'
+    state: present
+  when:
+    - ai_whisper_enabled | bool
+    - __ai_whisper_package | length > 0
+  retries: 3
+  delay: 5
+
 # LM Studio
 
 - name: Local | Install LM Studio from AUR (Arch)

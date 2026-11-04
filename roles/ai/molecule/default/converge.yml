@@ -16,6 +16,8 @@
     ai_antigravity_enabled: false
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: false
+    # whisper.cpp with the CPU backend; a no-op on Debian and EL
+    ai_whisper_enabled: true
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: false
 
@@ -117,9 +119,9 @@
         quiet: true
       when: ansible_facts['os_family'] != 'Archlinux'
 
-# Ollama with the CPU backend: only the ollama package. Runs on Arch only; the
+# Ollama and whisper.cpp with the CPU backend: no backend package. Runs on Arch only; the
 # install script on Debian and EL downloads the full upstream bundle.
-- name: Converge — Ollama CPU backend (Arch)
+- name: Converge — Ollama and whisper.cpp CPU backend (Arch)
   hosts: all
   gather_facts: true
 
@@ -135,6 +137,8 @@
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: true
     ai_ollama_backend: 'cpu'
+    ai_whisper_enabled: true
+    ai_whisper_backend: 'cpu'
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: false
 
@@ -152,8 +156,17 @@
         quiet: true
       when: ansible_facts['os_family'] == 'Archlinux'
 
-# Ollama with the Vulkan backend: ollama-vulkan next to ollama
-- name: Converge — Ollama Vulkan backend (Arch)
+    - name: Converge | Assert the whisper.cpp CPU backend adds no package
+      ansible.builtin.assert:
+        that:
+          - __ai_whisper_packages == ['whisper-cpp']
+        fail_msg: "cpu backend installs {{ __ai_whisper_packages }}, expected ['whisper-cpp']"
+        quiet: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Ollama and whisper.cpp with the Vulkan backend: ollama-vulkan next to ollama,
+# ggml-vulkan next to whisper-cpp
+- name: Converge — Ollama and whisper.cpp Vulkan backend (Arch)
   hosts: all
   gather_facts: true
 
@@ -169,6 +182,8 @@
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: true
     ai_ollama_backend: 'vulkan'
+    ai_whisper_enabled: true
+    ai_whisper_backend: 'vulkan'
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: false
 

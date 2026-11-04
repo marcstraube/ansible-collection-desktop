@@ -17,6 +17,7 @@ __ai_opencode_desktop_url: >-
 
 # Local AI
 __ai_ollama_package: ''
+__ai_whisper_package: ''
 __ai_lmstudio_package: ''
 
 # Service names

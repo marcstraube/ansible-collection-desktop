@@ -50,6 +50,18 @@ __ai_ollama_backend_packages:
     - 'ollama-cuda'
   cpu: []
 
+__ai_whisper_package: 'whisper-cpp'
+# Compute backend (ai_whisper_backend) → ggml backend package next to
+# whisper-cpp
+__ai_whisper_backend_packages:
+  rocm:
+    - 'ggml-hip'
+  vulkan:
+    - 'ggml-vulkan'
+  cuda:
+    - 'ggml-cuda'
+  cpu: []
+
 # Service names
 __ai_ollama_service: 'ollama.service'
 

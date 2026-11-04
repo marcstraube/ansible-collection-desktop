@@ -82,6 +82,14 @@ ai_ollama_service_enabled: true
 # script on Debian and EL detects the GPU itself and ignores this variable.
 ai_ollama_backend: 'cpu'
 
+# Enable whisper.cpp (local speech recognition; Arch only)
+ai_whisper_enabled: false
+
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu'. Arch Linux installs the
+# matching ggml backend package next to whisper-cpp; 'cpu' uses the ggml CPU
+# backend that whisper-cpp depends on.
+ai_whisper_backend: 'cpu'
+
 # Enable LM Studio
 ai_lmstudio_enabled: false
 

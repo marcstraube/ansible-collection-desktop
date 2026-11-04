@@ -105,7 +105,7 @@
         fail_msg: 'update-desktop-database did not run for the managed user'
       when: ansible_facts['os_family'] != 'Archlinux'
 
-- name: Verify Ollama backend
+- name: Verify Ollama and whisper.cpp backends
   hosts: all
   gather_facts: true
 
@@ -122,6 +122,16 @@
           - "'ollama-rocm' not in ansible_facts['packages']"
           - "'ollama-cuda' not in ansible_facts['packages']"
         fail_msg: 'expected ollama and ollama-vulkan, and no other backend'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert whisper.cpp and the ggml Vulkan backend are installed
+      ansible.builtin.assert:
+        that:
+          - "'whisper-cpp' in ansible_facts['packages']"
+          - "'ggml-vulkan' in ansible_facts['packages']"
+          - "'ggml-hip' not in ansible_facts['packages']"
+          - "'ggml-cuda' not in ansible_facts['packages']"
+        fail_msg: 'expected whisper-cpp and ggml-vulkan, and no other backend'
       when: ansible_facts['os_family'] == 'Archlinux'
 
     - name: Verify | Run role with an invalid Ollama backend
@@ -142,4 +152,24 @@
           ansible.builtin.assert:
             that:
               - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an invalid whisper.cpp backend
+      block:
+        - name: Verify | Include ai role with ai_whisper_backend 'opencl'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_whisper_enabled: true
+            ai_whisper_backend: 'opencl'
+
+        - name: Verify | Fail when the invalid whisper.cpp backend was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_whisper_backend 'opencl'."
+      rescue:
+        - name: Verify | Assert whisper.cpp rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
             quiet: true

@@ -6,7 +6,7 @@ Install AI development tools.
 
 Installs AI CLI tools, desktop applications, and local inference engines.
 Supports Claude Code, Antigravity, OpenAI Codex, OpenCode, Aider,
-Ollama, LM Studio, Claude Desktop (Chat, Cowork and Claude Code),
+Ollama, whisper.cpp, LM Studio, Claude Desktop (Chat, Cowork and Claude Code),
 OpenCode Desktop, and ComfyUI (Stable Diffusion).
 
 On Arch Linux, tools are installed via native packages (AUR/community/extra).
@@ -88,6 +88,8 @@ user out. The role's per-user entry pins the backend explicitly:
 | `ai_ollama_models`          | `[]`    | Models to pull after install                                      |
 | `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service                                     |
 | `ai_ollama_backend`         | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
+| `ai_whisper_enabled`        | `false` | Install whisper.cpp speech recognition (Arch only)                |
+| `ai_whisper_backend`        | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
 | `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only)                                     |
 
 **Ollama backend** (`ai_ollama_backend`):
@@ -103,6 +105,19 @@ user out. The role's per-user entry pins the backend explicitly:
   previous one in place.
 - **Debian / EL**: the upstream install script detects AMD and NVIDIA GPUs
   itself and installs the matching runtime; the variable has no effect.
+
+**whisper.cpp** (`ai_whisper_enabled`, `ai_whisper_backend`):
+
+- **Arch Linux**: installs `whisper-cpp` from `extra`. It depends on `ggml`,
+  which brings the CPU backend; the role installs the selected GPU backend
+  next to it: `ggml-hip` (AMD; pulls in `rocm-hip-runtime`, roughly 1.3 GiB),
+  `ggml-vulkan` (any Vulkan GPU, roughly 44 MiB) or `ggml-cuda` (NVIDIA;
+  roughly 150 MiB plus CUDA). `cpu` installs nothing extra. ggml loads every
+  installed backend at runtime, so the same GPU can show up once per backend;
+  applications select the device themselves.
+- **Debian / EL**: whisper.cpp is not packaged (Debian ships it from forky
+  on), so the toggle is a no-op. Build it from source:
+  <https://github.com/ggml-org/whisper.cpp>.
 
 ### ComfyUI (Stable Diffusion)
 
@@ -201,14 +216,14 @@ to any home directory while `ai_users` is empty or Claude Desktop is disabled.
 
 ## Tags
 
-| Tag          | Scope                              |
-| ------------ | ---------------------------------- |
-| `ai`         | All AI tasks                       |
-| `ai:cli`     | CLI tool installation              |
-| `ai:desktop` | Desktop application installation   |
-| `ai:local`   | Local AI tools (Ollama, LM Studio) |
-| `ai:comfyui` | ComfyUI installation               |
-| `ai:users`   | Per-user Claude Desktop entry      |
+| Tag          | Scope                                           |
+| ------------ | ----------------------------------------------- |
+| `ai`         | All AI tasks                                    |
+| `ai:cli`     | CLI tool installation                           |
+| `ai:desktop` | Desktop application installation                |
+| `ai:local`   | Local AI tools (Ollama, whisper.cpp, LM Studio) |
+| `ai:comfyui` | ComfyUI installation                            |
+| `ai:users`   | Per-user Claude Desktop entry                   |
 
 ## Example Playbook
 

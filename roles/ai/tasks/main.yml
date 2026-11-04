@@ -62,6 +62,19 @@
   tags:
     - always
 
+- name: Main | Validate ai_whisper_backend
+  ansible.builtin.assert:
+    that:
+      - ai_whisper_backend in ['rocm', 'vulkan', 'cuda', 'cpu']
+    fail_msg: >-
+      ai_whisper_backend must be 'rocm', 'vulkan', 'cuda' or 'cpu',
+      got '{{ ai_whisper_backend }}'
+  when:
+    - ai_enabled | bool
+    - ai_whisper_enabled | bool
+  tags:
+    - always
+
 - name: Main | Load OS-specific variables
   ansible.builtin.include_vars: '{{ item }}'
   with_first_found:
