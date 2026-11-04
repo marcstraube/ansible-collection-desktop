@@ -134,6 +134,75 @@
         fail_msg: 'expected whisper-cpp and ggml-vulkan, and no other backend'
       when: ansible_facts['os_family'] == 'Archlinux'
 
+    - name: Verify | Read Ollama environment drop-in
+      ansible.builtin.slurp:
+        src: '/etc/systemd/system/ollama.service.d/ansible.conf'
+      register: __ai_verify_ollama_dropin
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert drop-in sets the Ollama environment
+      ansible.builtin.assert:
+        that:
+          - >-
+            'Environment="OLLAMA_CONTEXT_LENGTH=32768"'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+          - >-
+            'Environment="OLLAMA_FLASH_ATTENTION=1"'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+        fail_msg: 'drop-in is missing an Environment= line'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Read Ollama service properties
+      ansible.builtin.systemd_service:
+        name: ollama.service
+      register: __ai_verify_ollama_unit
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the service runs with the environment
+      ansible.builtin.assert:
+        that:
+          - "'OLLAMA_CONTEXT_LENGTH=32768' in __ai_verify_ollama_unit.status.Environment | default('')"
+          - "'OLLAMA_FLASH_ATTENTION=1' in __ai_verify_ollama_unit.status.Environment | default('')"
+        fail_msg: >-
+          ollama.service does not carry the environment:
+          {{ __ai_verify_ollama_unit.status.Environment | default('') }}
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Emptying the mapping removes the drop-in again
+    - name: Verify | Include ai role with an empty Ollama environment  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      vars:
+        ai_enabled: true
+        ai_claude_code_enabled: false
+        ai_antigravity_cli_enabled: false
+        ai_codex_enabled: false
+        ai_opencode_enabled: false
+        ai_aider_enabled: false
+        ai_claude_desktop_enabled: false
+        ai_antigravity_enabled: false
+        ai_opencode_desktop_enabled: false
+        ai_ollama_enabled: true
+        ai_ollama_backend: 'vulkan'
+        ai_ollama_environment: {}
+        ai_whisper_enabled: false
+        ai_lmstudio_enabled: false
+        ai_comfyui_enabled: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat Ollama environment drop-in
+      ansible.builtin.stat:
+        path: '/etc/systemd/system/ollama.service.d/ansible.conf'
+      register: __ai_verify_ollama_dropin_stat
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the drop-in was removed
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_ollama_dropin_stat.stat.exists
+        fail_msg: 'drop-in still present after emptying ai_ollama_environment'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
     - name: Verify | Run role with an invalid Ollama backend
       block:
         - name: Verify | Include ai role with ai_ollama_backend 'opencl'  # noqa: role-name[path]

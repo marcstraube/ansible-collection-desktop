@@ -57,12 +57,49 @@
     - ansible_facts['os_family'] != 'Archlinux'
     - ai_ollama_enabled | bool
 
+# Ollama reads its server settings from the environment of the service.
+- name: Local | Create Ollama service drop-in directory
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_ollama_dropin_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - ai_ollama_enabled | bool
+    - ai_ollama_environment | length > 0
+
+- name: Local | Deploy Ollama environment drop-in
+  become: true
+  ansible.builtin.template:
+    src: ollama-environment.conf.j2
+    dest: '{{ __ai_ollama_dropin_dir }}/ansible.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ai_ollama_enabled | bool
+    - ai_ollama_environment | length > 0
+  notify: Restart Ollama
+
+- name: Local | Remove Ollama environment drop-in
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_ollama_dropin_dir }}/ansible.conf'
+    state: absent
+  when:
+    - ai_ollama_enabled | bool
+    - ai_ollama_environment | length == 0
+  notify: Restart Ollama
+
 - name: Local | Manage Ollama service
   become: true
   ansible.builtin.systemd_service:
     name: '{{ __ai_ollama_service }}'
     enabled: "{{ ai_ollama_service_enabled | bool }}"
     state: "{{ ai_ollama_service_enabled | bool | ternary('started', 'stopped') }}"
+    daemon_reload: true
   when:
     - ai_ollama_enabled | bool
 

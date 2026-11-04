@@ -137,6 +137,10 @@
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: true
     ai_ollama_backend: 'cpu'
+    # Same environment in both Arch plays; verify.yml tests the removal
+    ai_ollama_environment:
+      OLLAMA_CONTEXT_LENGTH: '32768'
+      OLLAMA_FLASH_ATTENTION: '1'
     ai_whisper_enabled: true
     ai_whisper_backend: 'cpu'
     ai_lmstudio_enabled: false
@@ -182,6 +186,9 @@
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: true
     ai_ollama_backend: 'vulkan'
+    ai_ollama_environment:
+      OLLAMA_CONTEXT_LENGTH: '32768'
+      OLLAMA_FLASH_ATTENTION: '1'
     ai_whisper_enabled: true
     ai_whisper_backend: 'vulkan'
     ai_lmstudio_enabled: false

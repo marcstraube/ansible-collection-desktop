@@ -62,6 +62,19 @@
   tags:
     - always
 
+- name: Main | Validate ai_ollama_environment
+  ansible.builtin.assert:
+    that:
+      - ai_ollama_environment is mapping
+    fail_msg: >-
+      ai_ollama_environment must be a mapping of environment variables,
+      got '{{ ai_ollama_environment }}'
+  when:
+    - ai_enabled | bool
+    - ai_ollama_enabled | bool
+  tags:
+    - always
+
 - name: Main | Validate ai_whisper_backend
   ansible.builtin.assert:
     that:

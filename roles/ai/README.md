@@ -88,6 +88,7 @@ user out. The role's per-user entry pins the backend explicitly:
 | `ai_ollama_models`          | `[]`    | Models to pull after install                                      |
 | `ai_ollama_service_enabled` | `true`  | Enable Ollama systemd service                                     |
 | `ai_ollama_backend`         | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
+| `ai_ollama_environment`     | `{}`    | Environment variables for the Ollama server (systemd drop-in)     |
 | `ai_whisper_enabled`        | `false` | Install whisper.cpp speech recognition (Arch only)                |
 | `ai_whisper_backend`        | `'cpu'` | Compute backend: `rocm`, `vulkan`, `cuda` or `cpu` (Arch only)    |
 | `ai_lmstudio_enabled`       | `false` | Install LM Studio (Arch only)                                     |
@@ -105,6 +106,25 @@ user out. The role's per-user entry pins the backend explicitly:
   previous one in place.
 - **Debian / EL**: the upstream install script detects AMD and NVIDIA GPUs
   itself and installs the matching runtime; the variable has no effect.
+
+**Ollama server settings** (`ai_ollama_environment`):
+
+Ollama reads its server settings from environment variables. The role renders
+each entry as an `Environment=` line into the systemd drop-in
+`/etc/systemd/system/ollama.service.d/ansible.conf` and restarts Ollama when
+the drop-in changes; an empty mapping removes the drop-in. Both the Arch
+package and the upstream install script ship `ollama.service`, so this works
+on every platform.
+
+```yaml
+ai_ollama_environment:
+  OLLAMA_CONTEXT_LENGTH: '32768'   # default context window
+  OLLAMA_FLASH_ATTENTION: '1'      # flash attention
+  OLLAMA_KEEP_ALIVE: '30m'         # keep models loaded
+  OLLAMA_HOST: '127.0.0.1:11434'   # listen address
+```
+
+See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
 
 **whisper.cpp** (`ai_whisper_enabled`, `ai_whisper_backend`):
 

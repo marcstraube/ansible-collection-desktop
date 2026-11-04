@@ -8,6 +8,7 @@
   ansible.builtin.systemd_service:
     name: '{{ __ai_ollama_service }}'
     state: restarted
+    daemon_reload: true
   when: ai_ollama_service_enabled | bool
 
 - name: Restart ComfyUI

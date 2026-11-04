@@ -82,6 +82,15 @@ ai_ollama_service_enabled: true
 # script on Debian and EL detects the GPU itself and ignores this variable.
 ai_ollama_backend: 'cpu'
 
+# Environment variables for the Ollama server, rendered into a systemd drop-in
+# (/etc/systemd/system/ollama.service.d/ansible.conf). An empty mapping removes
+# the drop-in. See https://docs.ollama.com/faq for the available settings.
+ai_ollama_environment: {}
+# Example:
+#   ai_ollama_environment:
+#     OLLAMA_CONTEXT_LENGTH: '32768'
+#     OLLAMA_FLASH_ATTENTION: '1'
+
 # Enable whisper.cpp (local speech recognition; Arch only)
 ai_whisper_enabled: false
 
