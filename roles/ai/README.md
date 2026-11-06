@@ -51,6 +51,26 @@ API keys are managed by the user via environment variables (not by this role).
 | `ai_opencode_claude_auth_enabled`  | `false` | OpenCode auth plugin for Claude creds          |
 | `ai_opencode_gemini_auth_enabled`  | `false` | OpenCode auth plugin for Gemini creds          |
 | `ai_aider_enabled`                 | `false` | Install Aider (pair programming)               |
+| `ai_aider_model`                   | `''`    | Default model in the per-user Aider config     |
+| `ai_aider_set_env`                 | `{}`    | Provider environment (Aider `set-env`)         |
+
+**Aider model server.** For each `ai_users` entry the role writes
+`~/.aider.conf.yml` (mode `0600`) with `model:` and the `set-env:` list when
+either variable is set (see [User Configuration](#user-configuration)). This
+points Aider at a model served by another host:
+
+```yaml
+# Ollama
+ai_aider_model: 'ollama_chat/qwen2.5-coder:32b'
+ai_aider_set_env:
+  OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+
+# LM Studio (the client needs a non-empty key even without authentication)
+ai_aider_model: 'lm_studio/qwen2.5-coder-32b-instruct'
+ai_aider_set_env:
+  LM_STUDIO_API_BASE: 'http://lmstudio.example.com:1234/v1'
+  LM_STUDIO_API_KEY: 'dummy-api-key'  # pragma: allowlist secret
+```
 
 ### Desktop Applications
 
@@ -225,11 +245,12 @@ Gated models need an access token: `hf auth login` stores it per user in
 The role copies the packaged Claude Desktop entry into a user's
 `~/.local/share/applications/`, appends `--password-store=<backend>` to every
 `Exec=` line and refreshes the desktop database — skipping that last step
-breaks the `claude://` sign-in redirect.
+breaks the `claude://` sign-in redirect. With Aider enabled it writes
+`~/.aider.conf.yml` from `ai_aider_model` and `ai_aider_set_env`.
 
 | Variable               | Default     | Description                                      |
 | ---------------------- | ----------- | ------------------------------------------------ |
-| `ai_users`             | `[]`        | Users to configure with a Claude Desktop entry   |
+| `ai_users`             | `[]`        | Users to configure (Claude Desktop, Aider)       |
 | `ai_user_config_mode`  | `'initial'` | Default mode: `managed` / `initial` / `disabled` |
 
 Each user entry supports:
@@ -259,12 +280,14 @@ Mode semantics:
 | Mode       | First run                     | Subsequent runs                            |
 | ---------- | ----------------------------- | ------------------------------------------ |
 | `managed`  | deploy                        | overwrite (always reconcile)               |
-| `initial`  | deploy if the entry is absent | leave the user's own edits alone           |
+| `initial`  | deploy if the file is absent  | leave the user's own edits alone           |
 | `disabled` | skip                          | skip                                       |
 
-`initial` gates on the entry file itself, not on whether the account was
-created in the same run, so a tag-scoped run still deploys. Nothing is written
-to any home directory while `ai_users` is empty or Claude Desktop is disabled.
+`initial` gates on the file itself, not on whether the account was created in
+the same run, so a tag-scoped run still deploys. In `managed` mode the Aider
+config is removed when `ai_aider_model` and `ai_aider_set_env` are both empty.
+Nothing is written to any home directory while `ai_users` is empty or neither
+Claude Desktop nor Aider is enabled.
 
 ## Tags
 
@@ -275,7 +298,7 @@ to any home directory while `ai_users` is empty or Claude Desktop is disabled.
 | `ai:desktop` | Desktop application installation                                  |
 | `ai:local`   | Local AI tools (Ollama, whisper.cpp, Hugging Face CLI, LM Studio) |
 | `ai:comfyui` | ComfyUI installation                                              |
-| `ai:users`   | Per-user Claude Desktop entry                                     |
+| `ai:users`   | Per-user Claude Desktop entry and Aider config                    |
 
 ## Example Playbook
 

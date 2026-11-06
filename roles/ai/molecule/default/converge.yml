@@ -80,6 +80,38 @@
         quiet: true
       when: ansible_facts['os_family'] != 'Archlinux'
 
+# Per-user Aider config. Only the user tasks run: installing Aider (AUR on
+# Arch, pipx elsewhere) has no bearing on the file the role writes. Runs
+# before the derivation play, whose derived ai_users becomes a host fact that
+# would override the list below.
+- name: Converge — Aider user config
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_desktop_enabled: false
+    ai_aider_enabled: true
+    ai_aider_model: 'ollama_chat/qwen2.5-coder:32b'
+    ai_aider_set_env:
+      OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+      LM_STUDIO_API_BASE: 'http://lmstudio.example.com:1234/v1'
+
+    ai_user_config_mode: 'initial'
+    ai_users:
+      - username: 'ai_aider_managed'
+        mode: 'managed'
+      - username: 'ai_aider_initial_new'
+      - username: 'ai_aider_initial_exist'
+      - username: 'ai_aider_disabled'
+        mode: 'disabled'
+
+  tasks:
+    - name: Converge | Include ai role user tasks  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+
 # Same role, users derived from users_list instead of a configured list.
 - name: Converge — Claude Desktop user derivation (non-Arch)
   hosts: all

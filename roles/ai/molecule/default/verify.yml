@@ -128,6 +128,102 @@
         fail_msg: 'update-desktop-database did not run for the managed user'
       when: ansible_facts['os_family'] != 'Archlinux'
 
+- name: Verify Aider user config
+  hosts: all
+  gather_facts: true
+
+  vars:
+    __ai_verify_aider_expected: |
+      model: "ollama_chat/qwen2.5-coder:32b"
+      set-env:
+        - "LM_STUDIO_API_BASE=http://lmstudio.example.com:1234/v1"
+        - "OLLAMA_API_BASE=http://ollama.example.com:11434"
+    __ai_verify_aider_fixture: |
+      model: "molecule/fixture"
+
+  tasks:
+    - name: Verify | Stat Aider configs
+      ansible.builtin.stat:
+        path: '/home/{{ item }}/.aider.conf.yml'
+      loop:
+        - 'ai_aider_managed'
+        - 'ai_aider_initial_new'
+        - 'ai_aider_initial_exist'
+        - 'ai_aider_disabled'
+      register: __ai_verify_aider_stat
+
+    - name: Verify | Assert Aider config owner and mode
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.mode == '0600'
+          - item.stat.pw_name == item.item
+        fail_msg: '{{ item.item }}: Aider config missing or wrong owner/mode'
+      loop: '{{ __ai_verify_aider_stat.results[:3] }}'
+      loop_control:
+        label: '{{ item.item }}'
+
+    - name: Verify | Assert disabled user got no Aider config
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_aider_stat.results[3].stat.exists
+        fail_msg: 'Aider config written for a disabled user'
+
+    - name: Verify | Read Aider configs
+      ansible.builtin.slurp:
+        src: '/home/{{ item }}/.aider.conf.yml'
+      loop:
+        - 'ai_aider_managed'
+        - 'ai_aider_initial_new'
+        - 'ai_aider_initial_exist'
+      register: __ai_verify_aider_content
+
+    - name: Verify | Assert Aider config content
+      ansible.builtin.assert:
+        that:
+          - (__ai_verify_aider_content.results[0].content | b64decode)
+            is search(__ai_verify_aider_expected | regex_escape)
+          - (__ai_verify_aider_content.results[1].content | b64decode)
+            is search(__ai_verify_aider_expected | regex_escape)
+          - (__ai_verify_aider_content.results[0].content | b64decode | from_yaml)['model']
+            == 'ollama_chat/qwen2.5-coder:32b'
+          # initial keeps the pre-seeded file untouched
+          - (__ai_verify_aider_content.results[2].content | b64decode)
+            == __ai_verify_aider_fixture
+        fail_msg: 'Aider config content not as expected'
+
+    # Emptying both variables removes the managed config, initial keeps its own
+    - name: Verify | Include ai role user tasks with nothing to configure  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+      vars:
+        ai_enabled: true
+        ai_claude_desktop_enabled: false
+        ai_aider_enabled: true
+        ai_aider_model: ''
+        ai_aider_set_env: {}
+        ai_user_config_mode: 'initial'
+        ai_users:
+          - username: 'ai_aider_managed'
+            mode: 'managed'
+          - username: 'ai_aider_initial_new'
+
+    - name: Verify | Stat Aider configs after emptying the variables
+      ansible.builtin.stat:
+        path: '/home/{{ item }}/.aider.conf.yml'
+      loop:
+        - 'ai_aider_managed'
+        - 'ai_aider_initial_new'
+      register: __ai_verify_aider_stat_empty
+
+    - name: Verify | Assert managed config removed, initial config kept
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_aider_stat_empty.results[0].stat.exists
+          - __ai_verify_aider_stat_empty.results[1].stat.exists
+        fail_msg: 'managed Aider config not removed or initial config touched'
+
 - name: Verify Ollama and whisper.cpp backends
   hosts: all
   gather_facts: true

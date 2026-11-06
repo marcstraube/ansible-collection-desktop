@@ -114,3 +114,30 @@
           Terminal=false
           Type=Application
       when: ansible_facts['os_family'] != 'Archlinux'
+
+    # Aider user-config fixture. The config is written independent of the
+    # install, so converge runs only the user tasks on every platform.
+    - name: Prepare | Create Aider test users
+      ansible.builtin.user:
+        name: '{{ item }}'
+        create_home: true
+        shell: /bin/bash
+      loop:
+        # managed: reconciled on every run, removed once nothing is set
+        - ai_aider_managed
+        # initial: config absent (deployed) and present (kept untouched)
+        - ai_aider_initial_new
+        - ai_aider_initial_exist
+        # disabled: never deployed
+        - ai_aider_disabled
+      loop_control:
+        label: '{{ item }}'
+
+    - name: Prepare | Pre-seed a hand-edited Aider config
+      ansible.builtin.copy:
+        dest: '/home/ai_aider_initial_exist/.aider.conf.yml'
+        owner: 'ai_aider_initial_exist'
+        group: 'ai_aider_initial_exist'
+        mode: '0600'
+        content: |
+          model: "molecule/fixture"
