@@ -24,4 +24,23 @@
     loop_var: ai_user
     label: '{{ ai_user.username }}'
   when:
+    - ai_claude_desktop_enabled | bool
+    - (ai_user.mode | default(ai_user_config_mode)) != 'disabled'
+
+- name: Users | Include Aider config
+  ansible.builtin.include_tasks:
+    file: users_aider.yml
+    apply:
+      tags:
+        - ai
+        - ai:users
+  tags:
+    - ai
+    - ai:users
+  loop: '{{ ai_users }}'
+  loop_control:
+    loop_var: ai_user
+    label: '{{ ai_user.username }}'
+  when:
+    - ai_aider_enabled | bool
     - (ai_user.mode | default(ai_user_config_mode)) != 'disabled'

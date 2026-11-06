@@ -1,0 +1,46 @@
+---
+- name: Users Aider | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ ai_user.username }}'
+
+- name: Users Aider | Set user home fact
+  ansible.builtin.set_fact:
+    __ai_user_home: "{{ ansible_facts['getent_passwd'][ai_user.username][4] }}"
+
+- name: Users Aider | Stat existing config
+  ansible.builtin.stat:
+    path: '{{ __ai_user_home }}/.aider.conf.yml'
+  register: __ai_aider_conf_stat
+
+# Mode semantics:
+#   managed  — reconcile the config on every run, remove it when there is
+#              nothing to configure
+#   initial  — write it only when absent, so a hand-edited config survives
+#   disabled — never write (gated in users.yml)
+- name: Users Aider | Build deploy decision
+  ansible.builtin.set_fact:
+    __ai_aider_managed: "{{ (ai_user.mode | default(ai_user_config_mode)) == 'managed' }}"
+    __ai_aider_configured: >-
+      {{ ai_aider_model | length > 0 or ai_aider_set_env | length > 0 }}
+
+# 0600 and no diff: set-env may carry API keys
+- name: Users Aider | Deploy Aider config
+  ansible.builtin.template:
+    src: aider.conf.yml.j2
+    dest: '{{ __ai_user_home }}/.aider.conf.yml'
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: '0600'
+  diff: false
+  when:
+    - __ai_aider_configured | bool
+    - __ai_aider_managed | bool or not __ai_aider_conf_stat.stat.exists
+
+- name: Users Aider | Remove Aider config
+  ansible.builtin.file:
+    path: '{{ __ai_user_home }}/.aider.conf.yml'
+    state: absent
+  when:
+    - __ai_aider_managed | bool
+    - not __ai_aider_configured | bool

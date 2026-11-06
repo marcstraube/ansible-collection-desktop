@@ -32,6 +32,21 @@ ai_opencode_gemini_auth_enabled: false
 # Enable Aider (AI pair programming)
 ai_aider_enabled: false
 
+# Default model, written as 'model:' into the per-user ~/.aider.conf.yml,
+# e.g. 'ollama_chat/<model>' or 'lm_studio/<model>'. Deployed per user via
+# ai_users.
+ai_aider_model: ''
+
+# Environment for the model provider, written as Aider's 'set-env' list into
+# the same file. Examples:
+#   ai_aider_set_env:
+#     OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+# LM Studio needs a non-empty key even without authentication:
+#   ai_aider_set_env:
+#     LM_STUDIO_API_BASE: 'http://lmstudio.example.com:1234/v1'
+#     LM_STUDIO_API_KEY: 'dummy-api-key'
+ai_aider_set_env: {}
+
 #
 # Desktop Applications
 #
@@ -146,15 +161,18 @@ ai_comfyui_service_enabled: true
 #
 # User Configuration
 #
-# Users for whom to deploy the per-user Claude Desktop entry.
+# Users for whom to deploy the per-user Claude Desktop entry and the Aider
+# config (~/.aider.conf.yml).
 #
 # DEPRECATED: left empty, the list derives from users_list entries carrying
 # an 'ai' attribute (system users excluded). Removal in v4.0.0 — from then on
 # an empty list means no users; set ai_users explicitly. See #304.
 #
 # Modes:
-#   managed  — always deploy/overwrite the desktop entry
-#   initial  — deploy the entry only when it is absent, then leave it
+#   managed  — always deploy/overwrite the desktop entry and the Aider
+#              config; the Aider config is removed when ai_aider_model and
+#              ai_aider_set_env are both empty
+#   initial  — deploy each file only when it is absent, then leave it
 #              under the user's control (default)
 #   disabled — skip config deployment for this user
 

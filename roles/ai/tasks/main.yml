@@ -240,7 +240,7 @@
         - ai:users
   when:
     - ai_enabled | bool
-    - ai_claude_desktop_enabled | bool
+    - ai_claude_desktop_enabled | bool or ai_aider_enabled | bool
     - ai_users | length > 0
   tags:
     - ai
