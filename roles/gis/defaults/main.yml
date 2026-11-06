@@ -1,0 +1,20 @@
+---
+#
+# Role Control
+#
+
+# Enable the gis role. Off by default: a host opts in through its inventory.
+gis_enabled: false
+
+#
+# GIS Applications
+#
+
+# Install QGIS (Arch, Debian and EL 9 from EPEL; not available on EL 10)
+gis_qgis_enabled: true
+
+# Install the GDAL command-line tools (gdalinfo, ogr2ogr, gdal_translate, ...)
+gis_gdal_enabled: true
+
+# Install GPlates (Arch only, AUR; builds from source)
+gis_gplates_enabled: false

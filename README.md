@@ -95,6 +95,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 | **wine**            | Wine Windows compatibility layer        |
 | **cad**             | CAD applications                        |
 | **printing_3d**     | Slicers for FDM and resin 3D printers   |
+| **gis**             | QGIS, GDAL tools, GPlates               |
 
 ### Helper Roles
 

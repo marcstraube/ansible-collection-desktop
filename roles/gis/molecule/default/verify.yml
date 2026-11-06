@@ -1,0 +1,73 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+
+  vars:
+    # Packages the converge must install, per platform
+    __verify_expected_packages:
+      Archlinux:
+        - qgis
+        - gdal
+      Debian:
+        - qgis
+        - gdal-bin
+      RedHat-9:
+        - qgis
+        - gdal
+      RedHat-10:
+        - gdal
+    __verify_platform: >-
+      {{ ansible_facts['os_family'] ~ ('-' ~ ansible_facts['distribution_major_version']
+         if ansible_facts['os_family'] == 'RedHat' else '') }}
+
+  tasks:
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+
+    - name: Verify | Assert GIS packages are installed
+      ansible.builtin.assert:
+        that:
+          - item in ansible_facts['packages']
+        fail_msg: '{{ item }} is not installed'
+        quiet: true
+      loop: '{{ __verify_expected_packages[__verify_platform] }}'
+
+    - name: Verify | Run gdalinfo
+      ansible.builtin.command:
+        cmd: gdalinfo --version
+      register: __verify_gdalinfo
+      changed_when: false
+
+    - name: Verify | Assert gdalinfo reports a GDAL version
+      ansible.builtin.assert:
+        that:
+          - __verify_gdalinfo.stdout is search('^GDAL [0-9]')
+        fail_msg: 'Unexpected gdalinfo output: {{ __verify_gdalinfo.stdout }}'
+        quiet: true
+
+    - name: Verify | Stat ogr2ogr
+      ansible.builtin.stat:
+        path: /usr/bin/ogr2ogr
+      register: __verify_ogr2ogr
+
+    - name: Verify | Assert ogr2ogr is installed
+      ansible.builtin.assert:
+        that:
+          - __verify_ogr2ogr.stat.exists
+        fail_msg: '/usr/bin/ogr2ogr is missing'
+        quiet: true
+
+    - name: Verify | Stat QGIS executable
+      ansible.builtin.stat:
+        path: /usr/bin/qgis
+      register: __verify_qgis
+      when: "'qgis' in __verify_expected_packages[__verify_platform]"
+
+    - name: Verify | Assert QGIS executable is installed
+      ansible.builtin.assert:
+        that:
+          - __verify_qgis.stat.exists
+        fail_msg: '/usr/bin/qgis is missing'
+        quiet: true
+      when: "'qgis' in __verify_expected_packages[__verify_platform]"
