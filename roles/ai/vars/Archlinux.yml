@@ -16,7 +16,7 @@ __ai_aur_packages:
   opencode_gemini_auth:
     - opencode-gemini-auth
   aider:
-    - aider
+    - aider-chat-venv
   claude_desktop:
     - claude-desktop
   antigravity:
@@ -24,7 +24,7 @@ __ai_aur_packages:
   opencode_desktop:
     - opencode-desktop-bin
   lmstudio:
-    - lmstudio-appimage
+    - lmstudio-bin
 
 # CLI Tools
 __ai_codex_package: 'openai-codex'
