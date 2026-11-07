@@ -149,3 +149,17 @@ targets:
     platform: rocky-9
     package: texstudio
     vars_file: vars/RedHat-9.yml
+
+  # EL10 EPEL drift — QGIS is packaged in EPEL 9, not in EPEL 10 (#337).
+  - role: gis
+    platform: rocky-10
+    package: qgis
+    vars_file: vars/RedHat.yml
+
+  # AUR drift — the release package gplates 2.5.0 does not build against
+  # GDAL 3.13; the role installs gplates-git until it does (#337).
+  - role: gis
+    platform: archlinux
+    package: gplates
+    source: aur
+    vars_file: vars/Archlinux.yml

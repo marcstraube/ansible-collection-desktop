@@ -1,0 +1,7 @@
+---
+#
+# Debian Packages
+#
+
+__gis_qgis_package: 'qgis'
+__gis_gdal_package: 'gdal-bin'

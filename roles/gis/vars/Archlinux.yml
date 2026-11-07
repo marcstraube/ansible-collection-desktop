@@ -1,0 +1,17 @@
+---
+#
+# Arch Linux Packages
+#
+
+__gis_qgis_package: 'qgis'
+__gis_gdal_package: 'gdal'
+
+#
+# AUR Packages
+#
+
+# gplates-git: the release package (gplates 2.5.0) does not build against
+# GDAL 3.13 (CSLConstList in GdalRasterWriter.cc)
+__gis_aur_packages:
+  gplates:
+    - gplates-git
