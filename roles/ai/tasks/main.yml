@@ -120,6 +120,97 @@
   tags:
     - always
 
+# The dedicated variables render the same environment keys; setting both
+# would leave it to the order of the drop-in which one wins.
+- name: Main | Validate Ollama directory and address settings
+  ansible.builtin.assert:
+    that:
+      - not (ai_ollama_models_dir | length > 0 and 'OLLAMA_MODELS' in ai_ollama_environment)
+      - >-
+        not ((ai_ollama_host | length > 0 or ai_ollama_port | int != 11434)
+             and 'OLLAMA_HOST' in ai_ollama_environment)
+      - ai_ollama_models_dir | length == 0 or ai_ollama_models_dir is match('/')
+      - ai_ollama_port | int > 0
+    fail_msg: >-
+      Set the Ollama model directory either with ai_ollama_models_dir or with
+      OLLAMA_MODELS in ai_ollama_environment, and the listen address either
+      with ai_ollama_host/ai_ollama_port or with OLLAMA_HOST, not both.
+      ai_ollama_models_dir must be an absolute path and ai_ollama_port a port
+      number.
+  when:
+    - ai_enabled | bool
+    - ai_ollama_enabled | bool
+  tags:
+    - always
+
+- name: Main | Validate per-user config modes
+  ansible.builtin.assert:
+    that:
+      - >-
+        [ai_user_config_mode, ai_claude_desktop_user_config_mode,
+         ai_aider_user_config_mode, ai_opencode_user_config_mode,
+         ai_lmstudio_user_config_mode]
+        | reject('in', ['managed', 'merged', 'initial', 'disabled'])
+        | list | length == 0
+      - >-
+        ai_users | selectattr('mode', 'defined') | map(attribute='mode')
+        | reject('in', ['managed', 'merged', 'initial', 'disabled'])
+        | list | length == 0
+    fail_msg: >-
+      ai_user_config_mode, the ai_<tool>_user_config_mode defaults and every
+      ai_users mode must be 'managed', 'merged', 'initial' or 'disabled'
+  when: ai_enabled | bool
+  tags:
+    - always
+
+- name: Main | Validate OpenCode providers
+  ansible.builtin.assert:
+    that:
+      - ai_opencode_providers is mapping
+      - >-
+        ai_opencode_providers.values() | rejectattr('base_url', 'defined') | list | length == 0
+      - >-
+        ai_opencode_providers.values() | map(attribute='models', default=[])
+        | flatten | rejectattr('id', 'defined') | list | length == 0
+      # OpenCode drops or rejects a model limit without both values
+      - >-
+        __ai_opencode_models | selectattr('context', 'defined')
+        | rejectattr('output', 'defined') | list | length == 0
+        and __ai_opencode_models | selectattr('output', 'defined')
+        | rejectattr('context', 'defined') | list | length == 0
+      - ai_opencode_model | length == 0 or '/' in ai_opencode_model
+    fail_msg: >-
+      ai_opencode_providers must map provider names to entries with a
+      base_url and a list of models, each with an id and either both or none
+      of context and output; ai_opencode_model must be
+      '<provider>/<model id>'
+  vars:
+    __ai_opencode_models: >-
+      {{ ai_opencode_providers.values() | map(attribute='models', default=[])
+         | flatten }}
+  when:
+    - ai_enabled | bool
+    - ai_opencode_enabled | bool
+  tags:
+    - always
+
+- name: Main | Validate LM Studio models
+  ansible.builtin.assert:
+    that:
+      - >-
+        ai_lmstudio_models | rejectattr('repo', 'defined') | list | length == 0
+        and ai_lmstudio_models | rejectattr('file', 'defined') | list | length == 0
+      - ai_lmstudio_ollama_models | length == 0 or ai_ollama_enabled | bool
+    fail_msg: >-
+      Every ai_lmstudio_models entry needs a repo and a file;
+      ai_lmstudio_ollama_models needs ai_ollama_enabled, since the links
+      point into the local Ollama model directory
+  when:
+    - ai_enabled | bool
+    - ai_lmstudio_enabled | bool
+  tags:
+    - always
+
 # ai_whisper_backend takes one backend or a list of them. A string is also a
 # sequence in Jinja, so only a real list is kept as is; every other value is
 # wrapped and then fails the check below unless it is a valid backend name.
@@ -178,6 +269,32 @@
         - '{{ ansible_facts["os_family"] }}.yml'
       paths:
         - 'vars'
+  tags:
+    - always
+
+# The model directory the service actually uses, and the full environment of
+# the drop-in: ai_ollama_environment plus the keys of the dedicated
+# variables, which the validation above keeps from colliding.
+- name: Main | Build Ollama service settings
+  ansible.builtin.set_fact:
+    __ai_ollama_models_dir: >-
+      {{ ai_ollama_models_dir
+         if ai_ollama_models_dir | length > 0
+         else ai_ollama_environment.OLLAMA_MODELS
+         | default(__ai_ollama_default_models_dir) }}
+    __ai_ollama_service_environment: >-
+      {{ ai_ollama_environment
+         | combine({'OLLAMA_MODELS': ai_ollama_models_dir}
+                   if ai_ollama_models_dir | length > 0 else {})
+         | combine({'OLLAMA_HOST':
+                      (ai_ollama_host | default(__ai_ollama_default_host, true))
+                      ~ ':' ~ ai_ollama_port}
+                   if (ai_ollama_host | length > 0
+                       or ai_ollama_port | int != __ai_ollama_default_port)
+                   else {}) }}
+  when:
+    - ai_enabled | bool
+    - ai_ollama_enabled | bool
   tags:
     - always
 
@@ -240,7 +357,9 @@
         - ai:users
   when:
     - ai_enabled | bool
-    - ai_claude_desktop_enabled | bool or ai_aider_enabled | bool
+    - >-
+      ai_claude_desktop_enabled | bool or ai_aider_enabled | bool
+      or ai_opencode_enabled | bool or ai_lmstudio_enabled | bool
     - ai_users | length > 0
   tags:
     - ai

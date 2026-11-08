@@ -141,3 +141,195 @@
         mode: '0600'
         content: |
           model: "molecule/fixture"
+
+    # Claude Desktop merged fixture: a hand-edited entry with an extra key and
+    # an outdated Exec line. merged must reset Exec and keep the rest.
+    - name: Prepare | Create Claude Desktop merged test user (non-Arch)
+      ansible.builtin.user:
+        name: 'ai_merged_exist'
+        create_home: true
+        shell: /bin/bash
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Prepare | Ensure applications directory for the merged case (non-Arch)
+      ansible.builtin.file:
+        path: '/home/ai_merged_exist/.local/share/applications'
+        state: directory
+        owner: 'ai_merged_exist'
+        group: 'ai_merged_exist'
+        mode: '0755'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Prepare | Pre-seed a hand-edited entry for merged mode (non-Arch)
+      ansible.builtin.copy:
+        dest: '/home/ai_merged_exist/.local/share/applications/claude-desktop.desktop'
+        owner: 'ai_merged_exist'
+        group: 'ai_merged_exist'
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Name=Claude
+          Exec=/usr/bin/claude-desktop --outdated %U
+          X-Molecule-Fixture=kept
+          Terminal=false
+          Type=Application
+
+          [Desktop Action new-window]
+          Name=New Window
+          Exec=/usr/bin/claude-desktop --outdated
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    # Merged-mode fixtures for Aider, OpenCode and LM Studio: every file
+    # carries a key of the user's own that must survive.
+    - name: Prepare | Create merged-mode test users
+      ansible.builtin.user:
+        name: '{{ item }}'
+        create_home: true
+        shell: /bin/bash
+      loop:
+        # merged with an existing file (user keys kept)
+        - ai_merge_exist
+        # merged without a file (created with the role-owned keys)
+        - ai_merge_new
+        # OpenCode managed (whole file) and initial (kept)
+        - ai_merge_managed
+        - ai_merge_initial
+        # an opencode.jsonc of the user's own, which the role must not replace
+        - ai_merge_foreign
+        # no files at all, for the check-mode run in verify.yml
+        - ai_check_none
+      loop_control:
+        label: '{{ item }}'
+
+    - name: Prepare | Create config directories for the merged fixtures
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        owner: "{{ item.split('/')[2] }}"
+        group: "{{ item.split('/')[2] }}"
+        mode: '0755'
+      loop:
+        - '/home/ai_merge_exist/.config'
+        - '/home/ai_merge_exist/.config/opencode'
+        - '/home/ai_merge_exist/.lmstudio'
+        - '/home/ai_merge_exist/.lmstudio/.internal'
+        - '/home/ai_merge_initial/.config'
+        - '/home/ai_merge_initial/.config/opencode'
+        - '/home/ai_merge_foreign/.config'
+        - '/home/ai_merge_foreign/.config/opencode'
+        - '/home/ai_merge_exist/.lmstudio/models'
+        - '/home/ai_merge_exist/.lmstudio/models/molecule'
+
+    - name: Prepare | Pre-seed merged-mode config files
+      ansible.builtin.copy:
+        dest: '{{ item.path }}'
+        owner: "{{ item.path.split('/')[2] }}"
+        group: "{{ item.path.split('/')[2] }}"
+        mode: '0644'
+        content: '{{ item.content }}'
+      loop:
+        - path: '/home/ai_merge_exist/.aider.conf.yml'
+          content: |
+            # hand-written comment, dropped on the first write
+            model: "molecule/outdated"
+            dark-mode: true
+        - path: '/home/ai_merge_exist/.config/opencode/opencode.json'
+          content: |
+            {
+              "$schema": "https://opencode.ai/config.json",
+              "theme": "molecule",
+              "provider": {"outdated": {"npm": "x", "options": {}, "models": {}}}
+            }
+        - path: '/home/ai_merge_initial/.config/opencode/opencode.jsonc'
+          content: |
+            {"theme": "initial-fixture"}
+        - path: '/home/ai_merge_foreign/.config/opencode/opencode.jsonc'
+          content: |
+            // the user's own file
+            {"theme": "foreign-fixture"}
+        - path: '/home/ai_merge_exist/.lmstudio/settings.json'
+          content: |
+            {"downloadsFolder": "/old/models", "appTheme": "molecule"}
+        - path: '/home/ai_merge_exist/.lmstudio/.internal/http-server-config.json'
+          content: |
+            {"port": 1234, "networkInterface": "127.0.0.1", "cors": true}
+      loop_control:
+        label: '{{ item.path }}'
+
+    # A model repository moved to another disk and linked back by hand: the
+    # role must keep the link and download through it.
+    - name: Prepare | Create a model repository on another disk
+      ansible.builtin.file:
+        path: '/srv/hdd-models/Repo-GGUF'
+        state: directory
+        mode: '0755'
+
+    - name: Prepare | Link the moved model repository into LM Studio
+      ansible.builtin.file:
+        src: '/srv/hdd-models/Repo-GGUF'
+        dest: '/home/ai_merge_exist/.lmstudio/models/molecule/Repo-GGUF'
+        state: link
+        owner: 'ai_merge_exist'
+        group: 'ai_merge_exist'
+        follow: false
+
+    # Stand-in for downloads with the Hugging Face CLI, so the test needs no
+    # network: it takes 'download <repo> <file> --local-dir <dir>' like the
+    # real one and hands every other command to the packaged CLI (Arch).
+    - name: Prepare | Install a stand-in Hugging Face CLI
+      ansible.builtin.copy:
+        dest: '/usr/local/bin/hf'
+        mode: '0755'
+        content: |
+          #!/bin/sh
+          if [ "$1" = download ] && [ "$4" = --local-dir ]; then
+            mkdir -p "$5" && echo "$2/$3" > "$5/$3"
+            exit
+          fi
+          exec /usr/bin/hf "$@"
+
+    # A fake Ollama store with one vision model (model + projector layer) and
+    # one text model; the blobs are placeholders, only the links are tested.
+    - name: Prepare | Create Ollama store fixture directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        mode: '0755'
+      loop:
+        - '/srv/ollama-fixture/blobs'
+        - '/srv/ollama-fixture/manifests/registry.ollama.ai/library/molecule-text'
+        - '/srv/ollama-fixture/manifests/hf.co/molecule/Vision-Model-GGUF'
+
+    - name: Prepare | Create Ollama store fixture files
+      ansible.builtin.copy:
+        dest: '{{ item.path }}'
+        mode: '0644'
+        content: '{{ item.content }}'
+      loop:
+        - path: '/srv/ollama-fixture/blobs/sha256-aaaa'
+          content: 'text model'
+        - path: '/srv/ollama-fixture/blobs/sha256-bbbb'
+          content: 'vision model'
+        - path: '/srv/ollama-fixture/blobs/sha256-cccc'
+          content: 'projector'
+        - path: '/srv/ollama-fixture/manifests/registry.ollama.ai/library/molecule-text/latest'
+          content: >-
+            {"layers": [{"mediaType": "application/vnd.ollama.image.model",
+            "digest": "sha256:aaaa"}]}
+        - path: '/srv/ollama-fixture/manifests/hf.co/molecule/Vision-Model-GGUF/Q4_K_M'
+          content: >-
+            {"layers": [{"mediaType": "application/vnd.ollama.image.model",
+            "digest": "sha256:bbbb"}, {"mediaType": "application/vnd.ollama.image.projector",
+            "digest": "sha256:cccc"}, {"mediaType": "application/vnd.ollama.image.template",
+            "digest": "sha256:dddd"}]}
+      loop_control:
+        label: '{{ item.path }}'
+
+    # A link directory of a model that is no longer listed: the role removes it
+    - name: Prepare | Create a stale Ollama link directory
+      ansible.builtin.file:
+        path: '/home/ai_merge_exist/.lmstudio/models/ollama/dropped-latest'
+        state: directory
+        owner: 'ai_merge_exist'
+        group: 'ai_merge_exist'
+        mode: '0755'

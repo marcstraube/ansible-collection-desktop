@@ -1,5 +1,10 @@
 {{ ansible_managed | comment }}
+[Unit]
+# Wait for the file system of the model directory, and do not start without
+# it: Ollama would otherwise fill the empty directory below the mount point.
+RequiresMountsFor={{ __ai_ollama_models_dir }}
+
 [Service]
-{% for key, value in ai_ollama_environment | dictsort %}
+{% for key, value in __ai_ollama_service_environment | dictsort %}
 Environment="{{ key }}={{ value }}"
 {% endfor %}

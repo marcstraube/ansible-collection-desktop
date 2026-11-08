@@ -1,0 +1,146 @@
+---
+#
+# LM Studio Per-User Settings and Models
+#
+# LM Studio writes its settings files itself, so the role only ever merges
+# the keys whose variables are set (managed behaves like merged), and an
+# empty variable leaves LM Studio's own value alone.
+
+- name: Users LM Studio | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ ai_user.username }}'
+
+- name: Users LM Studio | Set user paths
+  ansible.builtin.set_fact:
+    __ai_user_home: "{{ ansible_facts['getent_passwd'][ai_user.username][4] }}"
+    __ai_lmstudio_dir: >-
+      {{ (ai_lmstudio_models_dir is match('/'))
+         | ternary(ai_lmstudio_models_dir,
+                   ansible_facts['getent_passwd'][ai_user.username][4] ~ '/'
+                   ~ (ai_lmstudio_models_dir | default(__ai_lmstudio_default_models_dir, true))) }}
+
+# LM Studio creates ~/.lmstudio on its first start; the role may need it
+# earlier, and it must belong to the user, never to root.
+- name: Users LM Studio | Ensure LM Studio directories exist
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: 'u+rwx'
+  loop: >-
+    {{ ([__ai_user_home ~ '/.lmstudio',
+         __ai_user_home ~ '/' ~ (__ai_lmstudio_server_config_file | dirname)]
+        + ([__ai_lmstudio_dir | dirname]
+           if __ai_lmstudio_dir is match(__ai_user_home ~ '/') else []))
+       | unique }}
+
+# BTRFS: a missing or empty model directory below the home becomes a nested
+# subvolume, which snapshots of the home skip. Homes are not rolled back, so
+# nesting is safe here. The probe uses the inode number (256 is the root of
+# every subvolume) and needs no btrfs-progs.
+- name: Users LM Studio | Probe model directory
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      path="$TARGET_PATH"
+      state=missing
+      if [ -L "$path" ] || { [ -e "$path" ] && [ ! -d "$path" ]; }; then
+        state=other
+      elif [ -d "$path" ]; then
+        if [ "$(stat -c %i "$path")" = 256 ]; then state=subvolume
+        elif [ -n "$(ls -A "$path")" ]; then state=populated
+        else state=empty
+        fi
+      fi
+      printf '%s\n%s\n%s\n' "$(stat -f -c %T "$(dirname "$path")")" \
+        "$(findmnt -n -o TARGET --target "$(dirname "$path")")" "$state"
+    executable: /bin/bash
+  environment:
+    TARGET_PATH: '{{ __ai_lmstudio_dir }}'
+  register: __ai_lmstudio_btrfs_probe
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Users LM Studio | Create model subvolume
+  ansible.builtin.shell:
+    cmd: |
+      set -o errexit
+      [ -d "$TARGET_PATH" ] && rmdir "$TARGET_PATH"
+      btrfs subvolume create "$TARGET_PATH" >/dev/null
+      chmod 0700 "$TARGET_PATH"
+    executable: /bin/bash
+  environment:
+    TARGET_PATH: '{{ __ai_lmstudio_dir }}'
+  changed_when: true
+  when:
+    - __ai_lmstudio_btrfs_probe.rc == 0
+    - __ai_lmstudio_btrfs_probe.stdout_lines[0] == 'btrfs'
+    - __ai_lmstudio_btrfs_probe.stdout_lines[1] != __ai_lmstudio_dir
+    - __ai_lmstudio_btrfs_probe.stdout_lines[2] in ['missing', 'empty']
+    - __ai_lmstudio_dir is match(__ai_user_home ~ '/')
+
+- name: Users LM Studio | Ensure model directory exists
+  ansible.builtin.file:
+    path: '{{ __ai_lmstudio_dir }}'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: 'u+rwx'
+
+- name: Users LM Studio | Stat settings files
+  ansible.builtin.stat:
+    path: '{{ __ai_user_home }}/{{ item }}'
+  loop:
+    - '{{ __ai_lmstudio_settings_file }}'
+    - '{{ __ai_lmstudio_server_config_file }}'
+  register: __ai_lmstudio_settings_stat
+
+# Settings: managed behaves like merged; initial only writes a missing file
+- name: Users LM Studio | Merge model directory into the settings
+  ansible.builtin.include_tasks:
+    file: users_merge_file.yml
+  vars:
+    __ai_merge_path: '{{ __ai_user_home }}/{{ __ai_lmstudio_settings_file }}'
+    __ai_merge_format: 'json'
+    __ai_merge_set:
+      downloadsFolder: '{{ __ai_lmstudio_dir }}'
+    __ai_merge_comment: ''
+    __ai_merge_owner: '{{ ai_user.username }}'
+  when:
+    - ai_lmstudio_models_dir | length > 0
+    - >-
+      __ai_user_mode != 'initial'
+      or not __ai_lmstudio_settings_stat.results[0].stat.exists
+
+- name: Users LM Studio | Merge server address into the server config
+  ansible.builtin.include_tasks:
+    file: users_merge_file.yml
+  vars:
+    __ai_merge_path: '{{ __ai_user_home }}/{{ __ai_lmstudio_server_config_file }}'
+    __ai_merge_format: 'json'
+    __ai_merge_set: >-
+      {{ ({'networkInterface': ai_lmstudio_host} if ai_lmstudio_host | length > 0 else {})
+         | combine({'port': ai_lmstudio_port | int}
+                   if ai_lmstudio_port | string | length > 0 else {}) }}
+    __ai_merge_comment: ''
+    __ai_merge_owner: '{{ ai_user.username }}'
+  when:
+    - ai_lmstudio_host | length > 0 or ai_lmstudio_port | string | length > 0
+    - >-
+      __ai_user_mode != 'initial'
+      or not __ai_lmstudio_settings_stat.results[1].stat.exists
+
+# Downloads: GGUF files from Hugging Face, in LM Studio's
+# <publisher>/<repo>/<file> layout
+- name: Users LM Studio | Include model downloads
+  ansible.builtin.include_tasks:
+    file: users_lmstudio_download.yml
+  when: ai_lmstudio_models | length > 0
+
+# Links: Ollama models shown in LM Studio without a second copy
+- name: Users LM Studio | Include Ollama model links
+  ansible.builtin.include_tasks:
+    file: users_lmstudio_links.yml

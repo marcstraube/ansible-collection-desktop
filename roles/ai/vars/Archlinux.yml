@@ -67,6 +67,9 @@ __ai_huggingface_cli_package: 'python-huggingface-hub'
 # Service names
 __ai_ollama_service: 'ollama.service'
 
+# Ollama model directory when ai_ollama_models_dir is empty
+__ai_ollama_default_models_dir: '/var/lib/ollama'
+
 # ComfyUI — AUR package (handles user, install dir, venv, PyTorch, systemd unit)
 # See roles/ai/tasks/comfyui-archlinux.yml for the install flow.
 # These are AUR PKGBUILD facts, not inventory-tunable.

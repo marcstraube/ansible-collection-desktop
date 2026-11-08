@@ -1,0 +1,108 @@
+---
+#
+# Merge Role-Owned Keys into a Per-User Config File
+#
+# Shared by every config that supports the merged mode. The file is read,
+# the role-owned keys are set, and the result is written back; every other
+# key stays as the user or the application left it. A key whose variable is
+# empty is never removed: the role cannot tell its own earlier value from
+# one the user set, so removal is left to the managed mode or to the user.
+#
+# Inputs:
+#   __ai_merge_path    — absolute path of the file
+#   __ai_merge_format  — 'json' or 'yaml'
+#   __ai_merge_set     — role-owned keys to set (dict)
+#   __ai_merge_comment — comment marker of the format ('#', '//'), or '' for
+#                        a format without comments: then no header
+#   __ai_merge_owner   — owning user (group of the same name)
+#
+# The header names the keys set in this run. It is rewritten on every run
+# and stripped again before parsing. A missing file is created with the
+# role-owned keys only. A file that cannot be parsed fails the run and stays
+# untouched.
+
+- name: Users Merge | Build header
+  ansible.builtin.set_fact:
+    __ai_merge_header: >-
+      {{ [__ai_merge_comment ~ ' Partly managed by Ansible (marcstraube.desktop.ai): '
+          ~ (__ai_merge_set.keys() | sort | join(', ')),
+          __ai_merge_comment ~ ' Ansible updates these keys on every run;'
+          ~ ' all other keys are yours.']
+         if __ai_merge_comment | length > 0 and __ai_merge_set | length > 0
+         else [] }}
+    __ai_merge_header_pattern: >-
+      {{ '^' ~ (__ai_merge_comment | regex_escape)
+         ~ ' (Partly managed by Ansible \(marcstraube\.desktop\.ai\):|Ansible updates these keys )' }}
+
+- name: Users Merge | Stat config file
+  ansible.builtin.stat:
+    path: '{{ __ai_merge_path }}'
+  register: __ai_merge_stat
+
+- name: Users Merge | Read config file
+  ansible.builtin.slurp:
+    src: '{{ __ai_merge_path }}'
+  register: __ai_merge_raw
+  when: __ai_merge_stat.stat.exists
+
+- name: Users Merge | Parse config file
+  when: __ai_merge_stat.stat.exists
+  block:
+    # One expression: a stripped body kept as a fact of its own would be
+    # turned into a dict by the templating whenever it looks like a literal.
+    - name: Users Merge | Parse config file content
+      ansible.builtin.set_fact:
+        __ai_merge_current: >-
+          {{ ({} if __ai_merge_body | trim | length == 0
+              else (__ai_merge_body | from_json if __ai_merge_format == 'json'
+                    else __ai_merge_body | from_yaml | default({}, true))) }}
+        __ai_merge_had_header: >-
+          {{ __ai_merge_comment | length > 0
+             and __ai_merge_lines | select('match', __ai_merge_header_pattern)
+                 | list | length > 0 }}
+      vars:
+        __ai_merge_lines: '{{ (__ai_merge_raw.content | b64decode).splitlines() }}'
+        __ai_merge_body: >-
+          {{ (__ai_merge_lines
+              if __ai_merge_comment | length == 0
+              else __ai_merge_lines | reject('match', __ai_merge_header_pattern))
+             | join(__ai_newline) }}
+
+    - name: Users Merge | Check config file structure
+      ansible.builtin.assert:
+        that:
+          - __ai_merge_current is mapping
+        quiet: true
+
+  rescue:
+    - name: Users Merge | Stop on an unreadable config file
+      ansible.builtin.fail:
+        msg: >-
+          {{ __ai_merge_path }} is not a valid {{ __ai_merge_format | upper }}
+          mapping, so its keys cannot be merged. The file was left
+          unchanged; fix it, or use another mode for user
+          {{ __ai_merge_owner }}.
+
+- name: Users Merge | Build merged config
+  ansible.builtin.set_fact:
+    __ai_merge_result: >-
+      {{ (__ai_merge_current if __ai_merge_stat.stat.exists else {})
+         | combine(__ai_merge_set) }}
+
+# Written when there is a key to set, or to drop the header once nothing is
+# set any more. 0600 and no diff: the files may carry API keys.
+- name: Users Merge | Write config file
+  ansible.builtin.copy:
+    content: >-
+      {{ (__ai_merge_header + [''] if __ai_merge_header | length > 0 else [])
+         | join(__ai_newline) }}{{ __ai_merge_result | to_nice_json(indent=2)
+         if __ai_merge_format == 'json'
+         else __ai_merge_result | to_nice_yaml(indent=2) | trim }}{{ __ai_newline }}
+    dest: '{{ __ai_merge_path }}'
+    owner: '{{ __ai_merge_owner }}'
+    group: '{{ __ai_merge_owner }}'
+    mode: '0600'
+  diff: false
+  when: >-
+    __ai_merge_set | length > 0
+    or (__ai_merge_stat.stat.exists and __ai_merge_had_header | bool)

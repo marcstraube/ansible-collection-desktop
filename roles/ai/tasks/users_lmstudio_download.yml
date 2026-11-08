@@ -1,0 +1,78 @@
+---
+#
+# LM Studio Model Downloads
+#
+# hf download --local-dir writes the plain files into LM Studio's layout,
+# without a second copy in the Hugging Face cache. The download runs as root
+# and hands the files to the user afterwards, like the other per-user tasks.
+
+- name: Users LM Studio Download | Find the Hugging Face CLI
+  ansible.builtin.shell:
+    cmd: 'command -v hf'
+  register: __ai_hf_version
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Users LM Studio Download | Require the Hugging Face CLI
+  ansible.builtin.assert:
+    that:
+      - __ai_hf_version.rc == 0
+    fail_msg: >-
+      ai_lmstudio_models needs the Hugging Face CLI (hf). Enable
+      ai_huggingface_cli_enabled (Arch Linux) or install it on this host.
+
+- name: Users LM Studio Download | Create model repository directories
+  ansible.builtin.file:
+    path: '{{ __ai_lmstudio_dir }}/{{ item }}'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: 'u+rwx'
+  loop: >-
+    {{ (ai_lmstudio_models | map(attribute='repo') | map('dirname') | list
+        + ai_lmstudio_models | map(attribute='repo') | list) | unique }}
+
+# no_log only while a token is set, so a failed public download still shows
+# its error; the token itself never reaches the output.
+- name: Users LM Studio Download | Download model files
+  ansible.builtin.command:
+    argv:
+      - hf
+      - download
+      - '{{ item.repo }}'
+      - '{{ item.file }}'
+      - --local-dir
+      - '{{ __ai_lmstudio_dir }}/{{ item.repo }}'
+    creates: '{{ __ai_lmstudio_dir }}/{{ item.repo }}/{{ item.file }}'
+  environment:
+    HF_TOKEN: '{{ ai_huggingface_token }}'
+    HF_HUB_DISABLE_PROGRESS_BARS: '1'
+  loop: '{{ ai_lmstudio_models }}'
+  loop_control:
+    label: '{{ item.repo }}/{{ item.file }}'
+  register: __ai_lmstudio_download
+  failed_when: false
+  no_log: '{{ ai_huggingface_token | length > 0 }}'
+
+- name: Users LM Studio Download | Report failed downloads
+  ansible.builtin.fail:
+    msg: >-
+      Downloading {{ item.item.repo }}/{{ item.item.file }} failed
+      (rc {{ item.rc }}). Gated or private repositories need
+      ai_huggingface_token.
+      {{ (item.stderr_lines | default([]))[-3:] | join(' ') }}
+  loop: '{{ __ai_lmstudio_download.results }}'
+  loop_control:
+    label: '{{ item.item.repo }}/{{ item.item.file }}'
+  when: item.rc | default(0) != 0
+
+# The download leaves its files and the local-dir metadata owned by root
+- name: Users LM Studio Download | Hand the downloaded files to the user
+  ansible.builtin.file:
+    path: '{{ __ai_lmstudio_dir }}/{{ item }}'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    recurse: true
+  loop: "{{ ai_lmstudio_models | map(attribute='repo') | unique }}"

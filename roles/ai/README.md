@@ -18,7 +18,9 @@ API keys are managed by the user via environment variables (not by this role).
 ## Requirements
 
 - ansible-core >= 2.19
-- `community.general` collection (npm, pipx, pacman modules)
+- `community.general` collection (npm, pipx, pacman, ini_file modules)
+- `ansible.posix` collection (fstab mount of the Ollama model subvolume)
+- `btrfs-progs` on BTRFS hosts (creating the model subvolumes)
 - `kewlfft.aur` collection (AUR packages on Arch Linux)
 - Node.js and npm (for CLI tools on non-Arch)
 - pipx (for Aider on non-Arch)
@@ -53,6 +55,8 @@ API keys are managed by the user via environment variables (not by this role).
 | `ai_aider_enabled`                 | `false` | Install Aider (pair programming)               |
 | `ai_aider_model`                   | `''`    | Default model in the per-user Aider config     |
 | `ai_aider_set_env`                 | `{}`    | Provider environment (Aider `set-env`)         |
+| `ai_opencode_providers`            | `{}`    | OpenAI-compatible model servers for OpenCode   |
+| `ai_opencode_model`                | `''`    | Default OpenCode model (`<provider>/<model>`)  |
 
 **Aider model server.** For each `ai_users` entry the role writes
 `~/.aider.conf.yml` (mode `0600`) with `model:` and the `set-env:` list when
@@ -71,6 +75,45 @@ ai_aider_set_env:
   LM_STUDIO_API_BASE: 'http://lmstudio.example.com:1234/v1'
   LM_STUDIO_API_KEY: 'dummy-api-key'  # pragma: allowlist secret
 ```
+
+**OpenCode model server.** For each `ai_users` entry the role writes the
+`provider` block and the default `model` into
+`~/.config/opencode/opencode.jsonc` (mode `0600`), a file of the role's own.
+OpenCode merges it with the user's `opencode.json` next to it, which the role
+never touches and which wins on a conflict. Every provider talks to an
+OpenAI-compatible server through `@ai-sdk/openai-compatible`; `context` and
+`output` become the model's `limit` and are set together or not at all, as
+OpenCode rejects a limit with only one of them. `api_key` is only needed when
+LM Studio runs with authentication:
+
+```yaml
+ai_opencode_providers:
+  ollama:
+    name: 'Ollama'
+    base_url: 'http://localhost:11434/v1'
+    models:
+      - id: 'qwen3-coder:30b'
+        name: 'Qwen3-Coder 30B'
+        context: 32768
+        output: 8192
+  lmstudio:
+    name: 'LM Studio'
+    base_url: 'http://lmstudio.example.com:1234/v1'
+    api_key: '{{ lmstudio_api_key }}'
+    models:
+      - id: 'qwen3-coder-30b-a3b-instruct'
+ai_opencode_model: 'ollama/qwen3-coder:30b'
+```
+
+- **Model requirements:** OpenCode is an agent: the model has to call tools
+  reliably and needs a context window of at least 32k tokens. The context
+  length is set on the server — `OLLAMA_CONTEXT_LENGTH` in
+  `ai_ollama_environment`, or the context length LM Studio loads the model
+  with. Aider also works with weaker models and without tool calling.
+- **Model IDs** differ by server: Ollama uses the full model name (for
+  example `hf.co/<user>/<repo>:<quant>`), LM Studio its model key, which
+  `curl <server>/v1/models` lists. Models linked from Ollama (see below)
+  appear in LM Studio without the `ollama/` directory prefix.
 
 ### Desktop Applications
 
@@ -109,10 +152,19 @@ user out. The role's per-user entry pins the backend explicitly:
 | `ai_ollama_service_enabled`  | `true`  | Enable Ollama systemd service                                   |
 | `ai_ollama_backend`          | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only) |
 | `ai_ollama_environment`      | `{}`    | Environment variables for the Ollama server (systemd drop-in)   |
+| `ai_ollama_models_dir`       | `''`    | Model directory (empty: package default)                        |
+| `ai_ollama_host`             | `''`    | Listen address (empty: `127.0.0.1`)                             |
+| `ai_ollama_port`             | `11434` | Listen port                                                     |
 | `ai_whisper_enabled`         | `false` | Install whisper.cpp speech recognition (Arch only)              |
 | `ai_whisper_backend`         | `'cpu'` | Backend or list of: `rocm`, `vulkan`, `cuda`, `cpu` (Arch only) |
 | `ai_huggingface_cli_enabled` | `false` | Install the Hugging Face CLI `hf` (Arch only)                   |
 | `ai_lmstudio_enabled`        | `false` | Install LM Studio (Arch only)                                   |
+| `ai_lmstudio_models_dir`     | `''`    | Model directory per user (empty: LM Studio's own setting)       |
+| `ai_lmstudio_host`           | `''`    | Server address per user (empty: LM Studio's own setting)        |
+| `ai_lmstudio_port`           | `''`    | Server port per user (empty: LM Studio's own setting)           |
+| `ai_lmstudio_models`         | `[]`    | GGUF files to download per user (`repo`, `file`)                |
+| `ai_huggingface_token`       | `''`    | Token for gated or private Hugging Face repositories            |
+| `ai_lmstudio_ollama_models`  | `[]`    | Ollama models to link into LM Studio                            |
 
 **Ollama backend** (`ai_ollama_backend`):
 
@@ -141,7 +193,7 @@ ai_ollama_backend: ['rocm', 'vulkan']   # several backends side by side
 Ollama reads its server settings from environment variables. The role renders
 each entry as an `Environment=` line into the systemd drop-in
 `/etc/systemd/system/ollama.service.d/ansible.conf` and restarts Ollama when
-the drop-in changes; an empty mapping removes the drop-in. Both the Arch
+the drop-in changes. Both the Arch
 package and the upstream install script ship `ollama.service`, so this works
 on every platform.
 
@@ -150,10 +202,122 @@ ai_ollama_environment:
   OLLAMA_CONTEXT_LENGTH: '32768'   # default context window
   OLLAMA_FLASH_ATTENTION: '1'      # flash attention
   OLLAMA_KEEP_ALIVE: '30m'         # keep models loaded
-  OLLAMA_HOST: '127.0.0.1:11434'   # listen address
 ```
 
 See the [Ollama FAQ](https://docs.ollama.com/faq) for all settings.
+
+**Ollama model directory and address** (`ai_ollama_models_dir`,
+`ai_ollama_host`, `ai_ollama_port`):
+
+- `ai_ollama_models_dir` creates the directory for the `ollama` service user
+  and renders `OLLAMA_MODELS` into the same drop-in. Empty keeps the package
+  default: `/var/lib/ollama` on Arch Linux, `/usr/share/ollama/.ollama/models`
+  with the install script.
+- `ai_ollama_host` and `ai_ollama_port` render `OLLAMA_HOST` when either
+  differs from `127.0.0.1:11434`. `0.0.0.0` serves the whole network; a
+  changed port needs the matching firewalld service or port.
+- The drop-in also sets `RequiresMountsFor=` on the model directory: Ollama
+  waits for its file system and does not start without it, instead of
+  filling the empty directory below the mount point. This matters for a
+  directory on a second disk mounted with `nofail` or on demand.
+- Setting `OLLAMA_MODELS` or `OLLAMA_HOST` in `ai_ollama_environment` as well
+  fails the run. Inventories that set them only there keep working.
+- `ai_ollama_models` reports a change only when a model is new or its
+  manifest changed: the role compares the model ID `ollama list` shows
+  before and after each pull.
+
+**Model directories on BTRFS.** Models are large and can be downloaded
+again, so the role keeps them out of snapshots. A model directory on BTRFS
+that does not exist yet or is empty becomes its own subvolume:
+
+- **Ollama**, on the root filesystem: a top-level subvolume
+  (`<root subvolume base>/<path>`, e.g. `@/var/lib/ollama`) mounted through
+  `/etc/fstab` with the options of the root filesystem plus
+  `nosuid,nodev,noexec`. A subvolume nested below `/` would live inside the
+  root snapshot of a snapper rollback layout and stay behind on
+  `snapper rollback`. On any other mount (`/srv`, `/home`) the subvolume is
+  nested.
+- **LM Studio**, below the user's home: a nested subvolume with mode `0700`,
+  which snapshots of the home skip.
+- No NoCOW: model files are written once and keep checksums and compression.
+
+**Disk speed.** A hard disk works for the model directories: a model is read
+once when it loads, and inference runs from RAM or VRAM. A 20 GB model loads
+in about two minutes from a hard disk, against seconds from an NVMe SSD.
+Ollama unloads a model after five idle minutes (`OLLAMA_KEEP_ALIVE`), so the
+next prompt waits for the load again; layers kept in RAM through mmap are
+read from the disk again whenever memory runs short. Each tool has one model
+directory. To keep only some LM Studio models on another disk, move their
+repository directory (`<models dir>/<publisher>/<repo>`) there and link it
+back; the role downloads through the link and keeps it. Ollama's blobs are
+shared between models and cannot be split this way.
+
+A directory that already holds models stays as it is; the role never moves
+data. To move it onto a subvolume, stop the application (`systemctl stop
+ollama`, quit LM Studio), move the directory aside, run the role (or create
+the subvolume yourself), move the contents back and remove the old
+directory. On Arch Linux `/var/lib/ollama` is also the home of the service
+user and holds its key (`.ollama/id_ed25519`) after the first start — move it
+along with the models.
+
+**LM Studio settings** (`ai_lmstudio_models_dir`, `ai_lmstudio_host`,
+`ai_lmstudio_port`): LM Studio writes its settings files itself, so the role
+only sets the keys whose variables are set and leaves everything else —
+including a value set in the app while the variable is empty — alone:
+
+| File                                            | Keys                        |
+| ----------------------------------------------- | --------------------------- |
+| `~/.lmstudio/settings.json`                     | `downloadsFolder`           |
+| `~/.lmstudio/.internal/http-server-config.json` | `networkInterface`, `port`  |
+
+`ai_lmstudio_models_dir` is an absolute path or relative to the home. Changes
+apply on the next start of LM Studio. `lms server start` without `--bind`
+stores `127.0.0.1` as `networkInterface`, overriding the role's value until
+the next run; start the server with `--bind <address>` instead.
+
+**LM Studio models** (`ai_lmstudio_models`): each entry names a GGUF `file`
+in a Hugging Face `repo`. The role downloads it per user with
+`hf download --local-dir` into `<models dir>/<publisher>/<repo>/<file>`, the
+layout LM Studio expects, and skips files that are present. It needs the
+Hugging Face CLI (`ai_huggingface_cli_enabled`). Public repositories need no
+token; gated or private ones need `ai_huggingface_token`, which is passed to
+the download only and never written to disk.
+
+```yaml
+ai_lmstudio_models:
+  - repo: 'lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF'
+    file: 'Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf'
+```
+
+**Share Ollama models with LM Studio** (`ai_lmstudio_ollama_models`): the
+model directories stay separate by default. Every listed Ollama model is
+linked into `<models dir>/ollama/<model>-<tag>/` — the GGUF model layer as
+`<model>-<tag>.gguf` and, for vision models, the projector as
+`mmproj-<model>-<tag>.gguf`. Ollama stores its blobs with mode `0644`, so
+every LM Studio user can read them. The `ollama/` directory follows the list:
+links of removed entries are deleted, and links move when a newer pull
+replaces a blob. Ollama's own files are never changed.
+
+```yaml
+ai_ollama_models:
+  - 'hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M'
+ai_lmstudio_ollama_models:
+  - 'hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M'
+```
+
+- **Trade-offs:** one copy on disk and one download, against links that
+  depend on the Ollama model staying installed — removing it from Ollama
+  breaks the model in LM Studio.
+- **Source per use:** pull shared models from Hugging Face as
+  `hf.co/<user>/<gguf-repo>:<quant>`; Ollama stores the repository's GGUF
+  files unchanged, the same files LM Studio would download. Models used only
+  by Ollama come from Ollama's own library: library models carry Ollama's
+  model-specific prompt rendering and output parsing, while `hf.co` models
+  use the chat template embedded in the GGUF, so options such as `think` may
+  be unavailable.
+- **Compatibility:** library models in Ollama's own format cannot be loaded
+  by LM Studio. `ollama ps` shows the runner of a loaded model; `llamacpp`
+  indicates a standard GGUF.
 
 **whisper.cpp** (`ai_whisper_enabled`, `ai_whisper_backend`):
 
@@ -242,23 +406,34 @@ Gated models need an access token: `hf auth login` stores it per user in
 
 ### User Configuration
 
-The role copies the packaged Claude Desktop entry into a user's
-`~/.local/share/applications/`, appends `--password-store=<backend>` to every
-`Exec=` line and refreshes the desktop database — skipping that last step
-breaks the `claude://` sign-in redirect. With Aider enabled it writes
-`~/.aider.conf.yml` from `ai_aider_model` and `ai_aider_set_env`.
+For each `ai_users` entry the role writes the per-user configs of the
+enabled tools:
 
-| Variable               | Default     | Description                                      |
-| ---------------------- | ----------- | ------------------------------------------------ |
-| `ai_users`             | `[]`        | Users to configure (Claude Desktop, Aider)       |
-| `ai_user_config_mode`  | `'initial'` | Default mode: `managed` / `initial` / `disabled` |
+- **Claude Desktop:** copies the packaged entry into
+  `~/.local/share/applications/`, appends `--password-store=<backend>` to
+  every `Exec=` line and refreshes the desktop database — skipping that last
+  step breaks the `claude://` sign-in redirect.
+- **Aider:** `~/.aider.conf.yml` from `ai_aider_model` and `ai_aider_set_env`.
+- **OpenCode:** `~/.config/opencode/opencode.jsonc` from
+  `ai_opencode_providers` and `ai_opencode_model`.
+- **LM Studio:** the settings, downloads and Ollama links described under
+  [Local AI / Inference](#local-ai--inference).
+
+| Variable                             | Default                       | Description                          |
+| ------------------------------------ | ----------------------------- | ------------------------------------ |
+| `ai_users`                           | `[]`                          | Users to configure                   |
+| `ai_user_config_mode`                | `'initial'`                   | Fallback mode for the tool defaults  |
+| `ai_claude_desktop_user_config_mode` | `'{{ ai_user_config_mode }}'` | Default mode of the Claude entry     |
+| `ai_aider_user_config_mode`          | `'{{ ai_user_config_mode }}'` | Default mode of the Aider config     |
+| `ai_opencode_user_config_mode`       | `'managed'`                   | Default mode of the OpenCode config  |
+| `ai_lmstudio_user_config_mode`       | `'merged'`                    | Default mode of the LM Studio files  |
 
 Each user entry supports:
 
 | Key              | Required | Description                                             |
 | ---------------- | -------- | ------------------------------------------------------- |
 | `username`       | yes      | System username                                         |
-| `mode`           | no       | Per-user override of the global config mode             |
+| `mode`           | no       | Mode for every tool of this user (overrides defaults)   |
 | `password_store` | no       | Per-user override of `ai_claude_desktop_password_store` |
 
 Left empty, `ai_users` derives from `users_list` entries carrying an `ai`
@@ -277,17 +452,58 @@ users_list:
 
 Mode semantics:
 
-| Mode       | First run                     | Subsequent runs                            |
-| ---------- | ----------------------------- | ------------------------------------------ |
-| `managed`  | deploy                        | overwrite (always reconcile)               |
-| `initial`  | deploy if the file is absent  | leave the user's own edits alone           |
-| `disabled` | skip                          | skip                                       |
+| Mode       | First run                          | Subsequent runs                                  |
+| ---------- | ---------------------------------- | ------------------------------------------------ |
+| `managed`  | deploy the whole file              | overwrite the whole file (always reconcile)      |
+| `merged`   | deploy the role-owned keys         | set the role-owned keys, keep all others         |
+| `initial`  | deploy if the file is absent       | leave the user's own edits alone                 |
+| `disabled` | skip                               | skip                                             |
 
-`initial` gates on the file itself, not on whether the account was created in
-the same run, so a tag-scoped run still deploys. In `managed` mode the Aider
-config is removed when `ai_aider_model` and `ai_aider_set_env` are both empty.
-Nothing is written to any home directory while `ai_users` is empty or neither
-Claude Desktop nor Aider is enabled.
+A user's `mode` applies to every tool; without it each tool uses its own
+default. `initial` gates on the file itself, not on whether the account was
+created in the same run, so a tag-scoped run still deploys. In `managed` mode
+the Aider config and the role's OpenCode file are removed when none of their
+variables is set. Nothing is written to any home directory while `ai_users`
+is empty or none of the tools is enabled.
+
+**Choosing a mode.** A file of the role's own is always the cleaner way:
+`managed` then reconciles it completely, including removals, and the user's
+settings live in a file the role never touches. OpenCode supports this, so
+the role keeps its keys in `opencode.jsonc` and `merged` behaves like
+`managed` there. `merged` is for files the application reads only in one
+place, where the role still has to add or update its keys — the Aider
+config, the Claude Desktop entry and LM Studio's settings.
+
+**Role-owned keys in `merged` mode:**
+
+| Config                         | Keys                                          |
+| ------------------------------ | --------------------------------------------- |
+| `~/.aider.conf.yml`            | `model`, `set-env`                            |
+| Claude Desktop entry           | `Exec` of every group                         |
+| LM Studio settings (see above) | `downloadsFolder`, `networkInterface`, `port` |
+
+- A key is set while its variable is set, and written as a whole: an entry
+  dropped from `ai_aider_set_env` also leaves `set-env`.
+- `merged` never removes a key. The role cannot tell a value it wrote from
+  one the user set, so an empty variable leaves the key as it is. To remove
+  a value the role wrote, delete it by hand or run the user once in
+  `managed` mode.
+- The Aider config and the Claude Desktop entry carry a header naming the
+  keys the role sets; in the Aider config it disappears once none of them is
+  set:
+
+  ```yaml
+  # Partly managed by Ansible (marcstraube.desktop.ai): model, set-env
+  # Ansible updates these keys on every run; all other keys are yours.
+  ```
+
+- Writing a file back drops the comments of the user's own in
+  `~/.aider.conf.yml` and may reorder keys on the first run. A file the role
+  cannot parse fails the run and stays unchanged.
+- An `opencode.jsonc` the role did not write (it lacks the role's marker
+  line) is never replaced or removed: the run fails and names the file. Move
+  its settings to `opencode.json`, or use `initial` or `disabled` for that
+  user.
 
 ## Tags
 
@@ -298,7 +514,7 @@ Claude Desktop nor Aider is enabled.
 | `ai:desktop` | Desktop application installation                                  |
 | `ai:local`   | Local AI tools (Ollama, whisper.cpp, Hugging Face CLI, LM Studio) |
 | `ai:comfyui` | ComfyUI installation                                              |
-| `ai:users`   | Per-user Claude Desktop entry and Aider config                    |
+| `ai:users`   | Per-user Claude Desktop, Aider, OpenCode and LM Studio config     |
 
 ## Example Playbook
 
