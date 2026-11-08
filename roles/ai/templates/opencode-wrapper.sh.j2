@@ -1,0 +1,10 @@
+#!/bin/sh
+{{ ansible_managed | comment }}
+# OpenCode unpacks its native terminal library into Bun's temporary directory
+# and loads it from there, which fails on a /tmp mounted noexec. The runtime
+# directory of the session is executable and private to the user.
+if [ -z "${BUN_TMPDIR:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
+  BUN_TMPDIR="$XDG_RUNTIME_DIR"
+  export BUN_TMPDIR
+fi
+exec {{ __ai_opencode_binary }} "$@"

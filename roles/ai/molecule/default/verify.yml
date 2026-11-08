@@ -9,6 +9,102 @@
         that: true
         fail_msg: 'AI role did not complete'
 
+# OpenCode wrapper (Arch): the native library lands in the runtime directory,
+# a BUN_TMPDIR of the caller wins, and disabling OpenCode removes the wrapper.
+# Every converge play has OpenCode disabled, as other systems install it with
+# npm, so the wrapper tasks run on their own.
+- name: Verify OpenCode wrapper
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Include ai role OpenCode wrapper tasks  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: cli_opencode_wrapper.yml
+      vars:
+        ai_opencode_enabled: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat OpenCode wrapper
+      ansible.builtin.stat:
+        path: '/usr/local/bin/opencode'
+      register: __ai_verify_oc_wrapper
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert OpenCode wrapper
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_oc_wrapper.stat.exists
+          - __ai_verify_oc_wrapper.stat.mode == '0755'
+          - __ai_verify_oc_wrapper.stat.pw_name == 'root'
+        fail_msg: '/usr/local/bin/opencode is missing or has the wrong mode'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Create runtime directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        mode: '0700'
+      loop:
+        - '/run/ai-verify-runtime'
+        - '/run/ai-verify-own'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Run OpenCode through the wrapper
+      ansible.builtin.command:
+        argv: '{{ item }}'
+      loop:
+        - ['env', '-u', 'BUN_TMPDIR', '-u', 'TMPDIR',
+           'XDG_RUNTIME_DIR=/run/ai-verify-runtime', '/usr/local/bin/opencode', '--version']
+        - ['env', '-u', 'TMPDIR', 'BUN_TMPDIR=/run/ai-verify-own',
+           'XDG_RUNTIME_DIR=/run/ai-verify-runtime', '/usr/local/bin/opencode', '--version']
+      changed_when: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Find unpacked native libraries
+      ansible.builtin.find:
+        paths: '{{ item }}'
+        patterns: '.bun-*.so'
+        hidden: true
+      loop:
+        - '/run/ai-verify-runtime'
+        - '/run/ai-verify-own'
+      register: __ai_verify_oc_libs
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Both runs unpack the same library; the second one into BUN_TMPDIR only,
+    # so the runtime directory holds exactly the file of the first run.
+    - name: Verify | Assert the native library location
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_oc_libs.results[0].matched == 1
+          - __ai_verify_oc_libs.results[1].matched == 1
+        fail_msg: 'OpenCode did not unpack its native library where the wrapper points'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Include ai role OpenCode wrapper tasks with OpenCode disabled  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: cli_opencode_wrapper.yml
+      vars:
+        ai_opencode_enabled: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat OpenCode wrapper after disabling OpenCode
+      ansible.builtin.stat:
+        path: '/usr/local/bin/opencode'
+      register: __ai_verify_oc_wrapper_off
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert OpenCode wrapper removed
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_oc_wrapper_off.stat.exists
+        fail_msg: '/usr/local/bin/opencode was kept with OpenCode disabled'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Hugging Face CLI: installed on Arch only; the toggle is a no-op on Debian and EL
 - name: Verify Hugging Face CLI
   hosts: all
   gather_facts: true

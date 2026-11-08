@@ -114,6 +114,17 @@ ai_opencode_model: 'ollama/qwen3-coder:30b'
   example `hf.co/<user>/<repo>:<quant>`), LM Studio its model key, which
   `curl <server>/v1/models` lists. Models linked from Ollama (see below)
   appear in LM Studio without the `ollama/` directory prefix.
+- **Package:** on Arch Linux OpenCode comes from the `extra` repository
+  (`opencode`). It conflicts with the former AUR package `opencode-bin`,
+  which the role does not remove: run `pacman -Rns opencode-bin` first.
+- **`/tmp` mounted `noexec`:** OpenCode unpacks its native terminal library
+  into a temporary directory and loads it from there. On Arch Linux the role
+  installs a wrapper `/usr/local/bin/opencode` that points `BUN_TMPDIR` at
+  `$XDG_RUNTIME_DIR` unless it is already set, then starts `/usr/bin/opencode`;
+  the wrapper goes away when `ai_opencode_enabled` is `false`. On other
+  systems npm installs OpenCode into `/usr/local/bin` itself, so there is no
+  wrapper: set `BUN_TMPDIR` to an executable directory yourself, for example
+  `BUN_TMPDIR=$XDG_RUNTIME_DIR opencode`.
 
 ### Desktop Applications
 

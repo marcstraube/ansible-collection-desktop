@@ -9,8 +9,6 @@ __ai_aur_packages:
     - claude-code
   antigravity_cli:
     - antigravity-cli
-  opencode:
-    - opencode-bin
   opencode_claude_auth:
     - opencode-claude-auth
   opencode_gemini_auth:
@@ -28,6 +26,7 @@ __ai_aur_packages:
 
 # CLI Tools
 __ai_codex_package: 'openai-codex'
+__ai_opencode_package: 'opencode'
 
 # TODO(4.0): remove
 # Superseded by the claude-desktop package, removed when Claude Desktop is
