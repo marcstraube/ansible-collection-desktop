@@ -15,6 +15,18 @@ heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
+### `ai` — OpenCode from the official repository on Arch Linux
+
+On Arch Linux the role installs OpenCode from the `extra` repository
+(`opencode`, version 2) instead of the AUR package `opencode-bin`, which
+stayed on version 1 and no longer satisfies `opencode-claude-auth`. The two
+packages conflict and the role does not remove packages, so remove the old
+one on every host with `ai_opencode_enabled` before the next run:
+
+```bash
+sudo pacman -Rns opencode-bin
+```
+
 ## v3.0.0 - 2026-10-20
 
 ### `development` — languages and CLI tooling moved to `marcstraube.common`

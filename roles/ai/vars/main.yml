@@ -12,6 +12,54 @@ __ai_comfyui_manager_repo_url: 'https://github.com/ltdrdata/ComfyUI-Manager.git'
 # systemd drop-in directory for the Ollama service (environment settings)
 __ai_ollama_dropin_dir: '/etc/systemd/system/ollama.service.d'
 
+# Ollama service account (created by the package or the install script)
+__ai_ollama_user: 'ollama'
+__ai_ollama_group: 'ollama'
+
+# Ollama's built-in listen address and port; OLLAMA_HOST is only rendered
+# when ai_ollama_host or ai_ollama_port differs from them
+__ai_ollama_default_host: '127.0.0.1'
+__ai_ollama_default_port: 11434
+
+# Registry and namespace Ollama assumes for a model name without them
+__ai_ollama_default_registry: 'registry.ollama.ai'
+__ai_ollama_default_namespace: 'library'
+
+# Manifest layers linked into LM Studio: the GGUF model and the optional
+# vision projector
+__ai_ollama_model_media_type: 'application/vnd.ollama.image.model'
+__ai_ollama_projector_media_type: 'application/vnd.ollama.image.projector'
+
+# LM Studio per-user paths, relative to the home
+__ai_lmstudio_default_models_dir: '.lmstudio/models'
+__ai_lmstudio_settings_file: '.lmstudio/settings.json'
+__ai_lmstudio_server_config_file: '.lmstudio/.internal/http-server-config.json'
+
+# Subdirectory of the LM Studio model directory that holds the Ollama links
+__ai_lmstudio_ollama_subdir: 'ollama'
+
+# OpenCode per-user config of the role, relative to the home. OpenCode merges
+# it with the user's opencode.json next to it.
+__ai_opencode_config_file: '.config/opencode/opencode.jsonc'
+
+# Line that marks the file as the role's; a file without it is the user's
+__ai_opencode_marker: '// Managed by Ansible (marcstraube.desktop.ai); put your own settings in opencode.json'
+
+# OpenCode wrapper on Arch Linux and the packaged binary it starts
+__ai_opencode_wrapper: '/usr/local/bin/opencode'
+__ai_opencode_binary: '/usr/bin/opencode'
+
+# A real line break for joining lines in templates: '\n' inside a Jinja
+# string in a YAML block scalar stays a backslash and an n
+__ai_newline: "\n"
+
+# Valid per-user config modes
+__ai_user_config_modes:
+  - 'managed'
+  - 'merged'
+  - 'initial'
+  - 'disabled'
+
 # Desktop entry shipped by the claude-desktop package. The per-user override
 # in ~/.local/share/applications/ is a copy of this file with the credential
 # backend appended to every Exec= line.

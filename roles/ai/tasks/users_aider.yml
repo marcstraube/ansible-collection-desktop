@@ -14,13 +14,15 @@
   register: __ai_aider_conf_stat
 
 # Mode semantics:
-#   managed  — reconcile the config on every run, remove it when there is
-#              nothing to configure
+#   managed  — reconcile the whole config on every run, remove it when there
+#              is nothing to configure
+#   merged   — set only 'model' and 'set-env' while their variables are set,
+#              keep every other key and never remove one
 #   initial  — write it only when absent, so a hand-edited config survives
 #   disabled — never write (gated in users.yml)
 - name: Users Aider | Build deploy decision
   ansible.builtin.set_fact:
-    __ai_aider_managed: "{{ (ai_user.mode | default(ai_user_config_mode)) == 'managed' }}"
+    __ai_aider_managed: "{{ __ai_user_mode == 'managed' }}"
     __ai_aider_configured: >-
       {{ ai_aider_model | length > 0 or ai_aider_set_env | length > 0 }}
 
@@ -34,6 +36,7 @@
     mode: '0600'
   diff: false
   when:
+    - __ai_user_mode != 'merged'
     - __ai_aider_configured | bool
     - __ai_aider_managed | bool or not __ai_aider_conf_stat.stat.exists
 
@@ -44,3 +47,18 @@
   when:
     - __ai_aider_managed | bool
     - not __ai_aider_configured | bool
+
+- name: Users Aider | Merge role-owned keys into the Aider config
+  ansible.builtin.include_tasks:
+    file: users_merge_file.yml
+  vars:
+    __ai_merge_path: '{{ __ai_user_home }}/.aider.conf.yml'
+    __ai_merge_format: 'yaml'
+    __ai_merge_set: >-
+      {{ ({'model': ai_aider_model} if ai_aider_model | length > 0 else {})
+         | combine({'set-env': ai_aider_set_env | dictsort
+                                | map('join', '=') | list}
+                   if ai_aider_set_env | length > 0 else {}) }}
+    __ai_merge_comment: '#'
+    __ai_merge_owner: '{{ ai_user.username }}'
+  when: __ai_user_mode == 'merged'

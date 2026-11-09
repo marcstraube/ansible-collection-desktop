@@ -61,7 +61,36 @@
     - ansible_facts['os_family'] != 'Archlinux'
     - ai_ollama_enabled | bool
 
-# Ollama reads its server settings from the environment of the service.
+# On BTRFS the model directory becomes its own subvolume while it is still
+# missing or empty, so its large, re-downloadable files stay out of the
+# snapshots. Runs after the installation, which creates the service user.
+- name: Local | Include BTRFS tasks for the Ollama model directory
+  ansible.builtin.include_tasks:
+    file: btrfs.yml
+    apply:
+      tags:
+        - ai
+        - ai:local
+  when:
+    - ai_ollama_enabled | bool
+
+# A custom model directory must exist for the service user before the
+# service starts with OLLAMA_MODELS pointing at it.
+- name: Local | Create Ollama model directory
+  become: true
+  ansible.builtin.file:
+    path: '{{ ai_ollama_models_dir }}'
+    state: directory
+    owner: '{{ __ai_ollama_user }}'
+    group: '{{ __ai_ollama_group }}'
+    mode: '0755'
+  when:
+    - ai_ollama_enabled | bool
+    - ai_ollama_models_dir | length > 0
+
+# Ollama reads its server settings from the environment of the service. The
+# drop-in also ties the service to the mount of the model directory, which
+# can be a subvolume or a disk of its own.
 - name: Local | Create Ollama service drop-in directory
   become: true
   ansible.builtin.file:
@@ -72,9 +101,8 @@
     mode: '0755'
   when:
     - ai_ollama_enabled | bool
-    - ai_ollama_environment | length > 0
 
-- name: Local | Deploy Ollama environment drop-in
+- name: Local | Deploy Ollama service drop-in
   become: true
   ansible.builtin.template:
     src: ollama-environment.conf.j2
@@ -84,17 +112,6 @@
     mode: '0644'
   when:
     - ai_ollama_enabled | bool
-    - ai_ollama_environment | length > 0
-  notify: Restart Ollama
-
-- name: Local | Remove Ollama environment drop-in
-  become: true
-  ansible.builtin.file:
-    path: '{{ __ai_ollama_dropin_dir }}/ansible.conf'
-    state: absent
-  when:
-    - ai_ollama_enabled | bool
-    - ai_ollama_environment | length == 0
   notify: Restart Ollama
 
 - name: Local | Manage Ollama service
@@ -107,15 +124,37 @@
   when:
     - ai_ollama_enabled | bool
 
+# A changed directory or address must be live before the pull, which talks to
+# the running server.
+- name: Local | Apply pending Ollama restart
+  ansible.builtin.meta: flush_handlers
+
+# ollama pull prints its progress and rewrites the manifest even when nothing
+# is downloaded, so its output says nothing about a change. The model ID that
+# 'ollama list' shows is the manifest digest: compare it before and after.
 - name: Local | Pull Ollama models
-  ansible.builtin.command:
-    cmd: 'ollama pull {{ item }}'
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      model_id() {
+        ollama list | awk -v name="$1" 'NR > 1 && $1 == name { print $2 }'
+      }
+      before=$(model_id "$NAME")
+      ollama pull "$MODEL" >/dev/null
+      after=$(model_id "$NAME")
+      [ -n "$after" ] || { echo "model $NAME missing after the pull" >&2; exit 1; }
+      [ "$before" = "$after" ] || echo 'updated'
+    executable: /bin/bash
+  environment:
+    MODEL: '{{ item }}'
+    # 'ollama list' shows every name with its tag
+    NAME: "{{ item if (item | regex_search(':[^/]*$')) else item ~ ':latest' }}"
   loop: '{{ ai_ollama_models }}'
+  register: __ai_ollama_pull
+  changed_when: "'updated' in __ai_ollama_pull.stdout"
   when:
     - ai_ollama_enabled | bool
     - ai_ollama_models | length > 0
-  register: __ai_ollama_pull
-  changed_when: "'pulling' in __ai_ollama_pull.stdout"
 
 # whisper.cpp
 

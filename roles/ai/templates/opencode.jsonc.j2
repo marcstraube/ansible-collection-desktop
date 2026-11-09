@@ -1,0 +1,3 @@
+{{ ansible_managed | comment('cblock') }}
+{{ __ai_opencode_marker }}
+{{ {'$schema': 'https://opencode.ai/config.json'} | combine(__ai_opencode_owned) | to_nice_json(indent=2) }}

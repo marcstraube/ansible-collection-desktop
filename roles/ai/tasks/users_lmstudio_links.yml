@@ -1,0 +1,158 @@
+---
+#
+# Ollama Models in LM Studio
+#
+# Every model in ai_lmstudio_ollama_models gets a directory below
+# <models dir>/ollama/ with symlinks to the GGUF blobs Ollama stores: the
+# model layer as <name>.gguf and, for vision models, the projector layer as
+# mmproj-<name>.gguf. The ollama/ subdirectory belongs to the role and
+# follows the list; Ollama's own files are never changed.
+
+# Per-user facts: every user starts from an empty list
+- name: Users LM Studio Links | Reset link facts
+  ansible.builtin.set_fact:
+    __ai_lmstudio_ollama_entries: []
+    __ai_lmstudio_ollama_links: []
+
+# Ollama stores a model under manifests/<registry>/<namespace>/<model>/<tag>.
+# A name without registry or namespace uses Ollama's defaults, a name
+# without tag uses 'latest'. The directory name in LM Studio is the model
+# (without a '-GGUF' suffix) and the tag, in lower case.
+- name: Users LM Studio Links | Resolve Ollama manifests
+  ansible.builtin.set_fact:
+    __ai_lmstudio_ollama_entries: >-
+      {{ __ai_lmstudio_ollama_entries + [{
+           'name': item,
+           'slug': ((__ai_ref_path.split('/') | last | lower | regex_replace('-gguf$', ''))
+                    ~ '-' ~ __ai_ref_tag | lower)
+                   | regex_replace('[^a-z0-9._-]+', '-'),
+           'manifest': __ai_ollama_models_dir ~ '/manifests/'
+                       ~ ({1: [__ai_ollama_default_registry, __ai_ollama_default_namespace],
+                           2: [__ai_ollama_default_registry]}
+                          .get(__ai_ref_path.split('/') | length, []) + [__ai_ref_path])
+                         | join('/')
+                       ~ '/' ~ __ai_ref_tag}] }}
+  vars:
+    __ai_ref_path: "{{ item | regex_replace(':[^/:]*$', '') }}"
+    __ai_ref_tag: "{{ (item | regex_search(':([^/:]*)$', '\\1') or ['latest']) | first }}"
+  loop: '{{ ai_lmstudio_ollama_models }}'
+
+- name: Users LM Studio Links | Read Ollama manifests
+  ansible.builtin.slurp:
+    src: '{{ item.manifest }}'
+  loop: '{{ __ai_lmstudio_ollama_entries }}'
+  loop_control:
+    label: '{{ item.name }}'
+  register: __ai_lmstudio_ollama_manifests
+  failed_when: false
+
+- name: Users LM Studio Links | Require installed Ollama models
+  ansible.builtin.assert:
+    that:
+      - item.content is defined
+    fail_msg: >-
+      {{ item.item.name }} is not installed in Ollama
+      ({{ item.item.manifest }} is missing). Add it to ai_ollama_models.
+    quiet: true
+  loop: '{{ __ai_lmstudio_ollama_manifests.results }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+
+- name: Users LM Studio Links | Build link targets
+  ansible.builtin.set_fact:
+    __ai_lmstudio_ollama_links: >-
+      {{ __ai_lmstudio_ollama_links + [{
+           'slug': item.item.slug,
+           'model': __ai_layers
+                    | selectattr('mediaType', 'equalto', __ai_ollama_model_media_type)
+                    | map(attribute='digest') | first | default(''),
+           'projector': __ai_layers
+                        | selectattr('mediaType', 'equalto', __ai_ollama_projector_media_type)
+                        | map(attribute='digest') | first | default('')}] }}
+  vars:
+    __ai_layers: '{{ (item.content | b64decode | from_json).layers | default([]) }}'
+  loop: '{{ __ai_lmstudio_ollama_manifests.results }}'
+  loop_control:
+    label: '{{ item.item.name }}'
+
+- name: Users LM Studio Links | Require a GGUF model layer
+  ansible.builtin.assert:
+    that:
+      - item.model | length > 0
+    fail_msg: >-
+      The Ollama manifest of {{ item.slug }} has no GGUF model layer, so LM
+      Studio cannot load it.
+    quiet: true
+  loop: '{{ __ai_lmstudio_ollama_links }}'
+  loop_control:
+    label: '{{ item.slug }}'
+
+- name: Users LM Studio Links | Create model directories
+  ansible.builtin.file:
+    path: '{{ __ai_lmstudio_dir }}/{{ __ai_lmstudio_ollama_subdir }}/{{ item }}'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: 'u+rwx'
+  loop: >-
+    {{ ([''] + __ai_lmstudio_ollama_links | map(attribute='slug') | list) }}
+  when: __ai_lmstudio_ollama_links | length > 0
+
+# A newer pull points the manifest at a new blob; force moves the link.
+- name: Users LM Studio Links | Link model layers
+  ansible.builtin.file:
+    src: "{{ __ai_ollama_models_dir }}/blobs/{{ item.model | replace(':', '-') }}"
+    dest: '{{ __ai_lmstudio_dir }}/{{ __ai_lmstudio_ollama_subdir }}/{{ item.slug }}/{{ item.slug }}.gguf'
+    state: link
+    force: true
+    # follow: false changes the owner of the link itself, never of Ollama's blob
+    follow: false
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+  loop: '{{ __ai_lmstudio_ollama_links }}'
+  loop_control:
+    label: '{{ item.slug }}'
+
+- name: Users LM Studio Links | Link projector layers
+  ansible.builtin.file:
+    src: "{{ __ai_ollama_models_dir }}/blobs/{{ item.projector | replace(':', '-') }}"
+    dest: '{{ __ai_lmstudio_dir }}/{{ __ai_lmstudio_ollama_subdir }}/{{ item.slug }}/mmproj-{{ item.slug }}.gguf'
+    state: link
+    force: true
+    # follow: false changes the owner of the link itself, never of Ollama's blob
+    follow: false
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+  loop: "{{ __ai_lmstudio_ollama_links | selectattr('projector', '!=', '') }}"
+  loop_control:
+    label: '{{ item.slug }}'
+
+- name: Users LM Studio Links | Remove projector links of text models
+  ansible.builtin.file:
+    path: '{{ __ai_lmstudio_dir }}/{{ __ai_lmstudio_ollama_subdir }}/{{ item.slug }}/mmproj-{{ item.slug }}.gguf'
+    state: absent
+  loop: "{{ __ai_lmstudio_ollama_links | selectattr('projector', '==', '') }}"
+  loop_control:
+    label: '{{ item.slug }}'
+
+# The ollama/ subdirectory holds nothing but these links, so a directory of a
+# model dropped from the list goes with it.
+- name: Users LM Studio Links | Find linked model directories
+  ansible.builtin.find:
+    paths: '{{ __ai_lmstudio_dir }}/{{ __ai_lmstudio_ollama_subdir }}'
+    file_type: directory
+  register: __ai_lmstudio_ollama_dirs
+
+- name: Users LM Studio Links | Remove links of dropped models
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: absent
+  loop: >-
+    {{ __ai_lmstudio_ollama_dirs.files
+       | rejectattr('path', 'in',
+                    __ai_lmstudio_ollama_links | map(attribute='slug')
+                    | map('regex_replace', '^',
+                          __ai_lmstudio_dir ~ '/' ~ __ai_lmstudio_ollama_subdir ~ '/')
+                    | list) }}
+  loop_control:
+    label: '{{ item.path | basename }}'

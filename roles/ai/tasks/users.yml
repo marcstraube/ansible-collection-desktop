@@ -2,12 +2,14 @@
 #
 # AI User Configuration
 #
-# Respects mode: managed | initial | disabled
-#   managed  — overwrite on every run
+# Respects mode: managed | merged | initial | disabled
+#   managed  — overwrite the whole file on every run
+#   merged   — reconcile only the role-owned keys on every run
 #   initial  — deploy only when the target config is absent, then
 #              preserve it
 #   disabled — skip entirely
-# Per-user `mode:` overrides `ai_user_config_mode`.
+# Per-user `mode:` overrides the tool's default
+# (ai_<tool>_user_config_mode, falling back to ai_user_config_mode).
 
 - name: Users | Include Claude Desktop entry config
   ansible.builtin.include_tasks:
@@ -16,6 +18,8 @@
       tags:
         - ai
         - ai:users
+  vars:
+    __ai_user_mode: '{{ ai_user.mode | default(ai_claude_desktop_user_config_mode) }}'
   tags:
     - ai
     - ai:users
@@ -25,7 +29,7 @@
     label: '{{ ai_user.username }}'
   when:
     - ai_claude_desktop_enabled | bool
-    - (ai_user.mode | default(ai_user_config_mode)) != 'disabled'
+    - (ai_user.mode | default(ai_claude_desktop_user_config_mode)) != 'disabled'
 
 - name: Users | Include Aider config
   ansible.builtin.include_tasks:
@@ -34,6 +38,8 @@
       tags:
         - ai
         - ai:users
+  vars:
+    __ai_user_mode: '{{ ai_user.mode | default(ai_aider_user_config_mode) }}'
   tags:
     - ai
     - ai:users
@@ -43,4 +49,44 @@
     label: '{{ ai_user.username }}'
   when:
     - ai_aider_enabled | bool
-    - (ai_user.mode | default(ai_user_config_mode)) != 'disabled'
+    - (ai_user.mode | default(ai_aider_user_config_mode)) != 'disabled'
+
+- name: Users | Include OpenCode config
+  ansible.builtin.include_tasks:
+    file: users_opencode.yml
+    apply:
+      tags:
+        - ai
+        - ai:users
+  vars:
+    __ai_user_mode: '{{ ai_user.mode | default(ai_opencode_user_config_mode) }}'
+  tags:
+    - ai
+    - ai:users
+  loop: '{{ ai_users }}'
+  loop_control:
+    loop_var: ai_user
+    label: '{{ ai_user.username }}'
+  when:
+    - ai_opencode_enabled | bool
+    - (ai_user.mode | default(ai_opencode_user_config_mode)) != 'disabled'
+
+- name: Users | Include LM Studio settings and models
+  ansible.builtin.include_tasks:
+    file: users_lmstudio.yml
+    apply:
+      tags:
+        - ai
+        - ai:users
+  vars:
+    __ai_user_mode: '{{ ai_user.mode | default(ai_lmstudio_user_config_mode) }}'
+  tags:
+    - ai
+    - ai:users
+  loop: '{{ ai_users }}'
+  loop_control:
+    loop_var: ai_user
+    label: '{{ ai_user.username }}'
+  when:
+    - ai_lmstudio_enabled | bool
+    - (ai_user.mode | default(ai_lmstudio_user_config_mode)) != 'disabled'

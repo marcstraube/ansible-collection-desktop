@@ -60,6 +60,8 @@
       - username: 'ai_initial_exist'
       - username: 'ai_disabled_user'
         mode: 'disabled'
+      - username: 'ai_merged_exist'
+        mode: 'merged'
 
     # A configured ai_users wins over the deprecated users_list attribute.
     users_list:
@@ -105,6 +107,67 @@
       - username: 'ai_aider_initial_exist'
       - username: 'ai_aider_disabled'
         mode: 'disabled'
+
+  tasks:
+    - name: Converge | Include ai role user tasks  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+
+# Merged mode and per-tool defaults for Aider, OpenCode and LM Studio. Only
+# the user tasks run, like the Aider play above; the Ollama model directory
+# points at the store fixture from prepare.yml, which the full role would
+# otherwise derive from the installed package.
+- name: Converge — merged per-user configs
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_desktop_enabled: false
+    ai_aider_enabled: true
+    ai_aider_model: 'ollama_chat/qwen3-coder:30b'
+    ai_aider_set_env:
+      OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+    ai_aider_user_config_mode: 'merged'
+
+    ai_opencode_enabled: true
+    ai_opencode_providers:
+      ollama:
+        name: 'Ollama'
+        base_url: 'http://ollama.example.com:11434/v1'
+        models:
+          - id: 'qwen3-coder:30b'
+            name: 'Qwen3-Coder 30B'
+            context: 32768
+            output: 8192
+      lmstudio:
+        base_url: 'http://lmstudio.example.com:1234/v1'
+        api_key: 'molecule-key'  # pragma: allowlist secret
+        models:
+          - id: 'qwen3-coder-30b-a3b-instruct'
+    ai_opencode_model: 'ollama/qwen3-coder:30b'
+
+    ai_ollama_enabled: true
+    __ai_ollama_models_dir: '/srv/ollama-fixture'
+    ai_lmstudio_enabled: true
+    ai_lmstudio_models_dir: '.lmstudio/models'
+    ai_lmstudio_host: '0.0.0.0'
+    ai_lmstudio_port: 1240
+    ai_lmstudio_models:
+      - repo: 'molecule/Repo-GGUF'
+        file: 'model.gguf'
+    ai_lmstudio_ollama_models:
+      - 'molecule-text'
+      - 'hf.co/molecule/Vision-Model-GGUF:Q4_K_M'
+
+    ai_users:
+      - username: 'ai_merge_exist'
+      - username: 'ai_merge_new'
+      - username: 'ai_merge_managed'
+        mode: 'managed'
+      - username: 'ai_merge_initial'
+        mode: 'initial'
 
   tasks:
     - name: Converge | Include ai role user tasks  # noqa: role-name[path]
@@ -175,6 +238,9 @@
     ai_ollama_environment:
       OLLAMA_CONTEXT_LENGTH: '32768'
       OLLAMA_FLASH_ATTENTION: '1'
+    ai_ollama_models_dir: '/srv/ollama-models'
+    ai_ollama_host: '0.0.0.0'
+    ai_ollama_port: 11500
     ai_whisper_enabled: true
     ai_whisper_backend: 'cpu'
     ai_lmstudio_enabled: false
@@ -223,6 +289,9 @@
     ai_ollama_environment:
       OLLAMA_CONTEXT_LENGTH: '32768'
       OLLAMA_FLASH_ATTENTION: '1'
+    ai_ollama_models_dir: '/srv/ollama-models'
+    ai_ollama_host: '0.0.0.0'
+    ai_ollama_port: 11500
     ai_whisper_enabled: true
     ai_whisper_backend: 'vulkan'
     ai_lmstudio_enabled: false
@@ -256,6 +325,9 @@
     ai_ollama_environment:
       OLLAMA_CONTEXT_LENGTH: '32768'
       OLLAMA_FLASH_ATTENTION: '1'
+    ai_ollama_models_dir: '/srv/ollama-models'
+    ai_ollama_host: '0.0.0.0'
+    ai_ollama_port: 11500
     ai_whisper_enabled: true
     ai_whisper_backend: ['vulkan', 'cpu']
     ai_lmstudio_enabled: false

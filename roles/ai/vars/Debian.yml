@@ -24,6 +24,9 @@ __ai_lmstudio_package: ''
 # Service names
 __ai_ollama_service: 'ollama.service'
 
+# Ollama model directory when ai_ollama_models_dir is empty
+__ai_ollama_default_models_dir: '/usr/share/ollama/.ollama/models'
+
 # ComfyUI
 __ai_comfyui_python: 'python3'
 __ai_comfyui_venv_packages:
