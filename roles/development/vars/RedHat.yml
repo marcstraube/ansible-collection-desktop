@@ -3,13 +3,6 @@
 # RedHat Variables
 #
 
-# IDEs
-__development_vscodium_package: ''
-__development_vscode_package: ''
-__development_jetbrains_toolbox_package: ''
-__development_phpstorm_packages: []
-__development_zed_package: ''
-
 # Arduino: IDE 2.x is Flatpak/AppImage only; the classic 1.x EPEL
 # package is orphaned (last build EPEL 7) — both no-op
 __development_arduino_classic_package: ''
@@ -22,10 +15,6 @@ __development_serial_groups:
 __development_dbeaver_package: ''
 __development_pgadmin_package: 'pgadmin4'
 
-# API tools
-__development_postman_package: ''
-__development_bruno_package: ''
-
 # Lua tooling (none packaged on EL)
 __development_lua_stylua_package: ''
 __development_lua_luacheck_package: ''
@@ -33,3 +22,7 @@ __development_lua_busted_package: ''
 
 # QML tooling (qmllint + qmlformat in qt6-qtdeclarative-devel — appstream on EL10)
 __development_qml_tools_package: 'qt6-qtdeclarative-devel'
+
+# Game engines (none packaged on EL)
+__development_godot_package: ''
+__development_godot_mono_package: ''

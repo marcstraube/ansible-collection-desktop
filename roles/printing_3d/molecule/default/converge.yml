@@ -1,0 +1,40 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    printing_3d_enabled: true
+
+    # Distribution packages: Arch Linux and Debian
+    printing_3d_prusaslicer_enabled: true
+
+    # AUR-only applications (Cura included, Debian ships it from main): on in
+    # the containers without an AUR package, where the toggle must be a no-op,
+    # off on Arch Linux, where it would start an AUR build.
+    printing_3d_orcaslicer_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+    printing_3d_cura_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+    printing_3d_chitubox_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+    printing_3d_lychee_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+
+    # UVtools on everywhere: a no-op on Debian and EL; on Arch Linux the stub
+    # package from prepare.yml satisfies the AUR task (no build) and provides
+    # /usr/bin/uvtools for the role-provided desktop entry.
+    printing_3d_uvtools_enabled: true
+
+    # orcaslicer: fixture entry on Arch Linux (prepare.yml), no entry elsewhere.
+    # cura: packaged entry on Debian, no entry elsewhere.
+    printing_3d_environment:
+      orcaslicer:
+        WEBKIT_DISABLE_DMABUF_RENDERER: '1'
+        MESA_LOADER_DRIVER_OVERRIDE: 'zink'
+      cura:
+        QT_QPA_PLATFORM: 'xcb'
+      # uvtools: role-provided entry on Arch Linux
+      uvtools:
+        DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: '1'
+
+  tasks:
+    - name: Converge | Include printing_3d role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

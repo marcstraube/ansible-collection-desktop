@@ -1,9 +1,10 @@
 ---
 #
-# RedHat Variables
+# RedHat 10 Variables
 #
 
-# Official repository packages
-__remote_access_remmina_package: remmina
-__remote_access_tigervnc_package: tigervnc
+# The EPEL 10 remmina package is not installable: its libappindicator-gtk3
+# dependency needs libdbusmenu, which EL 10 does not ship.
+__remote_access_remmina_package: ''
+__remote_access_tigervnc_package: ''
 __remote_access_freerdp_package: freerdp

@@ -1,0 +1,27 @@
+---
+# Checks whether __desktop_entries_override_dir/<file> exists and whether it
+# is a file of this caller: its marker line names desktop_entries_caller.
+# Sets __desktop_entries_foreign when the file exists without that marker
+# (placed by hand, by another role or by another caller of this role).
+
+# find warns on a missing directory, the usual state without overrides
+- name: Ownership | Stat desktop entry
+  ansible.builtin.stat:
+    path: '{{ __desktop_entries_path }}'
+  register: __desktop_entries_existing_stat
+
+- name: Ownership | Find desktop entry with the marker of this caller
+  ansible.builtin.find:
+    paths: '{{ __desktop_entries_override_dir }}'
+    patterns:
+      - '{{ desktop_entries_file }}'
+    contains: '^{{ __desktop_entries_marker | regex_escape }}$'
+    file_type: file
+  register: __desktop_entries_own
+  when: __desktop_entries_existing_stat.stat.exists | default(false)
+
+- name: Ownership | Decide whether the desktop entry is foreign
+  ansible.builtin.set_fact:
+    __desktop_entries_foreign: >-
+      {{ __desktop_entries_existing_stat.stat.exists | default(false)
+         and __desktop_entries_own.files | default([]) | length == 0 }}

@@ -16,6 +16,10 @@ __pipewire_session_managers:
 __pipewire_pulse_package: pipewire-pulseaudio
 __pipewire_alsa_package: pipewire-alsa
 __pipewire_jack_package: pipewire-jack-audio-connection-kit
+
+__pipewire_alsa_firmware_package: alsa-firmware
+__pipewire_alsa_utils_package: alsa-utils
+
 __pipewire_zeroconf_package: ''
 
 __pipewire_bluetooth_packages:

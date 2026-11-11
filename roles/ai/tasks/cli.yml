@@ -82,11 +82,10 @@
 
 # OpenCode
 
-- name: CLI | Install OpenCode from AUR (Arch)
+- name: CLI | Install OpenCode (Arch)
   become: true
-  become_user: "{{ aur_builder_user | default('aur_builder') }}"
-  kewlfft.aur.aur:
-    name: '{{ __ai_aur_packages.opencode }}'
+  ansible.builtin.package:
+    name: '{{ __ai_opencode_package }}'
     state: present
   when:
     - ansible_facts['os_family'] == 'Archlinux'
@@ -157,6 +156,18 @@
     - ai_opencode_gemini_auth_enabled | bool
   retries: 3
   delay: 5
+
+- name: CLI | Include OpenCode wrapper (Arch)
+  ansible.builtin.include_tasks:
+    file: cli_opencode_wrapper.yml
+    apply:
+      tags:
+        - ai
+        - ai:cli
+  when: ansible_facts['os_family'] == 'Archlinux'
+  tags:
+    - ai
+    - ai:cli
 
 # Aider
 

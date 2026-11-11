@@ -1,0 +1,7 @@
+---
+#
+# RedHat 9 Packages (Rocky 9 / EPEL 9)
+#
+
+__gis_qgis_package: 'qgis'          # EPEL 9
+__gis_gdal_package: 'gdal'          # AppStream

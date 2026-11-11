@@ -1,0 +1,6 @@
+{{ __desktop_entries_marker }}
+{{ ansible_managed | comment }}
+{{ __desktop_entries_packaged.content | b64decode
+   | marcstraube.desktop.desktop_entries_override(environment=__desktop_entries_environment,
+                              set_keys=__desktop_entries_set,
+                              append_keys=__desktop_entries_append) }}

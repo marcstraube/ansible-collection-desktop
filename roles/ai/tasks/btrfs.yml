@@ -1,0 +1,188 @@
+---
+#
+# BTRFS Subvolume for the Ollama Model Directory
+#
+# Models are large and can be downloaded again, so they stay out of the
+# snapshots of the filesystem they live on. Only a missing or empty directory
+# is turned into a subvolume; a populated one is left alone (see README for
+# the manual migration).
+#
+# Placement follows the rollback behavior of the containing mount:
+#   root filesystem — a top-level subvolume next to the root subvolume,
+#                     mounted through fstab. A subvolume nested below / would
+#                     live inside the root snapshot of a snapper rollback
+#                     layout and stay behind on 'snapper rollback'.
+#   any other mount — a nested subvolume (e.g. below /home or /srv), which
+#                     snapshots of that mount skip.
+
+# One probe for everything the decision needs. The subvolume test uses the
+# inode number (256 is the root of every BTRFS subvolume), which needs no
+# btrfs-progs. A missing path is probed through its nearest existing parent.
+- name: BTRFS | Probe Ollama model directory
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      path="$TARGET_PATH"
+      probe="$path"
+      while [ ! -e "$probe" ]; do probe=$(dirname "$probe"); done
+      state=missing
+      if [ -L "$path" ] || { [ -e "$path" ] && [ ! -d "$path" ]; }; then
+        state=other
+      elif [ -d "$path" ]; then
+        if [ "$(stat -c %i "$path")" = 256 ]; then state=subvolume
+        elif [ -n "$(ls -A "$path")" ]; then state=populated
+        else state=empty
+        fi
+      fi
+      printf '%s\n%s\n%s\n' "$(stat -f -c %T "$probe")" \
+        "$(findmnt -n -o TARGET --target "$probe")" "$state"
+    executable: /bin/bash
+  environment:
+    TARGET_PATH: '{{ __ai_ollama_models_dir }}'
+  register: __ai_ollama_btrfs_probe
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: BTRFS | Decide on an Ollama model subvolume
+  ansible.builtin.set_fact:
+    __ai_ollama_btrfs_create: >-
+      {{ __ai_ollama_btrfs_probe.rc == 0
+         and __ai_ollama_btrfs_probe.stdout_lines[0] == 'btrfs'
+         and __ai_ollama_btrfs_probe.stdout_lines[1] != __ai_ollama_models_dir
+         and __ai_ollama_btrfs_probe.stdout_lines[2] in ['missing', 'empty'] }}
+    __ai_ollama_btrfs_on_root: >-
+      {{ __ai_ollama_btrfs_probe.rc == 0
+         and __ai_ollama_btrfs_probe.stdout_lines[1] == '/' }}
+
+- name: BTRFS | Note a populated Ollama model directory
+  ansible.builtin.debug:
+    msg: >-
+      {{ __ai_ollama_models_dir }} already holds data and stays a plain
+      directory. See the README for moving it onto a subvolume.
+  when:
+    - __ai_ollama_btrfs_probe.rc == 0
+    - __ai_ollama_btrfs_probe.stdout_lines[0] == 'btrfs'
+    - __ai_ollama_btrfs_probe.stdout_lines[2] == 'populated'
+
+# Root filesystem: read where the root subvolume sits. With a snapper
+# rollback layout it is '<base>/.snapshots/<n>/snapshot', and the new
+# subvolume goes next to the snapshots below <base>, like the other
+# subvolumes that must survive a rollback.
+- name: BTRFS | Read root filesystem layout
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      findmnt -n -o SOURCE --nofsroot /
+      findmnt -n -o UUID /
+      findmnt -n -o OPTIONS / | tr ',' '\n' | sed -n 's/^subvol=//p'
+      findmnt --fstab -n -o OPTIONS / || findmnt -n -o OPTIONS /
+    executable: /bin/bash
+  register: __ai_ollama_btrfs_root
+  changed_when: false
+  check_mode: false
+  when:
+    - __ai_ollama_btrfs_create | bool
+    - __ai_ollama_btrfs_on_root | bool
+
+- name: BTRFS | Build top-level subvolume settings
+  ansible.builtin.set_fact:
+    __ai_ollama_btrfs_device: '{{ __ai_ollama_btrfs_root.stdout_lines[0] }}'
+    __ai_ollama_btrfs_subvol: >-
+      {{ (__ai_ollama_btrfs_root.stdout_lines[2]
+          | regex_replace('/\.snapshots/.*$', '')
+          | regex_replace('/$', ''))
+         ~ __ai_ollama_models_dir }}
+    __ai_ollama_btrfs_opts: >-
+      {{ (__ai_ollama_btrfs_root.stdout_lines[3].split(',')
+          | reject('match', '^(subvol|subvolid)=')
+          | reject('in', ['defaults', 'nosuid', 'nodev', 'noexec'])
+          | list
+          + ['nosuid', 'nodev', 'noexec'])
+         | join(',') }}
+    __ai_ollama_btrfs_uuid: '{{ __ai_ollama_btrfs_root.stdout_lines[1] }}'
+  when:
+    - __ai_ollama_btrfs_create | bool
+    - __ai_ollama_btrfs_on_root | bool
+
+# The top level (subvolid=5) is mounted only for the creation and unmounted
+# again, also on failure.
+- name: BTRFS | Create top-level Ollama model subvolume
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      set -o errexit -o pipefail
+      top=$(mktemp -d)
+      trap 'umount "$top" 2>/dev/null; rmdir "$top"' EXIT
+      mount -o subvolid=5 "$DEVICE" "$top"
+      if [ -e "$top$SUBVOL" ]; then
+        echo 'exists'
+        exit 0
+      fi
+      mkdir -p "$(dirname "$top$SUBVOL")"
+      btrfs subvolume create "$top$SUBVOL" >/dev/null
+      echo 'created'
+    executable: /bin/bash
+  environment:
+    DEVICE: '{{ __ai_ollama_btrfs_device }}'
+    SUBVOL: '{{ __ai_ollama_btrfs_subvol }}'
+  register: __ai_ollama_btrfs_toplevel
+  changed_when: "'created' in __ai_ollama_btrfs_toplevel.stdout"
+  when:
+    - __ai_ollama_btrfs_create | bool
+    - __ai_ollama_btrfs_on_root | bool
+
+- name: BTRFS | Ensure Ollama model mount point
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_ollama_models_dir }}'
+    state: directory
+    owner: '{{ __ai_ollama_user }}'
+    group: '{{ __ai_ollama_group }}'
+    mode: '0755'
+  when:
+    - __ai_ollama_btrfs_create | bool
+    - __ai_ollama_btrfs_on_root | bool
+
+- name: BTRFS | Mount Ollama model subvolume
+  become: true
+  ansible.posix.mount:
+    path: '{{ __ai_ollama_models_dir }}'
+    src: 'UUID={{ __ai_ollama_btrfs_uuid }}'
+    fstype: btrfs
+    opts: '{{ __ai_ollama_btrfs_opts }},subvol={{ __ai_ollama_btrfs_subvol }}'
+    state: mounted
+  when:
+    - __ai_ollama_btrfs_create | bool
+    - __ai_ollama_btrfs_on_root | bool
+
+# Any other mount: an empty directory is replaced by the subvolume. rmdir
+# refuses a directory that gained content since the probe.
+- name: BTRFS | Create nested Ollama model subvolume
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      set -o errexit
+      [ -d "$TARGET_PATH" ] && rmdir "$TARGET_PATH"
+      mkdir -p "$(dirname "$TARGET_PATH")"
+      btrfs subvolume create "$TARGET_PATH" >/dev/null
+    executable: /bin/bash
+  environment:
+    TARGET_PATH: '{{ __ai_ollama_models_dir }}'
+  changed_when: true
+  when:
+    - __ai_ollama_btrfs_create | bool
+    - not (__ai_ollama_btrfs_on_root | bool)
+
+- name: BTRFS | Set Ollama model subvolume ownership
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_ollama_models_dir }}'
+    state: directory
+    owner: '{{ __ai_ollama_user }}'
+    group: '{{ __ai_ollama_group }}'
+    mode: '0755'
+  when:
+    - __ai_ollama_btrfs_create | bool

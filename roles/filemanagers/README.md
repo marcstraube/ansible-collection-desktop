@@ -15,16 +15,17 @@ Terminal file managers (mc, vifm, ranger, nnn, lf) are managed by
 ## Requirements
 
 - ansible-core >= 2.19
-- EPEL repository on Rocky Linux (managed by `marcstraube.common.package_management`)
+- EPEL repository on Rocky Linux (managed by `marcstraube.common.package_management`);
+  on EL 9, Dolphin also needs CRB
 
 ## Supported Platforms
 
-| Platform                   | Notes                                     |
-| -------------------------- | ----------------------------------------- |
-| Arch Linux                 |                                           |
-| Debian Trixie              |                                           |
-| EL 9 (Rocky, Alma, RHEL)   | Double Commander not available            |
-| EL 10 (Rocky, Alma, RHEL)  | Double Commander not available            |
+| Platform                   | Notes                                                    |
+| -------------------------- | -------------------------------------------------------- |
+| Arch Linux                 |                                                          |
+| Debian Trixie              |                                                          |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB — PCManFM and Double Commander not available  |
+| EL 10 (Rocky, Alma, RHEL)  | Thunar, PCManFM, Nemo and Double Commander not available |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,
 Fedora) should work but are not actively tested. Use distro-specific vars

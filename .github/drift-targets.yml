@@ -51,3 +51,115 @@ targets:
     platform: rocky-9
     package: wine
     vars_file: vars/RedHat-9.yml
+
+  # EL10 EPEL drift — file managers not packaged in EPEL 10 (#306).
+  - role: filemanagers
+    platform: rocky-10
+    package: Thunar
+    vars_file: vars/RedHat.yml
+
+  - role: filemanagers
+    platform: rocky-10
+    package: nemo
+    vars_file: vars/RedHat.yml
+
+  # EL10 drift — desktop environments not packaged in EL 10 / EPEL 10;
+  # the main package stands in for the extras of its stack (#307).
+  - role: desktop_environment
+    platform: rocky-10
+    package: hyprland
+    vars_file: vars/RedHat.yml
+
+  - role: desktop_environment
+    platform: rocky-10
+    package: sway
+    vars_file: vars/RedHat.yml
+
+  - role: desktop_environment
+    platform: rocky-10
+    package: i3
+    vars_file: vars/RedHat.yml
+
+  - role: desktop_environment
+    platform: rocky-10
+    package: lxde-common
+    vars_file: vars/RedHat.yml
+
+  - role: desktop_environment
+    platform: rocky-10
+    package: '@lxqt-desktop-environment'
+    vars_file: vars/RedHat.yml
+
+  # EL10 drift — LibreOffice is not packaged in EL 10 (#307).
+  - role: office
+    platform: rocky-10
+    package: libreoffice
+    vars_file: vars/RedHat.yml
+
+  # EL9 drift — desktop environments and i3 extras not packaged in
+  # EL 9 / EPEL 9; the main package stands in for the extras of its
+  # stack (#307).
+  - role: desktop_environment
+    platform: rocky-9
+    package: hyprland
+    vars_file: vars/RedHat-9.yml
+
+  - role: desktop_environment
+    platform: rocky-9
+    package: sway
+    vars_file: vars/RedHat-9.yml
+
+  - role: desktop_environment
+    platform: rocky-9
+    package: lxde-common
+    vars_file: vars/RedHat-9.yml
+
+  - role: desktop_environment
+    platform: rocky-9
+    package: '@lxqt-desktop-environment'
+    vars_file: vars/RedHat-9.yml
+
+  - role: desktop_environment
+    platform: rocky-9
+    package: i3blocks
+    vars_file: vars/RedHat-9.yml
+
+  - role: desktop_environment
+    platform: rocky-9
+    package: polybar
+    vars_file: vars/RedHat-9.yml
+
+  - role: desktop_environment
+    platform: rocky-9
+    package: picom
+    vars_file: vars/RedHat-9.yml
+
+  # EL9 drift — office applications not packaged in EPEL 9 (#307).
+  - role: office
+    platform: rocky-9
+    package: mupdf
+    vars_file: vars/RedHat-9.yml
+
+  - role: office
+    platform: rocky-9
+    package: calibre
+    vars_file: vars/RedHat-9.yml
+
+  - role: office
+    platform: rocky-9
+    package: texstudio
+    vars_file: vars/RedHat-9.yml
+
+  # EL10 EPEL drift — QGIS is packaged in EPEL 9, not in EPEL 10 (#337).
+  - role: gis
+    platform: rocky-10
+    package: qgis
+    vars_file: vars/RedHat.yml
+
+  # AUR drift — the release package gplates 2.5.0 does not build against
+  # GDAL 3.13; the role installs gplates-git until it does (#337).
+  - role: gis
+    platform: archlinux
+    package: gplates
+    source: aur
+    vars_file: vars/Archlinux.yml

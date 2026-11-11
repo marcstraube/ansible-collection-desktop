@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+{% if ai_aider_model | length > 0 %}
+model: {{ ai_aider_model | to_json }}
+{% endif %}
+{% if ai_aider_set_env | length > 0 %}
+set-env:
+{% for key, value in ai_aider_set_env | dictsort %}
+  - {{ (key ~ '=' ~ value) | to_json }}
+{% endfor %}
+{% endif %}

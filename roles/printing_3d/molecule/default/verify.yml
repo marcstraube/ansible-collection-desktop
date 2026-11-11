@@ -1,0 +1,313 @@
+---
+- name: Verify packages
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+
+    - name: Verify | Assert PrusaSlicer is installed (Arch, Debian)
+      ansible.builtin.assert:
+        that:
+          - "'prusa-slicer' in ansible_facts['packages']"
+        fail_msg: 'prusa-slicer is not installed'
+      when: ansible_facts['os_family'] in ['Archlinux', 'Debian']
+
+    - name: Verify | Assert UltiMaker Cura is installed (Debian)
+      ansible.builtin.assert:
+        that:
+          - "'cura' in ansible_facts['packages']"
+        fail_msg: 'cura is not installed'
+      when: ansible_facts['os_family'] == 'Debian'
+
+- name: Verify desktop entry overrides
+  hosts: all
+  gather_facts: true
+
+  vars:
+    __verify_marker: '# Managed by Ansible (marcstraube.desktop.printing_3d)'
+    __verify_orcaslicer_override: '/usr/local/share/applications/orca-slicer.desktop'
+    __verify_orcaslicer_prefix: 'Exec=env MESA_LOADER_DRIVER_OVERRIDE=zink WEBKIT_DISABLE_DMABUF_RENDERER=1 '
+    __verify_cura_override: '/usr/local/share/applications/com.ultimaker.cura.desktop'
+    __verify_cura_prefix: 'Exec=env QT_QPA_PLATFORM=xcb '
+    __verify_foreign_entry: '/usr/local/share/applications/lycheeslicer.desktop'
+    __verify_uvtools_entry: '/usr/local/share/applications/uvtools.desktop'
+
+  tasks:
+    # OrcaSlicer (fixture entry on Arch Linux)
+
+    - name: Verify | Read OrcaSlicer override (Arch)
+      ansible.builtin.slurp:
+        src: '{{ __verify_orcaslicer_override }}'
+      register: __verify_orcaslicer_content
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert env prefix on every OrcaSlicer Exec= line (Arch)
+      ansible.builtin.assert:
+        that:
+          - __verify_lines[0] == __verify_marker
+          - __verify_exec_lines | length == 2
+          - >-
+            __verify_exec_lines
+            | reject('search', '^' ~ (__verify_orcaslicer_prefix | regex_escape)) | list | length == 0
+          - "'TryExec=/opt/orca-slicer/AppRun' in __verify_lines"
+        fail_msg: 'OrcaSlicer override is missing the marker or the env prefix: {{ __verify_exec_lines }}'
+      vars:
+        __verify_lines: '{{ (__verify_orcaslicer_content.content | b64decode).splitlines() }}'
+        __verify_exec_lines: "{{ __verify_lines | select('match', '^Exec=') | list }}"
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # UltiMaker Cura (packaged entry on Debian)
+
+    - name: Verify | Read Cura override (Debian)
+      ansible.builtin.slurp:
+        src: '{{ __verify_cura_override }}'
+      register: __verify_cura_content
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Verify | Assert env prefix on every Cura Exec= line (Debian)
+      ansible.builtin.assert:
+        that:
+          - __verify_lines[0] == __verify_marker
+          - __verify_exec_lines | length > 0
+          - >-
+            __verify_exec_lines
+            | reject('search', '^' ~ (__verify_cura_prefix | regex_escape)) | list | length == 0
+        fail_msg: 'Cura override is missing the marker or the env prefix: {{ __verify_exec_lines }}'
+      vars:
+        __verify_lines: '{{ (__verify_cura_content.content | b64decode).splitlines() }}'
+        __verify_exec_lines: "{{ __verify_lines | select('match', '^Exec=') | list }}"
+      when: ansible_facts['os_family'] == 'Debian'
+
+    # Configured applications without a packaged entry are skipped
+
+    - name: Verify | Stat overrides without a packaged entry
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop: >-
+        {{ ([__verify_orcaslicer_override] if ansible_facts['os_family'] != 'Archlinux' else [])
+           + ([__verify_cura_override] if ansible_facts['os_family'] != 'Debian' else []) }}
+      register: __verify_skipped_stat
+
+    - name: Verify | Assert no override without a packaged entry
+      ansible.builtin.assert:
+        that:
+          - __verify_skipped_stat.results | selectattr('stat.exists') | list | length == 0
+        fail_msg: 'an override was written although the packaged entry is missing'
+
+    - name: Verify | Stat foreign entry (Arch)
+      ansible.builtin.stat:
+        path: '{{ __verify_foreign_entry }}'
+      register: __verify_foreign_stat
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert foreign entry was kept (Arch)
+      ansible.builtin.assert:
+        that:
+          - __verify_foreign_stat.stat.exists
+        fail_msg: 'a desktop entry without the role marker was removed'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # UVtools (role-provided entry, stub executable on Arch Linux)
+
+    - name: Verify | Read UVtools entry (Arch)
+      ansible.builtin.slurp:
+        src: '{{ __verify_uvtools_entry }}'
+      register: __verify_uvtools_content
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert UVtools entry with the environment (Arch)
+      ansible.builtin.assert:
+        that:
+          - __verify_lines[0] == __verify_marker
+          - "'[Desktop Entry]' in __verify_lines"
+          - "'Icon=applications-engineering' in __verify_lines"
+          - >-
+            __verify_lines | select('match', '^Exec=') | list
+            == ['Exec=env DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 uvtools %F']
+        fail_msg: 'UVtools entry is missing the marker or the env prefix: {{ __verify_lines }}'
+      vars:
+        __verify_lines: '{{ (__verify_uvtools_content.content | b64decode).splitlines() }}'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat UVtools entry without the executable (Debian, RedHat)
+      ansible.builtin.stat:
+        path: '{{ __verify_uvtools_entry }}'
+      register: __verify_uvtools_absent_stat
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert no UVtools entry without the executable (Debian, RedHat)
+      ansible.builtin.assert:
+        that:
+          - not __verify_uvtools_absent_stat.stat.exists
+        fail_msg: 'UVtools entry was deployed although /usr/bin/uvtools is missing'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    # Without an environment entry the UVtools entry stays, with a plain Exec=
+
+    - name: Verify | Include printing_3d role without a UVtools environment  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      vars:
+        printing_3d_enabled: true
+        printing_3d_orcaslicer_enabled: false
+        printing_3d_prusaslicer_enabled: false
+        printing_3d_cura_enabled: false
+        printing_3d_chitubox_enabled: false
+        printing_3d_lychee_enabled: false
+        printing_3d_uvtools_enabled: true
+        printing_3d_environment: {}
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Read plain UVtools entry (Arch)
+      ansible.builtin.slurp:
+        src: '{{ __verify_uvtools_entry }}'
+      register: __verify_uvtools_plain_content
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert plain UVtools Exec= line (Arch)
+      ansible.builtin.assert:
+        that:
+          - __verify_lines[0] == __verify_marker
+          - __verify_lines | select('match', '^Exec=') | list == ['Exec=uvtools %F']
+        fail_msg: 'UVtools entry without environment is wrong: {{ __verify_lines }}'
+      vars:
+        __verify_lines: '{{ (__verify_uvtools_plain_content.content | b64decode).splitlines() }}'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Emptying the mapping removes the overrides again; turning the UVtools
+    # toggle off removes the role-provided entry
+
+    - name: Verify | Include printing_3d role with an empty environment  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      vars:
+        printing_3d_enabled: true
+        printing_3d_orcaslicer_enabled: false
+        printing_3d_prusaslicer_enabled: false
+        printing_3d_cura_enabled: false
+        printing_3d_chitubox_enabled: false
+        printing_3d_lychee_enabled: false
+        printing_3d_uvtools_enabled: false
+        printing_3d_environment: {}
+
+    - name: Verify | Stat removed overrides
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - '{{ __verify_orcaslicer_override }}'
+        - '{{ __verify_cura_override }}'
+        - '{{ __verify_uvtools_entry }}'
+      register: __verify_removed_stat
+
+    - name: Verify | Assert the overrides were removed
+      ansible.builtin.assert:
+        that:
+          - __verify_removed_stat.results | selectattr('stat.exists') | list | length == 0
+        fail_msg: 'an override or the UVtools entry is still present after the removal run'
+
+    - name: Verify | Stat foreign entry after removal (Arch)
+      ansible.builtin.stat:
+        path: '{{ __verify_foreign_entry }}'
+      register: __verify_foreign_after_stat
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert foreign entry survived the removal (Arch)
+      ansible.builtin.assert:
+        that:
+          - __verify_foreign_after_stat.stat.exists
+        fail_msg: 'a desktop entry without the role marker was removed'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Invalid input fails before any change
+
+    - name: Verify | Run role with an unknown application
+      block:
+        - name: Verify | Include printing_3d role with application 'slic3r'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            printing_3d_enabled: true
+            printing_3d_environment:
+              slic3r:
+                GDK_BACKEND: 'x11'
+
+        - name: Verify | Fail when the unknown application was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted the application 'slic3r'."
+      rescue:
+        - name: Verify | Assert unknown application rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('printing_3d_environment must be a mapping')
+            quiet: true
+
+    - name: Verify | Run role with a value that needs quoting
+      block:
+        - name: Verify | Include printing_3d role with a value containing a space  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            printing_3d_enabled: true
+            printing_3d_environment:
+              prusaslicer:
+                GDK_BACKEND: 'x11 wayland'
+
+        - name: Verify | Fail when the value was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted the value 'x11 wayland'."
+      rescue:
+        # marcstraube.desktop.desktop_entries validates the values
+        - name: Verify | Assert value rejection reason
+          ansible.builtin.assert:
+            that:
+              - >-
+                ansible_failed_result | to_json
+                is search('desktop_entries \\(printing_3d, PrusaSlicer\\.desktop\\): desktop_entries_environment needs')
+            quiet: true
+
+    - name: Verify | Run role with an environment for a foreign entry (Arch)
+      when: ansible_facts['os_family'] == 'Archlinux'
+      block:
+        - name: Verify | Include printing_3d role with a Lychee Slicer environment  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            printing_3d_enabled: true
+            printing_3d_orcaslicer_enabled: false
+            printing_3d_prusaslicer_enabled: false
+            printing_3d_cura_enabled: false
+            printing_3d_chitubox_enabled: false
+            printing_3d_lychee_enabled: false
+            printing_3d_uvtools_enabled: false
+            printing_3d_environment:
+              lychee:
+                MOLECULE_OVERRIDE: '1'
+
+        - name: Verify | Fail when the foreign entry was overwritten
+          ansible.builtin.fail:
+            msg: 'The role wrote over lycheeslicer.desktop without the marker.'
+      rescue:
+        - name: Verify | Assert refusal reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result | to_json is search('exists and was not created by this role')
+            quiet: true
+
+    - name: Verify | Read foreign entry after the refusal (Arch)
+      ansible.builtin.slurp:
+        src: '{{ __verify_foreign_entry }}'
+      register: __verify_foreign_content
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert foreign entry is unchanged (Arch)
+      ansible.builtin.assert:
+        that:
+          - "'Exec=env MOLECULE_FIXTURE=1 lycheeslicer %u' in __verify_lines"
+          - __verify_marker not in __verify_lines
+          - __verify_lines | select('search', 'MOLECULE_OVERRIDE') | list | length == 0
+        fail_msg: 'the foreign entry was changed: {{ __verify_lines }}'
+      vars:
+        __verify_lines: '{{ (__verify_foreign_content.content | b64decode).splitlines() }}'
+      when: ansible_facts['os_family'] == 'Archlinux'

@@ -19,7 +19,7 @@
     ai_ollama_enabled: false
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: true
-    ai_comfyui_gpu: 'cpu'
+    ai_comfyui_backend: 'cpu'
     ai_comfyui_service_enabled: false
 
   tasks:

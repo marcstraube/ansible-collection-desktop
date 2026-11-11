@@ -8,7 +8,7 @@
 ## Description
 
 Desktop workstation roles for Arch Linux, Debian Trixie, and EL 9/10.
-27 roles covering desktop environments, display managers, browsers,
+Roles covering desktop environments, display managers, browsers,
 development tools, multimedia, office, and productivity applications.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
@@ -23,7 +23,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 ## Requirements
 
 - ansible-core >= 2.19
-- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) >= 3.0.0
+- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) >= 3.1.0
 
 ## Included Roles
 
@@ -62,10 +62,10 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ### Development & AI
 
-| Role            | Description                                |
-| --------------- | ------------------------------------------ |
-| **development** | IDEs, database/API tools, homebrew SDKs    |
-| **ai**          | Claude Code, Ollama, Antigravity, API keys |
+| Role            | Description                                           |
+| --------------- | ----------------------------------------------------- |
+| **development** | IDEs, database/API tools, game engines, homebrew SDKs |
+| **ai**          | Claude Code, Ollama, Antigravity, API keys            |
 
 ### Multimedia & Graphics
 
@@ -94,6 +94,17 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 | **virtual_reality** | VR streaming to standalone headsets     |
 | **wine**            | Wine Windows compatibility layer        |
 | **cad**             | CAD applications                        |
+| **printing_3d**     | Slicers for FDM and resin 3D printers   |
+| **gis**             | QGIS, GDAL tools, GPlates               |
+
+### Helper Roles
+
+Used by other roles through `include_role` and `tasks_from`; no toggle, no
+inventory variables and not part of the `workstation` playbook.
+
+| Role                | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| **desktop_entries** | Desktop entry overrides (environment, keys) and role launchers  |
 
 ## Installation
 

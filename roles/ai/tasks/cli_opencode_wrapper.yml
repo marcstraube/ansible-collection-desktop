@@ -1,0 +1,23 @@
+---
+#
+# OpenCode Wrapper (Arch)
+#
+# The package installs /usr/bin/opencode; the wrapper in /usr/local/bin comes
+# first in PATH and points Bun's temporary directory at the runtime directory
+# of the session (see the template). On other systems npm installs OpenCode
+# into /usr/local/bin itself, so there is no place for a wrapper.
+
+- name: CLI OpenCode Wrapper | Deploy OpenCode wrapper
+  ansible.builtin.template:
+    src: opencode-wrapper.sh.j2
+    dest: '{{ __ai_opencode_wrapper }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  when: ai_opencode_enabled | bool
+
+- name: CLI OpenCode Wrapper | Remove OpenCode wrapper
+  ansible.builtin.file:
+    path: '{{ __ai_opencode_wrapper }}'
+    state: absent
+  when: not ai_opencode_enabled | bool

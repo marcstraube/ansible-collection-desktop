@@ -17,10 +17,15 @@ __ai_opencode_desktop_url: >-
 
 # Local AI
 __ai_ollama_package: ''
+__ai_whisper_package: ''
+__ai_huggingface_cli_package: ''
 __ai_lmstudio_package: ''
 
 # Service names
 __ai_ollama_service: 'ollama.service'
+
+# Ollama model directory when ai_ollama_models_dir is empty
+__ai_ollama_default_models_dir: '/usr/share/ollama/.ollama/models'
 
 # ComfyUI is not supported on RedHat-family hosts: no complete native PyTorch
 # stack (torch/torchvision/torchaudio) exists in EPEL, and the upstream pip

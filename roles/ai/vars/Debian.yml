@@ -17,10 +17,15 @@ __ai_opencode_desktop_url: >-
 
 # Local AI
 __ai_ollama_package: ''
+__ai_whisper_package: ''
+__ai_huggingface_cli_package: ''
 __ai_lmstudio_package: ''
 
 # Service names
 __ai_ollama_service: 'ollama.service'
+
+# Ollama model directory when ai_ollama_models_dir is empty
+__ai_ollama_default_models_dir: '/usr/share/ollama/.ollama/models'
 
 # ComfyUI
 __ai_comfyui_python: 'python3'
@@ -32,9 +37,9 @@ __ai_comfyui_venv_packages:
 
 # ComfyUI — native PyTorch packages (manual install flow). torchvision and
 # torchaudio are GPU-agnostic; only the base torch package differs by backend.
-# AMD/ROCm has no Debian package, so it is rejected in comfyui-other.yml.
+# ROCm has no Debian package, so it is rejected in comfyui-other.yml.
 __ai_comfyui_torch_packages:
-  nvidia:
+  cuda:
     - 'python3-torch-cuda'
     - 'python3-torchvision'
     - 'python3-torchaudio'

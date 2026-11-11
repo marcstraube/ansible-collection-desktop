@@ -17,6 +17,25 @@
   tags:
     - always
 
+- name: Main | Validate ACP settings
+  ansible.builtin.assert:
+    that:
+      - pipewire_acp_quirks | difference(__pipewire_acp_quirks.keys()) | length == 0
+      - pipewire_acp_files | rejectattr('src', 'defined') | list | length == 0
+      - pipewire_acp_files | map(attribute='type', default='') | difference(['paths', 'profile-sets']) | length == 0
+      - pipewire_acp_udev_rules | rejectattr('name', 'defined') | list | length == 0
+      - pipewire_acp_udev_rules | rejectattr('match', 'defined') | list | length == 0
+      - pipewire_acp_udev_rules | rejectattr('profile_set', 'defined') | list | length == 0
+    fail_msg: >-
+      pipewire_acp_quirks accepts {{ __pipewire_acp_quirks.keys() | join(', ') }};
+      pipewire_acp_files entries need src and type (paths or profile-sets);
+      pipewire_acp_udev_rules entries need name, match and profile_set.
+    quiet: true
+  when: pipewire_enabled | bool
+  tags:
+    - pipewire
+    - pipewire:acp
+
 - name: Main | Import cleanup tasks
   ansible.builtin.import_tasks: cleanup.yml
   when:
@@ -41,6 +60,15 @@
   tags:
     - pipewire
     - pipewire:configure
+
+- name: Main | Import ACP tasks
+  ansible.builtin.import_tasks: acp.yml
+  when:
+    - pipewire_enabled | bool
+    - (pipewire_acp_quirks + pipewire_acp_files + pipewire_acp_udev_rules) | length > 0
+  tags:
+    - pipewire
+    - pipewire:acp
 
 - name: Main | Import realtime tasks
   ansible.builtin.import_tasks: realtime.yml

@@ -1,0 +1,597 @@
+---
+- name: Verify written entries
+  hosts: all
+  gather_facts: false
+
+  vars:
+    __verify_dir: '/usr/local/share/applications'
+    __verify_marker: '# Managed by Ansible (marcstraube.desktop.molecule)'
+    __verify_other_marker: '# Managed by Ansible (marcstraube.desktop.molecule_other)'
+    __verify_env: 'env MESA_LOADER_DRIVER_OVERRIDE=zink WEBKIT_DISABLE_DMABUF_RENDERER=1'
+    __verify_newline: "\n"
+
+  tasks:
+    - name: Verify | Read written entries
+      ansible.builtin.slurp:
+        src: '{{ __verify_dir }}/{{ item }}'
+      loop:
+        - 'molecule-app.desktop'
+        - 'molecule-env.desktop'
+        - 'molecule-launcher.desktop'
+        - 'molecule-other.desktop'
+      register: __verify_content
+
+    # Lines per file name, and the same lines without the comment header
+    - name: Verify | Split written entries into lines
+      ansible.builtin.set_fact:
+        __verify_lines: >-
+          {{ dict(__verify_content.results | map(attribute='item')
+                  | zip(__verify_content.results | map(attribute='content')
+                        | map('b64decode') | map('split', __verify_newline))) }}
+        __verify_body: >-
+          {{ dict(__verify_content.results | map(attribute='item')
+                  | zip(__verify_content.results | map(attribute='content')
+                        | map('b64decode') | map('regex_replace', '(?m)^#.*\n', '')
+                        | map('split', __verify_newline))) }}
+
+    - name: Verify | Assert marker first and the ansible_managed header after it
+      ansible.builtin.assert:
+        that:
+          - __verify_lines[item][0] == (__verify_other_marker if item == 'molecule-other.desktop' else __verify_marker)
+          - __verify_lines[item][1] is match('#')
+          - "'[Desktop Entry]' in __verify_lines[item]"
+          - >-
+            __verify_lines[item][:__verify_lines[item].index('[Desktop Entry]')]
+            | reject('match', '#') | list | length == 0
+        fail_msg: '{{ item }} has no marker or ansible_managed header: {{ __verify_lines[item] }}'
+      loop: '{{ __verify_lines | list }}'
+
+    # Exec= in both groups gets the env prefix; Name is replaced in
+    # [Desktop Entry] only, Name[de] stays; new keys go to the end of
+    # [Desktop Entry]; Graphics is not added a second time
+    - name: Verify | Assert override with environment, set and append
+      ansible.builtin.assert:
+        that:
+          - >-
+            __verify_body['molecule-app.desktop'] == [
+              '[Desktop Entry]',
+              'Type=Application',
+              'Name=Molecule App (Override)',
+              'Name[de]=Molecule Anwendung',
+              'Exec=' ~ __verify_env ~ ' /usr/bin/molecule-app %U',
+              'TryExec=/usr/bin/molecule-app',
+              'Terminal=false',
+              'Categories=Graphics;Development;',
+              'Actions=new-window;',
+              'StartupWMClass=molecule-app',
+              'Keywords=molecule;test;',
+              '',
+              '[Desktop Action new-window]',
+              'Name=New Window',
+              'Exec=' ~ __verify_env ~ ' /usr/bin/molecule-app --new-window',
+              '']
+        fail_msg: "Override is wrong: {{ __verify_body['molecule-app.desktop'] }}"
+
+    - name: Verify | Assert override with an environment only
+      ansible.builtin.assert:
+        that:
+          - >-
+            __verify_body['molecule-env.desktop'] == [
+              '[Desktop Entry]',
+              'Type=Application',
+              'Name=Molecule Env',
+              'Exec=env QT_QPA_PLATFORM=xcb /usr/bin/molecule-env',
+              '']
+        fail_msg: "Override is wrong: {{ __verify_body['molecule-env.desktop'] }}"
+
+    - name: Verify | Assert role-provided entry with all fields
+      ansible.builtin.assert:
+        that:
+          - >-
+            __verify_body['molecule-launcher.desktop'] == [
+              '[Desktop Entry]',
+              'Type=Application',
+              'Name=Molecule Launcher',
+              'GenericName=Test launcher',
+              'Comment=Role-provided desktop entry',
+              'Exec=env DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 molecule-launcher %F',
+              'Icon=applications-engineering',
+              'Terminal=false',
+              'Categories=Graphics;3DGraphics;',
+              'MimeType=model/stl;',
+              '']
+        fail_msg: "Entry is wrong: {{ __verify_body['molecule-launcher.desktop'] }}"
+
+    - name: Verify | Assert role-provided entry with the required fields only
+      ansible.builtin.assert:
+        that:
+          - >-
+            __verify_body['molecule-other.desktop'] == [
+              '[Desktop Entry]',
+              'Type=Application',
+              'Name=Molecule Other',
+              'Exec=molecule-other',
+              'Terminal=false',
+              '']
+        fail_msg: "Entry is wrong: {{ __verify_body['molecule-other.desktop'] }}"
+
+    - name: Verify | Stat directory and written entries
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - '{{ __verify_dir }}'
+        - '{{ __verify_dir }}/molecule-app.desktop'
+        - '{{ __verify_dir }}/molecule-launcher.desktop'
+      register: __verify_mode_stat
+
+    - name: Verify | Assert ownership and modes
+      ansible.builtin.assert:
+        that:
+          - item.stat.pw_name == 'root'
+          - item.stat.gr_name == 'root'
+          - item.stat.mode == ('0755' if item.stat.isdir else '0644')
+        fail_msg: '{{ item.item }} has wrong ownership or mode'
+      loop: '{{ __verify_mode_stat.results }}'
+      loop_control:
+        label: '{{ item.item }}'
+
+    - name: Verify | Stat missing override and kept files
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - '{{ __verify_dir }}/molecule-missing.desktop'
+        - '{{ __verify_dir }}/molecule-foreign.desktop'
+        - '/usr/share/applications/molecule-app.desktop'
+      register: __verify_kept_stat
+
+    - name: Verify | Assert no override without a packaged entry and kept files
+      ansible.builtin.assert:
+        that:
+          - not __verify_kept_stat.results[0].stat.exists
+          - __verify_kept_stat.results[1].stat.exists
+          - __verify_kept_stat.results[2].stat.exists
+        fail_msg: >-
+          An override was written without a packaged entry, or the foreign
+          entry or the packaged entry is gone.
+
+    - name: Verify | Read packaged entry
+      ansible.builtin.slurp:
+        src: '/usr/share/applications/molecule-app.desktop'
+      register: __verify_packaged
+
+    - name: Verify | Assert packaged entry is unchanged
+      ansible.builtin.assert:
+        that:
+          - (__verify_packaged.content | b64decode) is search('(?m)^Name=Molecule App$')
+          - (__verify_packaged.content | b64decode) is search('(?m)^Exec=/usr/bin/molecule-app %U$')
+        fail_msg: 'The packaged entry was changed.'
+
+- name: Verify removal
+  hosts: all
+  gather_facts: false
+
+  vars:
+    __verify_dir: '/usr/local/share/applications'
+
+  tasks:
+    - name: Verify | Include override.yml without changes  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: override.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: '{{ __verify_file }}'
+      loop:
+        - 'molecule-app.desktop'
+        - 'molecule-env.desktop'
+      loop_control:
+        loop_var: __verify_file
+
+    - name: Verify | Include entry.yml with state absent  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: entry.yml
+      vars:
+        desktop_entries_caller: 'molecule'
+        desktop_entries_file: 'molecule-launcher.desktop'
+        desktop_entries_state: 'absent'
+
+    - name: Verify | Stat entries after the removal
+      ansible.builtin.stat:
+        path: '{{ __verify_dir }}/{{ item }}'
+      loop:
+        - 'molecule-app.desktop'
+        - 'molecule-env.desktop'
+        - 'molecule-launcher.desktop'
+        - 'molecule-other.desktop'
+        - 'molecule-foreign.desktop'
+      register: __verify_removed_stat
+
+    - name: Verify | Assert own entries removed, other and foreign entries kept
+      ansible.builtin.assert:
+        that:
+          - >-
+            __verify_removed_stat.results | selectattr('stat.exists')
+            | map(attribute='item') | list
+            == ['molecule-other.desktop', 'molecule-foreign.desktop']
+        fail_msg: >-
+          Remaining entries:
+          {{ __verify_removed_stat.results | selectattr('stat.exists') | map(attribute='item') | list }}
+
+# Both entry points refuse to replace an existing file without the marker of
+# the caller: the foreign entry from prepare.yml (no marker) and the entry of
+# molecule_other from converge.yml. Both have a packaged entry of the same
+# name, so the override calls reach the write path.
+- name: Verify foreign files are never replaced
+  hosts: all
+  gather_facts: false
+
+  vars:
+    __verify_dir: '/usr/local/share/applications'
+    __verify_files:
+      - 'molecule-foreign.desktop'
+      - 'molecule-other.desktop'
+
+  tasks:
+    - name: Verify | Read existing files before the write attempts
+      ansible.builtin.slurp:
+        src: '{{ __verify_dir }}/{{ item }}'
+      loop: '{{ __verify_files }}'
+      register: __verify_before
+
+    - name: Verify | Run override.yml against the foreign entry
+      block:
+        - name: Verify | Include override.yml for the foreign entry  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-foreign.desktop'
+            desktop_entries_environment:
+              QT_QPA_PLATFORM: 'xcb'
+
+        - name: Verify | Fail when override.yml replaced the foreign entry
+          ansible.builtin.fail:
+            msg: 'The role wrote over the foreign entry with override.yml.'
+      rescue:
+        - name: Verify | Assert refusal reason for override.yml and the foreign entry
+          ansible.builtin.assert:
+            that:
+              - >-
+                'molecule-foreign.desktop exists and was not created by this role for molecule'
+                in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run entry.yml against the foreign entry
+      block:
+        - name: Verify | Include entry.yml for the foreign entry  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: entry.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-foreign.desktop'
+            desktop_entries_name: 'Molecule Foreign'
+            desktop_entries_exec: 'molecule-foreign'
+
+        - name: Verify | Fail when entry.yml replaced the foreign entry
+          ansible.builtin.fail:
+            msg: 'The role wrote over the foreign entry with entry.yml.'
+      rescue:
+        - name: Verify | Assert refusal reason for entry.yml and the foreign entry
+          ansible.builtin.assert:
+            that:
+              - >-
+                'molecule-foreign.desktop exists and was not created by this role for molecule'
+                in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml against the entry of another caller
+      block:
+        - name: Verify | Include override.yml for the entry of another caller  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-other.desktop'
+            desktop_entries_environment:
+              QT_QPA_PLATFORM: 'xcb'
+
+        - name: Verify | Fail when override.yml replaced the entry of another caller
+          ansible.builtin.fail:
+            msg: 'The role wrote over the entry of another caller with override.yml.'
+      rescue:
+        - name: Verify | Assert refusal reason for override.yml and the entry of another caller
+          ansible.builtin.assert:
+            that:
+              - >-
+                'molecule-other.desktop exists and was not created by this role for molecule'
+                in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run entry.yml against the entry of another caller
+      block:
+        - name: Verify | Include entry.yml for the entry of another caller  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: entry.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-other.desktop'
+            desktop_entries_name: 'Molecule Other'
+            desktop_entries_exec: 'molecule-other'
+
+        - name: Verify | Fail when entry.yml replaced the entry of another caller
+          ansible.builtin.fail:
+            msg: 'The role wrote over the entry of another caller with entry.yml.'
+      rescue:
+        - name: Verify | Assert refusal reason for entry.yml and the entry of another caller
+          ansible.builtin.assert:
+            that:
+              - >-
+                'molecule-other.desktop exists and was not created by this role for molecule'
+                in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Read existing files after the write attempts
+      ansible.builtin.slurp:
+        src: '{{ __verify_dir }}/{{ item }}'
+      loop: '{{ __verify_files }}'
+      register: __verify_after
+
+    - name: Verify | Assert existing files are unchanged
+      ansible.builtin.assert:
+        that:
+          - >-
+            __verify_before.results | map(attribute='content') | list
+            == __verify_after.results | map(attribute='content') | list
+        fail_msg: 'A foreign file or the file of another caller was changed.'
+
+- name: Verify invalid input
+  hosts: all
+  gather_facts: false
+
+  # Every case fails before any change. All cases name the packaged fixture
+  # molecule-env.desktop, so a case that is wrongly accepted leaves an
+  # override behind, which the last task detects.
+  tasks:
+    - name: Verify | Run override.yml with a missing caller
+      block:
+        - name: Verify | Include override.yml with a missing caller  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_environment:
+              QT_QPA_PLATFORM: 'xcb'
+
+        - name: Verify | Fail when a missing caller was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted a missing caller.'
+      rescue:
+        - name: Verify | Assert rejection reason for a missing caller
+          ansible.builtin.assert:
+            that:
+              - >-
+                'needs desktop_entries_caller' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with a file name with a directory
+      block:
+        - name: Verify | Include override.yml with a file name with a directory  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: '../molecule-env.desktop'
+            desktop_entries_environment:
+              QT_QPA_PLATFORM: 'xcb'
+
+        - name: Verify | Fail when a file name with a directory was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted a file name with a directory.'
+      rescue:
+        - name: Verify | Assert rejection reason for a file name with a directory
+          ansible.builtin.assert:
+            that:
+              - >-
+                'needs desktop_entries_caller' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with an environment name starting with a digit
+      block:
+        - name: Verify | Include override.yml with an environment name starting with a digit  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_environment:
+              1QT_QPA_PLATFORM: 'xcb'
+
+        - name: Verify | Fail when an environment name starting with a digit was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an environment name starting with a digit.'
+      rescue:
+        - name: Verify | Assert rejection reason for an environment name starting with a digit
+          ansible.builtin.assert:
+            that:
+              - >-
+                'Invalid names: [1QT_QPA_PLATFORM]' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with an environment value that needs quoting
+      block:
+        - name: Verify | Include override.yml with an environment value that needs quoting  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_environment:
+              GDK_BACKEND: 'x11 wayland'
+
+        - name: Verify | Fail when an environment value that needs quoting was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an environment value that needs quoting.'
+      rescue:
+        - name: Verify | Assert rejection reason for an environment value that needs quoting
+          ansible.builtin.assert:
+            that:
+              - >-
+                'invalid values: [x11 wayland]' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with a localized set key
+      block:
+        - name: Verify | Include override.yml with a localized set key  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_set:
+              Name[de]: 'Molecule'
+
+        - name: Verify | Fail when a localized set key was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted a localized set key.'
+      rescue:
+        - name: Verify | Assert rejection reason for a localized set key
+          ansible.builtin.assert:
+            that:
+              - >-
+                'Invalid keys: [Name[de]]' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with a set value with a line break
+      block:
+        - name: Verify | Include override.yml with a set value with a line break  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_set:
+              Name: "Molecule\nExec=/bin/false"
+
+        - name: Verify | Fail when a set value with a line break was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted a set value with a line break.'
+      rescue:
+        - name: Verify | Assert rejection reason for a set value with a line break
+          ansible.builtin.assert:
+            that:
+              - >-
+                'keys with invalid values: [Name]' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with an append value with a semicolon
+      block:
+        - name: Verify | Include override.yml with an append value with a semicolon  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_append:
+              Categories:
+                - 'Graphics;Development'
+
+        - name: Verify | Fail when an append value with a semicolon was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an append value with a semicolon.'
+      rescue:
+        - name: Verify | Assert rejection reason for an append value with a semicolon
+          ansible.builtin.assert:
+            that:
+              - >-
+                'keys with invalid values: [Categories]' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run override.yml with an append value that is not a list
+      block:
+        - name: Verify | Include override.yml with an append value that is not a list  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: override.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_append:
+              Categories: 'Graphics'
+
+        - name: Verify | Fail when an append value that is not a list was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an append value that is not a list.'
+      rescue:
+        - name: Verify | Assert rejection reason for an append value that is not a list
+          ansible.builtin.assert:
+            that:
+              - >-
+                'must map keys to lists of values' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run entry.yml with an entry without exec
+      block:
+        - name: Verify | Include entry.yml with an entry without exec  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: entry.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_name: 'Molecule Env'
+
+        - name: Verify | Fail when an entry without exec was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an entry without exec.'
+      rescue:
+        - name: Verify | Assert rejection reason for an entry without exec
+          ansible.builtin.assert:
+            that:
+              - >-
+                'needs desktop_entries_name and desktop_entries_exec' in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Run entry.yml with an unknown state
+      block:
+        - name: Verify | Include entry.yml with an unknown state  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: entry.yml
+          vars:
+            desktop_entries_caller: 'molecule'
+            desktop_entries_file: 'molecule-env.desktop'
+            desktop_entries_state: 'removed'
+
+        - name: Verify | Fail when an unknown state was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an unknown state.'
+      rescue:
+        - name: Verify | Assert rejection reason for an unknown state
+          ansible.builtin.assert:
+            that:
+              - >-
+                "must be 'present' or 'absent'" in (ansible_failed_result.msg | default(''))
+            fail_msg: 'Unexpected failure: {{ ansible_failed_result.msg | default(ansible_failed_result) }}'
+
+    - name: Verify | Stat override after the invalid cases
+      ansible.builtin.stat:
+        path: '/usr/local/share/applications/molecule-env.desktop'
+      register: __verify_invalid_stat
+
+    - name: Verify | Assert the invalid cases changed nothing
+      ansible.builtin.assert:
+        that:
+          - not __verify_invalid_stat.stat.exists
+        fail_msg: 'An invalid call wrote an override.'

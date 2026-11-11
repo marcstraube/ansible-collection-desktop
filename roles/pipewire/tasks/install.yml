@@ -13,6 +13,8 @@
         (pipewire_pulseaudio_enabled | bool | ternary([__pipewire_pulse_package], [])) +
         (pipewire_alsa_enabled | bool | ternary([__pipewire_alsa_package], [])) +
         (pipewire_jack_enabled | bool | ternary([__pipewire_jack_package], [])) +
+        (pipewire_alsa_firmware_enabled | bool | ternary([__pipewire_alsa_firmware_package], [])) +
+        (pipewire_alsa_utils_enabled | bool | ternary([__pipewire_alsa_utils_package], [])) +
         (pipewire_bluetooth_enabled | bool | ternary(__pipewire_bluetooth_packages | default([]), [])) +
         ((pipewire_zeroconf_enabled | bool and __pipewire_zeroconf_package | length > 0)
           | ternary([__pipewire_zeroconf_package], [])) +

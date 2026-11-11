@@ -1,9 +1,9 @@
 ---
-# All three plays share an identical feature-toggle set so the per-play
+# All four plays share an identical feature-toggle set so the per-play
 # manage tasks stay idempotent across the sequence (the database tool tasks
 # remove packages when their toggle flips to false, which would otherwise
-# make play 1 reinstall on every converge). Only development_user_config_mode
-# and development_users differ between the plays.
+# make play 1 reinstall on every converge). Only development_user_config_mode,
+# development_users and users_list differ between the plays.
 #
 # The devkitPro dkp-libs / dkp-linux repositories the toolchain toggles
 # depend on are registered in prepare.yml (via the real
@@ -11,6 +11,12 @@
 # own idempotence is not coupled to this scenario's idempotence gate.
 # devkitPro coverage is disabled in CI via __molecule_devkitpro_reachable
 # (molecule.yml) — pkg.devkitpro.org blocks GitHub-hosted runners.
+#
+# The game engine toggles are on everywhere: Godot installs on Arch and is
+# a no-op elsewhere; Unreal Engine runs without a vendor file (the default
+# vendor_packages_dir below the molecule inventory does not exist), so the
+# helper clones the AUR repository — network, like the other AUR installs
+# here — prints its notice and skips the package without failing.
 - name: Converge | Managed mode
   hosts: all
   gather_facts: true
@@ -21,6 +27,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -42,10 +51,24 @@
         git_name: 'Dev Disabled'
         git_email: 'disabled@example.com'
 
+    # A configured development_users wins over the deprecated users_list
+    # attribute.
+    users_list:
+      - name: 'dev_derived_user'
+        git:
+          name: 'Dev Derived'
+
   tasks:
     - name: Converge | Include development role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+
+    - name: Converge | Assert no users_list deprecation warning
+      ansible.builtin.assert:
+        that:
+          - not (__development_users_list_attribute_deprecated | bool)
+        fail_msg: 'deprecation warning fired although development_users is set'
+        quiet: true
 
 
 # initial mode deploys only when the target config is absent, and
@@ -60,6 +83,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -96,6 +122,9 @@
     development_gb_gbstudio_enabled: true
     development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
     development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
     development_vscodium_enabled: false
     development_vscode_enabled: false
     development_zed_enabled: false
@@ -117,3 +146,54 @@
     - name: Converge | Include development role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
+
+
+# Users derived from the deprecated users_list git attribute. The global
+# disabled mode keeps the derived users from touching any home directory.
+- name: Converge | Users derived from users_list (deprecated)
+  hosts: all
+  gather_facts: false
+
+  vars:
+    development_enabled: true
+    development_gb_gbdk_enabled: true
+    development_gb_gbstudio_enabled: true
+    development_devkitpro_enabled: '{{ __molecule_devkitpro_reachable | default(true) | bool }}'
+    development_devkitpro_gba_dev_enabled: true
+    development_godot_enabled: true
+    development_godot_mono_enabled: true
+    development_unreal_engine_enabled: true
+    development_vscodium_enabled: false
+    development_vscode_enabled: false
+    development_zed_enabled: false
+    development_arduino_ide_enabled: false
+    development_arduino_classic_enabled: false
+    development_lua_stylua_enabled: true
+    development_lua_luacheck_enabled: true
+    development_lua_busted_enabled: true
+    development_qml_tools_enabled: true
+    development_dbeaver_enabled: false
+    development_pgadmin_enabled: false
+    development_user_config_mode: 'disabled'
+    users_list:
+      - name: 'dev_derived_user'
+        git:
+          name: 'Dev Derived'
+      - name: 'dev_plain_user'
+      - name: 'dev_system_account'
+        system: true
+        git:
+          name: 'Dev System'
+
+  tasks:
+    - name: Converge | Include development role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+    - name: Converge | Assert users_list deprecation warning and derivation
+      ansible.builtin.assert:
+        that:
+          - __development_users_list_attribute_deprecated | bool
+          - development_users | map(attribute='username') | list == ['dev_derived_user']
+        fail_msg: 'users_list git attribute derivation or its deprecation warning is wrong'
+        quiet: true

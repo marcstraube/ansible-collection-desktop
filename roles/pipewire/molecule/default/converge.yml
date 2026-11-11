@@ -11,6 +11,8 @@
     pipewire_pulseaudio_enabled: true
     pipewire_alsa_enabled: true
     pipewire_jack_enabled: false
+    pipewire_alsa_firmware_enabled: true
+    pipewire_alsa_utils_enabled: true
     pipewire_bluetooth_enabled: false
     pipewire_32bit_enabled: false
     pipewire_realtime_enabled: false
@@ -18,6 +20,15 @@
     pipewire_patchbay: 'none'
     pipewire_custom_config_enabled: false
     pipewire_remove_pulseaudio_enabled: false
+    pipewire_acp_quirks:
+      - creative_ae5_plus
+    pipewire_acp_files:
+      - src: 'molecule-test.conf'
+        type: 'profile-sets'
+    pipewire_acp_udev_rules:
+      - name: 'Molecule test card'
+        match: 'ATTRS{subsystem_vendor}=="0x1234", ATTRS{subsystem_device}=="0x5678"'
+        profile_set: 'molecule-test.conf'
 
   tasks:
     - name: Converge | Include pipewire role  # noqa: role-name[path]

@@ -1,25 +1,33 @@
 # marcstraube.desktop.development
 
 Install developer desktop applications: IDEs and editors, database and API
-tools, console homebrew toolchains, and per-user editor configuration.
+tools, game engines, console homebrew toolchains, and per-user editor
+configuration.
 
 ## Description
 
 Installs the graphical side of a development workstation: IDEs and editors
 (VS Code, VSCodium, Zed, JetBrains, Arduino), database and API tools, Lua and
-QML tooling, Game Boy and devkitPro homebrew toolchains, and per-user editor
-settings.
+QML tooling, Game Boy and devkitPro homebrew toolchains, the Godot and Unreal
+game engines, and per-user editor settings.
 
 Languages, build tools and CLI tooling live in `marcstraube.common`, which the
 base system applies to every host: `python`, `nodejs`, `rust`, `go`, `java`,
 `build_tools`, `security_scanners`, the developer tools category of `utils`
 and `git`.
 
+The tool toggles are install-only: turning a toggle off after install does
+not uninstall the package, which may be installed manually or through another
+role. Files the role creates for a tool, such as the Arduino IDE desktop
+override, are removed when its toggle is turned off.
+
 ## Requirements
 
 - ansible-core >= 2.19
 - `community.general` collection (for pacman and user modules)
 - `kewlfft.aur` collection (for AUR packages on Arch Linux)
+- `marcstraube.common` >= 3.1.0 (`vendor_packages` builds Unreal Engine from
+  the vendor file; `package_management` sets up the AUR builder user)
 
 ## Supported Platforms
 
@@ -117,10 +125,102 @@ each repository entry imports one of the two. `package_management` imports
 and locally signs both; this role installs `devkitpro-keyring`, the `devkit-env` package
 (which provides `DEVKITPRO`, `DEVKITARM`, `DEVKITPPC`, `DEVKITA64` and
 `PATH` system-wide via `/etc/profile.d/devkit-env.sh`), and the selected
-platform groups. The groups share common members (compilers, tools), so
-they are install-only — disabling a platform toggle after install does
-not uninstall the toolchain. Debian/RedHat are a no-op (a notice is
-logged) until the cross-collection alternative-installs strategy lands.
+platform groups. Debian/RedHat are a no-op (a notice is logged) until the
+cross-collection alternative-installs strategy lands.
+
+### Game Engines
+
+| Variable                            | Default | Description                                      |
+|-------------------------------------|---------|--------------------------------------------------|
+| `development_godot_enabled`         | `false` | Enable the Godot engine (`godot`)                |
+| `development_godot_mono_enabled`    | `false` | Enable Godot with C# support (`godot-mono`)      |
+| `development_unreal_engine_enabled` | `false` | Enable Unreal Engine 5 (AUR `unreal-engine-bin`) |
+
+Platform support:
+
+| Engine          | Arch                   | Debian Trixie | EL 9        | EL 10       |
+|-----------------|------------------------|---------------|-------------|-------------|
+| Godot           | yes (extra)            | no            | no          | no          |
+| Godot (C#)      | yes (extra)            | no            | no          | no          |
+| Unreal Engine 5 | yes (AUR, vendor file) | no (notice)   | no (notice) | no (notice) |
+
+All three toggles are install-only: turning one off leaves the package in
+place.
+
+#### Godot
+
+`godot` and `godot-mono` come from the Arch Linux `extra` repository and
+install side by side (the Mono build is a separate editor binary with C#
+support). Debian Trixie ships Godot 3.6 under the package name `godot`, a
+different major version, and EL has no package, so the Godot toggles are a
+silent no-op there.
+
+#### Unreal Engine 5
+
+Epic hands out the Linux build of Unreal Engine only after a login and the
+EULA, so the AUR package `unreal-engine-bin` cannot download its source
+itself: its PKGBUILD expects the engine archive next to itself. The role
+therefore delegates the install to `marcstraube.common.vendor_packages`
+(entry point `aur.yml`), which stages the archive from the Ansible
+controller on the host and builds the package as the AUR builder user.
+
+To install it:
+
+1. Sign in at <https://www.unrealengine.com/linux> with an Epic Games
+   account, accept the EULA and download the Linux build of the version the
+   AUR package currently carries (`pkgver` of `unreal-engine-bin`, for
+   example 5.8.2).
+2. Keep the file name Epic uses: `Linux_Unreal_Engine_<version>.zip`, for
+   example `Linux_Unreal_Engine_5.8.2.zip`. The role derives the expected
+   name from the PKGBUILD, so the archive of another version has another
+   name and counts as missing.
+3. Place the file in `vendor_packages_dir` on the Ansible controller. The
+   default is `files/vendor/` next to the inventory; any absolute path
+   works, for example a mounted network share:
+
+   ```text
+   inventories/<name>/
+   ├── hosts.yml
+   ├── group_vars/
+   └── files/
+       └── vendor/
+           └── Linux_Unreal_Engine_5.8.2.zip
+   ```
+
+   The archive has several GB and is under Epic's license, so keep it out
+   of git (`files/vendor/` in the inventory's `.gitignore`).
+
+4. Run the role. The host needs free space for the staged archive, the
+   extracted engine and the package — about twice the archive plus the
+   package — below the build directory of the helper
+   (`vendor_packages_build_dir`, by default `vendor_packages/` below the
+   AUR builder's home). See the `vendor_packages` role for the details.
+
+Without the archive the role prints a notice with the expected file name,
+the version and the download URL, skips the package and does not fail the
+play, so the toggle can stay enabled in the inventory:
+
+```text
+Vendor file for unreal-engine-bin 5.8.2-1 not found on the Ansible controller:
+/home/user/inventories/prod/files/vendor/Linux_Unreal_Engine_5.8.2.zip.
+Download Linux_Unreal_Engine_5.8.2.zip from https://www.unrealengine.com/linux
+and place it in /home/user/inventories/prod/files/vendor; the package is
+skipped on this run.
+```
+
+A new release of the AUR package asks for the new archive the same way: the
+installed engine stays until the matching archive is present, the role never
+removes or downgrades it.
+
+When a pacman repository, for example a private one, already provides a
+prebuilt `unreal-engine-bin`, register it through
+`marcstraube.common.package_management` (`pacman_custom_repositories`) and
+leave the toggle on: the helper finds the package in the repository,
+installs it from there and skips the vendor path. Updates of the package
+then arrive with the system upgrade.
+
+On Debian and EL the toggle is a no-op that logs a notice: Epic ships the
+Linux build as a zip archive only, and the AUR package is Arch only.
 
 ### IDEs and Editors
 
@@ -230,10 +330,6 @@ below. Shell and Python tooling live in `marcstraube.common.utils` and
 |---------------------------------|---------|------------------------------------------------------|
 | `development_qml_tools_enabled` | `false` | Enable Qt6 QML tools (qmllint + qmlformat, same pkg) |
 
-The QML tools are install-only — on Arch they ship in `qt6-declarative`
-itself, a core Qt6 library the desktop stack depends on, so disabling the
-toggle after install does not uninstall the package.
-
 ##### Platform support
 
 | Tool         | Arch | Debian Trixie | EL 9 | EL 10 |
@@ -257,6 +353,15 @@ Each user entry supports:
 | `username`        | yes      | System username                              |
 | `mode`            | no       | Per-user override of the global config mode  |
 
+Left empty, `development_users` derives from `users_list` entries carrying a
+`git` attribute (system users excluded).
+
+> **Deprecation:** deriving `development_users` from the `users_list` `git`
+> attribute is deprecated and will be removed in v4.0.0. The role prints a
+> warning while it derives users this way. From v4.0.0 an empty
+> `development_users` means no users; set `development_users` explicitly.
+> See #304.
+
 Mode semantics — analog to `marcstraube.desktop.browser`:
 
 | Mode       | First run                       | Subsequent runs                          |
@@ -273,6 +378,7 @@ Mode semantics — analog to `marcstraube.desktop.browser`:
 | `development:ides`             | IDE installation tasks     |
 | `development:gb-dev`           | Game Boy toolchain tasks   |
 | `development:devkitpro`        | devkitPro toolchain tasks  |
+| `development:game-engines`     | Game engine tasks          |
 | `development:tools`            | Database tools tasks       |
 | `development:lua`              | Lua tooling tasks          |
 | `development:qml`              | QML tooling tasks          |
@@ -334,6 +440,10 @@ Driver: `podman` | Platforms: Arch Linux, Debian Trixie, Rocky 9, Rocky 10
 - [GB Studio](https://www.gbstudio.dev/) — Visual Game Boy game maker
 - [devkitPro](https://devkitpro.org/) — Nintendo console homebrew toolchains (devkitARM/devkitPPC/devkitA64)
 - [devkitPro pacman](https://github.com/devkitPro/pacman) — Package manager and repositories for the toolchains
+- [Godot](https://godotengine.org/) — Free and open source 2D and 3D game engine
+- [Unreal Engine for Linux](https://www.unrealengine.com/linux) — Linux build download (Epic account, EULA)
+- [unreal-engine-bin](https://aur.archlinux.org/packages/unreal-engine-bin) — AUR package built from the downloaded archive
+- [marcstraube.common](https://github.com/marcstraube/ansible-collection-common) — vendor_packages helper role
 - [shfmt](https://github.com/mvdan/sh) — Shell formatter
 - [shellcheck](https://github.com/koalaman/shellcheck) — Shell script static analysis
 - [bats-core](https://github.com/bats-core/bats-core) — Bash automated testing system

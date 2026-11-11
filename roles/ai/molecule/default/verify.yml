@@ -9,6 +9,124 @@
         that: true
         fail_msg: 'AI role did not complete'
 
+# OpenCode wrapper (Arch): the native library lands in the runtime directory,
+# a BUN_TMPDIR of the caller wins, and disabling OpenCode removes the wrapper.
+# Every converge play has OpenCode disabled, as other systems install it with
+# npm, so the wrapper tasks run on their own.
+- name: Verify OpenCode wrapper
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Include ai role OpenCode wrapper tasks  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: cli_opencode_wrapper.yml
+      vars:
+        ai_opencode_enabled: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat OpenCode wrapper
+      ansible.builtin.stat:
+        path: '/usr/local/bin/opencode'
+      register: __ai_verify_oc_wrapper
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert OpenCode wrapper
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_oc_wrapper.stat.exists
+          - __ai_verify_oc_wrapper.stat.mode == '0755'
+          - __ai_verify_oc_wrapper.stat.pw_name == 'root'
+        fail_msg: '/usr/local/bin/opencode is missing or has the wrong mode'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Create runtime directories
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: directory
+        mode: '0700'
+      loop:
+        - '/run/ai-verify-runtime'
+        - '/run/ai-verify-own'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Run OpenCode through the wrapper
+      ansible.builtin.command:
+        argv: '{{ item }}'
+      loop:
+        - ['env', '-u', 'BUN_TMPDIR', '-u', 'TMPDIR',
+           'XDG_RUNTIME_DIR=/run/ai-verify-runtime', '/usr/local/bin/opencode', '--version']
+        - ['env', '-u', 'TMPDIR', 'BUN_TMPDIR=/run/ai-verify-own',
+           'XDG_RUNTIME_DIR=/run/ai-verify-runtime', '/usr/local/bin/opencode', '--version']
+      changed_when: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Find unpacked native libraries
+      ansible.builtin.find:
+        paths: '{{ item }}'
+        patterns: '.bun-*.so'
+        hidden: true
+      loop:
+        - '/run/ai-verify-runtime'
+        - '/run/ai-verify-own'
+      register: __ai_verify_oc_libs
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Both runs unpack the same library; the second one into BUN_TMPDIR only,
+    # so the runtime directory holds exactly the file of the first run.
+    - name: Verify | Assert the native library location
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_oc_libs.results[0].matched == 1
+          - __ai_verify_oc_libs.results[1].matched == 1
+        fail_msg: 'OpenCode did not unpack its native library where the wrapper points'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Include ai role OpenCode wrapper tasks with OpenCode disabled  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: cli_opencode_wrapper.yml
+      vars:
+        ai_opencode_enabled: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat OpenCode wrapper after disabling OpenCode
+      ansible.builtin.stat:
+        path: '/usr/local/bin/opencode'
+      register: __ai_verify_oc_wrapper_off
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert OpenCode wrapper removed
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_oc_wrapper_off.stat.exists
+        fail_msg: '/usr/local/bin/opencode was kept with OpenCode disabled'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Hugging Face CLI: installed on Arch only; the toggle is a no-op on Debian and EL
+- name: Verify Hugging Face CLI
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert python-huggingface-hub is installed
+      ansible.builtin.assert:
+        that:
+          - "'python-huggingface-hub' in ansible_facts['packages']"
+        fail_msg: 'python-huggingface-hub is not installed'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Run hf version
+      ansible.builtin.command:
+        cmd: 'hf version'
+      changed_when: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
 - name: Verify Claude Desktop user config
   hosts: all
   gather_facts: true
@@ -74,6 +192,31 @@
         fail_msg: 'user derived from the users_list ai attribute got no entry'
       when: ansible_facts['os_family'] != 'Archlinux'
 
+    - name: Verify | Read the merged entry
+      ansible.builtin.slurp:
+        src: '/home/ai_merged_exist/{{ __ai_verify_entry }}'
+      register: __ai_verify_merged_entry
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Verify | Assert merged mode reset Exec and kept the rest
+      ansible.builtin.assert:
+        that:
+          - >-
+            'Exec=/usr/bin/claude-desktop --password-store=gnome-libsecret %U'
+            in __ai_verify_merged_text
+          - >-
+            'Exec=/usr/bin/claude-desktop --new-window --password-store=gnome-libsecret'
+            in __ai_verify_merged_text
+          - "'--outdated' not in __ai_verify_merged_text"
+          - "'X-Molecule-Fixture=kept' in __ai_verify_merged_text"
+          - >-
+            __ai_verify_merged_text is match('# Partly managed by Ansible
+            \(marcstraube.desktop.ai\): Exec\n')
+        fail_msg: 'merged entry: {{ __ai_verify_merged_text }}'
+      vars:
+        __ai_verify_merged_text: '{{ __ai_verify_merged_entry.content | b64decode }}'
+      when: ansible_facts['os_family'] != 'Archlinux'
+
     - name: Verify | Stat entries that must not exist
       ansible.builtin.stat:
         path: '/home/{{ item }}/{{ __ai_verify_entry }}'
@@ -104,3 +247,704 @@
           - __ai_verify_mimeinfo.stat.exists
         fail_msg: 'update-desktop-database did not run for the managed user'
       when: ansible_facts['os_family'] != 'Archlinux'
+
+- name: Verify Aider user config
+  hosts: all
+  gather_facts: true
+
+  vars:
+    __ai_verify_aider_expected: |
+      model: "ollama_chat/qwen2.5-coder:32b"
+      set-env:
+        - "LM_STUDIO_API_BASE=http://lmstudio.example.com:1234/v1"
+        - "OLLAMA_API_BASE=http://ollama.example.com:11434"
+    __ai_verify_aider_fixture: |
+      model: "molecule/fixture"
+
+  tasks:
+    - name: Verify | Stat Aider configs
+      ansible.builtin.stat:
+        path: '/home/{{ item }}/.aider.conf.yml'
+      loop:
+        - 'ai_aider_managed'
+        - 'ai_aider_initial_new'
+        - 'ai_aider_initial_exist'
+        - 'ai_aider_disabled'
+      register: __ai_verify_aider_stat
+
+    - name: Verify | Assert Aider config owner and mode
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+          - item.stat.mode == '0600'
+          - item.stat.pw_name == item.item
+        fail_msg: '{{ item.item }}: Aider config missing or wrong owner/mode'
+      loop: '{{ __ai_verify_aider_stat.results[:3] }}'
+      loop_control:
+        label: '{{ item.item }}'
+
+    - name: Verify | Assert disabled user got no Aider config
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_aider_stat.results[3].stat.exists
+        fail_msg: 'Aider config written for a disabled user'
+
+    - name: Verify | Read Aider configs
+      ansible.builtin.slurp:
+        src: '/home/{{ item }}/.aider.conf.yml'
+      loop:
+        - 'ai_aider_managed'
+        - 'ai_aider_initial_new'
+        - 'ai_aider_initial_exist'
+      register: __ai_verify_aider_content
+
+    - name: Verify | Assert Aider config content
+      ansible.builtin.assert:
+        that:
+          - (__ai_verify_aider_content.results[0].content | b64decode)
+            is search(__ai_verify_aider_expected | regex_escape)
+          - (__ai_verify_aider_content.results[1].content | b64decode)
+            is search(__ai_verify_aider_expected | regex_escape)
+          - (__ai_verify_aider_content.results[0].content | b64decode | from_yaml)['model']
+            == 'ollama_chat/qwen2.5-coder:32b'
+          # initial keeps the pre-seeded file untouched
+          - (__ai_verify_aider_content.results[2].content | b64decode)
+            == __ai_verify_aider_fixture
+        fail_msg: 'Aider config content not as expected'
+
+    # Emptying both variables removes the managed config, initial keeps its own
+    - name: Verify | Include ai role user tasks with nothing to configure  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+      vars:
+        ai_enabled: true
+        ai_claude_desktop_enabled: false
+        ai_aider_enabled: true
+        ai_aider_model: ''
+        ai_aider_set_env: {}
+        ai_user_config_mode: 'initial'
+        ai_users:
+          - username: 'ai_aider_managed'
+            mode: 'managed'
+          - username: 'ai_aider_initial_new'
+
+    - name: Verify | Stat Aider configs after emptying the variables
+      ansible.builtin.stat:
+        path: '/home/{{ item }}/.aider.conf.yml'
+      loop:
+        - 'ai_aider_managed'
+        - 'ai_aider_initial_new'
+      register: __ai_verify_aider_stat_empty
+
+    - name: Verify | Assert managed config removed, initial config kept
+      ansible.builtin.assert:
+        that:
+          - not __ai_verify_aider_stat_empty.results[0].stat.exists
+          - __ai_verify_aider_stat_empty.results[1].stat.exists
+        fail_msg: 'managed Aider config not removed or initial config touched'
+
+- name: Verify merged per-user configs
+  hosts: all
+  gather_facts: true
+
+  vars:
+    __ai_verify_lms: '.lmstudio/models/ollama'
+
+  tasks:
+    - name: Verify | Read merged-mode files
+      ansible.builtin.slurp:
+        src: '/home/{{ item }}'
+      loop:
+        - 'ai_merge_exist/.aider.conf.yml'                              # 0
+        - 'ai_merge_exist/.config/opencode/opencode.jsonc'              # 1
+        - 'ai_merge_new/.config/opencode/opencode.jsonc'                # 2
+        - 'ai_merge_managed/.config/opencode/opencode.jsonc'            # 3
+        - 'ai_merge_initial/.config/opencode/opencode.jsonc'            # 4
+        - 'ai_merge_exist/.lmstudio/settings.json'                      # 5
+        - 'ai_merge_exist/.lmstudio/.internal/http-server-config.json'  # 6
+        - 'ai_merge_new/.lmstudio/.internal/http-server-config.json'    # 7
+        - 'ai_merge_new/.aider.conf.yml'                                # 8
+        - 'ai_merge_exist/.config/opencode/opencode.json'               # 9
+      register: __ai_verify_merge_raw
+
+    - name: Verify | Build merged-mode content list
+      ansible.builtin.set_fact:
+        __ai_verify_merge: >-
+          {{ __ai_verify_merge_raw.results | map(attribute='content')
+             | map('b64decode') | list }}
+
+    # JSON files are parsed without the role's comment header
+    - name: Verify | Parse merged-mode files
+      ansible.builtin.set_fact:
+        __ai_verify_aider: '{{ __ai_verify_merge[0] | from_yaml }}'
+        __ai_verify_oc: >-
+          {{ __ai_verify_merge[1:5]
+             | map('regex_replace', '(?m)^\s*(//|/\*| \*).*$', '')
+             | map('from_json') | list }}
+        __ai_verify_lms_settings: '{{ __ai_verify_merge[5] | from_json }}'
+        __ai_verify_lms_server: '{{ __ai_verify_merge[6] | from_json }}'
+        __ai_verify_lms_server_new: '{{ __ai_verify_merge[7] | from_json }}'
+
+    - name: Verify | Assert Aider merged keys and kept user keys
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_aider['model'] == 'ollama_chat/qwen3-coder:30b'
+          - __ai_verify_aider['set-env'] == ['OLLAMA_API_BASE=http://ollama.example.com:11434']
+          - __ai_verify_aider['dark-mode'] == true
+          - >-
+            __ai_verify_merge[0] is match('# Partly managed by Ansible
+            \(marcstraube\.desktop\.ai\): model, set-env\n')
+          - "'hand-written comment' not in __ai_verify_merge[0]"
+          - __ai_verify_merge[8] is match('# Partly managed by Ansible')
+        fail_msg: 'merged Aider config: {{ __ai_verify_merge[0] }}'
+
+    - name: Verify | Assert OpenCode configs per mode
+      ansible.builtin.assert:
+        that:
+          # the role's own file, merged mode: written in full with the marker
+          - __ai_verify_oc[0]['$schema'] == 'https://opencode.ai/config.json'
+          - __ai_verify_oc[0]['model'] == 'ollama/qwen3-coder:30b'
+          - >-
+            __ai_verify_oc[0]['provider']['ollama']['models']['qwen3-coder:30b']
+            == {'name': 'Qwen3-Coder 30B', 'limit': {'context': 32768, 'output': 8192}}
+          - __ai_verify_oc[0]['provider']['lmstudio']['options']['apiKey'] == 'molecule-key'
+          - __ai_verify_oc[0]['provider']['lmstudio']['name'] == 'lmstudio'
+          - >-
+            __ai_verify_oc[0]['provider']['ollama']['npm'] == '@ai-sdk/openai-compatible'
+          - "'// Managed by Ansible (marcstraube.desktop.ai)' in __ai_verify_merge[1]"
+          # the user's opencode.json is never touched
+          - "'outdated' in __ai_verify_merge[9]"
+          - "'Ansible' not in __ai_verify_merge[9]"
+          # merged and managed write the same file
+          - __ai_verify_oc[1] == __ai_verify_oc[0]
+          - __ai_verify_oc[2] == __ai_verify_oc[0]
+          # initial: the pre-seeded file stays as it was
+          - >-
+            __ai_verify_merge[4] | trim == '{"theme": "initial-fixture"}'
+        fail_msg: 'OpenCode configs not as expected: {{ __ai_verify_oc }}'
+
+    - name: Verify | Stat OpenCode configs
+      ansible.builtin.stat:
+        path: '/home/ai_merge_new/.config/opencode/{{ item }}'
+      loop:
+        - 'opencode.jsonc'
+        - 'opencode.json'
+      register: __ai_verify_oc_stat
+
+    - name: Verify | Assert OpenCode config owner and mode
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_oc_stat.results[0].stat.mode == '0600'
+          - __ai_verify_oc_stat.results[0].stat.pw_name == 'ai_merge_new'
+          - not __ai_verify_oc_stat.results[1].stat.exists
+
+    - name: Verify | Assert LM Studio settings merged
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_lms_settings['downloadsFolder'] == '/home/ai_merge_exist/.lmstudio/models'
+          - __ai_verify_lms_settings['appTheme'] == 'molecule'
+          - __ai_verify_lms_server['networkInterface'] == '0.0.0.0'
+          - __ai_verify_lms_server['port'] == 1240
+          - __ai_verify_lms_server['cors'] == true
+          - >-
+            __ai_verify_lms_server_new == {'networkInterface': '0.0.0.0', 'port': 1240}
+          - "'Partly managed' not in __ai_verify_merge[6]"
+        fail_msg: 'LM Studio settings not as expected'
+
+    - name: Verify | Stat Ollama links
+      ansible.builtin.stat:
+        path: '/home/ai_merge_exist/{{ __ai_verify_lms }}/{{ item }}'
+      loop:
+        - 'molecule-text-latest/molecule-text-latest.gguf'                # 0
+        - 'molecule-text-latest/mmproj-molecule-text-latest.gguf'         # 1
+        - 'vision-model-q4_k_m/vision-model-q4_k_m.gguf'                  # 2
+        - 'vision-model-q4_k_m/mmproj-vision-model-q4_k_m.gguf'           # 3
+        - 'dropped-latest'                                                # 4
+      register: __ai_verify_links
+
+    - name: Verify | Assert Ollama links
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_links.results[0].stat.lnk_source == '/srv/ollama-fixture/blobs/sha256-aaaa'
+          - not __ai_verify_links.results[1].stat.exists
+          - __ai_verify_links.results[2].stat.lnk_source == '/srv/ollama-fixture/blobs/sha256-bbbb'
+          - __ai_verify_links.results[3].stat.lnk_source == '/srv/ollama-fixture/blobs/sha256-cccc'
+          - not __ai_verify_links.results[4].stat.exists
+        fail_msg: 'Ollama links not as expected'
+
+    - name: Verify | Stat Ollama blobs
+      ansible.builtin.stat:
+        path: '/srv/ollama-fixture/blobs/{{ item }}'
+      loop:
+        - 'sha256-aaaa'
+        - 'sha256-bbbb'
+        - 'sha256-cccc'
+      register: __ai_verify_blobs
+
+    - name: Verify | Assert Ollama's blobs were not touched
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_blobs.results | map(attribute='stat.pw_name') | unique == ['root']
+        fail_msg: 'linking changed the owner of an Ollama blob'
+
+    - name: Verify | Stat the moved model repository
+      ansible.builtin.stat:
+        path: '{{ item }}'
+      loop:
+        - '/home/ai_merge_exist/.lmstudio/models/molecule/Repo-GGUF'
+        - '/srv/hdd-models/Repo-GGUF/model.gguf'
+      register: __ai_verify_moved
+
+    - name: Verify | Assert the download went through the hand-made link
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_moved.results[0].stat.islnk
+          - __ai_verify_moved.results[0].stat.lnk_source == '/srv/hdd-models/Repo-GGUF'
+          - __ai_verify_moved.results[1].stat.exists
+          - __ai_verify_moved.results[1].stat.pw_name == 'ai_merge_exist'
+        fail_msg: 'the link to the moved repository was replaced or not used'
+
+    # Emptying the variables in merged mode leaves every key in place and
+    # only drops the header; the role's own OpenCode file goes away.
+    - name: Verify | Include ai role user tasks with nothing to configure  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+      vars:
+        ai_enabled: true
+        ai_claude_desktop_enabled: false
+        ai_aider_enabled: true
+        ai_aider_model: ''
+        ai_aider_set_env: {}
+        ai_aider_user_config_mode: 'merged'
+        ai_opencode_enabled: true
+        ai_opencode_providers: {}
+        ai_opencode_model: ''
+        ai_lmstudio_enabled: false
+        ai_users:
+          - username: 'ai_merge_exist'
+          - username: 'ai_merge_new'
+
+    - name: Verify | Read configs after emptying the variables
+      ansible.builtin.slurp:
+        src: '/home/ai_merge_exist/{{ item }}'
+      loop:
+        - '.aider.conf.yml'
+        - '.config/opencode/opencode.json'
+      register: __ai_verify_merge_empty
+
+    - name: Verify | Stat OpenCode configs after emptying the variables
+      ansible.builtin.stat:
+        path: '/home/{{ item }}/.config/opencode/opencode.jsonc'
+      loop:
+        - 'ai_merge_exist'
+        - 'ai_merge_new'
+      register: __ai_verify_merge_empty_oc
+
+    - name: Verify | Assert keys kept and the role's OpenCode file removed
+      ansible.builtin.assert:
+        that:
+          - >-
+            __ai_verify_merge_empty.results[0].content | b64decode | from_yaml
+            == {'dark-mode': true, 'model': 'ollama_chat/qwen3-coder:30b',
+                'set-env': ['OLLAMA_API_BASE=http://ollama.example.com:11434']}
+          - "'Partly managed' not in (__ai_verify_merge_empty.results[0].content | b64decode)"
+          - __ai_verify_merge_empty.results[1].content == __ai_verify_merge_raw.results[9].content
+          - __ai_verify_merge_empty_oc.results | map(attribute='stat.exists') | unique == [false]
+        fail_msg: 'emptying the variables removed a key or kept the OpenCode file'
+
+    # An opencode.jsonc the role did not write stops the run and stays as it is
+    - name: Verify | Run the OpenCode tasks against a config of the user
+      block:
+        - name: Verify | Include ai role user tasks for the foreign config  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+            tasks_from: users.yml
+          vars:
+            ai_enabled: true
+            ai_claude_desktop_enabled: false
+            ai_aider_enabled: false
+            ai_opencode_enabled: true
+            ai_opencode_model: 'ollama/qwen3-coder:30b'
+            ai_lmstudio_enabled: false
+            ai_users:
+              - username: 'ai_merge_foreign'
+
+        - name: Verify | Fail when the foreign config was accepted
+          ansible.builtin.fail:
+            msg: 'the role accepted an opencode.jsonc it did not write'
+
+      rescue:
+        - name: Verify | Assert the run stopped at the foreign config
+          ansible.builtin.assert:
+            that:
+              - "'was not written by this role' in ansible_failed_result.msg | default('')"
+            fail_msg: 'unexpected failure: {{ ansible_failed_result }}'
+
+    - name: Verify | Read the foreign OpenCode config
+      ansible.builtin.slurp:
+        src: '/home/ai_merge_foreign/.config/opencode/opencode.jsonc'
+      register: __ai_verify_oc_foreign
+
+    - name: Verify | Assert the foreign OpenCode config is unchanged
+      ansible.builtin.assert:
+        that:
+          - >-
+            (__ai_verify_oc_foreign.content | b64decode).splitlines()
+            == ["// the user's own file", '{"theme": "foreign-fixture"}']
+        fail_msg: 'the foreign opencode.jsonc was changed'
+
+- name: Verify Ollama and whisper.cpp backends
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Verify | Gather package facts
+      ansible.builtin.package_facts:
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert Ollama and the Vulkan backend are installed
+      ansible.builtin.assert:
+        that:
+          - "'ollama' in ansible_facts['packages']"
+          - "'ollama-vulkan' in ansible_facts['packages']"
+          - "'ollama-rocm' not in ansible_facts['packages']"
+          - "'ollama-cuda' not in ansible_facts['packages']"
+        fail_msg: 'expected ollama and ollama-vulkan, and no other backend'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert whisper.cpp and the ggml Vulkan backend are installed
+      ansible.builtin.assert:
+        that:
+          - "'whisper-cpp' in ansible_facts['packages']"
+          - "'ggml-vulkan' in ansible_facts['packages']"
+          - "'ggml-hip' not in ansible_facts['packages']"
+          - "'ggml-cuda' not in ansible_facts['packages']"
+        fail_msg: 'expected whisper-cpp and ggml-vulkan, and no other backend'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Read Ollama environment drop-in
+      ansible.builtin.slurp:
+        src: '/etc/systemd/system/ollama.service.d/ansible.conf'
+      register: __ai_verify_ollama_dropin
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert drop-in sets the Ollama environment
+      ansible.builtin.assert:
+        that:
+          - >-
+            'Environment="OLLAMA_CONTEXT_LENGTH=32768"'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+          - >-
+            'Environment="OLLAMA_FLASH_ATTENTION=1"'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+        fail_msg: 'drop-in is missing an Environment= line'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert drop-in sets the model directory and address
+      ansible.builtin.assert:
+        that:
+          - >-
+            'Environment="OLLAMA_MODELS=/srv/ollama-models"'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+          - >-
+            'Environment="OLLAMA_HOST=0.0.0.0:11500"'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+          - >-
+            'RequiresMountsFor=/srv/ollama-models'
+            in (__ai_verify_ollama_dropin.content | b64decode)
+        fail_msg: 'drop-in is missing OLLAMA_MODELS, OLLAMA_HOST or RequiresMountsFor'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Stat Ollama model directory
+      ansible.builtin.stat:
+        path: '/srv/ollama-models'
+      register: __ai_verify_ollama_models_dir
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the model directory belongs to the service user
+      ansible.builtin.assert:
+        that:
+          - __ai_verify_ollama_models_dir.stat.isdir
+          - __ai_verify_ollama_models_dir.stat.pw_name == 'ollama'
+        fail_msg: '/srv/ollama-models missing or not owned by ollama'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Read Ollama service properties
+      ansible.builtin.systemd_service:
+        name: ollama.service
+      register: __ai_verify_ollama_unit
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the service runs with the environment
+      ansible.builtin.assert:
+        that:
+          - "'OLLAMA_CONTEXT_LENGTH=32768' in __ai_verify_ollama_unit.status.Environment | default('')"
+          - "'OLLAMA_FLASH_ATTENTION=1' in __ai_verify_ollama_unit.status.Environment | default('')"
+          - "'/srv/ollama-models' in __ai_verify_ollama_unit.status.RequiresMountsFor | default('')"
+        fail_msg: >-
+          ollama.service does not carry the environment or the mount:
+          {{ __ai_verify_ollama_unit.status.Environment | default('') }}
+          {{ __ai_verify_ollama_unit.status.RequiresMountsFor | default('') }}
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Emptying the mapping keeps the drop-in for the mount of the default
+    # model directory, without Environment= lines
+    - name: Verify | Include ai role with an empty Ollama environment  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      vars:
+        ai_enabled: true
+        ai_claude_code_enabled: false
+        ai_antigravity_cli_enabled: false
+        ai_codex_enabled: false
+        ai_opencode_enabled: false
+        ai_aider_enabled: false
+        ai_claude_desktop_enabled: false
+        ai_antigravity_enabled: false
+        ai_opencode_desktop_enabled: false
+        ai_ollama_enabled: true
+        ai_ollama_backend: 'vulkan'
+        ai_ollama_environment: {}
+        ai_whisper_enabled: false
+        ai_lmstudio_enabled: false
+        ai_comfyui_enabled: false
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Read Ollama drop-in after emptying the environment
+      ansible.builtin.slurp:
+        src: '/etc/systemd/system/ollama.service.d/ansible.conf'
+      register: __ai_verify_ollama_dropin_empty
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Assert the drop-in only ties the service to the mount
+      ansible.builtin.assert:
+        that:
+          - "'RequiresMountsFor=/var/lib/ollama' in __ai_verify_ollama_dropin_empty.content | b64decode"
+          - "'Environment=' not in __ai_verify_ollama_dropin_empty.content | b64decode"
+        fail_msg: >-
+          unexpected drop-in after emptying ai_ollama_environment:
+          {{ __ai_verify_ollama_dropin_empty.content | b64decode }}
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Verify | Run role with an invalid Ollama backend
+      block:
+        - name: Verify | Include ai role with ai_ollama_backend 'opencl'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_ollama_enabled: true
+            ai_ollama_backend: 'opencl'
+
+        - name: Verify | Fail when the invalid backend was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_ollama_backend 'opencl'."
+      rescue:
+        - name: Verify | Assert rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an invalid whisper.cpp backend
+      block:
+        - name: Verify | Include ai role with ai_whisper_backend 'opencl'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_whisper_enabled: true
+            ai_whisper_backend: 'opencl'
+
+        - name: Verify | Fail when the invalid whisper.cpp backend was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_whisper_backend 'opencl'."
+      rescue:
+        - name: Verify | Assert whisper.cpp rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an invalid entry in the Ollama backend list
+      block:
+        - name: Verify | Include ai role with ai_ollama_backend ['vulkan', 'opencl']  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_ollama_enabled: true
+            ai_ollama_backend: ['vulkan', 'opencl']
+
+        - name: Verify | Fail when the invalid Ollama backend list was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_ollama_backend ['vulkan', 'opencl']."
+      rescue:
+        - name: Verify | Assert Ollama backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an empty Ollama backend list
+      block:
+        - name: Verify | Include ai role with an empty ai_ollama_backend  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_ollama_enabled: true
+            ai_ollama_backend: []
+
+        - name: Verify | Fail when the empty Ollama backend list was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an empty ai_ollama_backend.'
+      rescue:
+        - name: Verify | Assert empty Ollama backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_ollama_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an invalid entry in the whisper.cpp backend list
+      block:
+        - name: Verify | Include ai role with ai_whisper_backend ['vulkan', 'opencl']  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_whisper_enabled: true
+            ai_whisper_backend: ['vulkan', 'opencl']
+
+        - name: Verify | Fail when the invalid whisper.cpp backend list was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_whisper_backend ['vulkan', 'opencl']."
+      rescue:
+        - name: Verify | Assert whisper.cpp backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an empty whisper.cpp backend list
+      block:
+        - name: Verify | Include ai role with an empty ai_whisper_backend  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_whisper_enabled: true
+            ai_whisper_backend: []
+
+        - name: Verify | Fail when the empty whisper.cpp backend list was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an empty ai_whisper_backend.'
+      rescue:
+        - name: Verify | Assert empty whisper.cpp backend list rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_whisper_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an invalid ComfyUI backend
+      block:
+        - name: Verify | Include ai role with ai_comfyui_backend 'vulkan'  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_comfyui_enabled: true
+            ai_comfyui_backend: 'vulkan'
+
+        - name: Verify | Fail when the invalid ComfyUI backend was accepted
+          ansible.builtin.fail:
+            msg: "The role accepted ai_comfyui_backend 'vulkan'."
+      rescue:
+        - name: Verify | Assert ComfyUI rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('ai_comfyui_backend must be')
+            quiet: true
+
+    - name: Verify | Run role with an OpenCode model limit without output
+      block:
+        - name: Verify | Include ai role with only a context limit  # noqa: role-name[path]
+          ansible.builtin.include_role:
+            name: '{{ playbook_dir }}/../..'
+          vars:
+            ai_enabled: true
+            ai_opencode_enabled: true
+            ai_opencode_providers:
+              ollama:
+                base_url: 'http://ollama.example.com:11434/v1'
+                models:
+                  - id: 'qwen3-coder:30b'
+                    context: 32768
+
+        - name: Verify | Fail when the incomplete limit was accepted
+          ansible.builtin.fail:
+            msg: 'The role accepted an OpenCode model limit without output.'
+      rescue:
+        - name: Verify | Assert OpenCode limit rejection reason
+          ansible.builtin.assert:
+            that:
+              - ansible_failed_result.msg | default('') is search('both or none')
+            quiet: true
+
+# --check skips commands, so every read-only probe the decisions depend on
+# must run anyway. A dry run against the converged state and a user without
+# any files must pass without errors.
+- name: Verify check mode
+  hosts: all
+  gather_facts: true
+  check_mode: true
+
+  tasks:
+    - name: Verify | Run the user tasks in check mode  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+      vars:
+        ai_enabled: true
+        ai_claude_desktop_enabled: false
+        ai_aider_enabled: true
+        ai_aider_model: 'ollama_chat/qwen3-coder:30b'
+        ai_aider_user_config_mode: 'merged'
+        ai_opencode_enabled: true
+        ai_opencode_model: 'ollama/qwen3-coder:30b'
+        ai_ollama_enabled: true
+        __ai_ollama_models_dir: '/srv/ollama-fixture'
+        ai_lmstudio_enabled: true
+        ai_lmstudio_host: '0.0.0.0'
+        ai_lmstudio_models:
+          - repo: 'molecule/Check-GGUF'
+            file: 'model.gguf'
+        ai_lmstudio_ollama_models:
+          - 'molecule-text'
+        ai_users:
+          - username: 'ai_merge_exist'
+          - username: 'ai_check_none'
+
+    - name: Verify | Run the Ollama tasks in check mode  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      vars:
+        ai_enabled: true
+        ai_claude_code_enabled: false
+        ai_antigravity_cli_enabled: false
+        ai_codex_enabled: false
+        ai_opencode_enabled: false
+        ai_aider_enabled: false
+        ai_claude_desktop_enabled: false
+        ai_antigravity_enabled: false
+        ai_opencode_desktop_enabled: false
+        ai_ollama_enabled: true
+        ai_ollama_backend: 'vulkan'
+        ai_ollama_models_dir: '/srv/ollama-check'
+        ai_ollama_host: '0.0.0.0'
+        ai_whisper_enabled: false
+        ai_lmstudio_enabled: false
+        ai_comfyui_enabled: false
+      when: ansible_facts['os_family'] == 'Archlinux'

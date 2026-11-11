@@ -32,6 +32,49 @@ ai_opencode_gemini_auth_enabled: false
 # Enable Aider (AI pair programming)
 ai_aider_enabled: false
 
+# Default model, written as 'model:' into the per-user ~/.aider.conf.yml,
+# e.g. 'ollama_chat/<model>' or 'lm_studio/<model>'. Deployed per user via
+# ai_users.
+ai_aider_model: ''
+
+# Environment for the model provider, written as Aider's 'set-env' list into
+# the same file. Examples:
+#   ai_aider_set_env:
+#     OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+# LM Studio needs a non-empty key even without authentication:
+#   ai_aider_set_env:
+#     LM_STUDIO_API_BASE: 'http://lmstudio.example.com:1234/v1'
+#     LM_STUDIO_API_KEY: 'dummy-api-key'
+ai_aider_set_env: {}
+
+# OpenAI-compatible model servers for OpenCode, written as 'provider' into
+# the per-user ~/.config/opencode/opencode.jsonc, a file of the role's own;
+# OpenCode merges it with the user's opencode.json. Each provider takes a name,
+# the base URL of the server, an optional API key and its models; a model
+# takes an id, an optional display name and optional context/output limits.
+# Deployed per user via ai_users.
+ai_opencode_providers: {}
+# Example:
+#   ai_opencode_providers:
+#     ollama:
+#       name: 'Ollama'
+#       base_url: 'http://ollama.example.com:11434/v1'
+#       models:
+#         - id: 'qwen3-coder:30b'
+#           name: 'Qwen3-Coder 30B'
+#           context: 32768
+#           output: 8192
+#     lmstudio:
+#       name: 'LM Studio'
+#       base_url: 'http://lmstudio.example.com:1234/v1'
+#       api_key: '{{ lmstudio_api_key }}'  # only with LM Studio authentication
+#       models:
+#         - id: 'qwen3-coder-30b-a3b-instruct'
+
+# Default model as '<provider>/<model id>', written as 'model' into the same
+# file, e.g. 'ollama/qwen3-coder:30b'. Empty leaves the choice to OpenCode.
+ai_opencode_model: ''
+
 #
 # Desktop Applications
 #
@@ -66,25 +109,111 @@ ai_opencode_desktop_enabled: false
 # Enable Ollama (local LLM server)
 ai_ollama_enabled: false
 
-# Models to pull after installation
+# Models to pull after installation. A pull reports a change only when the
+# model was new or updated. Models shared with LM Studio come from Hugging
+# Face as 'hf.co/<user>/<gguf-repo>:<quant>' (see README).
 ai_ollama_models: []
 # Example:
 #   ai_ollama_models:
 #     - 'llama3.2'
-#     - 'codellama'
-#     - 'mistral'
+#     - 'hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M'
+
+# Model directory. Empty keeps the package default (/var/lib/ollama on Arch
+# Linux, /usr/share/ollama/.ollama/models elsewhere). A set path is created
+# for the Ollama service user and rendered as OLLAMA_MODELS into the
+# drop-in; do not set OLLAMA_MODELS in ai_ollama_environment as well. On
+# BTRFS a missing or empty directory becomes a subvolume (see README).
+ai_ollama_models_dir: ''
+
+# Listen address and port, rendered as OLLAMA_HOST into the drop-in when
+# either differs from the default (127.0.0.1:11434); do not set OLLAMA_HOST
+# in ai_ollama_environment as well. A changed port needs the matching
+# firewalld service or port.
+ai_ollama_host: ''
+ai_ollama_port: 11434
 
 # Enable and start the Ollama service
 ai_ollama_service_enabled: true
 
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu', or a list of them.
+# Arch Linux installs the matching ollama-<backend> package of every listed
+# backend next to ollama; the upstream install script on Debian and EL
+# detects the GPU itself and ignores this variable.
+ai_ollama_backend: 'cpu'
+# Example (several backends side by side; Ollama can see the same GPU once
+# per backend):
+#   ai_ollama_backend: ['rocm', 'vulkan']
+
+# Environment variables for the Ollama server, rendered into a systemd drop-in
+# (/etc/systemd/system/ollama.service.d/ansible.conf). An empty mapping removes
+# the drop-in. See https://docs.ollama.com/faq for the available settings.
+ai_ollama_environment: {}
+# Example:
+#   ai_ollama_environment:
+#     OLLAMA_CONTEXT_LENGTH: '32768'
+#     OLLAMA_FLASH_ATTENTION: '1'
+
+# Enable whisper.cpp (local speech recognition; Arch only)
+ai_whisper_enabled: false
+
+# Compute backend: 'rocm', 'vulkan', 'cuda' or 'cpu', or a list of them.
+# Arch Linux installs the matching ggml backend package of every listed
+# backend next to whisper-cpp; 'cpu' uses the ggml CPU backend that
+# whisper-cpp depends on.
+ai_whisper_backend: 'cpu'
+# Example (several backends side by side; ggml can see the same GPU once per
+# backend):
+#   ai_whisper_backend: ['rocm', 'vulkan']
+
+# Enable the Hugging Face CLI (hf; model and dataset downloads; Arch only)
+ai_huggingface_cli_enabled: false
+
 # Enable LM Studio
 ai_lmstudio_enabled: false
 
+# LM Studio settings, merged per user into the files LM Studio writes
+# itself (see User Configuration). Empty leaves LM Studio's own value alone.
+#   ai_lmstudio_models_dir — 'downloadsFolder' in ~/.lmstudio/settings.json;
+#                            an absolute path, or relative to the home
+#   ai_lmstudio_host/port  — 'networkInterface' and 'port' in
+#                            ~/.lmstudio/.internal/http-server-config.json
+# The model directory defaults to ~/.lmstudio/models; on BTRFS a missing or
+# empty one below the home becomes a subvolume (see README).
+ai_lmstudio_models_dir: ''
+ai_lmstudio_host: ''
+ai_lmstudio_port: ''
+
+# GGUF files to download per user with the Hugging Face CLI (needs
+# ai_huggingface_cli_enabled) into <models dir>/<publisher>/<repo>/<file>.
+# Public repositories need no token.
+ai_lmstudio_models: []
+# Example:
+#   ai_lmstudio_models:
+#     - repo: 'lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF'
+#       file: 'Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf'
+
+# Token for gated or private Hugging Face repositories, passed to the
+# download as HF_TOKEN and never written to disk
+ai_huggingface_token: ''
+
+# Ollama models (names as in ai_ollama_models) to link into LM Studio instead
+# of downloading them again. Each one appears in
+# <models dir>/ollama/<name>/; the subdirectory follows this list.
+ai_lmstudio_ollama_models: []
+# Example:
+#   ai_lmstudio_ollama_models:
+#     - 'hf.co/lmstudio-community/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M'
+
 # Enable ComfyUI (Stable Diffusion node-based UI)
 ai_comfyui_enabled: false
-# GPU backend: 'nvidia', 'amd', or 'cpu' (amd is Arch-only — Debian has no
-# native ROCm PyTorch package; see README)
-ai_comfyui_gpu: 'nvidia'
+# Compute backend: 'cuda', 'rocm' or 'cpu'. Arch Linux passes it to the AUR
+# package; Debian supports 'cuda' and 'cpu' only (no native ROCm PyTorch
+# package; see README). The default changes to 'cpu' in v4.0.0; set it
+# explicitly to keep CUDA.
+ai_comfyui_backend: 'cuda'
+# DEPRECATED: ai_comfyui_gpu ('nvidia', 'amd', 'cpu') still works and maps to
+# ai_comfyui_backend ('cuda', 'rocm', 'cpu'). Removal in v4.0.0.
+# ai_comfyui_gpu: 'nvidia'
 # Git branch/tag
 ai_comfyui_version: 'master'
 # Installation directory
@@ -108,24 +237,42 @@ ai_comfyui_service_enabled: true
 #
 # User Configuration
 #
-# Users for whom to deploy the per-user Claude Desktop entry.
+# Users for whom to deploy the per-user configs: the Claude Desktop entry,
+# the Aider config (~/.aider.conf.yml), the OpenCode config
+# (~/.config/opencode/opencode.jsonc) and the LM Studio settings and models.
 #
-# Left empty, the list derives from users_list entries carrying an 'ai'
-# attribute, the standard derivation across the marcstraube collections.
+# DEPRECATED: left empty, the list derives from users_list entries carrying
+# an 'ai' attribute (system users excluded). Removal in v4.0.0 — from then on
+# an empty list means no users; set ai_users explicitly. See #304.
 #
 # Modes:
-#   managed  — always deploy/overwrite the desktop entry
-#   initial  — deploy the entry only when it is absent, then leave it
-#              under the user's control (default)
-#   disabled — skip config deployment for this user
+#   managed  — always deploy/overwrite the whole file; the Aider config and
+#              the role's OpenCode file are removed when none of their
+#              variables is set. The LM Studio settings are written by LM
+#              Studio itself and treat managed like merged.
+#   merged   — set only the role-owned keys whose variables are set and keep
+#              every other key of the file; a key is never removed (see
+#              README for the keys per file). OpenCode keeps the role's keys
+#              in a file of their own, so merged behaves like managed there.
+#   initial  — deploy each file only when it is absent, then leave it
+#              under the user's control
+#   disabled — skip this user entirely
+# A user's 'mode' applies to every tool; without it each tool uses its own
+# default below.
 
 ai_users: []
 # ai_users:
 #   - username: 'johndoe'
-#     mode: 'managed'
+#     mode: 'merged'
 #     password_store: 'kwallet6'
 
-# Default mode when a user entry has no 'mode' key
+# Fallback mode for the tools that have no default of their own.
 # 'initial' deploys the entry only when it is absent, so hand-added
 # Chromium switches survive; 'managed' reconciles continuously.
 ai_user_config_mode: 'initial'
+
+# Default mode per tool
+ai_claude_desktop_user_config_mode: '{{ ai_user_config_mode }}'
+ai_aider_user_config_mode: '{{ ai_user_config_mode }}'
+ai_opencode_user_config_mode: 'managed'
+ai_lmstudio_user_config_mode: 'merged'

@@ -1,0 +1,28 @@
+---
+# The role has no standalone run. Other roles include one of its entry points
+# with include_role and tasks_from and pass the values as vars:
+#
+#   - name: Environment | Override the OrcaSlicer desktop entry
+#     ansible.builtin.include_role:
+#       name: marcstraube.desktop.desktop_entries
+#       tasks_from: override.yml
+#     vars:
+#       desktop_entries_caller: 'printing_3d'
+#       desktop_entries_file: 'orca-slicer.desktop'
+#       desktop_entries_environment:
+#         WEBKIT_DISABLE_DMABUF_RENDERER: '1'
+#
+# Entry points:
+#   override.yml - copy of a packaged entry with environment, set and append
+#                  changes; removed again without changes
+#   entry.yml    - role-provided entry from fields (state present/absent)
+
+- name: Main | Fail on a direct role run
+  ansible.builtin.fail:
+    msg: >-
+      marcstraube.desktop.desktop_entries has no standalone run. Include an
+      entry point with include_role and tasks_from (override.yml or
+      entry.yml) and pass desktop_entries_caller, desktop_entries_file and
+      the values of the entry point as vars; see the role README.
+  tags:
+    - always

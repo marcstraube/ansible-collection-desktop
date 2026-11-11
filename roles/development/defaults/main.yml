@@ -68,6 +68,31 @@ development_devkitpro_wii_dev_enabled: false        # Wii (devkitPPC)
 development_devkitpro_switch_dev_enabled: false     # Switch (devkitA64)
 
 #
+# Game Engines
+#
+# Godot comes from the Arch Linux extra repository; both packages install
+# side by side. Debian 13 ships Godot 3.6 as `godot`, a different major
+# version, and EL has no package, so the Godot toggles are a no-op there.
+# Unreal Engine is the AUR package unreal-engine-bin, built from the engine
+# archive that Epic hands out only after a login and the EULA (see the
+# README); a no-op with a notice on Debian/RedHat. All install-only: a
+# toggle turned off leaves the package in place.
+
+# Enable the Godot engine (package godot)
+development_godot_enabled: false
+
+# Enable Godot with C# support (package godot-mono, installs side by side
+# with godot)
+development_godot_mono_enabled: false
+
+# Enable Unreal Engine 5 (AUR unreal-engine-bin). Built by
+# marcstraube.common.vendor_packages from the archive in vendor_packages_dir
+# on the Ansible controller; a pacman repository that carries the package
+# is used instead. Without the archive the role prints a notice and skips
+# the package.
+development_unreal_engine_enabled: false
+
+#
 # Language Tooling
 #
 # Linters, formatters, and test frameworks for Lua and QML. Each toggle
@@ -146,6 +171,10 @@ development_bruno_enabled: false
 # Users to configure with development settings (git + IDEs).
 # Per-user mode (managed/initial/disabled) can be set per entry; the
 # top-level default below applies when an entry omits it.
+#
+# DEPRECATED: left empty, the list derives from users_list entries carrying
+# a 'git' attribute (system users excluded). Removal in v4.0.0 — from then on
+# an empty list means no users; set development_users explicitly. See #304.
 development_users: []
 # Example:
 #   - username: 'johndoe'

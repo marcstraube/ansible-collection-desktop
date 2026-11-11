@@ -1,0 +1,168 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Prepare | Update package cache (Arch)
+      community.general.pacman:
+        update_cache: true
+        upgrade: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Update package cache (Debian)
+      ansible.builtin.apt:
+        update_cache: true
+      changed_when: false
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Prepare | Update package cache (RedHat)
+      ansible.builtin.dnf:
+        update_cache: true
+      changed_when: false
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    # UVtools stub package.
+    #
+    # The role provides the UVtools desktop entry when /usr/bin/uvtools
+    # exists. Building uvtools-bin from the AUR is not done in the container:
+    # a local stub package with the same name provides the executable, so
+    # the AUR install task finds the package installed and builds nothing.
+    - name: Prepare | Install base-devel and sudo (Arch)
+      community.general.pacman:
+        name:
+          - base-devel
+          - sudo
+        state: present
+      retries: 3
+      delay: 5
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Create aur_builder user (Arch)
+      ansible.builtin.user:
+        name: aur_builder
+        group: wheel
+        create_home: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Configure sudoers for aur_builder (Arch)
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/aur_builder
+        line: 'aur_builder ALL=(ALL) NOPASSWD: ALL'
+        create: true
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Create UVtools stub build directory (Arch)
+      ansible.builtin.file:
+        path: '/home/aur_builder/uvtools-stub'
+        state: directory
+        owner: 'aur_builder'
+        group: 'wheel'
+        mode: '0755'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Deploy UVtools stub PKGBUILD (Arch)
+      ansible.builtin.copy:
+        dest: '/home/aur_builder/uvtools-stub/PKGBUILD'
+        owner: 'aur_builder'
+        group: 'wheel'
+        mode: '0644'
+        content: |
+          pkgname=uvtools-bin
+          pkgver=0.0.1
+          pkgrel=1
+          pkgdesc='Molecule stub standing in for the uvtools-bin AUR package'
+          arch=('any')
+          license=('MIT')
+          options=('!strip' '!debug')
+
+          package() {
+            install -dm755 "${pkgdir}/usr/bin"
+            printf '#!/bin/sh\nexit 0\n' > "${pkgdir}/usr/bin/uvtools"
+            chmod 755 "${pkgdir}/usr/bin/uvtools"
+          }
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Build UVtools stub package (Arch)
+      become: true
+      become_user: aur_builder
+      ansible.builtin.command:
+        cmd: makepkg --noconfirm --nodeps
+        chdir: '/home/aur_builder/uvtools-stub'
+        creates: '/home/aur_builder/uvtools-stub/uvtools-bin-0.0.1-1-any.pkg.tar.zst'
+      environment:
+        PKGEXT: '.pkg.tar.zst'
+        PKGDEST: '/home/aur_builder/uvtools-stub'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Install UVtools stub package (Arch)
+      community.general.pacman:
+        name: '/home/aur_builder/uvtools-stub/uvtools-bin-0.0.1-1-any.pkg.tar.zst'
+        state: present
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # Desktop entry override fixture.
+    #
+    # orca-slicer-bin is built from the AUR, which the container test does not
+    # do. The override code path only needs the packaged entry, so this
+    # fixture stands in for the one the package ships, with an Exec= line in
+    # the main group and one in a [Desktop Action] group.
+    - name: Prepare | Deploy packaged OrcaSlicer entry fixture (Arch)
+      ansible.builtin.copy:
+        dest: '/usr/share/applications/orca-slicer.desktop'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Name=OrcaSlicer
+          Exec=/opt/orca-slicer/AppRun %U
+          TryExec=/opt/orca-slicer/AppRun
+          Terminal=false
+          Type=Application
+          Actions=new-window;
+
+          [Desktop Action new-window]
+          Name=New Window
+          Exec=/opt/orca-slicer/AppRun --new-window
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    # A desktop entry without the role's marker at an override path, next to
+    # a fixture packaged entry: the lychee entry is absent from
+    # printing_3d_environment, so the removal must leave the file alone, and
+    # verify.yml checks that an environment for lychee refuses to overwrite it.
+    - name: Prepare | Ensure override directory for the foreign entry (Arch)
+      ansible.builtin.file:
+        path: '/usr/local/share/applications'
+        state: directory
+        owner: 'root'
+        group: 'root'
+        mode: '0755'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Deploy foreign Lychee Slicer entry (Arch)
+      ansible.builtin.copy:
+        dest: '/usr/local/share/applications/lycheeslicer.desktop'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Name=Lychee Slicer
+          Exec=env MOLECULE_FIXTURE=1 lycheeslicer %u
+          Type=Application
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Prepare | Deploy packaged Lychee Slicer entry fixture (Arch)
+      ansible.builtin.copy:
+        dest: '/usr/share/applications/lycheeslicer.desktop'
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+        content: |
+          [Desktop Entry]
+          Name=Lychee Slicer
+          Exec=lycheeslicer %u
+          Type=Application
+      when: ansible_facts['os_family'] == 'Archlinux'

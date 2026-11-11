@@ -17,6 +17,12 @@ __development_lua_busted_package: 'busted'
 # QML tooling (qmllint + qmlformat ship in the same package)
 __development_qml_tools_package: 'qt6-declarative'
 
+# Game engines (extra repository; godot and godot-mono install side by side).
+# Unreal Engine is built from the vendor file by
+# marcstraube.common.vendor_packages, see tasks/game_engines.yml
+__development_godot_package: 'godot'
+__development_godot_mono_package: 'godot-mono'
+
 # Serial device access for Arduino (uucp required for CH340 USB-serial
 # chips — uaccess from systemd-logind alone is not sufficient)
 __development_serial_groups:

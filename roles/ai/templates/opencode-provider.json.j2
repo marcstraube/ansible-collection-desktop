@@ -1,0 +1,28 @@
+{#- The 'provider' block of opencode.jsonc, rendered from
+    ai_opencode_providers. Every provider talks to an OpenAI-compatible
+    server (Ollama, LM Studio and others) through the same SDK package. -#}
+{%- set ns = namespace(providers={}) -%}
+{%- for provider_id, provider in ai_opencode_providers | dictsort -%}
+{%-   set models = namespace(entries={}) -%}
+{%-   for model in provider.models | default([]) -%}
+{%-     set limit = {} -%}
+{%-     if model.context is defined -%}
+{%-       set limit = limit | combine({'context': model.context | int}) -%}
+{%-     endif -%}
+{%-     if model.output is defined -%}
+{%-       set limit = limit | combine({'output': model.output | int}) -%}
+{%-     endif -%}
+{%-     set entry = ({'name': model.name} if model.name is defined else {})
+                    | combine({'limit': limit} if limit | length > 0 else {}) -%}
+{%-     set models.entries = models.entries | combine({model.id: entry}) -%}
+{%-   endfor -%}
+{%-   set options = {'baseURL': provider.base_url}
+                    | combine({'apiKey': provider.api_key}
+                              if provider.api_key | default('') | length > 0 else {}) -%}
+{%-   set ns.providers = ns.providers | combine({provider_id: {
+        'npm': '@ai-sdk/openai-compatible',
+        'name': provider.name | default(provider_id),
+        'options': options,
+        'models': models.entries}}) -%}
+{%- endfor -%}
+{{ ns.providers | to_json }}

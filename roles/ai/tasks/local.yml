@@ -5,17 +5,30 @@
 
 # Ollama
 
+- name: Local | Build Ollama package list (Arch)
+  ansible.builtin.set_fact:
+    __ai_ollama_packages: >-
+      {{ ([__ai_ollama_package]
+          + __ai_ollama_backends
+            | map('extract', __ai_ollama_backend_packages)
+            | flatten)
+         | unique }}
+  when:
+    - ansible_facts['os_family'] == 'Archlinux'
+    - ai_ollama_enabled | bool
+
+# Ollama loads its backends at startup, so a new backend needs a restart.
 - name: Local | Install Ollama
   become: true
   ansible.builtin.package:
-    name: '{{ __ai_ollama_package }}'
+    name: '{{ __ai_ollama_packages }}'
     state: present
   when:
     - ansible_facts['os_family'] == 'Archlinux'
     - ai_ollama_enabled | bool
-    - __ai_ollama_package | length > 0
   retries: 3
   delay: 5
+  notify: Restart Ollama
 
 - name: Local | Download Ollama install script (non-Arch)
   become: true
@@ -48,24 +61,138 @@
     - ansible_facts['os_family'] != 'Archlinux'
     - ai_ollama_enabled | bool
 
+# On BTRFS the model directory becomes its own subvolume while it is still
+# missing or empty, so its large, re-downloadable files stay out of the
+# snapshots. Runs after the installation, which creates the service user.
+- name: Local | Include BTRFS tasks for the Ollama model directory
+  ansible.builtin.include_tasks:
+    file: btrfs.yml
+    apply:
+      tags:
+        - ai
+        - ai:local
+  when:
+    - ai_ollama_enabled | bool
+
+# A custom model directory must exist for the service user before the
+# service starts with OLLAMA_MODELS pointing at it.
+- name: Local | Create Ollama model directory
+  become: true
+  ansible.builtin.file:
+    path: '{{ ai_ollama_models_dir }}'
+    state: directory
+    owner: '{{ __ai_ollama_user }}'
+    group: '{{ __ai_ollama_group }}'
+    mode: '0755'
+  when:
+    - ai_ollama_enabled | bool
+    - ai_ollama_models_dir | length > 0
+
+# Ollama reads its server settings from the environment of the service. The
+# drop-in also ties the service to the mount of the model directory, which
+# can be a subvolume or a disk of its own.
+- name: Local | Create Ollama service drop-in directory
+  become: true
+  ansible.builtin.file:
+    path: '{{ __ai_ollama_dropin_dir }}'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    - ai_ollama_enabled | bool
+
+- name: Local | Deploy Ollama service drop-in
+  become: true
+  ansible.builtin.template:
+    src: ollama-environment.conf.j2
+    dest: '{{ __ai_ollama_dropin_dir }}/ansible.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ai_ollama_enabled | bool
+  notify: Restart Ollama
+
 - name: Local | Manage Ollama service
   become: true
   ansible.builtin.systemd_service:
     name: '{{ __ai_ollama_service }}'
     enabled: "{{ ai_ollama_service_enabled | bool }}"
     state: "{{ ai_ollama_service_enabled | bool | ternary('started', 'stopped') }}"
+    daemon_reload: true
   when:
     - ai_ollama_enabled | bool
 
+# A changed directory or address must be live before the pull, which talks to
+# the running server.
+- name: Local | Apply pending Ollama restart
+  ansible.builtin.meta: flush_handlers
+
+# ollama pull prints its progress and rewrites the manifest even when nothing
+# is downloaded, so its output says nothing about a change. The model ID that
+# 'ollama list' shows is the manifest digest: compare it before and after.
 - name: Local | Pull Ollama models
-  ansible.builtin.command:
-    cmd: 'ollama pull {{ item }}'
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail
+      model_id() {
+        ollama list | awk -v name="$1" 'NR > 1 && $1 == name { print $2 }'
+      }
+      before=$(model_id "$NAME")
+      ollama pull "$MODEL" >/dev/null
+      after=$(model_id "$NAME")
+      [ -n "$after" ] || { echo "model $NAME missing after the pull" >&2; exit 1; }
+      [ "$before" = "$after" ] || echo 'updated'
+    executable: /bin/bash
+  environment:
+    MODEL: '{{ item }}'
+    # 'ollama list' shows every name with its tag
+    NAME: "{{ item if (item | regex_search(':[^/]*$')) else item ~ ':latest' }}"
   loop: '{{ ai_ollama_models }}'
+  register: __ai_ollama_pull
+  changed_when: "'updated' in __ai_ollama_pull.stdout"
   when:
     - ai_ollama_enabled | bool
     - ai_ollama_models | length > 0
-  register: __ai_ollama_pull
-  changed_when: "'pulling' in __ai_ollama_pull.stdout"
+
+# whisper.cpp
+
+- name: Local | Build whisper.cpp package list
+  ansible.builtin.set_fact:
+    __ai_whisper_packages: >-
+      {{ ([__ai_whisper_package]
+          + __ai_whisper_backends
+            | map('extract', __ai_whisper_backend_packages)
+            | flatten)
+         | unique }}
+  when:
+    - ai_whisper_enabled | bool
+    - __ai_whisper_package | length > 0
+
+- name: Local | Install whisper.cpp
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_whisper_packages }}'
+    state: present
+  when:
+    - ai_whisper_enabled | bool
+    - __ai_whisper_package | length > 0
+  retries: 3
+  delay: 5
+
+# Hugging Face CLI
+
+- name: Local | Install Hugging Face CLI
+  become: true
+  ansible.builtin.package:
+    name: '{{ __ai_huggingface_cli_package }}'
+    state: present
+  when:
+    - ai_huggingface_cli_enabled | bool
+    - __ai_huggingface_cli_package | length > 0
+  retries: 3
+  delay: 5
 
 # LM Studio
 

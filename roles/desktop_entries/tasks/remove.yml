@@ -1,0 +1,15 @@
+---
+# Removes __desktop_entries_override_dir/<file> when it is a file of this
+# caller. Files placed by hand or by another role (no marker, or the marker
+# of another caller) stay.
+
+- name: Remove | Import ownership tasks
+  ansible.builtin.import_tasks: ownership.yml
+
+- name: Remove | Delete desktop entry of this caller
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: absent
+  loop: '{{ __desktop_entries_own.files | default([]) }}'
+  loop_control:
+    label: '{{ item.path }}'

@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+
+  vars:
+    gis_enabled: true
+    gis_qgis_enabled: true
+    gis_gdal_enabled: true
+
+    # GPlates (AUR only): on in the containers without an AUR package, where
+    # the toggle must be a no-op, off on Arch Linux, where it would start a
+    # source build.
+    gis_gplates_enabled: "{{ ansible_facts['os_family'] != 'Archlinux' }}"
+
+  tasks:
+    - name: Converge | Include gis role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'

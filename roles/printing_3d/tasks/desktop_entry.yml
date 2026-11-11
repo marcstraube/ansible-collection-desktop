@@ -1,0 +1,45 @@
+---
+#
+# UVtools
+#
+# uvtools-bin ships the AppImage and /usr/bin/uvtools, but no desktop entry.
+# The role provides one through marcstraube.desktop.desktop_entries while the
+# toggle is on and the executable exists (installed by the role or by hand);
+# printing_3d_environment.uvtools goes into its Exec= line. Turning the toggle
+# off removes the entry; the package stays installed.
+
+- name: Desktop Entry | Stat UVtools executable
+  ansible.builtin.stat:
+    path: '{{ __printing_3d_uvtools_executable }}'
+  register: __printing_3d_uvtools_executable_stat
+  when:
+    - printing_3d_uvtools_enabled | bool
+
+# Toggle on without the executable (Debian, EL, not installed yet): no call
+- name: Desktop Entry | Manage UVtools entry
+  ansible.builtin.include_role:
+    name: marcstraube.desktop.desktop_entries
+    tasks_from: entry.yml
+    apply:
+      tags:
+        - printing-3d
+  vars:
+    desktop_entries_caller: 'printing_3d'
+    desktop_entries_file: '{{ __printing_3d_uvtools_entry }}'
+    desktop_entries_state: "{{ printing_3d_uvtools_enabled | bool | ternary('present', 'absent') }}"
+    desktop_entries_name: 'UVtools'
+    desktop_entries_generic_name: 'MSLA/DLP slicer file viewer and editor'
+    desktop_entries_comment: 'Inspect, repair, convert and edit resin printer files'
+    desktop_entries_exec: 'uvtools %F'
+    desktop_entries_icon: 'applications-engineering'
+    desktop_entries_terminal: false
+    desktop_entries_categories:
+      - 'Graphics'
+      - '3DGraphics'
+      - 'Engineering'
+    desktop_entries_environment: "{{ printing_3d_environment['uvtools'] | default({}) }}"
+  when:
+    - not (printing_3d_uvtools_enabled | bool)
+      or __printing_3d_uvtools_executable_stat.stat.exists | default(false)
+  tags:
+    - printing-3d

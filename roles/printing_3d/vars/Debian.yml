@@ -1,0 +1,7 @@
+---
+#
+# Debian Packages
+#
+
+__printing_3d_prusaslicer_package: 'prusa-slicer'
+__printing_3d_cura_package: 'cura'

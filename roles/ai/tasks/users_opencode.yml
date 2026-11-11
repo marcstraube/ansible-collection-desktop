@@ -1,0 +1,107 @@
+---
+#
+# OpenCode Per-User Config
+#
+# OpenCode reads both opencode.json and opencode.jsonc from
+# ~/.config/opencode/ and merges them, with opencode.json winning on a
+# conflict. The role keeps its keys in opencode.jsonc, a file of its own, and
+# never touches opencode.json: the user's settings live there and override
+# the role's.
+
+- name: Users OpenCode | Get user info
+  ansible.builtin.getent:
+    database: passwd
+    key: '{{ ai_user.username }}'
+
+- name: Users OpenCode | Set user home fact
+  ansible.builtin.set_fact:
+    __ai_user_home: "{{ ansible_facts['getent_passwd'][ai_user.username][4] }}"
+
+- name: Users OpenCode | Stat existing config
+  ansible.builtin.stat:
+    path: '{{ __ai_user_home }}/{{ __ai_opencode_config_file }}'
+  register: __ai_opencode_conf_stat
+
+# The keys the role owns: 'provider' (the whole block) and 'model'. no_log:
+# provider entries may carry API keys.
+- name: Users OpenCode | Build role-owned keys
+  ansible.builtin.set_fact:
+    __ai_opencode_owned: >-
+      {{ ({'provider': lookup('ansible.builtin.template', 'opencode-provider.json.j2') | from_json}
+          if ai_opencode_providers | length > 0 else {})
+         | combine({'model': ai_opencode_model}
+                   if ai_opencode_model | length > 0 else {}) }}
+  no_log: true
+
+# Mode semantics — the file is the role's own, so merged has nothing to
+# merge and behaves like managed:
+#   managed  — reconcile the file on every run, remove it when there is
+#              nothing to configure
+#   merged   — same as managed
+#   initial  — write it only when absent, then leave it alone
+#   disabled — never write (gated in users.yml)
+- name: Users OpenCode | Build deploy decision
+  ansible.builtin.set_fact:
+    __ai_opencode_reconcile: "{{ __ai_user_mode in ['managed', 'merged'] }}"
+
+# An opencode.jsonc without the role's marker was written by the user. It is
+# never overwritten or removed; the run stops and names the way out.
+- name: Users OpenCode | Read existing config
+  ansible.builtin.slurp:
+    src: '{{ __ai_user_home }}/{{ __ai_opencode_config_file }}'
+  register: __ai_opencode_conf_raw
+  no_log: true
+  when:
+    - __ai_opencode_reconcile | bool
+    - __ai_opencode_conf_stat.stat.exists
+
+- name: Users OpenCode | Refuse to replace a config of the user
+  ansible.builtin.assert:
+    that:
+      - __ai_opencode_marker in (__ai_opencode_conf_raw.content | b64decode)
+    fail_msg: >-
+      {{ __ai_user_home }}/{{ __ai_opencode_config_file }} was not written by
+      this role, so it is left unchanged. Move its settings to opencode.json
+      next to it, or use the initial or disabled mode for user
+      {{ ai_user.username }}.
+    quiet: true
+  when:
+    - __ai_opencode_reconcile | bool
+    - __ai_opencode_conf_stat.stat.exists
+
+# ~/.config may not exist yet; the symbolic mode only adds the owner's bits,
+# so an existing, stricter directory keeps its permissions.
+- name: Users OpenCode | Ensure config directories exist
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: directory
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: 'u+rwx'
+  loop:
+    - '{{ __ai_user_home }}/.config'
+    - '{{ __ai_user_home }}/{{ __ai_opencode_config_file | dirname }}'
+  when:
+    - __ai_opencode_owned | length > 0
+    - __ai_opencode_reconcile | bool or not __ai_opencode_conf_stat.stat.exists
+
+# 0600 and no diff: provider entries may carry API keys
+- name: Users OpenCode | Deploy OpenCode config
+  ansible.builtin.template:
+    src: opencode.jsonc.j2
+    dest: '{{ __ai_user_home }}/{{ __ai_opencode_config_file }}'
+    owner: '{{ ai_user.username }}'
+    group: '{{ ai_user.username }}'
+    mode: '0600'
+  diff: false
+  when:
+    - __ai_opencode_owned | length > 0
+    - __ai_opencode_reconcile | bool or not __ai_opencode_conf_stat.stat.exists
+
+- name: Users OpenCode | Remove OpenCode config
+  ansible.builtin.file:
+    path: '{{ __ai_user_home }}/{{ __ai_opencode_config_file }}'
+    state: absent
+  when:
+    - __ai_opencode_reconcile | bool
+    - __ai_opencode_owned | length == 0

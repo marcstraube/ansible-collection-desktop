@@ -1,0 +1,32 @@
+---
+- name: Install | QGIS
+  ansible.builtin.package:
+    name: '{{ __gis_qgis_package }}'
+    state: present
+  when:
+    - gis_qgis_enabled | bool
+    - __gis_qgis_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | GDAL command-line tools
+  ansible.builtin.package:
+    name: '{{ __gis_gdal_package }}'
+    state: present
+  when:
+    - gis_gdal_enabled | bool
+    - __gis_gdal_package | default('') | length > 0
+  retries: 3
+  delay: 5
+
+- name: Install | GPlates from AUR (Arch)
+  become: true
+  become_user: "{{ aur_builder_user | default('aur_builder') }}"
+  kewlfft.aur.aur:
+    name: '{{ __gis_aur_packages.gplates }}'
+    state: present
+  when:
+    - gis_gplates_enabled | bool
+    - (__gis_aur_packages | default({}))['gplates'] | default([]) | length > 0
+  retries: 3
+  delay: 5

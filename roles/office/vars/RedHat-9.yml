@@ -1,5 +1,9 @@
 ---
 #
+# RedHat 9 Variables
+#
+
+#
 # LibreOffice
 #
 
@@ -15,7 +19,7 @@ __office_pdf_viewers:
   evince: 'evince'
   okular: 'okular'
   zathura: 'zathura'
-  mupdf: 'mupdf'
+  mupdf: ''
 
 __office_pdf_tools_packages:
   - 'qpdf'
@@ -26,7 +30,8 @@ __office_pdf_tools_packages:
 #
 
 __office_thunderbird_package: 'thunderbird'
-__office_thunderbird_i18n_package: 'thunderbird-langpack-{{ office_thunderbird_i18n }}'
+# The thunderbird package ships all language packs.
+__office_thunderbird_i18n_package: ''
 __office_betterbird_package: ''
 __office_evolution_package: 'evolution'
 
@@ -49,20 +54,20 @@ __office_tesseract_lang_prefix: 'tesseract-langpack-'
 #
 
 __office_simple_scan_package: 'simple-scan'
-__office_gscan2pdf_package: ''
+__office_gscan2pdf_package: 'gscan2pdf'
 
 #
 # Ebook
-#
+# Not packaged in EPEL 9.
 
-__office_calibre_package: 'calibre'
+__office_calibre_package: ''
 __office_foliate_package: ''
 
 #
 # LaTeX
-#
+# Not packaged in EPEL 9.
 
-__office_texstudio_package: 'texstudio'
+__office_texstudio_package: ''
 
 #
 # Spell Checking
@@ -79,5 +84,7 @@ __office_hunspell_packages:
 
 __office_fonts_packages:
   - 'liberation-fonts'
-  - 'dejavu-fonts'
+  - 'dejavu-sans-fonts'
+  - 'dejavu-serif-fonts'
+  - 'dejavu-sans-mono-fonts'
   - 'google-noto-fonts-common'

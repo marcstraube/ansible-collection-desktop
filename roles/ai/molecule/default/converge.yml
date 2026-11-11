@@ -16,6 +16,10 @@
     ai_antigravity_enabled: false
     ai_opencode_desktop_enabled: false
     ai_ollama_enabled: false
+    # whisper.cpp with the CPU backend; a no-op on Debian and EL
+    ai_whisper_enabled: true
+    # Hugging Face CLI; a no-op on Debian and EL
+    ai_huggingface_cli_enabled: true
     ai_lmstudio_enabled: false
     ai_comfyui_enabled: false
 
@@ -56,12 +60,120 @@
       - username: 'ai_initial_exist'
       - username: 'ai_disabled_user'
         mode: 'disabled'
+      - username: 'ai_merged_exist'
+        mode: 'merged'
+
+    # A configured ai_users wins over the deprecated users_list attribute.
+    users_list:
+      - name: 'ai_derived_user'
+        ai: true
 
   tasks:
     - name: Converge | Include ai role  # noqa: role-name[path]
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
       when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Converge | Assert no users_list deprecation warning
+      ansible.builtin.assert:
+        that:
+          - not (__ai_users_list_attribute_deprecated | bool)
+        fail_msg: 'deprecation warning fired although ai_users is set'
+        quiet: true
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+# Per-user Aider config. Only the user tasks run: installing Aider (AUR on
+# Arch, pipx elsewhere) has no bearing on the file the role writes. Runs
+# before the derivation play, whose derived ai_users becomes a host fact that
+# would override the list below.
+- name: Converge — Aider user config
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_desktop_enabled: false
+    ai_aider_enabled: true
+    ai_aider_model: 'ollama_chat/qwen2.5-coder:32b'
+    ai_aider_set_env:
+      OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+      LM_STUDIO_API_BASE: 'http://lmstudio.example.com:1234/v1'
+
+    ai_user_config_mode: 'initial'
+    ai_users:
+      - username: 'ai_aider_managed'
+        mode: 'managed'
+      - username: 'ai_aider_initial_new'
+      - username: 'ai_aider_initial_exist'
+      - username: 'ai_aider_disabled'
+        mode: 'disabled'
+
+  tasks:
+    - name: Converge | Include ai role user tasks  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
+
+# Merged mode and per-tool defaults for Aider, OpenCode and LM Studio. Only
+# the user tasks run, like the Aider play above; the Ollama model directory
+# points at the store fixture from prepare.yml, which the full role would
+# otherwise derive from the installed package.
+- name: Converge — merged per-user configs
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_desktop_enabled: false
+    ai_aider_enabled: true
+    ai_aider_model: 'ollama_chat/qwen3-coder:30b'
+    ai_aider_set_env:
+      OLLAMA_API_BASE: 'http://ollama.example.com:11434'
+    ai_aider_user_config_mode: 'merged'
+
+    ai_opencode_enabled: true
+    ai_opencode_providers:
+      ollama:
+        name: 'Ollama'
+        base_url: 'http://ollama.example.com:11434/v1'
+        models:
+          - id: 'qwen3-coder:30b'
+            name: 'Qwen3-Coder 30B'
+            context: 32768
+            output: 8192
+      lmstudio:
+        base_url: 'http://lmstudio.example.com:1234/v1'
+        api_key: 'molecule-key'  # pragma: allowlist secret
+        models:
+          - id: 'qwen3-coder-30b-a3b-instruct'
+    ai_opencode_model: 'ollama/qwen3-coder:30b'
+
+    ai_ollama_enabled: true
+    __ai_ollama_models_dir: '/srv/ollama-fixture'
+    ai_lmstudio_enabled: true
+    ai_lmstudio_models_dir: '.lmstudio/models'
+    ai_lmstudio_host: '0.0.0.0'
+    ai_lmstudio_port: 1240
+    ai_lmstudio_models:
+      - repo: 'molecule/Repo-GGUF'
+        file: 'model.gguf'
+    ai_lmstudio_ollama_models:
+      - 'molecule-text'
+      - 'hf.co/molecule/Vision-Model-GGUF:Q4_K_M'
+
+    ai_users:
+      - username: 'ai_merge_exist'
+      - username: 'ai_merge_new'
+      - username: 'ai_merge_managed'
+        mode: 'managed'
+      - username: 'ai_merge_initial'
+        mode: 'initial'
+
+  tasks:
+    - name: Converge | Include ai role user tasks  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+        tasks_from: users.yml
 
 # Same role, users derived from users_list instead of a configured list.
 - name: Converge — Claude Desktop user derivation (non-Arch)
@@ -95,3 +207,188 @@
       ansible.builtin.include_role:
         name: '{{ playbook_dir }}/../..'
       when: ansible_facts['os_family'] != 'Archlinux'
+
+    - name: Converge | Assert users_list deprecation warning
+      ansible.builtin.assert:
+        that:
+          - __ai_users_list_attribute_deprecated | bool
+        fail_msg: 'no deprecation warning for the users_list ai attribute'
+        quiet: true
+      when: ansible_facts['os_family'] != 'Archlinux'
+
+# Ollama and whisper.cpp with the CPU backend: no backend package. Runs on Arch only; the
+# install script on Debian and EL downloads the full upstream bundle.
+- name: Converge — Ollama and whisper.cpp CPU backend (Arch)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: false
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: true
+    ai_ollama_backend: 'cpu'
+    # Same environment in both Arch plays; verify.yml tests the removal
+    ai_ollama_environment:
+      OLLAMA_CONTEXT_LENGTH: '32768'
+      OLLAMA_FLASH_ATTENTION: '1'
+    ai_ollama_models_dir: '/srv/ollama-models'
+    ai_ollama_host: '0.0.0.0'
+    ai_ollama_port: 11500
+    ai_whisper_enabled: true
+    ai_whisper_backend: 'cpu'
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Converge | Assert the CPU backend adds no package
+      ansible.builtin.assert:
+        that:
+          - __ai_ollama_packages == ['ollama']
+        fail_msg: "cpu backend installs {{ __ai_ollama_packages }}, expected ['ollama']"
+        quiet: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Converge | Assert the whisper.cpp CPU backend adds no package
+      ansible.builtin.assert:
+        that:
+          - __ai_whisper_packages == ['whisper-cpp']
+        fail_msg: "cpu backend installs {{ __ai_whisper_packages }}, expected ['whisper-cpp']"
+        quiet: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Ollama and whisper.cpp with the Vulkan backend: ollama-vulkan next to ollama,
+# ggml-vulkan next to whisper-cpp
+- name: Converge — Ollama and whisper.cpp Vulkan backend (Arch)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: false
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: true
+    ai_ollama_backend: 'vulkan'
+    ai_ollama_environment:
+      OLLAMA_CONTEXT_LENGTH: '32768'
+      OLLAMA_FLASH_ATTENTION: '1'
+    ai_ollama_models_dir: '/srv/ollama-models'
+    ai_ollama_host: '0.0.0.0'
+    ai_ollama_port: 11500
+    ai_whisper_enabled: true
+    ai_whisper_backend: 'vulkan'
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Backend list: the packages of every listed backend, cpu adds nothing. Runs
+# after the Vulkan play, so the packages are already present and the play
+# installs nothing new.
+- name: Converge — Ollama and whisper.cpp backend list (Arch)
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: false
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: true
+    ai_ollama_backend: ['vulkan', 'cpu']
+    ai_ollama_environment:
+      OLLAMA_CONTEXT_LENGTH: '32768'
+      OLLAMA_FLASH_ATTENTION: '1'
+    ai_ollama_models_dir: '/srv/ollama-models'
+    ai_ollama_host: '0.0.0.0'
+    ai_ollama_port: 11500
+    ai_whisper_enabled: true
+    ai_whisper_backend: ['vulkan', 'cpu']
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Converge | Assert the Ollama backend list builds the package list
+      ansible.builtin.assert:
+        that:
+          - __ai_ollama_packages == ['ollama', 'ollama-vulkan']
+        fail_msg: >-
+          backend list installs {{ __ai_ollama_packages }},
+          expected ['ollama', 'ollama-vulkan']
+        quiet: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+    - name: Converge | Assert the whisper.cpp backend list builds the package list
+      ansible.builtin.assert:
+        that:
+          - __ai_whisper_packages == ['whisper-cpp', 'ggml-vulkan']
+        fail_msg: >-
+          backend list installs {{ __ai_whisper_packages }},
+          expected ['whisper-cpp', 'ggml-vulkan']
+        quiet: true
+      when: ansible_facts['os_family'] == 'Archlinux'
+
+# Deprecated ai_comfyui_gpu: the vendor name maps to the backend name. ComfyUI
+# stays disabled; only the mapping and the warning flag are under test.
+- name: Converge — deprecated ai_comfyui_gpu
+  hosts: all
+  gather_facts: true
+
+  vars:
+    ai_enabled: true
+    ai_claude_code_enabled: false
+    ai_antigravity_cli_enabled: false
+    ai_codex_enabled: false
+    ai_opencode_enabled: false
+    ai_aider_enabled: false
+    ai_claude_desktop_enabled: false
+    ai_antigravity_enabled: false
+    ai_opencode_desktop_enabled: false
+    ai_ollama_enabled: false
+    ai_whisper_enabled: false
+    ai_lmstudio_enabled: false
+    ai_comfyui_enabled: false
+    ai_comfyui_gpu: 'amd'
+
+  tasks:
+    - name: Converge | Include ai role  # noqa: role-name[path]
+      ansible.builtin.include_role:
+        name: '{{ playbook_dir }}/../..'
+
+    - name: Converge | Assert ai_comfyui_gpu maps to ai_comfyui_backend
+      ansible.builtin.assert:
+        that:
+          - ai_comfyui_backend == 'rocm'
+        fail_msg: "ai_comfyui_gpu 'amd' maps to '{{ ai_comfyui_backend }}', expected 'rocm'"
+        quiet: true

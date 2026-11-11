@@ -9,14 +9,23 @@ Following the [Keep a Changelog](https://keepachangelog.com/) convention,
 the file always carries a persistent `## Unreleased` section at the top.
 Breaking-change PRs append their entries under that section; the release
 workflow dates it to `## v<X.Y.Z> - YYYY-MM-DD` at release time and
-inserts a fresh empty `## Unreleased` above it. Do not delete the
+inserts a fresh empty `## Unreleased` above it. A release without
+entries under `## Unreleased` gets no section of its own. Do not delete the
 heading or rename it to a concrete version — the workflow handles that.
 
 ## Unreleased
 
-## v3.0.2 - 2026-11-01
+### `ai` — OpenCode from the official repository on Arch Linux
 
-## v3.0.1 - 2026-10-25
+On Arch Linux the role installs OpenCode from the `extra` repository
+(`opencode`, version 2) instead of the AUR package `opencode-bin`, which
+stayed on version 1 and no longer satisfies `opencode-claude-auth`. The two
+packages conflict and the role does not remove packages, so remove the old
+one on every host with `ai_opencode_enabled` before the next run:
+
+```bash
+sudo pacman -Rns opencode-bin
+```
 
 ## v3.0.0 - 2026-10-20
 
@@ -350,14 +359,6 @@ ansible.builtin.import_tasks:
 Roles from `marcstraube.common` that the removed playbooks included, such as
 `energy_management`, `firewalld` or `apparmor`, run from
 `marcstraube.common.base_system`.
-
-## v2.4.0 - 2026-09-08
-
-## v2.3.0 - 2026-07-29
-
-## v2.2.0 - 2026-07-23
-
-## v2.1.0 - 2026-07-08
 
 ## v2.0.0 - 2026-05-22
 

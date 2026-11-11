@@ -6,7 +6,7 @@ readme: README.md
 authors:
   - Marc Straube <email@marcstraube.de>
 description: >-
-  27 desktop workstation roles for Arch Linux, Debian Trixie, and
+  Desktop workstation roles for Arch Linux, Debian Trixie, and
   Rocky Linux 9/10. Desktop environments, display managers, browsers,
   development tools, multimedia, office, and productivity applications.
   Built for ansible-core 2.19+.
@@ -47,7 +47,7 @@ build_ignore:
   - '__pycache__'
   - 'roles/*/molecule'
 dependencies:
-  marcstraube.common: '>=3.0.0'
+  marcstraube.common: '>=3.1.0'
   community.general: '>=8.0.0'
   ansible.posix: '>=1.5.0'
   kewlfft.aur: '>=0.11.0'

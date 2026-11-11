@@ -1,0 +1,36 @@
+---
+#
+# Desktop Entries
+#
+
+# Packaged desktop entries per application (file names under
+# /usr/share/applications) that printing_3d_environment overrides through
+# marcstraube.desktop.desktop_entries. Same names on Arch Linux and Debian:
+#   orcaslicer  - orca-slicer-bin (AUR) renames com.orcaslicer.OrcaSlicer.desktop
+#   prusaslicer - prusa-slicer (Arch extra, Debian) ships the slicer and the
+#                 G-code viewer entry
+#   cura        - cura-bin (AUR) and cura (Debian)
+#   chitubox    - chitubox-free-bin (AUR)
+#   lychee      - lycheeslicer (AUR)
+# UVtools is missing: uvtools-bin ships no desktop entry, the role provides
+# one (see __printing_3d_uvtools_entry).
+__printing_3d_desktop_entries:
+  orcaslicer:
+    - 'orca-slicer.desktop'
+  prusaslicer:
+    - 'PrusaSlicer.desktop'
+    - 'PrusaGcodeviewer.desktop'
+  cura:
+    - 'com.ultimaker.cura.desktop'
+  chitubox:
+    - 'chitubox-basic.desktop'
+  lychee:
+    - 'lycheeslicer.desktop'
+
+# Application names accepted by printing_3d_environment
+__printing_3d_environment_applications: "{{ (__printing_3d_desktop_entries | list) + ['uvtools'] }}"
+
+# Role-provided UVtools entry (in /usr/local/share/applications), deployed
+# through marcstraube.desktop.desktop_entries when the executable exists
+__printing_3d_uvtools_entry: 'uvtools.desktop'
+__printing_3d_uvtools_executable: '/usr/bin/uvtools'

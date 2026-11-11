@@ -20,7 +20,7 @@ skipped. Use Arch Linux or Debian for full Wayland coverage.
 |----------------------------|--------------------------------------------------------------------------------------|
 | Arch Linux                 | Full coverage                                                                        |
 | Debian Trixie              | Full coverage                                                                        |
-| EL 9 (Rocky, Alma, RHEL)   | EPEL — only wl-clipboard, XDG portals, brightnessctl, playerctl, obs-studio          |
+| EL 9 (Rocky, Alma, RHEL)   | EPEL + CRB — only wl-clipboard, XDG portals, brightnessctl, playerctl, obs-studio    |
 | EL 10 (Rocky, Alma, RHEL)  | EPEL — only wl-clipboard and XDG portals                                             |
 
 Other distributions in the same os_family (EndeavourOS, Manjaro, Ubuntu, Mint,

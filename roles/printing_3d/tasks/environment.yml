@@ -1,0 +1,44 @@
+---
+#
+# Validation
+#
+# Unknown application names fail here; marcstraube.desktop.desktop_entries
+# validates the variable names and values of every call.
+
+- name: Environment | Assert application names
+  ansible.builtin.assert:
+    that:
+      - printing_3d_environment is mapping
+      - >-
+        printing_3d_environment | dict2items | map(attribute='key')
+        | difference(__printing_3d_environment_applications) | length == 0
+    fail_msg: >-
+      printing_3d_environment must be a mapping with the application names
+      {{ __printing_3d_environment_applications | join(', ') }} as keys.
+    quiet: true
+
+#
+# Overrides
+#
+# One call per packaged desktop entry of every application. An application
+# without an environment entry is called with an empty environment, which
+# removes an override deployed earlier; a missing packaged entry (application
+# not installed) writes nothing and removes the override as well.
+
+- name: Environment | Manage desktop entry overrides
+  ansible.builtin.include_role:
+    name: marcstraube.desktop.desktop_entries
+    tasks_from: override.yml
+    apply:
+      tags:
+        - printing-3d
+  vars:
+    desktop_entries_caller: 'printing_3d'
+    desktop_entries_file: '{{ __printing_3d_entry.1 }}'
+    desktop_entries_environment: '{{ printing_3d_environment[__printing_3d_entry.0.key] | default({}) }}'
+  loop: "{{ __printing_3d_desktop_entries | dict2items | subelements('value') }}"
+  loop_control:
+    loop_var: __printing_3d_entry
+    label: '{{ __printing_3d_entry.1 }}'
+  tags:
+    - printing-3d
